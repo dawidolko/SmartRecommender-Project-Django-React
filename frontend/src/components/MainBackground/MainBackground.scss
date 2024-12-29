@@ -1,0 +1,185 @@
+@import "../../global.scss";
+
+.mainBackground {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+
+  /* Usunięcie przewijania poziomego */
+  overflow-x: hidden;
+
+  :hover &__arrow {
+    opacity: 1;
+  }
+
+  &__content {
+    @include flexCenter(column);
+    gap: 1em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    max-width: 600px;
+    transform: translate(-50%, -50%);
+    color: $white;
+    text-align: center;
+  }
+
+  /* Dodaj klasę logo */
+  &__logo {
+    width: 120px; // dostosuj rozmiar
+    height: auto;
+    margin-bottom: 0.5em;
+
+    // cień w kolorze $main
+    box-shadow: 0 0 20px $main;
+    border-radius: 50%;
+  }
+
+  &__arrow {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff15;
+    border-radius: 50%;
+    opacity: 0;
+    z-index: 2;
+    cursor: pointer;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+
+    &:hover {
+      background-color: $main;
+    }
+  }
+
+  &__arrows {
+    font-size: 20px;
+    color: $white;
+  }
+
+  &__arrow-right {
+    right: 10px;
+  }
+
+  &__arrow {
+    left: 10px;
+  }
+
+  &__container {
+    display: flex;
+    height: 100%;
+    transition: transform 1s ease;
+  }
+
+  &__slider {
+    width: 100vw;
+    height: 100vh;
+    flex-shrink: 0;
+    transition: transform 1s ease;
+  }
+
+  &__img {
+    height: 100%;
+  }
+
+  &__img::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  &__content {
+    @include flexCenter(column);
+    gap: 1em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    max-width: 600px;
+    transform: translate(-50%, -50%);
+    color: $white;
+    text-align: center;
+  }
+
+  &__title {
+    font-size: 5rem;
+    padding: 0 0.5em;
+    font-style: italic;
+    margin-bottom: 0.5em;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  &__text {
+    display: none;
+    margin-bottom: 1.5em;
+    font-size: 1.4rem;
+  }
+
+  &__link {
+    padding: 0.8em 2.4em;
+    background-color: $main;
+    color: $white;
+    border-radius: 8px;
+    text-transform: uppercase;
+    transition: border 0.3s, background-color 0.3s;
+
+    &:hover {
+      background-color: #e4e3e117;
+      border: 1px solid $white;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .mainBackground {
+    &__arrow {
+      display: flex;
+    }
+
+    &__title {
+      font-size: 6rem;
+      margin-bottom: unset;
+    }
+
+    &__text {
+      display: block;
+      font-size: 2rem;
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .mainBackground {
+    &__title {
+      font-size: 9rem;
+    }
+
+    &__content {
+      max-width: 800px;
+    }
+
+    &__text {
+      display: block;
+      font-size: 2.2rem;
+    }
+  }
+}
