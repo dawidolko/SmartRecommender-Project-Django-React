@@ -2,7 +2,7 @@
   "name": "product-recommender",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dawidolko.github.io/Django-React-Projekt-SmartRecommender",
+  "homepage": "https://project.dawidolko.pl",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
