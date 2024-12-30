@@ -9,21 +9,10 @@
     font-style: italic;
   }
 
-  &__subtitle {
-    font-size: 2rem;
-    text-align: center;
-  }
-
-  &__role {
-    color: $main;
-  }
-
   &__body {
     @include flexCenter(column);
     gap: 2em;
     padding: 3.5em 0;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    width: 100%;
   }
 
   &__card {
@@ -80,13 +69,10 @@
     &__body {
       display: flex;
       flex-direction: row;
-      flex-wrap: wrap; /* Prevent overflow */
-      justify-content: center;
     }
 
     &__card {
       height: 400px;
-      margin: 0 1em; /* Add margin to prevent stacking */
     }
 
     &__text {

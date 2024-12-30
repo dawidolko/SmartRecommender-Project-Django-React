@@ -2,7 +2,7 @@
 
 .fixed {
   height: 60vh;
-  background: url("../../assets/background2.webp") rgba(0, 0, 0, 0.6);
+  background: url("../../assets/background1.webp") rgba(0, 0, 0, 0.6);
   background-blend-mode: darken;
   background-size: cover;
   background-position: top;
@@ -32,8 +32,6 @@
     padding: 0 0.5em;
     font-size: 4rem;
     font-style: italic;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
     text-align: center;
     line-height: 1.3;
   }
@@ -76,6 +74,7 @@
 
     &__title {
       font-size: 8rem;
+      color: $white;
     }
   }
 }

@@ -1,10 +1,18 @@
 import React, { useContext } from "react";
 import { CartContext } from "../ShopContext/ShopContext";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
+import shopData from "../ShopContent/ShopData"; // Import the shop data to access product images
 
-const CartProduct = ({ id, img, name, price }) => {
+const CartProduct = ({ id, name, price }) => {
   const { items, addToCart, removeFromCart, singleProductAmount } =
     useContext(CartContext);
+
+  // Get the product data from shopData using the product id
+  const product = shopData.find((product) => product.id === id);
+
+  if (!product) return null; // If product is not found, do not render the component
+
+  const img = product.imgs[0]; // Get the first image from the imgs array
   const itemQuantity = items[id];
   const totalProductAmount = singleProductAmount(id);
 
