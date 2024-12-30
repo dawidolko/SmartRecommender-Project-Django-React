@@ -5,7 +5,7 @@ import { AiOutlineHeart, AiFillHeart, AiOutlineSearch } from "react-icons/ai";
 
 const ShopProduct = (props) => {
   const { id, imgs, name, price, category, isNew } = props;
-  const { items, addToCart } = useContext(CartContext);
+  const { items, addToCart } = useContext(CartContext); // Sprawdzamy, czy dodanie do koszyka działa dla wszystkich produktów.
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const itemsInfo = items[id];
   const [favorite, setFavorite] = useState(isFavorite(id));
@@ -36,6 +36,11 @@ const ShopProduct = (props) => {
     }
   };
 
+  // Funkcja obsługująca dodawanie produktów do koszyka
+  const handleAddToCart = () => {
+    addToCart(id);
+  };
+
   return (
     <div className="shop__product" key={id}>
       <div className="shop__image">
@@ -44,7 +49,7 @@ const ShopProduct = (props) => {
           className="shop__img"
           src={imgs[0]}
           alt={name}
-          onClick={handleImageEnlarge} // Make the image clickable
+          onClick={handleImageEnlarge} // Zrobienie obrazu klikalnym
         />
 
         <button
@@ -75,7 +80,7 @@ const ShopProduct = (props) => {
           </p>
           <p className="shop__price">${price}</p>
         </div>
-        <button className="shop__btn" onClick={() => addToCart(id)}>
+        <button className="shop__btn" onClick={handleAddToCart}>
           Add To Cart {itemsInfo > 0 && <span>( {itemsInfo} )</span>}
         </button>
       </div>
