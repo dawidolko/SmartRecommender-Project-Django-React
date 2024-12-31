@@ -15,6 +15,7 @@ import Cart from "./pages/Cart";
 import Favorites from "./pages/Favorites";
 import { FavoritesProvider } from "./components/FavoritesContent/FavoritesContext";
 import ShopContext from "./components/ShopContext/ShopContext";
+import ProductSection from "./pages/ProductSection";
 
 function App() {
   const location = useLocation();
@@ -39,6 +40,8 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/favorites" element={<Favorites />} />
+
+              <Route path="/product/:id" element={<ProductSection />} />
 
               {/* Obsługa nieznanych ścieżek */}
               <Route path="*" element={<NotFound />} />

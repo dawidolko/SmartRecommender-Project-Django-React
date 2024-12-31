@@ -27,7 +27,6 @@ const Navbar = () => {
       setNavBgc(window.scrollY > 10);
     };
     window.addEventListener("scroll", changeBgc);
-
     return () => {
       window.removeEventListener("scroll", changeBgc);
     };
@@ -37,8 +36,9 @@ const Navbar = () => {
     <nav className={navBgc ? "navbar navbar__bgc" : "navbar"}>
       <div className="navbar__container container">
         <Link to="/" className="navbar__logo">
-          <p className="navbar__logo-text">SmartRecommender</p>
+          <p className="navbar__logo-text"></p>
         </Link>
+
         <ul
           className={
             isOpen ? "navbar__links navbar__links-active" : "navbar__links"
@@ -73,10 +73,6 @@ const Navbar = () => {
               CONTACT
             </NavLink>
           </li>
-
-          {/* Kluczowa zmiana:
-             Umieszczamy ulubione + koszyk w jednym <li> 
-             i dajemy wspólny kontener, np. .navbar__icons */}
           <li className="navbar__icons">
             <NavLink
               className="navbar__favorites-link"
@@ -87,7 +83,6 @@ const Navbar = () => {
                 <AiOutlineHeart className="navbar__heart" />
               </div>
             </NavLink>
-
             <NavLink
               className="navbar__cart-link"
               to="/cart"

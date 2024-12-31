@@ -7,7 +7,17 @@
   background-color: $darker;
 
   &__logo-text {
-    font-size: 2.5rem;
+    display: block;
+    width: 140px;
+    height: 70px;
+    padding: 2px;
+    background: url("../../assets/logo_of_name.png") no-repeat center center;
+    background-size: contain;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 0 10px 2px #007bff;
+    }
   }
 
   &__content {

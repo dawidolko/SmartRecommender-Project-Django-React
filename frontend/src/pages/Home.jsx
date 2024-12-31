@@ -7,7 +7,7 @@ import Counter from "../components/Counter/Counter";
 import Team from "../components/Team/Team";
 import Testimonials from "../components/Testimonials/Testimonials";
 import CallBack from "../components/CallBack/CallBack";
-import LogoSlider from "../components/LogoSlider/LogoSlider";
+import ProductSlider from "../components/LogoSlider/ProductSlider";
 import NewProducts from "../components/NewProducts/NewProducts";
 
 const Home = () => {
@@ -30,7 +30,7 @@ const Home = () => {
       />
       <Pricing />
       <Testimonials />
-      <LogoSlider />
+      <ProductSlider />
       <CallBack />
     </AnimatedPage>
   );

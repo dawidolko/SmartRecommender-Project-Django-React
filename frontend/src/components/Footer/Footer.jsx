@@ -16,7 +16,8 @@ const Footer = () => {
         <div className="footer__content">
           <div className="footer__box">
             <Link to="/" className="footer__logo">
-              <p className="footer__logo-text">SmartRecommender</p>
+              {/* Poniższy <p> jest pusty – wypełnia go obrazek w tle */}
+              <p className="footer__logo-text"></p>
             </Link>
             <div className="footer__desc">
               Join the SmartRecommender to advance your knowledge, improve your
@@ -24,6 +25,7 @@ const Footer = () => {
               future!
             </div>
           </div>
+
           <div className="footer__box">
             <h3 className="footer__title">Useful Links</h3>
             <ul className="footer__links">
@@ -49,6 +51,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
+
           <div className="footer__box">
             <h3 className="footer__title">Office Hours</h3>
             <p>Mon To Fri</p>
@@ -56,6 +59,7 @@ const Footer = () => {
             <p>Sat To Sun</p>
             <p>Closed</p>
           </div>
+
           <div className="footer__box">
             <h3 className="footer__title">Contact</h3>
             <div className="footer__contact">
@@ -82,7 +86,9 @@ const Footer = () => {
             </div>
           </div>
         </div>
+
         <hr className="footer__line" />
+
         <div className="footer__date">
           <p>
             &copy; Copyright {new Date().getFullYear()}{" "}

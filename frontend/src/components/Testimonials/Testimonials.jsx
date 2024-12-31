@@ -1,11 +1,22 @@
-import "./Testimonials.scss";
-import TestimonialsItem from "./TestimonialsItem";
-import testimonialsData from "./TestimonialsData";
+import { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+import "./Testimonials.scss";
+import shopData from "../ShopContent/ShopData";
+import TestimonialsItem from "./TestimonialsItem";
+
 const Testimonials = () => {
+  const [randomProducts, setRandomProducts] = useState([]);
+
+  useEffect(() => {
+    // Losujemy np. 6 produktów (liczbę możesz zmienić)
+    const shuffled = [...shopData].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 6);
+    setRandomProducts(selected);
+  }, []);
+
   const sliderSettings = {
     infinite: true,
     speed: 2000,
@@ -33,14 +44,14 @@ const Testimonials = () => {
   return (
     <section className="testimonials">
       <div className="testimonials__wrapper">
-        <h2 className="testimonials__title">What Our Customers Say About Us</h2>
+        <h2 className="testimonials__title">Explore Our Latest Products</h2>
         <p className="testimonials__subtitle">
-          We value feedback from our customers to improve and provide the best
-          service possible.
+          Check out a few random picks from our store – swipe to see more!
         </p>
+
         <Slider {...sliderSettings}>
-          {testimonialsData.map((item) => (
-            <TestimonialsItem {...item} key={item.id} />
+          {randomProducts.map((product) => (
+            <TestimonialsItem key={product.id} {...product} />
           ))}
         </Slider>
       </div>

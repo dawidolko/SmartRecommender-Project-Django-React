@@ -8,13 +8,22 @@ const CallBack = () => {
 
   return (
     <section className="callBack">
-      <h2 className="callBack__title">Expert Advice for All Your Tech Needs</h2>
+      <h2 className="callBack__title">
+        Research-Driven Recommendation Methods
+      </h2>
       <FaPhoneVolume className="callBack__icon" />
-      <p className="callBack__text">Request a FREE call back</p>
+
+      <p className="callBack__text">Request a FREE consultation call</p>
       <p>
-        Our team of experts is here to assist you with any questions about our
-        products or services.
+        Our team integrates advanced techniques such as Collaborative Filtering,
+        Content-Based Filtering, Probabilistic Models, Fuzzy Decision Systems,
+        and Sentiment-Based Analysis. We use these methods to develop a
+        highly-personalized shopping experience, drawing on both user data and
+        product attributes to ensure optimal recommendations. If you wish to
+        learn more about how these algorithms form the backbone of our
+        engineering project, our experts are here to help.
       </p>
+
       <button className="callBack__btn" onClick={() => setOpenModal(true)}>
         Send Request
       </button>

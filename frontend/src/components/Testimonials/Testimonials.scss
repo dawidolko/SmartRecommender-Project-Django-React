@@ -1,106 +1,135 @@
 @import "../../global.scss";
 
 .testimonials {
-	background: url("../../assets/testimonials.webp") rgba(0, 0, 0, 0.9);
-	background-blend-mode: darken;
-	background-size: cover;
-	background-position: center;
+  /* Tło sekcji */
+  background: url("../../assets/testimonials.webp") rgba(0, 0, 0, 0.9);
+  background-blend-mode: darken;
+  background-size: cover;
+  background-position: center;
 
-	&__wrapper {
-		width: 90%;
-		margin: 0 auto;
-		padding: 5em 0 7em;
-	}
+  &__wrapper {
+    width: 90%;
+    margin: 0 auto;
+    padding: 5em 0 7em;
+  }
 
-	&__title {
-		margin-bottom: 1.5em;
-		text-align: center;
-		font-size: 5rem;
-		font-style: italic;
-		color: $white;
-		font-weight: 500;
-	}
+  &__title {
+    margin-bottom: 1.5em;
+    text-align: center;
+    font-size: 5rem;
+    font-style: italic;
+    color: $white;
+    font-weight: 500;
+  }
 
-	&__box {
-		height: 350px;
-		width: 100%;
-		padding: 0.8em;
-		margin-bottom: 1em;
-		border-radius: 8px;
-		overflow: hidden;
-		background-color: rgb(235, 233, 233);
-	}
+  &__subtitle {
+    text-align: center;
+    color: $white;
+    margin-bottom: 2em;
+  }
 
-	&__person {
-		display: flex;
-		align-items: center;
-		gap: 1em;
-	}
+  /* BOX Z PRODUKTEM */
+  &__box {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 2em;
+    border-radius: 8px;
+    background-color: rgb(235, 233, 233);
+    text-align: center;
+    padding: 1.5em;
+    min-height: 420px;
 
-	&__img {
-		width: 90px;
-		height: 90px;
-		margin: 1em 0 2em;
-		padding: 0.2em;
-		object-fit: cover;
-		border-radius: 50%;
-		border: 2px solid $main;
-	}
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
 
-	&__info {
-		font-weight: 500;
-	}
+    &:hover {
+      background-color: #e1dfdf; /* delikatna zmiana tła na hover */
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+  }
 
-	&__name {
-		font-size: 2rem;
-	}
+  &__label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0.3em 0.6em;
+    background-color: $main;
+    color: $white;
+    font-size: 1.4rem;
+    z-index: 2;
+  }
 
-	&__client {
-		color: $main;
-	}
+  &__img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    margin-bottom: 1em;
+    object-fit: cover;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+  }
 
-	&__review {
-		font-style: italic;
-		max-width: 400px;
-	}
+  &__category {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 0.5em;
+    background-color: #f5f5f5;
+    padding: 0.5em;
+    border-radius: 8px;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0.3em;
+    transition: color 0.3s ease;
+
+    &:hover {
+      text-decoration: underline;
+      color: #007bff; /* dopasuj do kolorystyki strony */
+      cursor: pointer;
+    }
+  }
+
+  &__price {
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin-bottom: 1em;
+  }
 }
 
+/* Slick Carousel styling */
 .slick-slide > div {
-	margin: 0 10px;
+  margin: 0 10px;
 }
 
 .slick-list {
-	margin: 0 -10px;
+  margin: 0 -10px;
 }
 
+/* Dots styl */
 .slick-dots li button:before {
-	font-size: 12px;
-	background-color: #fff;
-	border-radius: 50%;
+  font-size: 12px;
+  background-color: #fff;
+  border-radius: 50%;
 }
 
 .slick-dots li.slick-active button:before {
-	background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
 }
 
+/* Responsywność */
 @media (min-width: 500px) {
-	.testimonials {
-		&__wrapper {
-			width: 70%;
-		}
-	}
+  .testimonials {
+    &__wrapper {
+      width: 70%;
+    }
+  }
 }
 
 @media (min-width: 796px) {
-	.testimonials {
-		background-attachment: fixed;
-	}
-}
-
-@media (min-width: 1300px) {
-	.testimonials {
-		&__box {
-			height: 300px;
-		}
-	}
+  .testimonials {
+    background-attachment: fixed;
+  }
 }

@@ -1,17 +1,37 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
 import { AiOutlineHeart, AiFillHeart, AiOutlineSearch } from "react-icons/ai";
 
 const ShopProduct = (props) => {
   const { id, imgs, name, price, category, isNew } = props;
-  const { items, addToCart } = useContext(CartContext); // Sprawdzamy, czy dodanie do koszyka działa dla wszystkich produktów.
+  const { items, addToCart } = useContext(CartContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const itemsInfo = items[id];
+
   const [favorite, setFavorite] = useState(isFavorite(id));
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
+  const [oldPrice, setOldPrice] = useState(null);
 
-  const handleFavoriteToggle = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const difference = Math.floor(Math.random() * 51);
+    if (difference > 0) {
+      setOldPrice(parseFloat(price) + difference);
+    }
+  }, [price]);
+
+  // Kliknięcie w tło boxa => przejście na podstronę, o ile nie mamy otwartego powiększenia
+  const handleBoxClick = () => {
+    if (!isImageEnlarged) {
+      navigate(`/product/${id}`);
+    }
+  };
+
+  const handleFavoriteToggle = (e) => {
+    e.stopPropagation();
     if (favorite) {
       removeFromFavorites(id);
     } else {
@@ -20,7 +40,8 @@ const ShopProduct = (props) => {
     setFavorite(!favorite);
   };
 
-  const handleImageEnlarge = () => {
+  const handleImageEnlarge = (e) => {
+    e.stopPropagation();
     setIsImageEnlarged(true);
   };
 
@@ -28,30 +49,35 @@ const ShopProduct = (props) => {
     setIsImageEnlarged(false);
   };
 
-  const discountedPrice = parseFloat(price) + 10.0;
-
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       closeImageOverlay();
     }
   };
 
-  // Funkcja obsługująca dodawanie produktów do koszyka
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
     addToCart(id);
   };
 
+  // Kliknięcie w nazwę produktu => także przejście na podstronę, jeśli nie jest otwarty overlay
+  const handleNameClick = (e) => {
+    e.stopPropagation();
+    if (!isImageEnlarged) {
+      navigate(`/product/${id}`);
+    }
+  };
+
   return (
-    <div className="shop__product" key={id}>
-      <div className="shop__image">
+    <div className="shop__product" key={id} onClick={handleBoxClick}>
+      <div className="shop__image" onClick={(e) => e.stopPropagation()}>
         {isNew && <span className="shop__label">NEW</span>}
         <img
           className="shop__img"
           src={imgs[0]}
           alt={name}
-          onClick={handleImageEnlarge} // Zrobienie obrazu klikalnym
+          onClick={handleImageEnlarge}
         />
-
         <button
           className="shop__favorite-btn"
           onClick={handleFavoriteToggle}
@@ -62,7 +88,6 @@ const ShopProduct = (props) => {
             <AiOutlineHeart className="shop__favorite-icon" />
           )}
         </button>
-
         <button
           className="shop__image-enlarge-btn"
           onClick={handleImageEnlarge}
@@ -71,21 +96,26 @@ const ShopProduct = (props) => {
         </button>
       </div>
 
-      <div className="shop__content">
-        <p className="shop__category">CATEGORY: {category.toUpperCase()}</p>
-        <p className="shop__name">{name}</p>
+      <div className="shop__content" onClick={(e) => e.stopPropagation()}>
+        <p className="shop__category">{`CATEGORY: ${category.toUpperCase()}`}</p>
+
+        {/* Kliknięcie nazwy produktu => handleNameClick */}
+        <p className="shop__name" onClick={handleNameClick}>
+          {name}
+        </p>
+
         <div className="shop__prices">
-          <p className="shop__price--discounted">
-            ${discountedPrice.toFixed(2)}
-          </p>
+          {oldPrice && (
+            <p className="shop__price--discounted">${oldPrice.toFixed(2)}</p>
+          )}
           <p className="shop__price">${price}</p>
         </div>
+
         <button className="shop__btn" onClick={handleAddToCart}>
           Add To Cart {itemsInfo > 0 && <span>( {itemsInfo} )</span>}
         </button>
       </div>
 
-      {/* Image Overlay */}
       {isImageEnlarged && (
         <div className="image-overlay" onClick={handleOverlayClick}>
           <button
