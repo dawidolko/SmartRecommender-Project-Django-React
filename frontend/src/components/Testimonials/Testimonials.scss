@@ -1,7 +1,7 @@
 @import "../../global.scss";
 
 .testimonials {
-  /* Tło sekcji */
+  /* Sekcja z tłem */
   background: url("../../assets/testimonials.webp") rgba(0, 0, 0, 0.9);
   background-blend-mode: darken;
   background-size: cover;
@@ -28,7 +28,7 @@
     margin-bottom: 2em;
   }
 
-  /* BOX Z PRODUKTEM */
+  /* Pudełko z produktem */
   &__box {
     position: relative;
     width: 100%;
@@ -38,10 +38,12 @@
     background-color: rgb(235, 233, 233);
     text-align: center;
     padding: 1.5em;
-    min-height: 420px;
+
+    /* KLUCZOWA ZMIANA: jednoczesna szerokość i wysokość */
+    height: 420px; /* Wymuszenie tej samej wysokości kart */
+    box-sizing: border-box; /* Upewniamy się, że padding jest wliczany w wysokość */
 
     transition: box-shadow 0.3s ease, background-color 0.3s ease;
-
     &:hover {
       background-color: #e1dfdf; /* delikatna zmiana tła na hover */
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
@@ -63,10 +65,11 @@
     width: 100%;
     max-width: 250px;
     height: auto;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
     object-fit: cover;
     border-radius: 4px;
     transition: transform 0.3s ease;
+    max-height: 180px;
   }
 
   &__category {
@@ -84,10 +87,9 @@
     font-weight: 500;
     margin-bottom: 0.3em;
     transition: color 0.3s ease;
-
     &:hover {
       text-decoration: underline;
-      color: #007bff; /* dopasuj do kolorystyki strony */
+      color: #007bff;
       cursor: pointer;
     }
   }
@@ -108,7 +110,7 @@
   margin: 0 -10px;
 }
 
-/* Dots styl */
+/* Styl kropek (dots) */
 .slick-dots li button:before {
   font-size: 12px;
   background-color: #fff;

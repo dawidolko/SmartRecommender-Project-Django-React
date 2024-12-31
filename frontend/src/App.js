@@ -17,8 +17,15 @@ import { FavoritesProvider } from "./components/FavoritesContent/FavoritesContex
 import ShopContext from "./components/ShopContext/ShopContext";
 import ProductSection from "./pages/ProductSection";
 
+// Nowe importy:
+import LoginPanel from "./components/panelLogin/LoginPanel";
+import RegisterPanel from "./components/panelLogin/RegisterPanel";
+import AdminPanel from "./pages/AdminPanel"; // Poprawny import
+import ClientPanel from "./pages/ClientPanel"; // Poprawny import
+
 function App() {
   const location = useLocation();
+
   return (
     <>
       <FavoritesProvider>
@@ -27,10 +34,7 @@ function App() {
           <AnimatePresence mode="wait" initial={false}>
             <ScrollToTop />
             <Routes location={location} key={location.pathname}>
-              {/* Przekierowanie domyślnej ścieżki na stronę główną */}
               <Route path="/" element={<Navigate to="/home" />} />
-
-              {/* Ścieżki bez prefiksu */}
               <Route path="/home" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/shop" element={<Shop />} />
@@ -40,10 +44,17 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/favorites" element={<Favorites />} />
-
               <Route path="/product/:id" element={<ProductSection />} />
 
-              {/* Obsługa nieznanych ścieżek */}
+              {/* Logowanie i rejestracja */}
+              <Route path="/login" element={<LoginPanel />} />
+              <Route path="/signup" element={<RegisterPanel />} />
+
+              {/* Panel Admina i Klienta */}
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/client" element={<ClientPanel />} />
+
+              {/* Strona 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

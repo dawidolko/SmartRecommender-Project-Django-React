@@ -11,7 +11,7 @@ const Testimonials = () => {
   const [randomProducts, setRandomProducts] = useState([]);
 
   useEffect(() => {
-    // Losujemy np. 6 produktów (liczbę możesz zmienić)
+    // Wybieramy losowo np. 6 produktów
     const shuffled = [...shopData].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 6);
     setRandomProducts(selected);

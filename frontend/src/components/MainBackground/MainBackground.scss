@@ -156,7 +156,7 @@
     }
 
     &__title {
-      font-size: 6rem;
+      font-size: 4rem;
       margin-bottom: unset;
     }
 
@@ -190,14 +190,28 @@
     margin-top: 60px; /* Dodanie marginesu top, aby oddzielić od navbaru */
     height: auto;
     padding-bottom: 20px;
+
+    &__logo {
+      margin-top: 30px;
+      width: 60px;
+      height: 60px;
+      margin-bottom: 0.5em;
+      box-shadow: 0 0 20px $main;
+      border-radius: 50%;
+    }
+
+    &__link {
+      padding: 0.8em 1.6em;
+      font-size: 1.2rem;
+    }
   }
 
   .mainBackground__title {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .mainBackground__text {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .mainBackground__image {

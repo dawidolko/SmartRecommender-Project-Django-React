@@ -13,26 +13,31 @@ const Accordion = () => {
 
   return (
     <div className="accordion">
-      <img
-        src={faq}
-        alt="A modern electronics store with gadgets on display."
-        className="accordion__img"
-      />
-      <div className="accordion__questions">
-        <h2 className="accordion__title">Frequently Asked Questions</h2>
-        {accordionData.map((q, index) => (
-          <div key={index} className="accordion__item">
-            <div
-              className="accordion__box"
-              onClick={() => toggleAccordion(index)}>
-              <h3 className="accordion__question">{q.question}</h3>
-              {activeIndex === index ? <AiOutlineMinus /> : <AiOutlinePlus />}
+      {/* Tytuł FAQ na środku ekranu */}
+      <h2 className="accordion__title">Frequently Asked Questions</h2>
+
+      <div className="accordion__wrapper">
+        <img
+          src={faq}
+          alt="A modern electronics store with gadgets on display."
+          className="accordion__img"
+        />
+
+        <div className="accordion__questions">
+          {accordionData.map((q, index) => (
+            <div key={index} className="accordion__item">
+              <div
+                className="accordion__box"
+                onClick={() => toggleAccordion(index)}>
+                <h3 className="accordion__question">{q.question}</h3>
+                {activeIndex === index ? <AiOutlineMinus /> : <AiOutlinePlus />}
+              </div>
+              {activeIndex === index && (
+                <div className="accordion__answer">{q.answer}</div>
+              )}
             </div>
-            {activeIndex === index && (
-              <div className="accordion__answer">{q.answer}</div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

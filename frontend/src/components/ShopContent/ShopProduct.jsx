@@ -23,7 +23,6 @@ const ShopProduct = (props) => {
     }
   }, [price]);
 
-  // Kliknięcie w tło boxa => przejście na podstronę, o ile nie mamy otwartego powiększenia
   const handleBoxClick = () => {
     if (!isImageEnlarged) {
       navigate(`/product/${id}`);
@@ -57,10 +56,10 @@ const ShopProduct = (props) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
+    // Ensure that the same product can only be added once and adjust the quantity
     addToCart(id);
   };
 
-  // Kliknięcie w nazwę produktu => także przejście na podstronę, jeśli nie jest otwarty overlay
   const handleNameClick = (e) => {
     e.stopPropagation();
     if (!isImageEnlarged) {
@@ -99,7 +98,6 @@ const ShopProduct = (props) => {
       <div className="shop__content" onClick={(e) => e.stopPropagation()}>
         <p className="shop__category">{`CATEGORY: ${category.toUpperCase()}`}</p>
 
-        {/* Kliknięcie nazwy produktu => handleNameClick */}
         <p className="shop__name" onClick={handleNameClick}>
           {name}
         </p>

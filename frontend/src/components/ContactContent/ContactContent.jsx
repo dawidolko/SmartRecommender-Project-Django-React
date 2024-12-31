@@ -7,17 +7,23 @@ const ContactContent = () => {
   return (
     <section className="contact">
       <div className="contact__container">
+        {/* BOXY KONTAKTOWE (telefon, email, itd.) */}
         <div className="contact__boxes">
           {boxData.map((box) => (
             <ContactBox {...box} key={box.id} />
           ))}
         </div>
+
+        {/* GŁÓWNY WRAPPER: tytuł, opis, formularz */}
         <div className="contact__wrapper">
+          {/* Tytuł i opis nad formularzem */}
           <h2 className="contact__form-title">Get in Touch</h2>
           <p className="contact__form-description">
             If you have any questions or need assistance, feel free to reach out
             to us using the form below.
           </p>
+
+          {/* Formularz (zawiera obrazek i pola) */}
           <ContactForm />
         </div>
       </div>

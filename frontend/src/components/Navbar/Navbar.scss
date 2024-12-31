@@ -1,3 +1,5 @@
+/* src/components/Navbar/Navbar.scss */
+
 @import "../../global.scss";
 
 .navbar {
@@ -10,6 +12,61 @@
   background-color: #0a0a0a;
   transition: background-color 0.3s ease;
 
+  &__search {
+    display: flex;
+    gap: 0.5rem;
+
+    input {
+      width: 250px;
+      border-radius: 4px;
+    }
+
+    .navbar__search-button {
+      background-color: $main;
+    }
+  }
+
+  &__categories {
+    position: relative;
+
+    .navbar__dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      color: #333;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+
+      .navbar__dropdown-item {
+        padding: 0.5rem 0;
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+          color: $main;
+        }
+      }
+    }
+  }
+
+  &__links {
+    flex-direction: column;
+    transition: transform 0.3s ease;
+
+    &-active {
+      transform: translateX(0);
+    }
+  }
+
+  @media (min-width: 1300px) {
+    &__links {
+      flex-direction: row;
+    }
+  }
+
   &__logo-text {
     display: block;
     width: 140px;
@@ -17,7 +74,6 @@
     background: url("../../assets/logo_of_name.png") no-repeat center center;
     background-size: contain;
     transition: box-shadow 0.3s ease;
-
     &:hover {
       box-shadow: 0 0 10px 2px #007bff;
     }
@@ -103,6 +159,46 @@
     color: #007bff;
   }
 
+  /* IKONA LUDZIKA */
+  &__user {
+    position: relative; /* aby dropdown można było umieścić absolutnie */
+    cursor: pointer;
+
+    .navbar__user-icon {
+      font-size: 2.4rem;
+      transition: color 0.3s ease;
+      &:hover {
+        color: $main;
+      }
+    }
+  }
+
+  &__user-dropdown {
+    position: absolute;
+    top: 50px; /* w razie potrzeby dopasuj */
+    right: 0;
+    background-color: #222;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 999; /* upewnij się, że dropdown jest nad innymi elementami */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* w razie potrzeby */
+
+    .navbar__logoutBtn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: color 0.3s;
+      &:hover {
+        color: $main;
+      }
+    }
+  }
+
   &__links-active {
     left: 0;
   }
@@ -137,7 +233,6 @@
 
       &__link {
         transition: color 0.3s ease;
-
         &:hover {
           color: $main;
         }
@@ -152,6 +247,12 @@
   @media (min-width: 1024px) {
     &__logo {
       font-size: 3.5rem;
+    }
+  }
+
+  @media (max-width: 624px) {
+    &__search {
+      display: none;
     }
   }
 }

@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import shopData from "../ShopContent/ShopData";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   AiOutlineHeart,
   AiFillHeart,
@@ -22,12 +24,11 @@ const ProductPage = () => {
 
   const [oldPrice, setOldPrice] = useState(null);
   const [favorite, setFavorite] = useState(false);
-
-  // Index obrazka w sliderze
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ rating: 0, text: "" });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Powiększanie: czy overlay jest otwarty i które zdjęcie pokazujemy
-  const [enlargedImage, setEnlargedImage] = useState(null);
 
   useEffect(() => {
     if (product) {
@@ -38,7 +39,14 @@ const ProductPage = () => {
         setOldPrice(parseFloat(product.price) + difference);
       }
     }
-  }, [product, isFavorite]);
+
+    const savedReviews =
+      JSON.parse(localStorage.getItem("productReviews")) || [];
+    const productReviews = savedReviews.filter(
+      (review) => review.productId === productId
+    );
+    setReviews(productReviews);
+  }, [product, isFavorite, productId]);
 
   if (!product) {
     return <h2 style={{ textAlign: "center" }}>Product not found.</h2>;
@@ -47,6 +55,10 @@ const ProductPage = () => {
   const handleToggleFavorite = () => {
     if (favorite) {
       removeFromFavorites(product.id);
+      toast.success("Removed from Favorites", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
     } else {
       addToFavorites({
         id: product.id,
@@ -54,17 +66,24 @@ const ProductPage = () => {
         name: product.name,
         price: product.price,
       });
+      toast.success("Added to Favorites", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
     }
     setFavorite(!favorite);
   };
 
   const handleAddToCart = () => {
     addToCart(product.id);
+    toast.success("Added to Cart", {
+      position: "bottom-right",
+      autoClose: 3000,
+    });
   };
 
   const quantityInCart = items[product.id] || 0;
 
-  // Slider: poprzednie i następne zdjęcie
   const handlePrevImage = () => {
     setCurrentIndex((prev) =>
       prev === 0 ? product.imgs.length - 1 : prev - 1
@@ -77,28 +96,46 @@ const ProductPage = () => {
     );
   };
 
-  // Kliknięcie w zdjęcie => powiększenie
-  const handleEnlargeImage = (imgUrl) => {
-    setEnlargedImage(imgUrl);
+  const handleImageEnlarge = () => {
+    setIsImageEnlarged(true);
   };
 
-  // Zamknięcie overlay
-  const handleCloseOverlay = () => {
-    setEnlargedImage(null);
+  const closeImageOverlay = () => {
+    setIsImageEnlarged(false);
   };
 
-  // Kliknięcie tła overlay
-  const handleOverlayBackgroundClick = (e) => {
-    if (e.target === e.currentTarget) {
-      handleCloseOverlay();
+  const handleAddReview = () => {
+    if (
+      newReview.rating < 1 ||
+      newReview.rating > 5 ||
+      !newReview.text.trim()
+    ) {
+      toast.error("Please provide a valid rating (1-5) and a review text.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
     }
+
+    const updatedReviews = [
+      ...reviews,
+      { productId, ...newReview, id: Date.now() },
+    ];
+    localStorage.setItem("productReviews", JSON.stringify(updatedReviews));
+    setReviews(updatedReviews);
+
+    setNewReview({ rating: 0, text: "" });
+    setShowReviewForm(false);
+    toast.success("Your review has been submitted!", {
+      position: "bottom-right",
+      autoClose: 3000,
+    });
   };
 
   return (
     <section className="productPage">
       <div className="productPage__container">
         <div className="productPage__images">
-          {/* Slider */}
           <div className="productPage__slider">
             <button
               className="productPage__arrow"
@@ -111,7 +148,7 @@ const ProductPage = () => {
               className="productPage__main-img"
               src={product.imgs[currentIndex]}
               alt={product.name}
-              onClick={() => handleEnlargeImage(product.imgs[currentIndex])}
+              onClick={handleImageEnlarge}
             />
 
             <button
@@ -122,7 +159,6 @@ const ProductPage = () => {
             </button>
           </div>
 
-          {/* Miniaturki (opcjonalne) */}
           <div className="productPage__thumbnails">
             {product.imgs.map((imgUrl, idx) => (
               <img
@@ -137,6 +173,22 @@ const ProductPage = () => {
             ))}
           </div>
         </div>
+
+        {isImageEnlarged && (
+          <div className="productPage__overlay">
+            <button
+              className="productPage__overlay-close"
+              onClick={closeImageOverlay}
+              aria-label="Close">
+              &times;
+            </button>
+            <img
+              className="productPage__overlay-image"
+              src={product.imgs[currentIndex]}
+              alt={product.name}
+            />
+          </div>
+        )}
 
         <div className="productPage__info">
           <h2 className="productPage__title">{product.name}</h2>
@@ -176,26 +228,79 @@ const ProductPage = () => {
               )}
             </button>
           </div>
+
+          <div>
+            <h3>Customer Reviews</h3>
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <div
+                  key={review.id}
+                  style={{
+                    border: "1px solid #ddd",
+                    margin: "1rem 0",
+                    padding: "1rem",
+                  }}>
+                  <p>
+                    <strong>Rating:</strong> {review.rating} / 5
+                  </p>
+                  <p>{review.text}</p>
+                </div>
+              ))
+            ) : (
+              <p>No reviews yet for this product.</p>
+            )}
+
+            {showReviewForm ? (
+              <div style={{ marginTop: "1rem" }}>
+                <h4>Add a Review</h4>
+                <label>
+                  Rating (1-5):
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={newReview.rating}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({
+                        ...prev,
+                        rating: parseInt(e.target.value, 10),
+                      }))
+                    }
+                  />
+                </label>
+                <br />
+                <label>
+                  Review:
+                  <textarea
+                    rows="4"
+                    value={newReview.text}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({
+                        ...prev,
+                        text: e.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <br />
+                <button onClick={handleAddReview}>Submit</button>
+                <button
+                  onClick={() => setShowReviewForm(false)}
+                  style={{ marginLeft: "1rem" }}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowReviewForm(true)}
+                style={{ marginTop: "1rem" }}>
+                Add a Review
+              </button>
+            )}
+          </div>
         </div>
       </div>
-
-      {enlargedImage && (
-        <div
-          className="productPage__overlay"
-          onClick={handleOverlayBackgroundClick}>
-          <button
-            className="productPage__overlay-close"
-            onClick={handleCloseOverlay}
-            aria-label="Close Overlay">
-            X
-          </button>
-          <img
-            className="productPage__overlay-image"
-            src={enlargedImage}
-            alt="Enlarged"
-          />
-        </div>
-      )}
+      <ToastContainer />
     </section>
   );
 };
