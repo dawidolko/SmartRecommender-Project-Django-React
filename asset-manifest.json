@@ -1,18 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.f2c1f174.css",
-    "main.js": "/static/js/main.534520e2.js",
+    "main.css": "/static/css/main.a1cb3a2e.css",
+    "main.js": "/static/js/main.e282bdc8.js",
     "static/media/team3.jpg": "/static/media/team3.90be010c4b5ee32ed51d.jpg",
     "static/media/bgc2.webp": "/static/media/bgc2.7733536eb54694cbc4b9.webp",
-    "static/media/logo2.webp": "/static/media/logo2.507881e5f556de3dcf08.webp",
     "static/media/hero_blog.webp": "/static/media/hero_blog.a58ae711b6780e3ba180.webp",
     "static/media/background1.webp": "/static/media/background1.1ab816706ec9870faf98.webp",
     "static/media/blog_big1.webp": "/static/media/blog_big1.2c1364174bac6b791fcc.webp",
     "static/media/blog6.webp": "/static/media/blog6.19a2d4ae66a75be92f5a.webp",
-    "static/media/logo3.webp": "/static/media/logo3.557cb7b156645b55269e.webp",
     "static/media/blog4.webp": "/static/media/blog4.55553c3bed6bb0f9e651.webp",
     "static/media/blog2.webp": "/static/media/blog2.1562d96b7ce56e461499.webp",
-    "static/media/logo4.webp": "/static/media/logo4.e22998132c733f78280f.webp",
     "static/media/blog1.webp": "/static/media/blog1.6aef8d1be21144d4796b.webp",
     "static/media/hero.webp": "/static/media/hero.8b6f92ac04dd8bec68f8.webp",
     "static/media/about.webp": "/static/media/about.e9e9feb412ca3d551dd5.webp",
@@ -24,20 +21,13 @@
     "static/media/bgc1.webp": "/static/media/bgc1.75bdbb0ad3802e340b83.webp",
     "static/media/faq.webp": "/static/media/faq.4c0669f9ef743a6828cb.webp",
     "static/media/mb7v2.webp": "/static/media/mb7v2.a8a1b7378dc8e161be8b.webp",
-    "static/media/client5.webp": "/static/media/client5.ee46c47939ff89d331a8.webp",
-    "static/media/logo1.webp": "/static/media/logo1.cefab53274da2ddfa85c.webp",
     "static/media/power5v1.webp": "/static/media/power5v1.bd8c90aa2449efe96896.webp",
     "static/media/power4v1.webp": "/static/media/power4v1.b8561e47f1521738b0cc.webp",
     "static/media/contact.webp": "/static/media/contact.488297641cf3b47850aa.webp",
     "static/media/case5v1.webp": "/static/media/case5v1.d2eb9bd1975c180c252f.webp",
     "static/media/counter.webp": "/static/media/counter.6406314165d20fb745f2.webp",
-    "static/media/client3.webp": "/static/media/client3.4703c64794c489a07b50.webp",
-    "static/media/client2.webp": "/static/media/client2.cf10856c8a5d699e90e8.webp",
-    "static/media/client1.webp": "/static/media/client1.f7fc9baeec6704a08bb3.webp",
     "static/media/mb7v3.webp": "/static/media/mb7v3.f4963428141543e29cf2.webp",
     "static/media/mb9v3.webp": "/static/media/mb9v3.1ea884543d89ff75f154.webp",
-    "static/media/client4.webp": "/static/media/client4.769c47ce1eb635636a3f.webp",
-    "static/media/client6.webp": "/static/media/client6.b4b995b306e98bfccbc0.webp",
     "static/media/case3v1.webp": "/static/media/case3v1.f6b63941a87fc2fbc841.webp",
     "static/media/case1v1.webp": "/static/media/case1v1.27d0edbb81215cce4a15.webp",
     "static/media/mb9v4.webp": "/static/media/mb9v4.8c1d9f02fafac4a6062c.webp",
@@ -68,6 +58,7 @@
     "static/media/grap3v4.webp": "/static/media/grap3v4.ac974fe1c2a08b9f3f75.webp",
     "static/media/team1.jpg": "/static/media/team1.3949d4d28bb925bccfd7.jpg",
     "static/media/grap3v5.webp": "/static/media/grap3v5.72f4034867e5b68723fb.webp",
+    "static/media/logo_of_name.png": "/static/media/logo_of_name.555ccbece1f9eab940ec.png",
     "static/media/power2v7.webp": "/static/media/power2v7.c8094ca9cdbe3c4b7f6c.webp",
     "static/media/team2.png": "/static/media/team2.ced4af65e6a80dc45bb8.png",
     "static/media/mb3v3.webp": "/static/media/mb3v3.89b045470b32c40cdd9f.webp",
@@ -572,11 +563,11 @@
     "index.html": "/index.html",
     "static/media/case8v3.webp": "/static/media/case8v3.39dafbdb4630c92795e1.webp",
     "static/media/slick.woff": "/static/media/slick.295183786cd8a1389865.woff",
-    "main.f2c1f174.css.map": "/static/css/main.f2c1f174.css.map",
-    "main.534520e2.js.map": "/static/js/main.534520e2.js.map"
+    "main.a1cb3a2e.css.map": "/static/css/main.a1cb3a2e.css.map",
+    "main.e282bdc8.js.map": "/static/js/main.e282bdc8.js.map"
   },
   "entrypoints": [
-    "static/css/main.f2c1f174.css",
-    "static/js/main.534520e2.js"
+    "static/css/main.a1cb3a2e.css",
+    "static/js/main.e282bdc8.js"
   ]
 }
