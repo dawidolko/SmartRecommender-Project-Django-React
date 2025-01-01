@@ -3,7 +3,6 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
 
-// 1. Import logo:
 import logoWheel from "../../assets/logo-wheel.webp";
 
 const MainBackgroundItem = ({ item, currentSlide }) => {
@@ -19,19 +18,16 @@ const MainBackgroundItem = ({ item, currentSlide }) => {
       </div>
 
       <div className="mainBackground__content">
-        {/* 2. Logo nad tytułem (np. "NEVER STOP LEARNING") */}
         <motion.img
           src={logoWheel}
           alt="Logo Wheel"
           className="mainBackground__logo"
-          // PRZYKŁADOWA animacja we Framer Motion
           initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 1.5, ease: "easeInOut" }}
           whileHover={{ scale: 1.1, rotate: 10 }}
         />
 
-        {/* Tytuł */}
         <motion.h1
           variants={AnimationVariants.fadeIn}
           initial="initial"
@@ -41,7 +37,6 @@ const MainBackgroundItem = ({ item, currentSlide }) => {
           {item.title}
         </motion.h1>
 
-        {/* Tekst */}
         <motion.p
           variants={AnimationVariants.fadeIn2}
           initial="initial"
@@ -51,7 +46,6 @@ const MainBackgroundItem = ({ item, currentSlide }) => {
           {item.text}
         </motion.p>
 
-        {/* Przycisk/Link */}
         <motion.div
           variants={AnimationVariants.fadeIn2}
           initial="initial"

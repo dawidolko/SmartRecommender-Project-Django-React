@@ -2,10 +2,15 @@ import "./Navbar.scss";
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { AiOutlineClose, AiOutlineHeart } from "react-icons/ai";
+import {
+  AiOutlineClose,
+  AiOutlineHeart,
+  AiOutlineSearch,
+} from "react-icons/ai";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
+import accountData from "../panelLogin/AccountData";
 
 const Navbar = ({ categories = [] }) => {
   const { totalCartItems } = useContext(CartContext);
@@ -13,10 +18,11 @@ const Navbar = ({ categories = [] }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [navBgc, setNavBgc] = useState(false);
-  const [showCategories, setShowCategories] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showCartDropdown, setShowCartDropdown] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedUser");
@@ -38,13 +44,23 @@ const Navbar = ({ categories = [] }) => {
   const handleClick = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
 
-  const handleUserIconClick = () => {
-    if (loggedUser) {
-      setShowUserDropdown(!showUserDropdown);
-    } else {
-      window.location.href = "/login";
-    }
+  const handleUserIconHover = () => {
+    setShowUserDropdown(true);
   };
+
+  const handleUserIconLeave = () => {
+    setShowUserDropdown(false);
+  };
+
+  const handleCartHover = () => {
+    setShowCartDropdown(true);
+  };
+
+  const handleCartLeave = () => {
+    setShowCartDropdown(false);
+  };
+
+  const toggleSearch = () => setShowSearch(!showSearch);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
@@ -53,28 +69,39 @@ const Navbar = ({ categories = [] }) => {
     window.location.href = "/";
   };
 
-  const handleCategoryHover = () => setShowCategories(true);
-  const handleCategoryLeave = () => setShowCategories(false);
+  const getUserRedirect = () => {
+    if (loggedUser) {
+      const user = accountData.find((user) => user.email === loggedUser.email);
+      if (user) {
+        return user.role === "Admin" ? "/admin" : "/client";
+      }
+    }
+    return "/login";
+  };
 
   return (
     <nav className={navBgc ? "navbar navbar__bgc" : "navbar"}>
       <div className="navbar__container container">
+        <div className="navbar__search-wrapper">
+          <button className="navbar__search-icon" onClick={toggleSearch}>
+            <AiOutlineSearch />
+          </button>
+          {showSearch && (
+            <div className="navbar__search">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              <button className="navbar__search-button">Search</button>
+            </div>
+          )}
+        </div>
         <Link to="/" className="navbar__logo">
           <p className="navbar__logo-text"></p>
         </Link>
 
-        {/* Pasek wyszukiwania */}
-        <div className="navbar__search">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <button className="navbar__search-button">Search</button>
-        </div>
-
-        {/* Nawigacja */}
         <ul
           className={
             isOpen ? "navbar__links navbar__links-active" : "navbar__links"
@@ -105,28 +132,15 @@ const Navbar = ({ categories = [] }) => {
             </NavLink>
           </li>
 
-          {/* Kategorie */}
-          <li
-            className="navbar__categories"
-            onMouseEnter={handleCategoryHover}
-            onMouseLeave={handleCategoryLeave}>
-            <span className="navbar__link">CATEGORIES</span>
-            {showCategories && (
-              <div className="navbar__dropdown">
-                {categories.map((category, index) => (
-                  <Link
-                    key={index}
-                    to={`/shop/${category}`}
-                    className="navbar__dropdown-item"
-                    onClick={closeNav}>
-                    {category}
-                  </Link>
-                ))}
-              </div>
-            )}
+          <li className="navbar__categories">
+            <NavLink
+              className="navbar__link"
+              to="/categories"
+              onClick={closeNav}>
+              CATEGORIES
+            </NavLink>
           </li>
 
-          {/* Ikony */}
           <li className="navbar__icons">
             <NavLink
               className="navbar__favorites-link"
@@ -137,28 +151,49 @@ const Navbar = ({ categories = [] }) => {
                 <AiOutlineHeart className="navbar__heart" />
               </div>
             </NavLink>
-            <NavLink
-              className="navbar__cart-link"
-              to="/cart"
-              onClick={closeNav}>
-              <div className="navbar__cart">
-                <span className="navbar__quantity">{totalCartItems()}</span>
-                <FaShoppingCart className="navbar__basket" />
-              </div>
-            </NavLink>
 
-            {/* Ikona ludzika */}
+            <div
+              className="navbar__cart"
+              onMouseEnter={handleCartHover}
+              onMouseLeave={handleCartLeave}
+              onClick={() => (window.location.href = "/cart")}
+              style={{ cursor: "pointer" }}>
+              <span className="navbar__quantity">{totalCartItems()}</span>
+              <FaShoppingCart className="navbar__basket" />
+              {showCartDropdown && (
+                <div className="navbar__cart-dropdown">
+                  {totalCartItems() === 0 ? (
+                    <p>Your cart is empty.</p>
+                  ) : (
+                    <p>You have {totalCartItems()} items in your cart.</p>
+                  )}
+                  <Link to="/cart" className="navbar__cart-button">
+                    Go to cart
+                  </Link>
+                </div>
+              )}
+            </div>
+
             <div
               className="navbar__user"
-              onClick={() => {
-                closeNav();
-                handleUserIconClick();
-              }}>
+              onMouseEnter={handleUserIconHover}
+              onMouseLeave={handleUserIconLeave}
+              onClick={() => (window.location.href = getUserRedirect())}
+              style={{ cursor: "pointer" }}>
               <FaUserCircle className="navbar__user-icon" />
-              {loggedUser && showUserDropdown && (
+              {showUserDropdown && (
                 <div className="navbar__user-dropdown">
+                  <Link to="/account" className="navbar__dropdown-link">
+                    Your Account
+                  </Link>
+                  <Link to="/orders" className="navbar__dropdown-link">
+                    Orders
+                  </Link>
+                  <Link to="/settings" className="navbar__dropdown-link">
+                    Settings
+                  </Link>
                   <button onClick={handleLogout} className="navbar__logoutBtn">
-                    Log out
+                    Logout
                   </button>
                 </div>
               )}
@@ -166,7 +201,6 @@ const Navbar = ({ categories = [] }) => {
           </li>
         </ul>
 
-        {/* Ikona hamburgera */}
         <div className="navbar__hamburger" onClick={handleClick}>
           {isOpen ? <AiOutlineClose /> : <GiHamburgerMenu />}
         </div>

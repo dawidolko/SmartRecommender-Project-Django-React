@@ -11,7 +11,7 @@ const NotFound = () => {
       navigate("/");
     }, 5000);
 
-    return () => clearTimeout(timeout); // Cleanup timeout on unmount
+    return () => clearTimeout(timeout);
   }, [navigate]);
 
   return (

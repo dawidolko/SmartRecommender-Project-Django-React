@@ -16,10 +16,9 @@ body {
   line-height: 1.6;
   background-color: #f9f9f9;
   color: #333;
-  overflow-x: hidden; /* Zapobieganie przewijaniu poziomemu, jeśli nie jest wymagane */
+  overflow-x: hidden;
 }
 
-/* Styl pasków przewijania dla ciała dokumentu */
 body::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -40,7 +39,6 @@ body::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
 
-/* Styl pasków przewijania dla elementów z klasą .has-scrollbar */
 .has-scrollbar {
   overflow: auto;
 }

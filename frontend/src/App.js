@@ -1,6 +1,7 @@
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { ScrollToTop } from "react-router-scroll-to-top";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -16,12 +17,10 @@ import Favorites from "./pages/Favorites";
 import { FavoritesProvider } from "./components/FavoritesContent/FavoritesContext";
 import ShopContext from "./components/ShopContext/ShopContext";
 import ProductSection from "./pages/ProductSection";
-
-// Nowe importy:
 import LoginPanel from "./components/panelLogin/LoginPanel";
 import RegisterPanel from "./components/panelLogin/RegisterPanel";
-import AdminPanel from "./pages/AdminPanel"; // Poprawny import
-import ClientPanel from "./pages/ClientPanel"; // Poprawny import
+import AdminPanel from "./pages/AdminPanel";
+import ClientPanel from "./pages/ClientPanel";
 
 function App() {
   const location = useLocation();
@@ -31,8 +30,19 @@ function App() {
       <FavoritesProvider>
         <ShopContext>
           <Navbar />
-          <AnimatePresence mode="wait" initial={false}>
-            <ScrollToTop />
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={true}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
+          <AnimatePresence mode="sync" initial={false}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Navigate to="/home" />} />
               <Route path="/home" element={<Home />} />
@@ -45,20 +55,14 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/product/:id" element={<ProductSection />} />
-
-              {/* Logowanie i rejestracja */}
               <Route path="/login" element={<LoginPanel />} />
               <Route path="/signup" element={<RegisterPanel />} />
-
-              {/* Panel Admina i Klienta */}
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/client" element={<ClientPanel />} />
-
-              {/* Strona 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <Footer />
           </AnimatePresence>
+          <Footer />
         </ShopContext>
       </FavoritesProvider>
     </>

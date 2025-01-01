@@ -5,7 +5,6 @@ const TestimonialsItem = (props) => {
   const { id, imgs, name, price, category, isNew } = props;
   const navigate = useNavigate();
 
-  // Kliknięcie w całą kartę (box) przenosi do strony szczegółów
   const handleBoxClick = () => {
     if (id) {
       navigate(`/product/${id}`);

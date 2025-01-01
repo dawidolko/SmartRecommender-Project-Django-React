@@ -32,7 +32,7 @@ const FormComponent = ({
         setIsMessageSent(true);
         setMessage("Your message has been sent successfully!");
         actions.resetForm();
-        setTimeout(() => setIsMessageSent(false), 3000); // Hide the message after 3 seconds
+        setTimeout(() => setIsMessageSent(false), 3000);
       }}
       initialValues={initialValues}
       validationSchema={validationSchema}>

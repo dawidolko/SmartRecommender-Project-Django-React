@@ -56,8 +56,14 @@ const ProductPage = () => {
     if (favorite) {
       removeFromFavorites(product.id);
       toast.success("Removed from Favorites", {
-        position: "bottom-right",
+        position: "top-center",
         autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
       });
     } else {
       addToFavorites({
@@ -67,8 +73,14 @@ const ProductPage = () => {
         price: product.price,
       });
       toast.success("Added to Favorites", {
-        position: "bottom-right",
+        position: "top-center",
         autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
       });
     }
     setFavorite(!favorite);
@@ -77,8 +89,14 @@ const ProductPage = () => {
   const handleAddToCart = () => {
     addToCart(product.id);
     toast.success("Added to Cart", {
-      position: "bottom-right",
+      position: "top-center",
       autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
     });
   };
 
@@ -111,8 +129,14 @@ const ProductPage = () => {
       !newReview.text.trim()
     ) {
       toast.error("Please provide a valid rating (1-5) and a review text.", {
-        position: "bottom-right",
+        position: "top-center",
         autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
       });
       return;
     }
@@ -127,8 +151,14 @@ const ProductPage = () => {
     setNewReview({ rating: 0, text: "" });
     setShowReviewForm(false);
     toast.success("Your review has been submitted!", {
-      position: "bottom-right",
+      position: "top-center",
       autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
     });
   };
 

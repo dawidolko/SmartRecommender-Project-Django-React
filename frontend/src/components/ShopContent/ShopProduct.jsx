@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
 import { AiOutlineHeart, AiFillHeart, AiOutlineSearch } from "react-icons/ai";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ShopProduct = (props) => {
   const { id, imgs, name, price, category, isNew } = props;
@@ -33,8 +35,26 @@ const ShopProduct = (props) => {
     e.stopPropagation();
     if (favorite) {
       removeFromFavorites(id);
+      toast.success("Removed from Favorites", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
     } else {
       addToFavorites({ id, img: imgs[0], name, price });
+      toast.success("Added to Favorites", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
     }
     setFavorite(!favorite);
   };
@@ -56,8 +76,16 @@ const ShopProduct = (props) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    // Ensure that the same product can only be added once and adjust the quantity
     addToCart(id);
+    toast.success("Added to Cart", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "colored",
+    });
   };
 
   const handleNameClick = (e) => {

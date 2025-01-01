@@ -1,7 +1,6 @@
 @import "../../global.scss";
 
 .testimonials {
-  /* Sekcja z tłem */
   background: url("../../assets/testimonials.webp") rgba(0, 0, 0, 0.9);
   background-blend-mode: darken;
   background-size: cover;
@@ -28,7 +27,6 @@
     margin-bottom: 2em;
   }
 
-  /* Pudełko z produktem */
   &__box {
     position: relative;
     width: 100%;
@@ -39,13 +37,12 @@
     text-align: center;
     padding: 1.5em;
 
-    /* KLUCZOWA ZMIANA: jednoczesna szerokość i wysokość */
-    height: 420px; /* Wymuszenie tej samej wysokości kart */
-    box-sizing: border-box; /* Upewniamy się, że padding jest wliczany w wysokość */
+    height: 420px;
+    box-sizing: border-box;
 
     transition: box-shadow 0.3s ease, background-color 0.3s ease;
     &:hover {
-      background-color: #e1dfdf; /* delikatna zmiana tła na hover */
+      background-color: #e1dfdf;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
     }
   }
@@ -74,9 +71,9 @@
 
   &__category {
     font-size: 1.2rem;
-    color: #666;
+    color: #000000;
     margin-bottom: 0.5em;
-    background-color: #f5f5f5;
+    background-color: $main;
     padding: 0.5em;
     border-radius: 8px;
     text-transform: uppercase;
@@ -101,7 +98,6 @@
   }
 }
 
-/* Slick Carousel styling */
 .slick-slide > div {
   margin: 0 10px;
 }
@@ -110,7 +106,6 @@
   margin: 0 -10px;
 }
 
-/* Styl kropek (dots) */
 .slick-dots li button:before {
   font-size: 12px;
   background-color: #fff;
@@ -121,7 +116,6 @@
   background-color: rgb(255, 255, 255);
 }
 
-/* Responsywność */
 @media (min-width: 500px) {
   .testimonials {
     &__wrapper {

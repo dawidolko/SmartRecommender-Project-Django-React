@@ -1,7 +1,5 @@
-/* src/components/panelLogin/PanelLogin.scss */
 @import "../../global.scss";
 
-/* Panel logowania i rejestracji: wspólna baza */
 .loginPanel,
 .registerPanel {
   display: flex;
@@ -121,13 +119,12 @@
   &__imageWrapper {
     position: relative;
     width: 50%;
-    display: none; /* ukryte na mobile */
+    display: none;
     @media (min-width: 768px) {
-      display: block; /* widoczne na tablet+ */
+      display: block;
     }
   }
 
-  /* Tło login.webp */
   &__overlay {
     position: absolute;
     inset: 0;
@@ -135,7 +132,6 @@
   }
 }
 
-/* Mobile */
 @media (max-width: 767px) {
   .loginPanel,
   .registerPanel {

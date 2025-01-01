@@ -75,15 +75,18 @@
   &__product {
     @include flexCenter(column);
     position: relative;
-    /* Styl podobny do blog__box */
-    height: 100%;
     max-width: 300px;
+    width: 100%;
+    max-height: 450px;
     padding: 1.5em;
-    overflow: hidden; /* Dzięki temu powiększane zdjęcie nie wychodzi poza ramkę */
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* Nowy cień jak w blogu */
+    overflow: hidden;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     margin-bottom: 2em;
     text-align: center;
-    background-color: #fff; /* jeżeli chcesz białe tło, analogiczne do bloga */
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   &__label {
@@ -101,19 +104,21 @@
     background-color: gray;
   }
 
-  /* Wydzielamy "overflow" dla obrazka, jeśli chcesz analogię do blog__overflow */
   &__image {
     margin-bottom: 1em;
-    overflow: hidden; /* Spójne z blog__overflow */
+    overflow: hidden;
     position: relative;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   &__img {
-    /* Styl podobny do blog__img */
     width: 100%;
-    height: 220px; /* Tak samo jak blog__img */
-    object-fit: cover;
-    transition: transform 0.2s linear; /* Płynne powiększanie */
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.2s linear;
   }
 
   &__image-enlarge-btn {
@@ -136,12 +141,17 @@
   &__content {
     @include flexCenter(column);
     gap: 0.5em;
+    flex-grow: 1;
+    justify-content: space-between;
   }
 
   &__name {
     font-weight: 500;
     cursor: pointer;
     transition: color 0.3s ease;
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: normal;
 
     &:hover {
       text-decoration: underline;
@@ -151,11 +161,11 @@
 
   &__category {
     font-size: 1.2rem;
-    color: #666;
+    color: #000000;
     margin-bottom: 0.5em;
-    background-color: #f5f5f5;
+    background-color: $main;
     padding: 0.5em;
-    border-radius: 8px;
+    border-radius: 5px;
     text-transform: uppercase;
   }
 
@@ -254,8 +264,6 @@
       }
     }
 
-    /* Na większych ekranach zdjęcie ma 250px wysokości
-       i lekko się powiększa w hover (jak w blogu) */
     &__img {
       height: 250px;
       transition: transform 0.2s linear;
@@ -271,4 +279,38 @@
       font-size: 1.8rem;
     }
   }
+}
+
+@media (max-width: 599px) {
+  .shop {
+    &__name {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.Toastify__toast {
+  position: relative;
+  margin: 10px 0;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.Toastify__toast--success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.Toastify__toast--error {
+  background-color: #f44336;
+  color: white;
+}
+
+.Toastify__toast-body {
+  margin: 0;
+}
+
+.Toastify__close-button {
+  color: white;
 }

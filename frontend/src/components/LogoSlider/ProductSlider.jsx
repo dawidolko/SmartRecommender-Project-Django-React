@@ -11,13 +11,11 @@ const ProductSlider = () => {
   const [randomProducts, setRandomProducts] = useState([]);
 
   useEffect(() => {
-    // Losujemy 10 produktów
     const shuffled = [...shopData].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 10);
     setRandomProducts(selected);
   }, []);
 
-  // Ustawienia slidera
   const settings = {
     dots: false,
     infinite: true,

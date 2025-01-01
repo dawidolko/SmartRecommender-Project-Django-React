@@ -69,3 +69,11 @@
     }
   }
 }
+
+@media (max-width: 768px) {
+  .about {
+    &__title {
+      font-size: 3rem;
+    }
+  }
+}

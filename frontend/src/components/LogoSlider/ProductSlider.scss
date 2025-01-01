@@ -24,14 +24,13 @@
   }
 }
 
-/* Styl samego itemu wewnątrz slajdu */
 .sliderItem {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.6em;
   padding: 1em;
-  cursor: pointer; /* całość jest klikalna */
+  cursor: pointer;
 
   transition: background-color 0.3s ease;
 
@@ -44,7 +43,6 @@
     height: 80px;
     object-fit: cover;
     border-radius: 4px;
-    /* Zatrzymanie propagacji w onClick w kodzie JS */
   }
 
   &__name {
@@ -70,5 +68,11 @@
     background: none;
     border: none;
     cursor: pointer;
+  }
+
+  @media (max-width: 596px) {
+    &__name {
+      font-size: 1rem;
+    }
   }
 }

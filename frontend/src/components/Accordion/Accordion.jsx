@@ -13,7 +13,6 @@ const Accordion = () => {
 
   return (
     <div className="accordion">
-      {/* Tytuł FAQ na środku ekranu */}
       <h2 className="accordion__title">Frequently Asked Questions</h2>
 
       <div className="accordion__wrapper">

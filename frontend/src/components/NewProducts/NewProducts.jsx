@@ -17,7 +17,7 @@ const NewProducts = () => {
     const shuffledProducts = [...shopData].sort(() => Math.random() - 0.5);
     const selectedProducts = shuffledProducts.slice(0, 9);
     setRandomProducts(selectedProducts);
-  }, []); // Empty dependency array ensures this runs once on component mount
+  }, []);
 
   return (
     <motion.section

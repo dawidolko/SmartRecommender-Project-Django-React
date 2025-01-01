@@ -1,15 +1,14 @@
 import React, { useContext } from "react";
 import { CartContext } from "../ShopContext/ShopContext";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
-import shopData from "../ShopContent/ShopData"; // Importujemy dane z shopData
+import shopData from "../ShopContent/ShopData";
 
 const CartProduct = ({ id, name, price }) => {
   const { items, addToCart, removeFromCart, singleProductAmount } =
     useContext(CartContext);
 
-  // Znajdź produkt po id z shopData
   const product = shopData.find((product) => product.id === id);
-  const img = product ? product.imgs[0] : ""; // Pobierz zdjęcie z imgs[0]
+  const img = product ? product.imgs[0] : "";
   const itemQuantity = items[id];
   const totalProductAmount = singleProductAmount(id);
 

@@ -4,10 +4,8 @@ import shopData from "./ShopData";
 import ShopProduct from "./ShopProduct";
 
 const ShopContent = () => {
-  // Set default category to 'all' to ensure products show by default
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Updated categories array with lowercase for internal logic
   const categories = [
     "all",
     "computer",
@@ -27,7 +25,6 @@ const ShopContent = () => {
     setSelectedCategory(category);
   };
 
-  // Filter products by selected category
   const filteredProducts =
     selectedCategory === "all"
       ? shopData
@@ -35,7 +32,9 @@ const ShopContent = () => {
 
   return (
     <div className="shop container">
-      <h2 className="shop__title">Our Products</h2>
+      <h2 id="category" className="shop__title">
+        Our Products
+      </h2>
 
       <div className="shop__buttons">
         {categories.map((category) => (
@@ -43,15 +42,15 @@ const ShopContent = () => {
             key={category}
             onClick={() => handleCategoryClick(category)}
             className={selectedCategory === category ? "shop__active" : ""}>
-            {category.toUpperCase()} {/* Display category names in uppercase */}
+            {category.toUpperCase()}
           </button>
         ))}
       </div>
 
       <div className="shop__products">
         {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <ShopProduct key={product.id} {...product} />
+          filteredProducts.map((product, index) => (
+            <ShopProduct key={product.id || index} {...product} />
           ))
         ) : (
           <p>No products available in this category.</p>

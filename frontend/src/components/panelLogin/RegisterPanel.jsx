@@ -1,13 +1,6 @@
-// src/components/panelLogin/RegisterPanel.jsx
-
 import React, { useState } from "react";
 import "./PanelLogin.scss";
 
-/**
- * Panel rejestracji.
- * Po rejestracji dane użytkownika zapisywane są w localStorage w kluczu "registeredUsers".
- * Domyślnie rejestrowany użytkownik ma rolę "Client".
- */
 const RegisterPanel = () => {
   const [email, setEmail] = useState("");
   const [password1, setPassword1] = useState("");
@@ -18,13 +11,11 @@ const RegisterPanel = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Walidacja czy hasła się zgadzają
     if (password1 !== password2) {
       setErrorMsg("Passwords do not match.");
       return;
     }
 
-    // Pobieramy już zarejestrowanych użytkowników z localStorage
     const storedUsers = localStorage.getItem("registeredUsers");
     let usersArray = [];
 
@@ -39,38 +30,28 @@ const RegisterPanel = () => {
       }
     }
 
-    // Sprawdzamy, czy nie ma już konta o tym emailu
     const userExists = usersArray.some((user) => user.email === email);
     if (userExists) {
       setErrorMsg("An account with this email already exists.");
       return;
     }
 
-    // Tworzymy nowego usera
     const newUser = {
-      id: Date.now(), // losowe ID
+      id: Date.now(),
       email: email,
       password: password1,
       role: "Client",
     };
 
-    // Dodajemy do tablicy
     usersArray.push(newUser);
 
-    // Zapisujemy w localStorage
     localStorage.setItem("registeredUsers", JSON.stringify(usersArray));
 
-    // Czyścimy pola i komunikaty
     setEmail("");
     setPassword1("");
     setPassword2("");
     setErrorMsg("");
     setSuccessMsg("Account created successfully! You can now log in.");
-
-    // Ewentualnie redirect po chwili:
-    // setTimeout(() => {
-    //   window.location.href = "/login";
-    // }, 1500);
   };
 
   return (
@@ -94,7 +75,6 @@ const RegisterPanel = () => {
           <span>or</span>
         </div>
 
-        {/* Komunikaty o błędzie lub sukcesie */}
         {errorMsg && (
           <div style={{ color: "red", marginBottom: "1em" }}>{errorMsg}</div>
         )}

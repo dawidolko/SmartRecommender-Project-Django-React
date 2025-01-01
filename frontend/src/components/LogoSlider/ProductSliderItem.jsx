@@ -7,15 +7,12 @@ const ProductSliderItem = ({ id, imgs, name, price }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const favorite = isFavorite(id);
 
-  // Hook do nawigacji
   const navigate = useNavigate();
 
-  // Kliknięcie w cały box => przejście na stronę produktu
   const handleBoxClick = () => {
     navigate(`/product/${id}`);
   };
 
-  // Kliknięcie w przycisk serca => toggle ulubionych (bez przejścia)
   const toggleFavorite = (e) => {
     e.stopPropagation();
     if (favorite) {

@@ -16,7 +16,6 @@ const Footer = () => {
         <div className="footer__content">
           <div className="footer__box">
             <Link to="/" className="footer__logo">
-              {/* Poniższy <p> jest pusty – wypełnia go obrazek w tle */}
               <p className="footer__logo-text"></p>
             </Link>
             <div className="footer__desc">

@@ -1,21 +1,17 @@
 @import "../../global.scss";
 
 .accordion {
-  /* Podstawowy kontener, tytuł na środku ekranu */
   @include flexCenter(column);
   gap: 2em;
   padding: 3em 1em;
 
-  /* Tytuł FAQ */
   &__title {
     margin-bottom: 1.5em;
     text-align: center;
     font-size: 4rem;
     font-style: italic;
-    /* Dodatkowo można ustawić align-self: center, ale flexCenter(column) i text-align: center wystarczy */
   }
 
-  /* Wrapper na obrazek + pytania */
   &__wrapper {
     @include flexCenter(column);
     gap: 2em;
@@ -32,7 +28,6 @@
     border-radius: 6px;
   }
 
-  /* Sekcja z pytaniami */
   &__questions {
     @include flexCenter(column);
     gap: 1em;
@@ -66,20 +61,18 @@
   }
 }
 
-/* Responsywność */
 @media (min-width: 1024px) {
   .accordion {
     padding: 5em 0.5em;
 
     &__wrapper {
-      /* Na większych ekranach obrazek i pytania w wierszu */
       flex-direction: row;
-      align-items: flex-start; /* Pytania i obrazek zaczynają się od góry */
+      align-items: flex-start;
       gap: 3em;
     }
 
     &__img {
-      max-width: 450px; /* ewentualna korekta */
+      max-width: 450px;
     }
 
     &__box {
