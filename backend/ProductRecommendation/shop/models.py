@@ -37,8 +37,11 @@ class Product(models.Model):
 
 # Relacja między produktami a kategoriami
 class ProductCategory(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, primary_key=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('product', 'category'),)
 
 # Zdjęcia produktów
 class PhotoProduct(models.Model):

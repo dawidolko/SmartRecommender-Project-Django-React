@@ -8,7 +8,7 @@ BEGIN
     FOR obj IN
         SELECT conname, connamespace::regnamespace::text, conrelid::regclass::text
         FROM pg_constraint
-        WHERE contype = 'f'
+        WHERE contype = 'f'  -- 'f' indicates foreign key
     LOOP
         EXECUTE format(
             'ALTER TABLE %I.%I DROP CONSTRAINT %I',
@@ -24,7 +24,7 @@ BEGIN
         FROM pg_tables
         WHERE schemaname = 'public'
     LOOP
-        EXECUTE format('DROP TABLE IF EXISTS %I CASCADE', obj.tablename);
+        EXECUTE format('DROP TABLE IF EXISTS %I.%I CASCADE', 'public', obj.tablename);
     END LOOP;
 
     -- Drop all sequences
@@ -33,7 +33,7 @@ BEGIN
         FROM pg_sequences
         WHERE schemaname = 'public'
     LOOP
-        EXECUTE format('DROP SEQUENCE IF EXISTS %I CASCADE', obj.sequencename);
+        EXECUTE format('DROP SEQUENCE IF EXISTS %I.%I CASCADE', 'public', obj.sequencename);
     END LOOP;
 
     -- Drop all views
@@ -42,7 +42,7 @@ BEGIN
         FROM pg_views
         WHERE schemaname = 'public'
     LOOP
-        EXECUTE format('DROP VIEW IF EXISTS %I CASCADE', obj.viewname);
+        EXECUTE format('DROP VIEW IF EXISTS %I.%I CASCADE', 'public', obj.viewname);
     END LOOP;
 
     -- Drop all materialized views
@@ -51,7 +51,7 @@ BEGIN
         FROM pg_matviews
         WHERE schemaname = 'public'
     LOOP
-        EXECUTE format('DROP MATERIALIZED VIEW IF EXISTS %I CASCADE', obj.matviewname);
+        EXECUTE format('DROP MATERIALIZED VIEW IF EXISTS %I.%I CASCADE', 'public', obj.matviewname);
     END LOOP;
 
     -- Drop all functions
@@ -60,7 +60,7 @@ BEGIN
         FROM information_schema.routines
         WHERE routine_schema = 'public'
     LOOP
-        EXECUTE format('DROP FUNCTION IF EXISTS %I() CASCADE', obj.routine_name);
+        EXECUTE format('DROP FUNCTION IF EXISTS %I.%I() CASCADE', 'public', obj.routine_name);
     END LOOP;
 
     -- Drop all types
@@ -68,10 +68,20 @@ BEGIN
         SELECT typname
         FROM pg_type
         WHERE typnamespace = 'public'::regnamespace
-          AND typtype = 'e'
+          AND typtype = 'e'  -- 'e' indicates an enum type
     LOOP
-        EXECUTE format('DROP TYPE IF EXISTS %I CASCADE', obj.typname);
+        EXECUTE format('DROP TYPE IF EXISTS %I.%I CASCADE', 'public', obj.typname);
     END LOOP;
+
+    -- Drop all indexes (other than constraints, which are handled above)
+    FOR obj IN
+        SELECT indexname
+        FROM pg_indexes
+        WHERE schemaname = 'public'
+    LOOP
+        EXECUTE format('DROP INDEX IF EXISTS %I.%I CASCADE', 'public', obj.indexname);
+    END LOOP;
+
 END $$;
 
 */
