@@ -1,19 +1,27 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import "./Testimonials.scss";
-import shopData from "../ShopContent/ShopData";
 import TestimonialsItem from "./TestimonialsItem";
 
 const Testimonials = () => {
   const [randomProducts, setRandomProducts] = useState([]);
 
   useEffect(() => {
-    const shuffled = [...shopData].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 6);
-    setRandomProducts(selected);
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/random-products/"
+        );
+        setRandomProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching random products:", error);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const sliderSettings = {

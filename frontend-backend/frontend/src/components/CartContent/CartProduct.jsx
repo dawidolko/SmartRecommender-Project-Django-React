@@ -1,14 +1,15 @@
 import React, { useContext } from "react";
 import { CartContext } from "../ShopContext/ShopContext";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
-import shopData from "../ShopContent/ShopData";
 
-const CartProduct = ({ id, name, price }) => {
+const CartProduct = ({ id, name, price, photos }) => {
   const { items, addToCart, removeFromCart, singleProductAmount } =
     useContext(CartContext);
 
-  const product = shopData.find((product) => product.id === id);
-  const img = product ? product.imgs[0] : "";
+  const img = photos?.[0]?.path
+    ? `http://localhost:8000/media/${photos[0].path}`
+    : "https://via.placeholder.com/150";
+
   const itemQuantity = items[id];
   const totalProductAmount = singleProductAmount(id);
 
@@ -34,10 +35,7 @@ const CartProduct = ({ id, name, price }) => {
         </button>
       </td>
       <td className="cart__total">
-        $
-        {typeof totalProductAmount === "number"
-          ? totalProductAmount.toFixed(2)
-          : "0.00"}
+        ${totalProductAmount ? totalProductAmount.toFixed(2) : "0.00"}
       </td>
     </tr>
   );

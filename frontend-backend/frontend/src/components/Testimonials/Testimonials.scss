@@ -96,6 +96,16 @@
     font-size: 1.6rem;
     margin-bottom: 1em;
   }
+
+  &__old-price {
+    text-decoration: line-through;
+    color: #999;
+  }
+
+  &__current-price {
+    font-weight: bold;
+    color: #333;
+  }
 }
 
 .slick-slide > div {

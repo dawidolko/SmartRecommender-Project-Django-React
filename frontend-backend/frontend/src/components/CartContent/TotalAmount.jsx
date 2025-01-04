@@ -4,6 +4,7 @@ import { CartContext } from "../ShopContext/ShopContext";
 import CartModal from "./CartModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const TotalAmount = () => {
   const { totalAmount, totalCartItems, resetCart, items } =
@@ -14,7 +15,7 @@ const TotalAmount = () => {
   const formattedTotalAmount =
     typeof totalAmount() === "number" ? totalAmount().toFixed(2) : "0.00";
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
 
     if (!loggedUser) {
@@ -31,18 +32,26 @@ const TotalAmount = () => {
       return;
     }
 
-    const clientOrders = JSON.parse(localStorage.getItem("clientOrders")) || [];
-    const newOrder = {
-      id: Date.now(),
-      userId: loggedUser.id,
-      items: items,
-      total: totalAmount(),
-    };
-
-    clientOrders.push(newOrder);
-    localStorage.setItem("clientOrders", JSON.stringify(clientOrders));
-
-    openModal();
+    try {
+      await axios.post("http://localhost:8000/api/orders/", {
+        userId: loggedUser.id,
+        items,
+        total: totalAmount(),
+      });
+      openModal();
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      toast.error("Checkout failed. Please try again.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
   };
 
   const openModal = () => {

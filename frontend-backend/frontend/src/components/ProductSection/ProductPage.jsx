@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import shopData from "../ShopContent/ShopData";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,106 +10,83 @@ import {
   AiOutlineLeft,
   AiOutlineRight,
 } from "react-icons/ai";
+import { FaStar } from "react-icons/fa";
 import "./ProductPage.scss";
 
 const ProductPage = () => {
   const { id } = useParams();
-  const productId = parseInt(id, 10);
-
   const { addToCart, items } = useContext(CartContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
 
-  const product = shopData.find((p) => p.id === productId);
-
-  const [oldPrice, setOldPrice] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [favorite, setFavorite] = useState(false);
-  const [reviews, setReviews] = useState([]);
-  const [newReview, setNewReview] = useState({ rating: 0, text: "" });
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [isImageEnlarged, setIsImageEnlarged] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false);
 
   useEffect(() => {
-    if (product) {
-      const isFav = isFavorite(product.id);
-      setFavorite(isFav);
-      const difference = Math.floor(Math.random() * 51);
-      if (difference > 0) {
-        setOldPrice(parseFloat(product.price) + difference);
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/api/product/${id}/`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch product details.");
+        }
+        const data = await response.json();
+        setProduct(data);
+        setFavorite(isFavorite(data.id));
+      } catch (error) {
+        console.error(error);
+        toast.error("Error loading product details.", {
+          position: "top-center",
+        });
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    const savedReviews =
-      JSON.parse(localStorage.getItem("productReviews")) || [];
-    const productReviews = savedReviews.filter(
-      (review) => review.productId === productId
-    );
-    setReviews(productReviews);
-  }, [product, isFavorite, productId]);
+    fetchProduct();
+  }, [id, isFavorite]);
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
 
   if (!product) {
-    return <h2 style={{ textAlign: "center" }}>Product not found.</h2>;
+    return <h2>Product not found.</h2>;
   }
 
   const handleToggleFavorite = () => {
     if (favorite) {
       removeFromFavorites(product.id);
-      toast.success("Removed from Favorites", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      toast.success("Removed from Favorites", { position: "top-center" });
     } else {
       addToFavorites({
         id: product.id,
-        img: product.imgs[0],
+        img: `http://localhost:8000/media/${product.photos[0]?.path}`,
         name: product.name,
         price: product.price,
       });
-      toast.success("Added to Favorites", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      toast.success("Added to Favorites", { position: "top-center" });
     }
     setFavorite(!favorite);
   };
 
   const handleAddToCart = () => {
     addToCart(product.id);
-    toast.success("Added to Cart", {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+    toast.success("Added to Cart", { position: "top-center" });
   };
-
-  const quantityInCart = items[product.id] || 0;
 
   const handlePrevImage = () => {
     setCurrentIndex((prev) =>
-      prev === 0 ? product.imgs.length - 1 : prev - 1
+      prev === 0 ? product.photos.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
     setCurrentIndex((prev) =>
-      prev === product.imgs.length - 1 ? 0 : prev + 1
+      prev === product.photos.length - 1 ? 0 : prev + 1
     );
   };
 
@@ -118,83 +94,55 @@ const ProductPage = () => {
     setIsImageEnlarged(true);
   };
 
-  const closeImageOverlay = () => {
-    setIsImageEnlarged(false);
-  };
-
-  const handleAddReview = () => {
-    if (
-      newReview.rating < 1 ||
-      newReview.rating > 5 ||
-      !newReview.text.trim()
-    ) {
-      toast.error("Please provide a valid rating (1-5) and a review text.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-      return;
+  const closeImageOverlay = (e) => {
+    if (e.target.className.includes("productPage__overlay")) {
+      setIsImageEnlarged(false);
     }
-
-    const updatedReviews = [
-      ...reviews,
-      { productId, ...newReview, id: Date.now() },
-    ];
-    localStorage.setItem("productReviews", JSON.stringify(updatedReviews));
-    setReviews(updatedReviews);
-
-    setNewReview({ rating: 0, text: "" });
-    setShowReviewForm(false);
-    toast.success("Your review has been submitted!", {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
   };
+
+  const quantityInCart = items[product.id] || 0;
 
   return (
     <section className="productPage">
       <div className="productPage__container">
+        <div className="productPage__buttons-top">
+          <button className="productPage__cart-btn" onClick={handleAddToCart}>
+            Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
+          </button>
+          <button
+            className="productPage__fav-btn"
+            onClick={handleToggleFavorite}>
+            {favorite ? <AiFillHeart /> : <AiOutlineHeart />}
+          </button>
+        </div>
+
         <div className="productPage__images">
           <div className="productPage__slider">
             <button
-              className="productPage__arrow"
               onClick={handlePrevImage}
-              aria-label="Previous Image">
+              aria-label="Previous Image"
+              className="productPage__arrow">
               <AiOutlineLeft />
             </button>
-
             <img
-              className="productPage__main-img"
-              src={product.imgs[currentIndex]}
+              src={`http://localhost:8000/media/${product.photos[currentIndex]?.path}`}
               alt={product.name}
+              className="productPage__main-img"
               onClick={handleImageEnlarge}
             />
-
             <button
-              className="productPage__arrow"
               onClick={handleNextImage}
-              aria-label="Next Image">
+              aria-label="Next Image"
+              className="productPage__arrow">
               <AiOutlineRight />
             </button>
           </div>
-
           <div className="productPage__thumbnails">
-            {product.imgs.map((imgUrl, idx) => (
+            {product.photos.map((photo, idx) => (
               <img
                 key={idx}
-                src={imgUrl}
-                alt={product.name}
+                src={`http://localhost:8000/media/${photo.path}`}
+                alt={`Thumbnail ${idx + 1}`}
                 className={`productPage__thumbnail ${
                   idx === currentIndex ? "active" : ""
                 }`}
@@ -205,16 +153,15 @@ const ProductPage = () => {
         </div>
 
         {isImageEnlarged && (
-          <div className="productPage__overlay">
+          <div className="productPage__overlay" onClick={closeImageOverlay}>
             <button
               className="productPage__overlay-close"
-              onClick={closeImageOverlay}
-              aria-label="Close">
-              &times;
+              onClick={() => setIsImageEnlarged(false)}>
+              X
             </button>
             <img
               className="productPage__overlay-image"
-              src={product.imgs[currentIndex]}
+              src={`http://localhost:8000/media/${product.photos[currentIndex]?.path}`}
               alt={product.name}
             />
           </div>
@@ -223,109 +170,67 @@ const ProductPage = () => {
         <div className="productPage__info">
           <h2 className="productPage__title">{product.name}</h2>
           <p className="productPage__category">
-            Category: {product.category.toUpperCase()}
+            Category: {product.categories.join(", ")}
           </p>
-
           <div className="productPage__prices">
-            {oldPrice && (
+            {product.old_price && !isNaN(product.old_price) ? (
               <span className="productPage__old-price">
-                ${oldPrice.toFixed(2)}
+                ${parseFloat(product.old_price).toFixed(2)}
               </span>
-            )}
-            <span className="productPage__current-price">${product.price}</span>
+            ) : null}
+            <span className="productPage__current-price">
+              ${parseFloat(product.price).toFixed(2)}
+            </span>
           </div>
 
-          {product.description && (
-            <div className="productPage__desc">
-              <h4>Description:</h4>
-              <div dangerouslySetInnerHTML={{ __html: product.description }} />
-            </div>
-          )}
-
-          <div className="productPage__buttons">
-            <button className="productPage__cart-btn" onClick={handleAddToCart}>
-              Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
-            </button>
-
-            <button
-              className="productPage__fav-btn"
-              onClick={handleToggleFavorite}
-              aria-label="Toggle Favorites">
-              {favorite ? (
-                <AiFillHeart style={{ color: "red", fontSize: "1.8rem" }} />
-              ) : (
-                <AiOutlineHeart style={{ fontSize: "1.8rem" }} />
-              )}
-            </button>
+          <div className="productPage__desc">
+            <h4>Description:</h4>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: product.description,
+              }}
+            />
           </div>
 
-          <div>
-            <h3>Customer Reviews</h3>
-            {reviews.length > 0 ? (
-              reviews.map((review) => (
-                <div
-                  key={review.id}
-                  style={{
-                    border: "1px solid #ddd",
-                    margin: "1rem 0",
-                    padding: "1rem",
-                  }}>
-                  <p>
-                    <strong>Rating:</strong> {review.rating} / 5
-                  </p>
-                  <p>{review.text}</p>
+          <div className="productPage__specs">
+            <h4>Specifications:</h4>
+            <table>
+              <tbody>
+                {product.specifications.map((spec, index) => (
+                  <tr key={index}>
+                    <td>{spec.parameter_name}</td>
+                    <td>{spec.specification}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="productPage__reviews">
+            <h4>Customer Reviews</h4>
+            {product.opinions.length > 0 ? (
+              product.opinions.map((review) => (
+                <div key={review.id} className="productPage__review">
+                  <div className="productPage__review-header">
+                    <span>{review.user_email}</span>
+                    <div className="productPage__review-stars">
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <FaStar
+                          key={index}
+                          className={
+                            index < review.rating
+                              ? "productPage__review-stars__star--active"
+                              : "productPage__review-stars__star"
+                          }
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p>{review.content}</p>
                 </div>
               ))
             ) : (
               <p>No reviews yet for this product.</p>
-            )}
-
-            {showReviewForm ? (
-              <div style={{ marginTop: "1rem" }}>
-                <h4>Add a Review</h4>
-                <label>
-                  Rating (1-5):
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={newReview.rating}
-                    onChange={(e) =>
-                      setNewReview((prev) => ({
-                        ...prev,
-                        rating: parseInt(e.target.value, 10),
-                      }))
-                    }
-                  />
-                </label>
-                <br />
-                <label>
-                  Review:
-                  <textarea
-                    rows="4"
-                    value={newReview.text}
-                    onChange={(e) =>
-                      setNewReview((prev) => ({
-                        ...prev,
-                        text: e.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <br />
-                <button onClick={handleAddReview}>Submit</button>
-                <button
-                  onClick={() => setShowReviewForm(false)}
-                  style={{ marginLeft: "1rem" }}>
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowReviewForm(true)}
-                style={{ marginTop: "1rem" }}>
-                Add a Review
-              </button>
             )}
           </div>
         </div>

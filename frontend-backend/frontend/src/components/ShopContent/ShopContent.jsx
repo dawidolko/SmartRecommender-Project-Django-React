@@ -5,31 +5,37 @@ import ShopProduct from "./ShopProduct";
 const ShopContent = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const categories = [
-    "all",
-    "peripherals.printers",
-    "components.powerSupply",
-    "peripherals.mousePads",
-    "laptops.learning",
-    "networking.networkCards",
-    "storage.usbFlashDrives",
-    "components.fans",
-    "laptops.gaming",
-  ];
+  const [categories, setCategories] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/random-products/")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/categories/");
+        const data = await response.json();
+        setCategories(["all", ...data.map((category) => category.name)]);
+        setIsLoadingCategories(false);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setIsLoadingCategories(false);
+      }
+    };
+
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/products/");
+        const data = await response.json();
         setProducts(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
+        setIsLoadingProducts(false);
+      } catch (error) {
         console.error("Error fetching products:", error);
-        setIsLoading(false);
-      });
+        setIsLoadingProducts(false);
+      }
+    };
+
+    fetchCategories();
+    fetchProducts();
   }, []);
 
   const handleCategoryClick = (category) => {
@@ -40,7 +46,7 @@ const ShopContent = () => {
     selectedCategory === "all"
       ? products
       : products.filter((product) =>
-          product.categories.includes(selectedCategory)
+          product.categories.some((cat) => cat === selectedCategory)
         );
 
   return (
@@ -50,18 +56,22 @@ const ShopContent = () => {
       </h2>
 
       <div className="shop__buttons">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => handleCategoryClick(category)}
-            className={selectedCategory === category ? "shop__active" : ""}>
-            {category.toUpperCase()}
-          </button>
-        ))}
+        {isLoadingCategories ? (
+          <p>Loading categories...</p>
+        ) : (
+          categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryClick(category)}
+              className={selectedCategory === category ? "shop__active" : ""}>
+              {category.toUpperCase()}
+            </button>
+          ))
+        )}
       </div>
 
       <div className="shop__products">
-        {isLoading ? (
+        {isLoadingProducts ? (
           <p>Loading products...</p>
         ) : filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (

@@ -1,14 +1,28 @@
 import "./CartContent.scss";
-import shopData from "../ShopContent/ShopData";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../ShopContext/ShopContext";
 import CartProduct from "./CartProduct";
 import TotalAmount from "./TotalAmount";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const CartContent = () => {
   const { items, totalAmount } = useContext(CartContext);
+  const [shopData, setShopData] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/products/");
+        setShopData(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <div className="cart container">
       {totalAmount() > 0 ? (

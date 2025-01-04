@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"; // Usunięto `useEffect`
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";

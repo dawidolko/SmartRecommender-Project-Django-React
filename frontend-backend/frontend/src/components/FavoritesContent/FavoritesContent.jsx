@@ -1,6 +1,6 @@
 import "./FavoritesContent.scss";
-import shopData from "../ShopContent/ShopData";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import axios from "axios";
 import { useFavorites } from "./FavoritesContext";
 import { CartContext } from "../ShopContext/ShopContext";
 import FavoritesProduct from "./FavoritesProduct";
@@ -9,10 +9,24 @@ import { useNavigate } from "react-router-dom";
 const FavoritesContent = () => {
   const { favorites, removeFromFavorites } = useFavorites();
   const { addToCart } = useContext(CartContext);
+  const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/products/");
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const handleMoveToCart = (productId) => {
-    const product = shopData.find((item) => item.id === productId);
+    const product = products.find((item) => item.id === productId);
     if (product) {
       addToCart(product.id);
       removeFromFavorites(product.id);
@@ -32,13 +46,19 @@ const FavoritesContent = () => {
               </tr>
             </thead>
             <tbody>
-              {favorites.map((product) => (
-                <FavoritesProduct
-                  key={product.id}
-                  product={product}
-                  onMoveToCart={handleMoveToCart}
-                />
-              ))}
+              {favorites.map((fav) => {
+                const product = products.find((p) => p.id === fav.id);
+                if (product) {
+                  return (
+                    <FavoritesProduct
+                      key={product.id}
+                      product={product}
+                      onMoveToCart={handleMoveToCart}
+                    />
+                  );
+                }
+                return null;
+              })}
             </tbody>
           </table>
         </div>
