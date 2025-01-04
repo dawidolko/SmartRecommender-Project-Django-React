@@ -1,0 +1,149 @@
+@import "../../global.scss";
+
+.loginPanel,
+.registerPanel {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 100vh;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+    z-index: 1;
+  }
+
+  &__title {
+    font-size: 3rem;
+    font-weight: bold;
+  }
+
+  &__subtitle {
+    font-size: 1rem;
+    color: #666;
+  }
+
+  &__googleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: #302d2d;
+    border: 1px solid #ccc;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    &:hover {
+      background-color: #4e4949;
+    }
+  }
+
+  &__googleIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__divider {
+    position: relative;
+    text-align: center;
+    color: #aaa;
+    margin: 1.5rem 0;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: #ddd;
+      z-index: -1;
+    }
+    span {
+      background-color: #fff;
+      padding: 0 1rem;
+      position: relative;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  &__inputGroup {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__input {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    outline: none;
+    &:focus {
+      border-color: #666;
+    }
+  }
+
+  &__submitBtn {
+    background-color: #333;
+    color: #fff;
+    padding: 0.8rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    &:hover {
+      background-color: #444;
+    }
+  }
+
+  &__footer {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+
+    a {
+      color: #333;
+      text-decoration: underline;
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+
+  &__imageWrapper {
+    position: relative;
+    width: 50%;
+    display: none;
+    @media (min-width: 768px) {
+      display: block;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: url("../../assets/login.webp") center center / cover no-repeat;
+  }
+}
+
+@media (max-width: 767px) {
+  .loginPanel,
+  .registerPanel {
+    flex-direction: column;
+
+    &__content {
+      width: 100%;
+      max-width: none;
+    }
+
+    &__imageWrapper {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,348 @@
+/* src/components/Navbar/Navbar.scss */
+
+@import "../../global.scss";
+
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 8vh;
+  z-index: 1000;
+  color: $white;
+  background-color: #0a0a0a;
+  transition: background-color 0.3s ease;
+
+  &__search-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .navbar__search-icon {
+      background: none;
+      border: none;
+      color: $white;
+      font-size: 2rem;
+      cursor: pointer;
+      &:hover {
+        color: $main;
+      }
+    }
+
+    .navbar__search {
+      display: flex;
+      gap: 0.5rem;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #fff;
+      padding: 0.5rem;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      z-index: 100;
+      width: 160px;
+
+      input {
+        width: 150px;
+        max-width: 400px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        &:focus {
+          outline: none;
+          border-color: $main;
+        }
+      }
+
+      .navbar__search-button {
+        background-color: $main;
+        color: $white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        &:hover {
+          background-color: darken($main, 10%);
+        }
+      }
+    }
+  }
+
+  &__categories {
+    position: relative;
+
+    .navbar__dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      color: #333;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+
+      .navbar__dropdown-item {
+        padding: 0.5rem 0;
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+          color: $main;
+        }
+      }
+    }
+  }
+
+  &__links {
+    flex-direction: column;
+    transition: transform 0.3s ease;
+
+    &-active {
+      transform: translateX(0);
+    }
+  }
+
+  @media (min-width: 1300px) {
+    &__links {
+      flex-direction: row;
+    }
+  }
+
+  &__logo-text {
+    display: block;
+    width: 140px;
+    height: 60px;
+    background: url("../../assets/logo_of_name.png") no-repeat center center;
+    background-size: contain;
+    transition: box-shadow 0.3s ease;
+    &:hover {
+      box-shadow: 0 0 10px 2px #007bff;
+    }
+  }
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 0.5em;
+  }
+
+  &__logo {
+    font-size: 3.5rem;
+    color: $white;
+    font-family: "Wallpoet", sans-serif;
+  }
+
+  &__links {
+    @include flexCenter(column);
+    gap: 1em;
+    position: absolute;
+    top: 8vh;
+    left: 0;
+    height: 45vh;
+    width: 100%;
+    left: -100%;
+    background-color: #111;
+    transition: 0.3s ease;
+    z-index: 10;
+  }
+
+  &__icons {
+    @include flexCenter(row);
+    gap: 1.6rem;
+  }
+
+  &__link,
+  &__cart-link,
+  &__favorites-link {
+    padding: 0.4em;
+    color: $white;
+  }
+
+  &__link {
+    &.active {
+      color: $main;
+      font-weight: 500;
+    }
+  }
+
+  &__cart-link,
+  &__favorites-link {
+    &.active {
+      color: unset;
+    }
+  }
+
+  &__cart,
+  &__favorites {
+    position: relative;
+  }
+
+  &__quantity {
+    @include flexCenter(row);
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: -10px;
+    left: 6px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    background-color: $main;
+  }
+
+  &__basket,
+  &__heart {
+    font-size: 2.4rem;
+  }
+
+  &__heart:hover {
+    color: #007bff;
+  }
+
+  &__user {
+    position: relative;
+    cursor: pointer;
+
+    .navbar__user-icon {
+      font-size: 2.4rem;
+      transition: color 0.3s ease;
+      &:hover {
+        color: $main;
+      }
+    }
+
+    .navbar__user-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background-color: #222;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      .navbar__dropdown-link {
+        text-decoration: none;
+        color: $white;
+        margin-bottom: 0.5rem;
+        &:hover {
+          color: $main;
+        }
+      }
+
+      .navbar__logoutBtn {
+        background: none;
+        border: none;
+        color: #fff;
+
+        cursor: pointer;
+        transition: color 0.3s;
+        &:hover {
+          color: $main;
+        }
+      }
+    }
+  }
+
+  &__cart-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #222;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 150px;
+
+    p {
+      color: $white;
+      margin-bottom: 0.5rem;
+    }
+
+    .navbar__cart-button {
+      text-decoration: none;
+      background-color: $main;
+      color: $white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      &:hover {
+        background-color: darken($main, 10%);
+      }
+    }
+  }
+
+  &__links-active {
+    left: 0;
+  }
+
+  &__hamburger {
+    padding: 0.3em;
+  }
+
+  @media (max-width: 800px) {
+    &__search {
+      width: 100%;
+      input {
+        width: calc(100% - 120px);
+      }
+    }
+  }
+
+  @media (min-width: 888px) {
+    .navbar {
+      background-color: unset;
+
+      &__bgc {
+        background-color: $darker;
+      }
+
+      &__logo {
+        font-size: 4.2rem;
+      }
+
+      &__links {
+        flex-direction: row;
+        gap: 1em;
+        position: relative;
+        top: 0;
+        left: unset;
+        height: unset;
+        width: unset;
+        background-color: inherit;
+        transform: translateX(0);
+      }
+
+      &__link {
+        transition: color 0.3s ease;
+        &:hover {
+          color: $main;
+        }
+      }
+
+      &__hamburger {
+        display: none;
+      }
+    }
+  }
+
+  @media (min-width: 1024px) {
+    &__logo {
+      font-size: 3.5rem;
+    }
+  }
+
+  @media (max-width: 624px) {
+    &__search {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,34 @@
+const accordionData = [
+  {
+    question: "WHAT PAYMENT METHODS DO YOU ACCEPT?",
+    answer:
+      "We accept Visa, MasterCard, American Express, and PayPal. You can also pay in cash at our store. For online purchases, secure payment options are available via our website.",
+  },
+  {
+    question: "DO YOU OFFER A WARRANTY ON YOUR PRODUCTS?",
+    answer:
+      "Yes, all our products come with a standard manufacturer's warranty. For extended warranties, you can contact our support team or select the option during checkout.",
+  },
+  {
+    question: "HOW CAN I TRACK MY ORDER?",
+    answer:
+      "After placing an order, you will receive a confirmation email with a tracking link. You can also log into your account on our website to view the status of your order.",
+  },
+  {
+    question: "CAN I RETURN OR EXCHANGE A PRODUCT?",
+    answer:
+      "Yes, we have a hassle-free return and exchange policy. Products can be returned or exchanged within 30 days of purchase, provided they are in original condition and packaging.",
+  },
+  {
+    question: "DO YOU OFFER INSTALLATION SERVICES?",
+    answer:
+      "Yes, we offer installation services for certain products such as computers, TVs, and smart home devices. Please contact our support team to schedule an installation.",
+  },
+  {
+    question: "WHAT ARE YOUR SHIPPING OPTIONS?",
+    answer:
+      "We provide standard, express, and same-day delivery options. Shipping costs depend on your location and the selected method. Free shipping is available for orders over $100.",
+  },
+];
+
+export default accordionData;

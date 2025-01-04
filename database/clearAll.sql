@@ -1,77 +1,67 @@
 /* 
 
-DO $$ 
-DECLARE
-    obj RECORD;
+DO $$
 BEGIN
     -- Drop all foreign key constraints
-    FOR obj IN
-        SELECT conname, connamespace::regnamespace::text, conrelid::regclass::text
+    PERFORM (
+        SELECT COALESCE(string_agg(format(
+            'ALTER TABLE %I.%I DROP CONSTRAINT %I;',
+            nspname, relname, conname), ' '), '')
         FROM pg_constraint
+        JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
+        JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
         WHERE contype = 'f'
-    LOOP
-        EXECUTE format(
-            'ALTER TABLE %I.%I DROP CONSTRAINT %I',
-            obj.connamespace,
-            obj.conrelid,
-            obj.conname
-        );
-    END LOOP;
+    );
 
     -- Drop all tables
-    FOR obj IN
-        SELECT tablename
+    PERFORM (
+        SELECT COALESCE(string_agg(format('DROP TABLE IF EXISTS %I.%I CASCADE;', schemaname, tablename), ' '), '')
         FROM pg_tables
         WHERE schemaname = 'public'
-    LOOP
-        EXECUTE format('DROP TABLE IF EXISTS %I CASCADE', obj.tablename);
-    END LOOP;
+    );
 
     -- Drop all sequences
-    FOR obj IN
-        SELECT sequencename
+    PERFORM (
+        SELECT COALESCE(string_agg(format('DROP SEQUENCE IF EXISTS %I.%I CASCADE;', schemaname, sequencename), ' '), '')
         FROM pg_sequences
         WHERE schemaname = 'public'
-    LOOP
-        EXECUTE format('DROP SEQUENCE IF EXISTS %I CASCADE', obj.sequencename);
-    END LOOP;
+    );
 
     -- Drop all views
-    FOR obj IN
-        SELECT viewname
+    PERFORM (
+        SELECT COALESCE(string_agg(format('DROP VIEW IF EXISTS %I.%I CASCADE;', schemaname, viewname), ' '), '')
         FROM pg_views
         WHERE schemaname = 'public'
-    LOOP
-        EXECUTE format('DROP VIEW IF EXISTS %I CASCADE', obj.viewname);
-    END LOOP;
+    );
 
     -- Drop all materialized views
-    FOR obj IN
-        SELECT matviewname
+    PERFORM (
+        SELECT COALESCE(string_agg(format('DROP MATERIALIZED VIEW IF EXISTS %I.%I CASCADE;', schemaname, matviewname), ' '), '')
         FROM pg_matviews
         WHERE schemaname = 'public'
-    LOOP
-        EXECUTE format('DROP MATERIALIZED VIEW IF EXISTS %I CASCADE', obj.matviewname);
-    END LOOP;
+    );
 
     -- Drop all functions
-    FOR obj IN
-        SELECT routine_name
-        FROM information_schema.routines
-        WHERE routine_schema = 'public'
-    LOOP
-        EXECUTE format('DROP FUNCTION IF EXISTS %I() CASCADE', obj.routine_name);
-    END LOOP;
+    PERFORM (
+        SELECT COALESCE(string_agg(format('DROP FUNCTION IF EXISTS %I.%I(%s) CASCADE;', n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)), ' '), '')
+        FROM pg_proc p
+        JOIN pg_namespace n ON p.pronamespace = n.oid
+        WHERE n.nspname = 'public'
+    );
 
     -- Drop all types
-    FOR obj IN
-        SELECT typname
-        FROM pg_type
-        WHERE typnamespace = 'public'::regnamespace
-          AND typtype = 'e'
-    LOOP
-        EXECUTE format('DROP TYPE IF EXISTS %I CASCADE', obj.typname);
-    END LOOP;
+    PERFORM (
+        SELECT COALESCE(string_agg(format('DROP TYPE IF EXISTS %I.%I CASCADE;', n.nspname, t.typname), ' '), '')
+        FROM pg_type t
+        JOIN pg_namespace n ON t.typnamespace = n.oid
+        WHERE n.nspname = 'public' AND t.typtype = 'e'
+    );
+
+    -- Reset the schema to default state
+    EXECUTE 'DROP SCHEMA IF EXISTS public CASCADE';
+    EXECUTE 'CREATE SCHEMA public';
+    EXECUTE 'GRANT ALL ON SCHEMA public TO postgres';
+    EXECUTE 'GRANT ALL ON SCHEMA public TO public';
 END $$;
 
 */

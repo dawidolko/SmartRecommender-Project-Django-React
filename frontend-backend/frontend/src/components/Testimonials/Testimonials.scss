@@ -1,0 +1,131 @@
+@import "../../global.scss";
+
+.testimonials {
+  background: url("../../assets/testimonials.webp") rgba(0, 0, 0, 0.9);
+  background-blend-mode: darken;
+  background-size: cover;
+  background-position: center;
+
+  &__wrapper {
+    width: 90%;
+    margin: 0 auto;
+    padding: 5em 0 7em;
+  }
+
+  &__title {
+    margin-bottom: 1.5em;
+    text-align: center;
+    font-size: 5rem;
+    font-style: italic;
+    color: $white;
+    font-weight: 500;
+  }
+
+  &__subtitle {
+    text-align: center;
+    color: $white;
+    margin-bottom: 2em;
+  }
+
+  &__box {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 2em;
+    border-radius: 8px;
+    background-color: rgb(235, 233, 233);
+    text-align: center;
+    padding: 1.5em;
+
+    height: 420px;
+    box-sizing: border-box;
+
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    &:hover {
+      background-color: #e1dfdf;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  &__label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0.3em 0.6em;
+    background-color: $main;
+    color: $white;
+    font-size: 1.4rem;
+    z-index: 2;
+  }
+
+  &__img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    margin-bottom: 0.5em;
+    object-fit: cover;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+    max-height: 180px;
+  }
+
+  &__category {
+    font-size: 1.2rem;
+    color: #000000;
+    margin-bottom: 0.5em;
+    background-color: $main;
+    padding: 0.5em;
+    border-radius: 8px;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0.3em;
+    transition: color 0.3s ease;
+    &:hover {
+      text-decoration: underline;
+      color: #007bff;
+      cursor: pointer;
+    }
+  }
+
+  &__price {
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin-bottom: 1em;
+  }
+}
+
+.slick-slide > div {
+  margin: 0 10px;
+}
+
+.slick-list {
+  margin: 0 -10px;
+}
+
+.slick-dots li button:before {
+  font-size: 12px;
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+.slick-dots li.slick-active button:before {
+  background-color: rgb(255, 255, 255);
+}
+
+@media (min-width: 500px) {
+  .testimonials {
+    &__wrapper {
+      width: 70%;
+    }
+  }
+}
+
+@media (min-width: 796px) {
+  .testimonials {
+    background-attachment: fixed;
+  }
+}
