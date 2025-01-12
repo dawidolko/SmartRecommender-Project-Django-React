@@ -19,8 +19,25 @@ import ShopContext from "./components/ShopContext/ShopContext";
 import ProductSection from "./pages/ProductSection";
 import LoginPanel from "./components/panelLogin/LoginPanel";
 import RegisterPanel from "./components/panelLogin/RegisterPanel";
+
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
+
+function AdminRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem("loggedUser") || "null");
+  if (!user || user.role !== "admin") {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+function ClientRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem("loggedUser") || "null");
+  if (!user || user.role !== "client") {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
 
 function App() {
   const location = useLocation();
@@ -55,10 +72,29 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/product/:id" element={<ProductSection />} />
+              <Route path="/category/:category" element={<Shop />} />
+
               <Route path="/login" element={<LoginPanel />} />
               <Route path="/signup" element={<RegisterPanel />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/client" element={<ClientPanel />} />
+
+              <Route
+                path="/admin/*"
+                element={
+                  <AdminRoute>
+                    <AdminPanel />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/client/*"
+                element={
+                  <ClientRoute>
+                    <ClientPanel />
+                  </ClientRoute>
+                }
+              />
+
+              {/* 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

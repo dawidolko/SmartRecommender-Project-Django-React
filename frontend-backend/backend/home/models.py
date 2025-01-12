@@ -1,13 +1,16 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# User model with roles
 class User(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('client', 'Client'),
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='client')
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         db_table = 'user'

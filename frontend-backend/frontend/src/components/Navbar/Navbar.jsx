@@ -10,9 +10,9 @@ import {
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
-import accountData from "../panelLogin/AccountData";
+import axios from "axios";
 
-const Navbar = ({ categories = [] }) => {
+const Navbar = () => {
   const { totalCartItems } = useContext(CartContext);
   const { favorites } = useFavorites();
 
@@ -22,7 +22,7 @@ const Navbar = ({ categories = [] }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [showCartDropdown, setShowCartDropdown] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedUser");
@@ -41,6 +41,13 @@ const Navbar = ({ categories = [] }) => {
     };
   }, []);
 
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/categories/")
+      .then((res) => setCategories(res.data))
+      .catch((err) => console.error("Error fetching categories:", err));
+  }, []);
+
   const handleClick = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
 
@@ -50,14 +57,6 @@ const Navbar = ({ categories = [] }) => {
 
   const handleUserIconLeave = () => {
     setShowUserDropdown(false);
-  };
-
-  const handleCartHover = () => {
-    setShowCartDropdown(true);
-  };
-
-  const handleCartLeave = () => {
-    setShowCartDropdown(false);
   };
 
   const toggleSearch = () => setShowSearch(!showSearch);
@@ -71,10 +70,7 @@ const Navbar = ({ categories = [] }) => {
 
   const getUserRedirect = () => {
     if (loggedUser) {
-      const user = accountData.find((user) => user.email === loggedUser.email);
-      if (user) {
-        return user.role === "Admin" ? "/admin" : "/client";
-      }
+      return loggedUser.role === "admin" ? "/admin" : "/client";
     }
     return "/login";
   };
@@ -131,17 +127,95 @@ const Navbar = ({ categories = [] }) => {
               BLOG
             </NavLink>
           </li>
-
-          <li className="navbar__categories">
-            <NavLink
-              className="navbar__link"
-              to="/categories"
-              onClick={closeNav}>
-              CATEGORIES
-            </NavLink>
+          <li
+            className="navbar__categories"
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}>
+            <p className="navbar__link">CATEGORY</p>
+            <div className={`navbar__dropdown ${isOpen ? "active" : ""}`}>
+              {Object.entries(
+                categories.reduce((acc, category) => {
+                  const [main, sub] = category.name.split(".");
+                  if (!acc[main]) acc[main] = [];
+                  if (sub) acc[main].push(sub);
+                  return acc;
+                }, {})
+              ).map(([mainCategory, subCategories]) => (
+                <div
+                  key={mainCategory}
+                  className="navbar__main-category"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.classList.add("hover");
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.classList.remove("hover");
+                  }}>
+                  <p className="navbar__main-category-name">
+                    {mainCategory.toUpperCase()}
+                  </p>
+                  <div className="navbar__subcategories">
+                    {subCategories.map((subCategory) => (
+                      <NavLink
+                        key={subCategory}
+                        to={`/category/${mainCategory}.${subCategory}`}
+                        className="navbar__dropdown-item"
+                        onClick={closeNav}>
+                        {subCategory}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </li>
 
+          {/* User Icon */}
           <li className="navbar__icons">
+            <div
+              className="navbar__user"
+              onMouseEnter={handleUserIconHover}
+              onMouseLeave={handleUserIconLeave}
+              style={{ cursor: "pointer" }}>
+              <FaUserCircle
+                className="navbar__user-icon"
+                onClick={() => (window.location.href = getUserRedirect())}
+              />
+              {showUserDropdown && (
+                <div className="navbar__user-dropdown">
+                  {loggedUser ? (
+                    <>
+                      <Link to="/account" className="navbar__dropdown-link">
+                        Your Account
+                      </Link>
+                      <Link to="/orders" className="navbar__dropdown-link">
+                        Orders
+                      </Link>
+                      <Link
+                        to={getUserRedirect()}
+                        className="navbar__dropdown-link">
+                        Go to Panel
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="navbar__logoutBtn">
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" className="navbar__dropdown-link">
+                        Login
+                      </Link>
+                      <Link to="/signup" className="navbar__dropdown-link">
+                        Register
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Favorites */}
             <NavLink
               className="navbar__favorites-link"
               to="/favorites"
@@ -152,51 +226,13 @@ const Navbar = ({ categories = [] }) => {
               </div>
             </NavLink>
 
+            {/* Cart */}
             <div
               className="navbar__cart"
-              onMouseEnter={handleCartHover}
-              onMouseLeave={handleCartLeave}
               onClick={() => (window.location.href = "/cart")}
               style={{ cursor: "pointer" }}>
               <span className="navbar__quantity">{totalCartItems()}</span>
               <FaShoppingCart className="navbar__basket" />
-              {showCartDropdown && (
-                <div className="navbar__cart-dropdown">
-                  {totalCartItems() === 0 ? (
-                    <p>Your cart is empty.</p>
-                  ) : (
-                    <p>You have {totalCartItems()} items in your cart.</p>
-                  )}
-                  <Link to="/cart" className="navbar__cart-button">
-                    Go to cart
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="navbar__user"
-              onMouseEnter={handleUserIconHover}
-              onMouseLeave={handleUserIconLeave}
-              onClick={() => (window.location.href = getUserRedirect())}
-              style={{ cursor: "pointer" }}>
-              <FaUserCircle className="navbar__user-icon" />
-              {showUserDropdown && (
-                <div className="navbar__user-dropdown">
-                  <Link to="/account" className="navbar__dropdown-link">
-                    Your Account
-                  </Link>
-                  <Link to="/orders" className="navbar__dropdown-link">
-                    Orders
-                  </Link>
-                  <Link to="/settings" className="navbar__dropdown-link">
-                    Settings
-                  </Link>
-                  <button onClick={handleLogout} className="navbar__logoutBtn">
-                    Logout
-                  </button>
-                </div>
-              )}
             </div>
           </li>
         </ul>

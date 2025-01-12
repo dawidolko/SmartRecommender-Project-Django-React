@@ -7,7 +7,10 @@ from datetime import datetime, timedelta
 from tqdm import tqdm 
 from colorama import Fore, Style, init  
 import random
+from django.db import connection
+from django.contrib.auth import get_user_model, authenticate
 init(autoreset=True)  
+User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Seed database with initial data'
@@ -25,6 +28,17 @@ class Command(BaseCommand):
         seed_orders()
         seed_complaints()
         self.stdout.write(Fore.BLUE + 'Database seeding completed.')
+
+def reset_sequences():
+    with connection.cursor() as cursor:
+        tables = ["auth_user", "home_order", "home_complaint", "home_opinion", "home_orderproduct"]
+        for table in tables:
+            try:
+                cursor.execute(f"ALTER SEQUENCE {table}_id_seq RESTART WITH 1;")
+                print(Fore.GREEN + f"Reset sequence for table {table}.")
+            except Exception as e:
+                print(Fore.RED + f"Failed to reset sequence for table {table}: {e}")
+
 
 def seed_categories():
     Category.objects.all().delete()
@@ -190,30 +204,38 @@ def seed_users():
     User.objects.all().delete()
 
     users = [
-        {"username": f"admin{i}", "email": f"admin{i}@example.com", "role": "admin", "password": "Admin123!"}
+        {
+            "username": f"admin{i}",
+            "email": f"admin{i}@example.com",
+            "role": "admin",
+            "password": "Admin123!",
+            "first_name": "Admin",
+            "last_name": f"Number{i}"
+        }
         for i in range(1, 6)
     ] + [
-        {"username": f"client{i}", "email": f"client{i}@example.com", "role": "client", "password": "Client123!"}
+        {
+            "username": f"client{i}",
+            "email": f"client{i}@example.com",
+            "role": "client",
+            "password": "Client123!",
+            "first_name": "Client",
+            "last_name": f"Number{i}"
+        }
         for i in range(1, 16)
     ]
 
-    for user_data in tqdm(users, desc="Seeding users", unit="user"):
-        try:
-            validate_password(user_data["password"])
+    for user_data in users:
+        user = User.objects.create(
+            username=user_data["username"],
+            email=user_data["email"],
+            role=user_data["role"],
+            password=make_password(user_data["password"]),
+            first_name=user_data["first_name"],
+            last_name=user_data["last_name"]
+        )
 
-            User.objects.create(
-                username=user_data["username"],
-                email=user_data["email"],
-                role=user_data["role"],
-                password=make_password(user_data["password"])  
-            )
-            print(Fore.GREEN + f"Successfully added user {user_data['username']}.")
-        except ValidationError as e:
-            print(Fore.RED + f"Validation error for user {user_data['username']}: {e}")
-        except Exception as ex:
-            print(Fore.RED + f"Error adding user {user_data['username']}: {ex}")
-
-    print(Fore.GREEN + "Users successfully seeded.")
+    print("Users successfully seeded.")
 
 def seed_products():
     Product.objects.all().delete()
@@ -6957,7 +6979,7 @@ def seed_product_photos():
         {"id": 580, "product_id": 115, "path": "mouse10v1.webp"},
         {"id": 581, "product_id": 115, "path": "mouse10v2.webp"},
         {"id": 582, "product_id": 115, "path": "mouse10v3.webp"},
-        {"id": 583, "product_id": 115, "path": "mouse10v4.webp"},
+        {"id": 583, "product_id": 115, "path": "mouse10v4.jpg"},
         {"id": 584, "product_id": 115, "path": "mouse10v5.webp"},
 
         {"id": 585, "product_id": 116, "path": "keyboard1v1.webp"},
@@ -7186,11 +7208,11 @@ def seed_product_photos():
         {"id": 766, "product_id": 167, "path": "mousepad2v1.webp"},
         {"id": 767, "product_id": 167, "path": "mousepad2v2.webp"},
 
-        {"id": 768, "product_id": 168, "path": "mousepad3v1.webp"},
+        {"id": 768, "product_id": 168, "path": "mousepad3v1.jpg"},
         {"id": 769, "product_id": 168, "path": "mousepad3v2.webp"},
 
-        {"id": 770, "product_id": 169, "path": "mousepad4v1.webp"},
-        {"id": 771, "product_id": 169, "path": "mousepad4v2.webp"},
+        {"id": 770, "product_id": 169, "path": "mousepad4v1.jpg"},
+        {"id": 771, "product_id": 169, "path": "mousepad4v2.jpg"},
 
         {"id": 772, "product_id": 170, "path": "mousepad5v1.webp"},
         {"id": 773, "product_id": 170, "path": "mousepad5v2.webp"},
@@ -7235,12 +7257,12 @@ def seed_product_photos():
         {"id": 802, "product_id": 180, "path": "chair5v4.webp"},
 
         {"id": 803, "product_id": 181, "path": "chair6v1.webp"},
-        {"id": 804, "product_id": 181, "path": "chair6v2.webp"},
+        {"id": 804, "product_id": 181, "path": "chair6v2.jpg"},
         {"id": 805, "product_id": 181, "path": "chair6v3.webp"},
         {"id": 806, "product_id": 181, "path": "chair6v4.webp"},
 
         {"id": 807, "product_id": 182, "path": "chair7v1.webp"},
-        {"id": 808, "product_id": 182, "path": "chair7v2.webp"},
+        {"id": 808, "product_id": 182, "path": "chair7v2.jpg"},
         {"id": 809, "product_id": 182, "path": "chair7v3.webp"},
         {"id": 810, "product_id": 182, "path": "chair7v4.webp"},
 
@@ -7493,7 +7515,7 @@ def seed_product_photos():
 
         {"id": 991, "product_id": 250, "path": "tv5v1.webp"},
         {"id": 992, "product_id": 250, "path": "tv5v2.webp"},
-        {"id": 993, "product_id": 250, "path": "tv5v3.webp"},
+        {"id": 993, "product_id": 250, "path": "tv5v3.jpg"},
         {"id": 994, "product_id": 250, "path": "tv5v4.webp"},
         {"id": 995, "product_id": 250, "path": "tv5v5.webp"},
 
@@ -7553,7 +7575,7 @@ def seed_product_photos():
 
         {"id": 1039, "product_id": 262, "path": "watch7v1.webp"},
         {"id": 1040, "product_id": 262, "path": "watch7v2.webp"},
-        {"id": 1041, "product_id": 262, "path": "watch7v3.webp"},
+        {"id": 1041, "product_id": 262, "path": "watch7v3.jpg"},
 
         {"id": 1042, "product_id": 263, "path": "watch8v1.webp"},
         {"id": 1043, "product_id": 263, "path": "watch8v2.webp"},
@@ -7717,7 +7739,7 @@ def seed_product_photos():
 
         {"id": 1157, "product_id": 308, "path": "cartAudio3v1.webp"},
         {"id": 1158, "product_id": 308, "path": "cartAudio3v2.webp"},
-        {"id": 1159, "product_id": 308, "path": "cartAudio3v3.webp"},
+        {"id": 1159, "product_id": 308, "path": "cartAudio3v3.jpg"},
 
         {"id": 1160, "product_id": 309, "path": "cartAudio4v1.webp"},
         {"id": 1161, "product_id": 309, "path": "cartAudio4v2.webp"},
@@ -12298,39 +12320,43 @@ def seed_opinions():
     Opinion.objects.all().delete()
 
     products = Product.objects.all()
-    users = list(User.objects.filter(id__range=(1, 20)))
+    users = list(User.objects.all())
 
-    opinion_contents = [
-        "Great product, highly recommend!",
-        "Good quality, but a bit expensive.",
-        "Average product, could be better.",
-        "Excellent value for money!",
-        "Not satisfied with the product.",
-        "Works as expected, would buy again.",
-        "The product is fantastic, love it!",
-        "Terrible experience, avoid this product.",
-        "Fast delivery and good packaging.",
-        "It's okay, nothing special.",
-        "Amazing design, really stands out!",
-        "Very durable and reliable.",
-        "The product doesn't match the description.",
-        "Superb customer service experience.",
-        "Highly functional, exceeds expectations.",
-        "Good for its price, worth it!",
-        "Could use some improvements in build quality.",
-        "Performance is top-notch!",
-        "Received a damaged product, disappointing.",
-        "Value for money, would buy again.",
-        "Stylish and modern, fits perfectly.",
-        "Battery life is amazing, very satisfied.",
-        "Not what I expected, returning it.",
-        "Highly portable and easy to use.",
-        "Build quality is excellent!",
-        "Perfect for daily use.",
-        "The product feels a bit cheap.",
-        "Very intuitive and user-friendly.",
-        "Exceeded my expectations, worth every penny.",
-        "The warranty service is exceptional.",
+    if not users:
+        print(Fore.RED + "No users found in the database. Seed users before seeding opinions.")
+        return
+
+    opinion_contents_with_ratings = [
+        ("Great product, highly recommend!", 5),
+        ("Good quality, but a bit expensive.", 4),
+        ("Average product, could be better.", 3),
+        ("Excellent value for money!", 5),
+        ("Not satisfied with the product.", 1),
+        ("Works as expected, would buy again.", 5),
+        ("The product is fantastic, love it!", 5),
+        ("Terrible experience, avoid this product.", 1),
+        ("Fast delivery and good packaging.", 4),
+        ("It's okay, nothing special.", 3),
+        ("Amazing design, really stands out!", 5),
+        ("Very durable and reliable.", 5),
+        ("The product doesn't match the description.", 2),
+        ("Superb customer service experience.", 5),
+        ("Highly functional, exceeds expectations.", 5),
+        ("Good for its price, worth it!", 4),
+        ("Could use some improvements in build quality.", 3),
+        ("Performance is top-notch!", 5),
+        ("Received a damaged product, disappointing.", 1),
+        ("Value for money, would buy again.", 4),
+        ("Stylish and modern, fits perfectly.", 5),
+        ("Battery life is amazing, very satisfied.", 5),
+        ("Not what I expected, returning it.", 2),
+        ("Highly portable and easy to use.", 5),
+        ("Build quality is excellent!", 5),
+        ("Perfect for daily use.", 4),
+        ("The product feels a bit cheap.", 2),
+        ("Very intuitive and user-friendly.", 5),
+        ("Exceeded my expectations, worth every penny.", 5),
+        ("The warranty service is exceptional.", 5),
     ]
 
     for product in tqdm(products, desc="Seeding Opinions", unit="product"):
@@ -12338,8 +12364,7 @@ def seed_opinions():
 
         for _ in range(num_opinions):
             user = random.choice(users)
-            content = random.choice(opinion_contents)
-            rating = random.randint(1, 5)
+            content, rating = random.choice(opinion_contents_with_ratings)
 
             try:
                 Opinion.objects.create(
@@ -12355,11 +12380,17 @@ def seed_opinions():
     print(Fore.GREEN + "Opinions successfully seeded.")
 
 def seed_orders():
+    reset_sequences()
+
     OrderProduct.objects.all().delete()
     Order.objects.all().delete()
 
-    users = User.objects.filter(id__range=(1, 20)) 
-    products = list(Product.objects.all()) 
+    users = User.objects.all()
+    products = list(Product.objects.all())
+
+    if not users.exists() or not products:
+        print(Fore.RED + "No users or products available for seeding orders.")
+        return
 
     order_statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]
 
@@ -12389,10 +12420,17 @@ def seed_orders():
 
     print(Fore.GREEN + "Orders successfully seeded.")
 
+
 def seed_complaints():
+    reset_sequences()
+
     Complaint.objects.all().delete()
 
     orders_with_products = Order.objects.prefetch_related('orderproduct_set').all()
+
+    if not orders_with_products.exists():
+        print(Fore.RED + "No orders available for seeding complaints.")
+        return
 
     complaint_statuses = ["Pending", "Resolved", "Rejected"]
 
@@ -12410,7 +12448,10 @@ def seed_complaints():
     for order in tqdm(orders_with_products, desc="Seeding Complaints", unit="order"):
         products_in_order = order.orderproduct_set.all()
 
-        num_complaints = random.randint(0, len(products_in_order))
+        if not products_in_order:
+            continue
+
+        num_complaints = random.randint(1, len(products_in_order))  # Przynajmniej 1 skarga na zamówienie
         products_for_complaints = random.sample(list(products_in_order), num_complaints)
 
         for product_entry in products_for_complaints:

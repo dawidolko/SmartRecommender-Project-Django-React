@@ -1,62 +1,57 @@
-// src/components/panelLogin/LoginPanel.jsx
-
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import "./PanelLogin.scss";
-import accountData from "./AccountData";
 
-/**
- * Panel logowania.
- * Sprawdza zarówno "wbudowanych" userów (accountData),
- * jak i tych zarejestrowanych w localStorage (key: "registeredUsers").
- */
 const LoginPanel = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Pobieramy zarejestrowanych userów z localStorage
-    const storedUsers = localStorage.getItem("registeredUsers");
-    let customUsersArray = [];
-
-    if (storedUsers) {
-      try {
-        customUsersArray = JSON.parse(storedUsers);
-        if (!Array.isArray(customUsersArray)) {
-          customUsersArray = [];
-        }
-      } catch (err) {
-        customUsersArray = [];
-      }
+    if (!email) {
+      toast.error("Email is required.");
+      console.log("[LoginPanel] Email is empty; cannot login.");
+      return;
+    }
+    if (!password) {
+      toast.error("Password is required.");
+      console.log("[LoginPanel] Password is empty; cannot login.");
+      return;
     }
 
-    // 2. Łączymy accountData + customUsersArray w jedną tablicę
-    const allUsers = [...accountData, ...customUsersArray];
+    console.log("[LoginPanel] Sending login data:", { email, password });
 
-    // 3. Szukamy usera po emailu i haśle
-    const foundUser = allUsers.find(
-      (item) => item.email === email && item.password === password
-    );
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/login/", {
+        email,
+        password,
+      });
 
-    if (foundUser) {
-      // Ustawiamy w localStorage info o zalogowanym userze
-      const userData = {
-        id: foundUser.id,
-        email: foundUser.email,
-        role: foundUser.role,
-      };
-      localStorage.setItem("loggedUser", JSON.stringify(userData));
+      console.log("[LoginPanel] Response from /api/login:", response);
 
-      // Przekierowanie w zależności od roli
-      if (foundUser.role === "Admin") {
-        window.location.href = "/admin";
-      } else {
-        window.location.href = "/client";
+      const { user } = response.data;
+      localStorage.setItem("loggedUser", JSON.stringify(user));
+
+      toast.success("Logged in successfully!");
+
+      setTimeout(() => {
+        if (user.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/client";
+        }
+      }, 500);
+    } catch (error) {
+      console.log("[LoginPanel] Error while logging in:", error);
+
+      if (!error.response) {
+        toast.error("Cannot connect to the server. Check network console.");
+        return;
       }
-    } else {
-      setErrorMsg("Invalid email or password.");
+
+      toast.error(error.response.data?.error || "Invalid email or password.");
     }
   };
 
@@ -65,7 +60,7 @@ const LoginPanel = () => {
       <div className="loginPanel__content">
         <h2 className="loginPanel__title">Welcome back</h2>
         <p className="loginPanel__subtitle">
-          Welcome back, please enter your details.
+          Please enter your details to log in.
         </p>
 
         <button className="loginPanel__googleBtn">
@@ -80,10 +75,6 @@ const LoginPanel = () => {
         <div className="loginPanel__divider">
           <span>or</span>
         </div>
-
-        {errorMsg && (
-          <div style={{ color: "red", marginBottom: "1em" }}>{errorMsg}</div>
-        )}
 
         <form className="loginPanel__form" onSubmit={handleSubmit}>
           <div className="loginPanel__inputGroup">

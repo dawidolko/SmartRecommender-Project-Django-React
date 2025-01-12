@@ -1,66 +1,78 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import "./PanelLogin.scss";
 
 const RegisterPanel = () => {
+  const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password1 !== password2) {
-      setErrorMsg("Passwords do not match.");
+      toast.error("Passwords do not match.");
+      console.log("[RegisterPanel] Passwords do not match.");
       return;
     }
 
-    const storedUsers = localStorage.getItem("registeredUsers");
-    let usersArray = [];
-
-    if (storedUsers) {
-      try {
-        usersArray = JSON.parse(storedUsers);
-        if (!Array.isArray(usersArray)) {
-          usersArray = [];
-        }
-      } catch (err) {
-        usersArray = [];
-      }
-    }
-
-    const userExists = usersArray.some((user) => user.email === email);
-    if (userExists) {
-      setErrorMsg("An account with this email already exists.");
+    if (!nickname) {
+      toast.error("Nickname is required.");
+      console.log("[RegisterPanel] Nickname is empty; cannot register.");
       return;
     }
-
-    const newUser = {
-      id: Date.now(),
-      email: email,
+    console.log("[RegisterPanel] Sending register data:", {
+      nickname,
+      email,
+      first_name: firstName,
+      last_name: lastName,
       password: password1,
-      role: "Client",
-    };
+    });
 
-    usersArray.push(newUser);
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/register/", {
+        nickname,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        password: password1,
+      });
 
-    localStorage.setItem("registeredUsers", JSON.stringify(usersArray));
+      console.log("[RegisterPanel] Response from /api/register:", response);
 
-    setEmail("");
-    setPassword1("");
-    setPassword2("");
-    setErrorMsg("");
-    setSuccessMsg("Account created successfully! You can now log in.");
+      toast.success(response.data.message || "Registered successfully!");
+
+      setNickname("");
+      setEmail("");
+      setFirstName("");
+      setLastName("");
+      setPassword1("");
+      setPassword2("");
+
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1000);
+    } catch (error) {
+      console.log("[RegisterPanel] Error while registering:", error);
+
+      if (!error.response) {
+        toast.error("Cannot connect to the server. Check network console.");
+        return;
+      }
+
+      toast.error(error.response.data?.error || "An error occurred.");
+    }
   };
 
   return (
     <div className="registerPanel">
       <div className="registerPanel__content">
-        <h2 className="registerPanel__title">Welcome back</h2>
-        <p className="registerPanel__subtitle">
-          Welcome back, please enter your details.
-        </p>
+        <h2 className="registerPanel__title">Create an account</h2>
+        <p className="registerPanel__subtitle">Enter your details below.</p>
 
         <button className="registerPanel__googleBtn">
           <img
@@ -75,16 +87,17 @@ const RegisterPanel = () => {
           <span>or</span>
         </div>
 
-        {errorMsg && (
-          <div style={{ color: "red", marginBottom: "1em" }}>{errorMsg}</div>
-        )}
-        {successMsg && (
-          <div style={{ color: "green", marginBottom: "1em" }}>
-            {successMsg}
-          </div>
-        )}
-
         <form className="registerPanel__form" onSubmit={handleSubmit}>
+          <div className="registerPanel__inputGroup">
+            <input
+              type="text"
+              className="registerPanel__input"
+              placeholder="Nickname"
+              required
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+            />
+          </div>
           <div className="registerPanel__inputGroup">
             <input
               type="email"
@@ -92,11 +105,25 @@ const RegisterPanel = () => {
               placeholder="Email"
               required
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setErrorMsg("");
-                setSuccessMsg("");
-              }}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="registerPanel__inputGroup">
+            <input
+              type="text"
+              className="registerPanel__input"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+          <div className="registerPanel__inputGroup">
+            <input
+              type="text"
+              className="registerPanel__input"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
           </div>
           <div className="registerPanel__inputGroup">
@@ -106,11 +133,7 @@ const RegisterPanel = () => {
               placeholder="Password"
               required
               value={password1}
-              onChange={(e) => {
-                setPassword1(e.target.value);
-                setErrorMsg("");
-                setSuccessMsg("");
-              }}
+              onChange={(e) => setPassword1(e.target.value)}
             />
           </div>
           <div className="registerPanel__inputGroup">
@@ -120,11 +143,7 @@ const RegisterPanel = () => {
               placeholder="Confirm Password"
               required
               value={password2}
-              onChange={(e) => {
-                setPassword2(e.target.value);
-                setErrorMsg("");
-                setSuccessMsg("");
-              }}
+              onChange={(e) => setPassword2(e.target.value)}
             />
           </div>
 

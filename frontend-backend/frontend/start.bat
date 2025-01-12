@@ -14,6 +14,8 @@ exit /b
 :: Installing dependencies
 echo Installing dependencies...
 npm install
+npm install react-toastify
+npm install react-countup
 
 :: Installing axios
 echo Installing axios...

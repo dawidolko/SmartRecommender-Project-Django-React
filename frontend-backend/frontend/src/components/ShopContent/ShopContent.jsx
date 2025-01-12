@@ -1,20 +1,23 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
 
 const ShopContent = () => {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const { category } = useParams(); // Pobiera kategorię z URL
+  const [selectedCategory, setSelectedCategory] = useState(category || "all");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:8000/api/categories/");
         const data = await response.json();
-        setCategories(["all", ...data.map((category) => category.name)]);
+        setCategories(["all", ...data.map((cat) => cat.name)]);
         setIsLoadingCategories(false);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -38,8 +41,15 @@ const ShopContent = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (category) {
+      setSelectedCategory(category);
+    }
+  }, [category]);
+
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
+    navigate(`/category/${category}`); // Aktualizuje URL
   };
 
   const filteredProducts =
@@ -52,7 +62,9 @@ const ShopContent = () => {
   return (
     <div className="shop container">
       <h2 id="category" className="shop__title">
-        Our Products
+        {selectedCategory !== "all"
+          ? `Products in "${selectedCategory}" category`
+          : "Our Products"}
       </h2>
 
       <div className="shop__buttons">

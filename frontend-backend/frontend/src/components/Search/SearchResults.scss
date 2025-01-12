@@ -1,0 +1,16 @@
+.search-results {
+  padding: 2em;
+  text-align: center;
+
+  &__title {
+    font-size: 2.5rem;
+    margin-bottom: 1em;
+  }
+
+  &__products {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5em;
+  }
+}

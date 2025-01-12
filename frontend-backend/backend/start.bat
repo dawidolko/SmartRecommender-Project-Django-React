@@ -50,6 +50,7 @@ pip install -r requirements.txt
 REM Installing psycopg2-binary
 pip uninstall psycopg2-binary
 pip install psycopg[c]
+pip install djangorestframework-simplejwt
 @REM pip install psycopg2-binary
 
 REM Creating and applying migrations
@@ -77,6 +78,7 @@ if %errorlevel% neq 0 (
 REM Running Django server
 echo Starting Django server...
 start http://127.0.0.1:8000
+python check_media.py
 python manage.py runserver
 
 pause
