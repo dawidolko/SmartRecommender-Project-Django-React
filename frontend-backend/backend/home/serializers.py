@@ -28,6 +28,7 @@ class SpecificationSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     photos = PhotoProductSerializer(source='photoproduct_set', many=True)
+    tags = serializers.StringRelatedField(many=True)
     categories = serializers.SlugRelatedField(
         many=True,
         read_only=True,
@@ -40,11 +41,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'price', 'old_price', 'description', 'categories',
-            'photos', 'opinions', 'specifications'
+            'photos', 'opinions', 'specifications', 'tags'
         ]
 
 class ProductSerializer(serializers.ModelSerializer):
     photos = PhotoProductSerializer(source='photoproduct_set', many=True)
+    tags = serializers.StringRelatedField(many=True)
     categories = serializers.SlugRelatedField(
         many=True,
         read_only=True,
@@ -53,10 +55,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price', 'old_price', 'description', 'categories', 'photos']
+        fields = ['id', 'name', 'price', 'old_price', 'description', 'categories', 'photos', 'tags']
 
 # ---------------------------
-#   NOWE SERIALIZERY
+#   NEW SERIALIZERS
 # ---------------------------
 
 class OrderSerializer(serializers.ModelSerializer):

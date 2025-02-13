@@ -9,6 +9,7 @@ from colorama import Fore, Style, init
 import random
 from django.db import connection
 from django.contrib.auth import get_user_model, authenticate
+from home.models import Product, Tag, PhotoProduct, Category, ProductCategory, Sale, Opinion, Order, Complaint, OrderProduct, Specification
 init(autoreset=True)  
 User = get_user_model()
 
@@ -20,10 +21,12 @@ class Command(BaseCommand):
         seed_categories()  
         seed_users()
         seed_sales()
+        seed_tags()
         seed_products()
         seed_specifications()
         seed_product_photos()
         seed_product_categories()  
+        seed_product_tags()
         seed_opinions()
         seed_orders()
         seed_complaints()
@@ -236,6 +239,28 @@ def seed_users():
         )
 
     print("Users successfully seeded.")
+
+def seed_tags():
+    Tag.objects.all().delete()
+
+    tag_names = [
+        "Gaming", "Office", "High Performance", "Budget", "Premium", "RGB",
+        "Silent", "Water Cooling", "Compact", "Overclocking", "Energy Efficient",
+        "Educational", "Productivity",
+
+        "Portable", "Fast Charging", "MagSafe Compatible", "Wireless",
+        "Mechanical Keyboard", "Noise Cancelling", "Fitness", "Waterproof",
+        "Wearable", "Stylus Support", "High Resolution", "Hi-Fi", "Studio",
+        "4K", "HDR", "Curved", "Mesh Networking", "WiFi 6",
+
+        "Unknown Category"
+    ]
+
+    for tag_name in tag_names:
+        Tag.objects.create(name=tag_name)
+
+    print("✅ Tags successfully seeded.")
+
 
 def seed_products():
     Product.objects.all().delete()
@@ -7841,7 +7866,123 @@ def seed_product_photos():
 
     print(Fore.GREEN + "Product photos successfully seeded.")
 
-# Seed product categories
+# Seed product tags
+
+# CATEGORY_TAGS = {
+#     "gaming": ["Gaming", "High Performance", "RGB", "Overclocking"],
+#     "learning": ["Office", "Budget", "Energy Efficient"],
+#     "office": ["Office", "Silent", "Energy Efficient"],
+#     "cooling": ["Water Cooling", "Silent", "Overclocking"],
+#     "graphics": ["High Performance", "Gaming", "Premium"],
+#     "laptops": ["Compact", "Energy Efficient", "Office"],
+#     "processors": ["Overclocking", "High Performance"],
+#     "accessories": ["Budget", "RGB", "Premium"],
+# }
+
+def seed_product_tags():
+    products = Product.objects.all()
+    tags = {tag.name.lower(): tag for tag in Tag.objects.all()}
+
+    if not products.exists():
+        print("No products found in database!")
+        return
+
+    if not tags:
+        print("No tags found in database!")
+        return
+
+    for product in products:
+        product_tags = set()
+        product_name_lower = product.name.lower()
+        product_description_lower = product.description.lower() if product.description else ""
+
+        # Mapping based on categories
+        category_mappings = {
+            "gaming": ["Gaming", "High Performance", "RGB"],
+            "learning": ["Educational", "Energy Efficient"],
+            "office": ["Office", "Silent", "Productivity"],
+            "cooling": ["Water Cooling", "Overclocking"],
+            "graphics": ["High Performance", "Gaming", "Premium"],
+            "laptops": ["Portable", "Productivity", "Energy Efficient"],
+            "mice": ["Gaming", "Wireless", "RGB"],
+            "keyboards": ["Gaming", "Mechanical Keyboard", "RGB"],
+            "monitors": ["4K", "HDR", "Curved"],
+            "routers": ["WiFi 6", "Mesh Networking"],
+            "phones": ["Smartphone", "5G", "Dual SIM"],
+            "watches": ["Smartwatch", "Fitness", "Waterproof"],
+            "headphones": ["Wireless", "Noise Cancelling", "Bluetooth"],
+            "printers": ["Inkjet", "Laser", "Wireless"],
+            "tablets": ["Tablet", "Stylus Support", "High Resolution"],
+            "usbFlashDrives": ["Portable", "High Speed"],
+            "powerbanks": ["Portable", "Fast Charging"],
+            "soundCards": ["Hi-Fi", "Gaming", "Studio"],
+            "consoles": ["Gaming", "4K", "Next-Gen"]
+        }
+
+        product_categories = product.categories.all()
+        if not product_categories.exists():
+            product_tags.add("Unknown Category")
+
+        for category in product_categories:
+            category_name_lower = category.name.lower()
+            for category_key, category_tags in category_mappings.items():
+                if category_key in category_name_lower:
+                    product_tags.update(category_tags)
+
+        # Mapping based on product name
+        name_mappings = {
+            "powerbank": ["Portable", "Fast Charging"],
+            "magsafe": ["MagSafe Compatible", "Wireless"],
+            "gaming mouse": ["Gaming", "RGB", "High Performance"],
+            "ultrabook": ["Compact", "Energy Efficient"],
+            "headphones": ["Wireless", "Noise Cancelling"],
+            "smartwatch": ["Fitness", "Waterproof", "Wearable"],
+            "printer": ["Wireless", "Office"],
+            "tablet": ["Stylus Support", "High Resolution"],
+            "router": ["WiFi 6", "Mesh Networking"],
+            "keyboard": ["Mechanical Keyboard", "RGB"],
+            "monitor": ["4K", "HDR"],
+        }
+
+        for keyword, tag_list in name_mappings.items():
+            if keyword in product_name_lower:
+                product_tags.update(tag_list)
+
+        # Mapping based on product description
+        description_mappings = {
+            "rgb": ["RGB"],
+            "magsafe": ["MagSafe Compatible"],
+            "wireless": ["Wireless"],
+            "mechanical keyboard": ["Mechanical Keyboard"],
+            "noise cancelling": ["Noise Cancelling"],
+            "fitness": ["Fitness"],
+            "waterproof": ["Waterproof"],
+        }
+
+        for keyword, tag_list in description_mappings.items():
+            if keyword in product_description_lower:
+                product_tags.update(tag_list)
+
+        # Mapping based on price
+        if product.price < 100:
+            product_tags.add("Budget")
+        elif product.price > 1000:
+            product_tags.add("Premium")
+
+        if "Budget" in product_tags and "Premium" in product_tags:
+            product_tags.discard("Premium")
+
+        print(f"✅ Product: {product.name}, Assigned Tags: {product_tags}")
+
+        # Assigning tags to the product
+        assigned_tags = [tags[tag.lower()] for tag in product_tags if tag.lower() in tags]
+        product.tags.set(assigned_tags)
+        product.save()
+
+    print("✅ Product tags successfully assigned with better accuracy.")
+
+
+# Seed product specifications
 
 def seed_specifications():
     specifications = [

@@ -111,7 +111,8 @@ const ProductPage = () => {
           </button>
           <button
             className="productPage__fav-btn"
-            onClick={handleToggleFavorite}>
+            onClick={handleToggleFavorite}
+          >
             {favorite ? <AiFillHeart /> : <AiOutlineHeart />}
           </button>
         </div>
@@ -121,7 +122,8 @@ const ProductPage = () => {
             <button
               onClick={handlePrevImage}
               aria-label="Previous Image"
-              className="productPage__arrow">
+              className="productPage__arrow"
+            >
               <AiOutlineLeft />
             </button>
             <img
@@ -133,7 +135,8 @@ const ProductPage = () => {
             <button
               onClick={handleNextImage}
               aria-label="Next Image"
-              className="productPage__arrow">
+              className="productPage__arrow"
+            >
               <AiOutlineRight />
             </button>
           </div>
@@ -143,9 +146,8 @@ const ProductPage = () => {
                 key={idx}
                 src={`http://localhost:8000/media/${photo.path}`}
                 alt={`Thumbnail ${idx + 1}`}
-                className={`productPage__thumbnail ${
-                  idx === currentIndex ? "active" : ""
-                }`}
+                className={`productPage__thumbnail ${idx === currentIndex ? "active" : ""
+                  }`}
                 onClick={() => setCurrentIndex(idx)}
               />
             ))}
@@ -156,7 +158,8 @@ const ProductPage = () => {
           <div className="productPage__overlay" onClick={closeImageOverlay}>
             <button
               className="productPage__overlay-close"
-              onClick={() => setIsImageEnlarged(false)}>
+              onClick={() => setIsImageEnlarged(false)}
+            >
               X
             </button>
             <img
@@ -172,6 +175,18 @@ const ProductPage = () => {
           <p className="productPage__category">
             Category: {product.categories.join(", ")}
           </p>
+          <div className="productPage__tags">
+            <p className="tags">
+              <span className="tagsHeader">Tags: </span>
+              {product.tags.length > 0 ? (
+                product.tags.map((tag, index) => (
+                  <span key={index} className={index === 2 ? "tag active" : "tag"}>{tag}</span>
+                ))
+              ) : (
+                <p>No tags available for this product.</p>
+              )}
+            </p>
+          </div>
           <div className="productPage__prices">
             {product.old_price && !isNaN(product.old_price) ? (
               <span className="productPage__old-price">
