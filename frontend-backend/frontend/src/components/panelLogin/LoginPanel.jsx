@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./PanelLogin.scss";
@@ -6,48 +8,45 @@ import "./PanelLogin.scss";
 const LoginPanel = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email) {
       toast.error("Email is required.");
-      console.log("[LoginPanel] Email is empty; cannot login.");
       return;
     }
     if (!password) {
       toast.error("Password is required.");
-      console.log("[LoginPanel] Password is empty; cannot login.");
       return;
     }
 
-    console.log("[LoginPanel] Sending login data:", { email, password });
-
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/login/", {
+      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
         email,
         password,
       });
 
-      console.log("[LoginPanel] Response from /api/login:", response);
-
-      const { user } = response.data;
-      localStorage.setItem("loggedUser", JSON.stringify(user));
+      const { access, refresh } = response.data; // Pobieranie tokenów
+      login(access); // Przekazanie access token do kontekstu
 
       toast.success("Logged in successfully!");
 
       setTimeout(() => {
-        if (user.role === "admin") {
-          window.location.href = "/admin";
+        const decoded = JSON.parse(atob(access.split(".")[1])); // Dekodowanie JWT
+        if (decoded.role === "admin") {
+          navigate("/admin");
         } else {
-          window.location.href = "/client";
+          navigate("/client");
         }
       }, 500);
     } catch (error) {
-      console.log("[LoginPanel] Error while logging in:", error);
+      console.error("[LoginPanel] Error while logging in:", error);
 
       if (!error.response) {
-        toast.error("Cannot connect to the server. Check network console.");
+        toast.error("Cannot connect to the server. Check your connection.");
         return;
       }
 

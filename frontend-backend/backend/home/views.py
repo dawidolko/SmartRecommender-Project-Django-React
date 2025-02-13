@@ -11,9 +11,11 @@ from rest_framework.generics import (
 )
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model, authenticate
+from rest_framework import viewsets
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from .permissions import IsAdminUser
 
 from .models import Product, Category, Order, Complaint, User as MyUser
 from .serializers import (
@@ -258,3 +260,9 @@ class ClientStatsView(APIView):
             "complaints": complaints_count,
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+# class ProductAdminViewSet(viewsets.ModelViewSet):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     permission_classes = [IsAuthenticated, IsAdminUser]  # Tylko dla admina

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
 import AnimatedPage from "../components/AnimatedPage/AnimatedPage";
@@ -15,16 +17,16 @@ import AdminComplaints from "../components/AdminPanel/AdminComplaints";
 import "../components/AdminPanel/AdminPanel.scss";
 
 const AdminPanel = () => {
+  const { user } = useContext(AuthContext); // Pobieranie użytkownika z kontekstu
   const navigate = useNavigate();
 
-  const storedUser = localStorage.getItem("loggedUser");
-  let user = null;
-  if (storedUser) {
-    user = JSON.parse(storedUser);
-  }
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/login", { replace: true });
+    }
+  }, [user, navigate]);
 
   if (!user || user.role !== "admin") {
-    navigate("/login");
     return null;
   }
 

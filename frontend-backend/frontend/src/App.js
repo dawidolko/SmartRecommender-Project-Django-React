@@ -1,7 +1,11 @@
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer } from "react-toastify";
+import React from "react";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
+
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -23,19 +27,18 @@ import RegisterPanel from "./components/panelLogin/RegisterPanel";
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
 
-function AdminRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem("loggedUser") || "null");
-  if (!user || user.role !== "admin") {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-}
+// Ochrona tras na podstawie roli
+function PrivateRoute({ children, roles }) {
+  const { user } = useContext(AuthContext);
 
-function ClientRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem("loggedUser") || "null");
-  if (!user || user.role !== "client") {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
+
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
@@ -77,20 +80,23 @@ function App() {
               <Route path="/login" element={<LoginPanel />} />
               <Route path="/signup" element={<RegisterPanel />} />
 
+              {/* 🔹 Ochrona admina */}
               <Route
                 path="/admin/*"
                 element={
-                  <AdminRoute>
+                  <PrivateRoute roles={["admin"]}>
                     <AdminPanel />
-                  </AdminRoute>
+                  </PrivateRoute>
                 }
               />
+
+              {/* 🔹 Ochrona klienta */}
               <Route
                 path="/client/*"
                 element={
-                  <ClientRoute>
+                  <PrivateRoute roles={["client"]}>
                     <ClientPanel />
-                  </ClientRoute>
+                  </PrivateRoute>
                 }
               />
 
