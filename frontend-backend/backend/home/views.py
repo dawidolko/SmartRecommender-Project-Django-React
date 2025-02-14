@@ -15,6 +15,7 @@ from rest_framework import viewsets
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 from .permissions import IsAdminUser
 
 from .models import Product, Category, Order, Complaint, User as MyUser
@@ -24,13 +25,36 @@ from .serializers import (
     OrderSerializer,
     ComplaintSerializer,
     UserSerializer,
+    MyTokenObtainPairSerializer,
 )
 
 from django.db.models import Q
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 User = get_user_model()
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = self.user
+
+        data["user"] = {
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return data
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 # ---------------------------
 # KATEGORIE
@@ -116,7 +140,7 @@ class UserRegisterView(APIView):
         nickname = request.data.get("nickname")
         first_name = request.data.get("first_name", "")
         last_name = request.data.get("last_name", "")
-        role = "client"
+        role = request.data.get("role", "client")
 
         if User.objects.filter(email=email).exists():
             return Response({"error": "Email is already registered"}, status=status.HTTP_400_BAD_REQUEST)
@@ -125,10 +149,10 @@ class UserRegisterView(APIView):
             return Response({"error": "Password must be at least 8 characters long"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.create_user(
+            user = User.objects.create(
                 username=nickname,
                 email=email,
-                password=password,
+                password=make_password(password),
                 role=role,
                 first_name=first_name,
                 last_name=last_name,
@@ -216,22 +240,21 @@ class AdminStatsView(APIView):
 
 
 class CurrentUserView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = User.objects.first()  
-        if not user:
-            return Response({"error": "No users available in the system"}, status=404)
-
-        return Response(
-            {
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "role": user.role,
-            }
-        )
+        print(f"Received request from: {request.user}")
+        print(f"🔹 Headers: {request.headers}") 
+        if request.user.is_anonymous:
+            return Response({"error": "Not authenticated"}, status=401)
+        user = request.user
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }, status=status.HTTP_200_OK)
 
 class ProductSearchAPIView(APIView):
     def get(self, request):

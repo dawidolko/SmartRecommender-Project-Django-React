@@ -29,13 +29,13 @@ const LoginPanel = () => {
         password,
       });
 
-      const { access, refresh } = response.data; // Pobieranie tokenów
-      login(access); // Przekazanie access token do kontekstu
+      const { access, refresh } = response.data;
+      login(access);
 
       toast.success("Logged in successfully!");
 
       setTimeout(() => {
-        const decoded = JSON.parse(atob(access.split(".")[1])); // Dekodowanie JWT
+        const decoded = JSON.parse(atob(access.split(".")[1]));
         if (decoded.role === "admin") {
           navigate("/admin");
         } else {

@@ -27,15 +27,20 @@ import RegisterPanel from "./components/panelLogin/RegisterPanel";
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
 
-// Ochrona tras na podstawie roli
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
+
+  console.log("[PrivateRoute] Checking user:", user);
+
+  if (user === null) {
+    return <p>Loading...</p>;
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (roles && !roles.includes(user.role)) {
+  if (!user.role || (roles && !roles.includes(user.role))) {
     return <Navigate to="/" replace />;
   }
 
@@ -80,7 +85,6 @@ function App() {
               <Route path="/login" element={<LoginPanel />} />
               <Route path="/signup" element={<RegisterPanel />} />
 
-              {/* 🔹 Ochrona admina */}
               <Route
                 path="/admin/*"
                 element={
@@ -90,7 +94,6 @@ function App() {
                 }
               />
 
-              {/* 🔹 Ochrona klienta */}
               <Route
                 path="/client/*"
                 element={

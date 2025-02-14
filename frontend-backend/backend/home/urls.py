@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     CategoriesAPIView,
     ProductsAPIView,
@@ -19,6 +20,8 @@ from .views import (
     CurrentUserView,
     ProductSearchAPIView,
     ClientStatsView,
+    CustomTokenObtainPairView,
+    MyTokenObtainPairView,
 )
 
 urlpatterns = [
@@ -27,7 +30,9 @@ urlpatterns = [
     path("api/random-products/", RandomProductsAPIView.as_view(), name="random-products"),
     path("api/product/<int:pk>/", ProductDetailAPIView.as_view(), name="product-detail"),
     path("api/products-old/", ProductsAPIView.as_view(), name="products"),
-    path("api/login/", UserLoginView.as_view(), name="login"),
+    path("api/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/register/", UserRegisterView.as_view(), name="register"),
     path("api/products/", ProductListCreateAPIView.as_view(), name="product-list-create"),
     path("api/products/<int:pk>/", ProductRetrieveUpdateDestroyAPIView.as_view(), name="product-rud"),
@@ -38,7 +43,7 @@ urlpatterns = [
     path("api/complaints/", ComplaintListCreateAPIView.as_view(), name="complaint-list-create"),
     path("api/complaints/<int:pk>/", ComplaintRetrieveUpdateDestroyAPIView.as_view(), name="complaint-rud"),
     path("api/admin-stats/", AdminStatsView.as_view(), name="admin-stats"),
-    path("api/me/", CurrentUserView.as_view(), name="current-user"),
+    path("api/user/", CurrentUserView.as_view(), name="current_user"),
     path("api/search/", ProductSearchAPIView.as_view(), name="product-search"),
     path("api/client-stats/", ClientStatsView.as_view(), name="client-stats"),
 ]
