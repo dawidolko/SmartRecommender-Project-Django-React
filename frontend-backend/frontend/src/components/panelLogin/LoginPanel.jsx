@@ -14,12 +14,8 @@ const LoginPanel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email) {
-      toast.error("Email is required.");
-      return;
-    }
-    if (!password) {
-      toast.error("Password is required.");
+    if (!email || !password) {
+      toast.error("Please enter email and password.");
       return;
     }
 
@@ -29,92 +25,65 @@ const LoginPanel = () => {
         password,
       });
 
-      const { access, refresh } = response.data;
+      const { access } = response.data;
       login(access);
 
       toast.success("Logged in successfully!");
 
       setTimeout(() => {
         const decoded = JSON.parse(atob(access.split(".")[1]));
-        if (decoded.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/client");
-        }
+        navigate(decoded.role === "admin" ? "/admin" : "/client");
       }, 500);
     } catch (error) {
-      console.error("[LoginPanel] Error while logging in:", error);
-
-      if (!error.response) {
-        toast.error("Cannot connect to the server. Check your connection.");
-        return;
-      }
-
-      toast.error(error.response.data?.error || "Invalid email or password.");
+      toast.error(error.response?.data?.error || "Invalid email or password.");
     }
   };
 
   return (
     <div className="loginPanel">
-      <div className="loginPanel__content">
-        <h2 className="loginPanel__title">Welcome back</h2>
-        <p className="loginPanel__subtitle">
-          Please enter your details to log in.
-        </p>
-
-        <button className="loginPanel__googleBtn">
-          <img
-            className="loginPanel__googleIcon"
-            src="https://static.cdnlogo.com/logos/g/35/google-icon.svg"
-            alt="Google"
-          />
-          Log in with Google
-        </button>
-
-        <div className="loginPanel__divider">
-          <span>or</span>
-        </div>
+      <div className="loginPanel__container">
+        <div className="loginPanel__image"></div>
 
         <form className="loginPanel__form" onSubmit={handleSubmit}>
-          <div className="loginPanel__inputGroup">
+          <h2>Welcome back</h2>
+          <p>Please enter your details to log in.</p>
+
+          <div className="floating-label">
             <input
               type="email"
-              className="loginPanel__input"
+              id="email"
+              name="email"
               placeholder="Email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
-          <div className="loginPanel__inputGroup">
+
+          <div className="floating-label">
             <input
               type="password"
-              className="loginPanel__input"
+              id="password"
+              name="password"
               placeholder="Password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <button type="submit" className="loginPanel__submitBtn">
-            Log in
-          </button>
+          <div className="loginPanel__buttons">
+            <button type="submit">Log in</button>
+            <span className="loginPanel__or">OR</span>
+            <button
+              type="button"
+              className="loginPanel__signupBtn"
+              onClick={() => navigate("/signup")}
+            >
+              Sign Up
+            </button>
+          </div>
         </form>
-
-        <div className="loginPanel__footer">
-          <p>
-            If you have not created an account yet, please{" "}
-            <a href="/signup" className="loginPanel__link">
-              Sign up for free
-            </a>
-            .
-          </p>
-        </div>
-      </div>
-
-      <div className="loginPanel__imageWrapper">
-        <div className="loginPanel__overlay" />
       </div>
     </div>
   );

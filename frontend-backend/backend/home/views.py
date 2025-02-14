@@ -2,6 +2,8 @@ from django.db.models import Count
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .models import CartItem
+from .serializers import CartItemSerializer
 from rest_framework.generics import (
     RetrieveAPIView,
     ListCreateAPIView,
@@ -289,3 +291,29 @@ class ClientStatsView(APIView):
 #     queryset = Product.objects.all()
 #     serializer_class = ProductSerializer
 #     permission_classes = [IsAuthenticated, IsAdminUser]  # Tylko dla admina
+
+class CartPreviewView(APIView):
+
+    def get(self, request):
+        cart_items = CartItem.objects.filter(user=request.user)[:3]  # Max 3 products
+        serializer = CartItemSerializer(cart_items, many=True)
+        return Response(serializer.data)
+
+    def patch(self, request, item_id):
+        """Products quantity update"""
+        cart_item = CartItem.objects.get(id=item_id, user=request.user)
+        action = request.data.get("action")
+
+        if action == "increase":
+            cart_item.quantity += 1
+        elif action == "decrease" and cart_item.quantity > 1:
+            cart_item.quantity -= 1
+        cart_item.save()
+
+        return Response({"message": "Quantity updated", "new_quantity": cart_item.quantity})
+
+    def delete(self, request, item_id):
+        """Product removal from cart"""
+        cart_item = CartItem.objects.get(id=item_id, user=request.user)
+        cart_item.delete()
+        return Response({"message": "Item removed"})

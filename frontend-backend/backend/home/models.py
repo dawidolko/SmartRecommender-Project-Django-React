@@ -17,6 +17,14 @@ class User(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
 
+class CartItem(models.Model):
+    user = models.ForeignKey("home.User", on_delete=models.CASCADE)
+    product = models.ForeignKey("home.Product", on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.user} - {self.product} ({self.quantity})"
+
 # Product category
 class Category(models.Model):
     id = models.AutoField(primary_key=True)

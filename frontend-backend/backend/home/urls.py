@@ -1,5 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import (
     CategoriesAPIView,
     ProductsAPIView,
@@ -22,6 +24,7 @@ from .views import (
     ClientStatsView,
     CustomTokenObtainPairView,
     MyTokenObtainPairView,
+    CartPreviewView,
 )
 
 urlpatterns = [
@@ -45,5 +48,8 @@ urlpatterns = [
     path("api/admin-stats/", AdminStatsView.as_view(), name="admin-stats"),
     path("api/user/", CurrentUserView.as_view(), name="current_user"),
     path("api/search/", ProductSearchAPIView.as_view(), name="product-search"),
+    path('cart/preview/', CartPreviewView.as_view(), name="cart_preview"),
+    path('cart/update/<int:item_id>/', CartPreviewView.as_view(), name="cart_update"),
+    path('cart/remove/<int:item_id>/', CartPreviewView.as_view(), name="cart_remove"),
     path("api/client-stats/", ClientStatsView.as_view(), name="client-stats"),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

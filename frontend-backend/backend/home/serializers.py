@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     Product, PhotoProduct, Opinion, Category, Specification,
-    Order, Complaint, User
+    Order, Complaint, User, CartItem
 )
 
 class PhotoProductSerializer(serializers.ModelSerializer):
@@ -64,6 +64,17 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source="user.email", read_only=True)
+
+# Item in cart
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ["id", "user", "product", "quantity"]
+        extra_kwargs = {
+            "user": {"read_only": True},
+        }
 
     class Meta:
         model = Order

@@ -10,6 +10,7 @@ import {
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
+import CartPreview from "../CartContent/CartPreview";
 import axios from "axios";
 
 const Navbar = () => {
@@ -22,6 +23,7 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showCartPreview, setShowCartPreview] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -227,13 +229,7 @@ const Navbar = () => {
             </NavLink>
 
             {/* Cart */}
-            <div
-              className="navbar__cart"
-              onClick={() => (window.location.href = "/cart")}
-              style={{ cursor: "pointer" }}>
-              <span className="navbar__quantity">{totalCartItems()}</span>
-              <FaShoppingCart className="navbar__basket" />
-            </div>
+            <CartPreview />
           </li>
         </ul>
 
