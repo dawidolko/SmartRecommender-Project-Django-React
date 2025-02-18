@@ -13,16 +13,19 @@
   }
 
   &__wrapper {
-    @include flexCenter(column);
+    // @include flexCenter(column);
     gap: 2em;
+    display: flex;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     max-width: 1200px;
   }
 
   &__img {
     max-width: 500px;
-    width: 100%;
-    height: 100%;
+    height: 70vh;
     object-fit: cover;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -61,18 +64,51 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 1024px) {
   .accordion {
     padding: 5em 0.5em;
 
     &__wrapper {
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 3em;
+      gap: 2em;
+    }
+
+    &__questions{
+      width: 50%;
     }
 
     &__img {
-      max-width: 450px;
+      max-height: 700px;
+    }
+
+    &__box {
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $main;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .accordion {
+    padding: 2em 0.5em 0 0.5em;
+
+    &__wrapper {
+      gap: 2em;
+    }
+
+    &__questions{
+      width: 90%;
+      gap: 0;
+    }
+
+    &__img {
+      display: none;
+    }
+
+    &__title{
+      margin-bottom: 10px;
     }
 
     &__box {

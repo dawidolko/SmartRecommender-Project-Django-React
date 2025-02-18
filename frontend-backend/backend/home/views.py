@@ -19,6 +19,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from .permissions import IsAdminUser
+from django.db.models import Q
 
 from .models import Product, Category, Order, Complaint, User as MyUser
 from .serializers import (
@@ -317,3 +318,18 @@ class CartPreviewView(APIView):
         cart_item = CartItem.objects.get(id=item_id, user=request.user)
         cart_item.delete()
         return Response({"message": "Item removed"})
+    
+class ProductSearchAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.GET.get("q", "")
+        if query:
+            products = Product.objects.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query) |
+                Q(categories__name__icontains=query)
+            ).distinct()
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data)
+        return Response({"error": "No query provided"}, status=400)

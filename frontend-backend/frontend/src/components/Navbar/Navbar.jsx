@@ -1,11 +1,10 @@
 import "./Navbar.scss";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
   AiOutlineClose,
   AiOutlineHeart,
-  AiOutlineSearch,
 } from "react-icons/ai";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { CartContext } from "../ShopContext/ShopContext";
@@ -16,6 +15,7 @@ import axios from "axios";
 const Navbar = () => {
   const { totalCartItems } = useContext(CartContext);
   const { favorites } = useFavorites();
+  const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
   const [navBgc, setNavBgc] = useState(false);
@@ -23,7 +23,7 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [showCartPreview, setShowCartPreview] = useState(false);
+  // const [showCartPreview, setShowCartPreview] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -61,7 +61,13 @@ const Navbar = () => {
     setShowUserDropdown(false);
   };
 
-  const toggleSearch = () => setShowSearch(!showSearch);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      navigate(`/search/${searchInput}`);
+      setSearchInput("");
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
@@ -80,26 +86,24 @@ const Navbar = () => {
   return (
     <nav className={navBgc ? "navbar navbar__bgc" : "navbar"}>
       <div className="navbar__container container">
-        <div className="navbar__search-wrapper">
-          <button className="navbar__search-icon" onClick={toggleSearch}>
-            <AiOutlineSearch />
-          </button>
-          {showSearch && (
-            <div className="navbar__search">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-              <button className="navbar__search-button">Search</button>
-            </div>
-          )}
-        </div>
-        <Link to="/" className="navbar__logo">
+      <Link to="/" className="navbar__logo">
           <p className="navbar__logo-text"></p>
         </Link>
-
+        <div className="navbar__search-wrapper">
+        <form className="search-bar" onSubmit={handleSearchSubmit}>
+          <input
+            type="search"
+            name="search"
+            placeholder="Search products..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            required
+          />
+          <button className="search-btn" type="submit">
+            <span>Search</span>
+          </button>
+        </form>
+        </div>
         <ul
           className={
             isOpen ? "navbar__links navbar__links-active" : "navbar__links"

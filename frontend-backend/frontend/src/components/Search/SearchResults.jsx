@@ -1,26 +1,52 @@
-import React from "react";
-import "./SearchResults.scss";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import "../ShopContent/ShopContent.scss";
 import ShopProduct from "../ShopContent/ShopProduct";
 
-const SearchResults = ({ searchResults }) => {
+const SearchResults = () => {
+  const { query } = useParams();
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/products/search/?q=${query}`);
+        const data = await response.json();
+        setProducts(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [query]);
+
   return (
-    <div className="search-results">
-      <h2 className="search-results__title">Search Results</h2>
-      <div className="search-results__products">
-        {searchResults.length > 0 ? (
-          searchResults.map((product) => (
+    <div className="shop container">
+      <h2 className="shop__title">Search Results for "{query}"</h2>
+
+      <div className="shop__products">
+        {isLoading ? (
+          <p>Loading products...</p>
+        ) : products.length > 0 ? (
+          products.map((product) => (
             <ShopProduct
               key={product.id}
               id={product.id}
               name={product.name}
               price={product.price}
               old_price={product.old_price}
-              imgs={product.photos.map((photo) => photo.path)}
+              imgs={product.photos.map(
+                (photo) => `http://localhost:8000/media/${photo.path}`
+              )}
               category={product.categories[0] || "N/A"}
             />
           ))
         ) : (
-          <p>No products found.</p>
+          <p>No products match your search.</p>
         )}
       </div>
     </div>

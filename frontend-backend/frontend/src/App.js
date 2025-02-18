@@ -5,6 +5,7 @@ import React from "react";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
+import ScrollToTop from "./utils/ScrollToTop";
 
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
@@ -23,6 +24,8 @@ import ShopContext from "./components/ShopContext/ShopContext";
 import ProductSection from "./pages/ProductSection";
 import LoginPanel from "./components/panelLogin/LoginPanel";
 import RegisterPanel from "./components/panelLogin/RegisterPanel";
+import SearchResults from "./components/Search/SearchResults";
+
 
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
@@ -52,6 +55,7 @@ function App() {
 
   return (
     <>
+      {/* <ScrollToTop /> */}
       <FavoritesProvider>
         <ShopContext>
           <Navbar />
@@ -81,6 +85,7 @@ function App() {
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/product/:id" element={<ProductSection />} />
               <Route path="/category/:category" element={<Shop />} />
+              <Route path="/search/:query" element={<SearchResults />} />
 
               <Route path="/login" element={<LoginPanel />} />
               <Route path="/signup" element={<RegisterPanel />} />

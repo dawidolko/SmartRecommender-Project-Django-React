@@ -25,6 +25,7 @@ from .views import (
     CustomTokenObtainPairView,
     MyTokenObtainPairView,
     CartPreviewView,
+    ProductSearchAPIView,
 )
 
 urlpatterns = [
@@ -47,7 +48,7 @@ urlpatterns = [
     path("api/complaints/<int:pk>/", ComplaintRetrieveUpdateDestroyAPIView.as_view(), name="complaint-rud"),
     path("api/admin-stats/", AdminStatsView.as_view(), name="admin-stats"),
     path("api/user/", CurrentUserView.as_view(), name="current_user"),
-    path("api/search/", ProductSearchAPIView.as_view(), name="product-search"),
+    path("api/products/search/", ProductSearchAPIView.as_view(), name="product_search"),
     path('cart/preview/', CartPreviewView.as_view(), name="cart_preview"),
     path('cart/update/<int:item_id>/', CartPreviewView.as_view(), name="cart_update"),
     path('cart/remove/<int:item_id>/', CartPreviewView.as_view(), name="cart_remove"),

@@ -3,7 +3,7 @@
 .mainBackground {
   position: relative;
   width: 100%;
-  height: auto;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -17,6 +17,7 @@
   &__content {
     @include flexCenter(column);
     gap: 1em;
+    // margin-top: 50px;
     position: absolute;
     top: 50%;
     left: 50%;
