@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     Product, PhotoProduct, Opinion, Category, Specification,
-    Order, Complaint, User, CartItem
+    Order, Complaint, User, CartItem, Tag
 )
 
 class PhotoProductSerializer(serializers.ModelSerializer):
@@ -97,3 +97,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["role"] = user.role
         return token
+    
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ["id", "name"]

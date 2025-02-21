@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from .permissions import IsAdminUser
 from django.db.models import Q
 
-from .models import Product, Category, Order, Complaint, User as MyUser
+from .models import Product, Category, Order, Complaint, Tag, User as MyUser
 from .serializers import (
     ProductSerializer,
     ProductDetailSerializer,
@@ -29,6 +29,7 @@ from .serializers import (
     ComplaintSerializer,
     UserSerializer,
     MyTokenObtainPairSerializer,
+    TagSerializer,
 )
 
 from django.db.models import Q
@@ -333,3 +334,10 @@ class ProductSearchAPIView(APIView):
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return Response({"error": "No query provided"}, status=400)
+    
+class TagsAPIView(APIView):
+# Api returns all available tags in the system.
+    def get(self, request, *args, **kwargs):
+        tags = Tag.objects.all()
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data)

@@ -251,9 +251,7 @@ def seed_tags():
         "Portable", "Fast Charging", "MagSafe Compatible", "Wireless",
         "Mechanical Keyboard", "Noise Cancelling", "Fitness", "Waterproof",
         "Wearable", "Stylus Support", "High Resolution", "Hi-Fi", "Studio",
-        "4K", "HDR", "Curved", "Mesh Networking", "WiFi 6",
-
-        "Unknown Category"
+        "4K", "HDR", "Curved", "Mesh Networking", "WiFi 6"
     ]
 
     for tag_name in tag_names:

@@ -26,6 +26,7 @@ from .views import (
     MyTokenObtainPairView,
     CartPreviewView,
     ProductSearchAPIView,
+    TagsAPIView,
 )
 
 urlpatterns = [
@@ -33,6 +34,7 @@ urlpatterns = [
     path("api/categories/", CategoriesAPIView.as_view(), name="categories"),
     path("api/random-products/", RandomProductsAPIView.as_view(), name="random-products"),
     path("api/product/<int:pk>/", ProductDetailAPIView.as_view(), name="product-detail"),
+    path("api/tags/", TagsAPIView.as_view(), name="tags"),
     path("api/products-old/", ProductsAPIView.as_view(), name="products"),
     path("api/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),

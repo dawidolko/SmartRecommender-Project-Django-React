@@ -4,24 +4,51 @@ import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
 
 const ShopContent = () => {
-  const { category } = useParams(); // Pobiera kategorię z URL
-  const [selectedCategory, setSelectedCategory] = useState(category || "all");
+  const { category } = useParams();
+  const navigate = useNavigate();
+
+  const [selectedMainCategory, setSelectedMainCategory] = useState("all");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("all");
+  const [selectedTag, setSelectedTag] = useState(null);
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-  const navigate = useNavigate();
+  const [isLoadingTags, setIsLoadingTags] = useState(true);
+
+  useEffect(() => {
+    if (category) {
+      const parts = category.split(".");
+      setSelectedMainCategory(parts[0] || "all");
+      setSelectedSubCategory(parts[1] || "all");
+    }
+  }, [category]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:8000/api/categories/");
         const data = await response.json();
-        setCategories(["all", ...data.map((cat) => cat.name)]);
+        setCategories(data.map((cat) => cat.name));
         setIsLoadingCategories(false);
       } catch (error) {
         console.error("Error fetching categories:", error);
         setIsLoadingCategories(false);
+      }
+    };
+
+    const fetchTags = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/tags/");
+        const data = await response.json();
+        setTags(data);
+        setIsLoadingTags(false);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+        setIsLoadingTags(false);
       }
     };
 
@@ -38,47 +65,121 @@ const ShopContent = () => {
     };
 
     fetchCategories();
+    fetchTags();
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    if (category) {
-      setSelectedCategory(category);
-    }
-  }, [category]);
+  const mainCategories = Array.from(new Set(categories.map((cat) => cat.split(".")[0])));
+  const subCategories =
+    selectedMainCategory !== "all"
+      ? categories
+          .filter((cat) => cat.startsWith(selectedMainCategory + "."))
+          .map((cat) => cat.split(".")[1])
+      : [];
 
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
-    navigate(`/category/${category}`); // Aktualizuje URL
-  };
+  // Product filtering - we take into account the category and the selected tag
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedMainCategory === "all" ||
+      product.categories.some((prodCat) => {
+        const [prodMain, prodSub = "all"] = prodCat.split(".");
+        return selectedSubCategory === "all"
+          ? prodMain === selectedMainCategory
+          : prodMain === selectedMainCategory && prodSub === selectedSubCategory;
+      });
 
-  const filteredProducts =
-    selectedCategory === "all"
-      ? products
-      : products.filter((product) =>
-          product.categories.some((cat) => cat === selectedCategory)
-        );
+    const matchesTag = !selectedTag || product.tags.includes(selectedTag);
+
+    return matchesCategory && matchesTag;
+  });
 
   return (
     <div className="shop container">
-      <h2 id="category" className="shop__title">
-        {selectedCategory !== "all"
-          ? `Products in "${selectedCategory}" category`
-          : "Our Products"}
+      <h2 className="shop__title">
+        {selectedMainCategory === "all"
+          ? "Our Products"
+          : `Products in "${selectedMainCategory.toUpperCase()}" category`}
       </h2>
 
       <div className="shop__buttons">
         {isLoadingCategories ? (
           <p>Loading categories...</p>
         ) : (
-          categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className={selectedCategory === category ? "shop__active" : ""}>
-              {category.toUpperCase()}
-            </button>
-          ))
+          <>
+            <div className="shop__main-categories">
+              <p>Filter by category and subcategory:</p>
+              <button
+                onClick={() => {
+                  setSelectedMainCategory("all");
+                  setSelectedSubCategory("all");
+                  navigate(`/category/all`);
+                }}
+                className={selectedMainCategory === "all" ? "shop__active" : ""}
+              >
+                ALL PRODUCTS
+              </button>
+              {mainCategories.map((mainCat) => (
+                <button
+                  key={mainCat}
+                  onClick={() => {
+                    setSelectedMainCategory(mainCat);
+                    setSelectedSubCategory("all");
+                    navigate(`/category/${mainCat}`);
+                  }}
+                  className={selectedMainCategory === mainCat ? "shop__active" : ""}
+                >
+                  {mainCat.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {selectedMainCategory !== "all" && subCategories.length > 0 && (
+              <div className="shop__sub-categories">
+                <button
+                  onClick={() => {
+                    setSelectedSubCategory("all");
+                    navigate(`/category/${selectedMainCategory}`);
+                  }}
+                  className={selectedSubCategory === "all" ? "shop__active" : ""}
+                >
+                  ALL PRODUCTS
+                </button>
+                {subCategories.map((subCat) => (
+                  <button
+                    key={subCat}
+                    onClick={() => {
+                      setSelectedSubCategory(subCat);
+                      navigate(`/category/${selectedMainCategory}.${subCat}`);
+                    }}
+                    className={selectedSubCategory === subCat ? "shop__active" : ""}
+                  >
+                    {subCat.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!isLoadingTags && tags.length > 0 && (
+              <div className="shop__tags">
+                <p>Filter by tag:</p>
+                <button
+                  onClick={() => setSelectedTag(null)}
+                  className={!selectedTag ? "shop__active" : ""}
+                >
+                  ALL TAGS
+                </button>
+                {tags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    onClick={() => setSelectedTag(tag.name)}
+                    className={selectedTag === tag.name ? "shop__active" : ""}
+                  >
+                    {tag.name.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -100,7 +201,7 @@ const ShopContent = () => {
             />
           ))
         ) : (
-          <p>No products available in this category.</p>
+          <p>No products available in this category or tag.</p>
         )}
       </div>
     </div>
