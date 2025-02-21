@@ -142,6 +142,19 @@ This project, developed by Dawid Olko and Piotr Smoła under the supervision of 
   - Backend (NLP): Configuring NLP pipelines, refining sentiment model parameters (e.g., tokenization, stopword removal).
   - Frontend: Adding a filter to display products with positive sentiment and performing basic A/B tests.
 
+### Stage 6: Sentiment Analysis and Dynamic Recommendations (NLP)
+
+- **Person 1 and 2 together:**
+
+  - **Frequent Itemset Detection**:  
+    I will use algorithms like **Apriori** or **FP-Growth** to identify groups of products that frequently appear together in user transactions.
+
+  - **Rule Generation**:  
+    Based on the frequent itemsets, rules are generated in the form: "If a user buys product A, then they are likely to buy product B." Metrics such as **support**, **confidence**, and **lift** help evaluate the strength of these rules.
+
+  - **Personalized Recommendations**:  
+    These rules can be applied to a user's shopping history to suggest complementary products, enhancing the overall recommendation quality.
+
 ---
 
 This README provides a comprehensive guide to the platform's development, methodology, and technical stack. The work distribution ensures efficient collaboration and modular implementation of key features. Further refinements and iterations will continue as the project progresses.
