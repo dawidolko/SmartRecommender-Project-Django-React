@@ -106,9 +106,6 @@ const ProductPage = () => {
     <section className="productPage">
       <div className="productPage__container">
         <div className="productPage__buttons-top">
-          <button className="productPage__cart-btn" onClick={handleAddToCart}>
-            Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
-          </button>
           <button
             className="productPage__fav-btn"
             onClick={handleToggleFavorite}
@@ -171,9 +168,14 @@ const ProductPage = () => {
         )}
 
         <div className="productPage__info">
+          <div className="productPage__info__main">
           <h2 className="productPage__title">{product.name}</h2>
           <p className="productPage__category">
-            Category: {product.categories.join(", ")}
+            Category: {product.categories
+              .map(category => category.replace(/\./g, " > "))
+              .join(", ")
+              .toUpperCase()}
+
           </p>
           <div className="productPage__tags">
             <p className="tags">
@@ -196,6 +198,10 @@ const ProductPage = () => {
             <span className="productPage__current-price">
               ${parseFloat(product.price).toFixed(2)}
             </span>
+            <button className="productPage__cart-btn" onClick={handleAddToCart}>
+              Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
+            </button>
+          </div>
           </div>
 
           <div className="productPage__desc">
