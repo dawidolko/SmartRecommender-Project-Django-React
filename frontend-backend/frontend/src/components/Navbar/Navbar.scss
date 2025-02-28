@@ -40,10 +40,11 @@
 
         .navbar__main-category-name {
           font-weight: bold;
-          font-size: 1rem;
+          font-size: 1.4rem;
           color: $main;
           cursor: pointer;
           text-transform: uppercase;
+          padding: 2px;
         }
 
         .navbar__main-category-name:hover {

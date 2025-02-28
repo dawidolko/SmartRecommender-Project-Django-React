@@ -40,10 +40,12 @@ function PrivateRoute({ children, roles }) {
   }
 
   if (!user) {
+    console.warn("[PrivateRoute] User not authenticated, redirecting...");
     return <Navigate to="/login" replace />;
   }
 
   if (!user.role || (roles && !roles.includes(user.role))) {
+    console.warn("[PrivateRoute] Unauthorized access, redirecting...");
     return <Navigate to="/" replace />;
   }
 

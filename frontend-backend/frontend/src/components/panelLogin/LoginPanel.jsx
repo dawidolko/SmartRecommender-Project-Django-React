@@ -13,32 +13,36 @@ const LoginPanel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!email || !password) {
       toast.error("Please enter email and password.");
       return;
     }
-
+  
     try {
       const response = await axios.post("http://127.0.0.1:8000/api/token/", {
         email,
         password,
       });
-
+  
       const { access } = response.data;
       login(access);
-
+  
+      const decoded = JSON.parse(atob(access.split(".")[1]));
+      
+      console.log("Saving loggedUser:", decoded);
+      localStorage.setItem("loggedUser", JSON.stringify(decoded));
+  
       toast.success("Logged in successfully!");
-
+  
       setTimeout(() => {
-        const decoded = JSON.parse(atob(access.split(".")[1]));
         navigate(decoded.role === "admin" ? "/admin" : "/client");
       }, 500);
     } catch (error) {
       toast.error(error.response?.data?.error || "Invalid email or password.");
     }
   };
-
+  
   return (
     <div className="loginPanel">
       <div className="loginPanel__container">
