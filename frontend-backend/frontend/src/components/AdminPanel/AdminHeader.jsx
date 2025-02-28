@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import "./AdminPanel.scss";
 
 const AdminHeader = () => {
@@ -7,11 +6,17 @@ const AdminHeader = () => {
   const avatarUrl = "http://127.0.0.1:8000/media/avatar.svg";
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/me/")
-      .then((res) => setUser(res.data))
-      .catch((err) => console.error("Error fetching user data:", err));
+    const storedUser = localStorage.getItem("loggedUser");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
+
+  const displayName = user
+    ? (user.first_name || user.last_name) 
+      ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
+      : user.username || user.email
+    : null;
 
   return (
     <header className="admin-header">
@@ -20,7 +25,7 @@ const AdminHeader = () => {
         <img className="admin-header__user-av" src={avatarUrl} alt="avatar" />
         {user && (
           <span className="admin-header__user-hello">
-            Hello, {user.first_name} {user.last_name}
+            Hello, {displayName}
           </span>
         )}
       </div>

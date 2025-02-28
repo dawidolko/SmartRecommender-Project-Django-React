@@ -11,8 +11,11 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/admin-stats/")
+      .get("http://127.0.0.1:8000/api/admin-stats/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         setOrders(res.data.orders);
         setClients(res.data.clients);

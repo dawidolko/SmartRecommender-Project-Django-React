@@ -20,21 +20,31 @@ const AdminProducts = () => {
   }, []);
 
   const fetchProducts = () => {
+    const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/products/")
+      .get("http://127.0.0.1:8000/api/products/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setProducts(res.data))
       .catch((err) => console.error("Error fetching products:", err));
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("access");
     try {
-      await axios.post("http://127.0.0.1:8000/api/products/", {
-        name,
-        price,
-        old_price: oldPrice,
-        description,
-      });
+      await axios.post(
+        "http://127.0.0.1:8000/api/products/",
+        {
+          name,
+          price,
+          old_price: oldPrice,
+          description,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchProducts();
       setName("");
       setPrice("");
@@ -48,8 +58,11 @@ const AdminProducts = () => {
   const handleDelete = async (productId) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
+    const token = localStorage.getItem("access");
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/products/${productId}/`);
+      await axios.delete(`http://127.0.0.1:8000/api/products/${productId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProducts((prev) => prev.filter((p) => p.id !== productId));
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -66,13 +79,20 @@ const AdminProducts = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("access");
     try {
-      await axios.put(`http://127.0.0.1:8000/api/products/${editId}/`, {
-        name: editName,
-        price: editPrice,
-        old_price: editOldPrice,
-        description: editDescription,
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/products/${editId}/`,
+        {
+          name: editName,
+          price: editPrice,
+          old_price: editOldPrice,
+          description: editDescription,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchProducts();
       setEditId(null);
       setEditName("");
@@ -184,14 +204,10 @@ const AdminProducts = () => {
                       />
                     </td>
                     <td>
-                      <button
-                        className="btn btn-success"
-                        onClick={handleEditSubmit}>
+                      <button className="btn btn-success" onClick={handleEditSubmit}>
                         Save
                       </button>{" "}
-                      <button
-                        className="btn btn-secondary"
-                        onClick={cancelEdit}>
+                      <button className="btn btn-secondary" onClick={cancelEdit}>
                         Cancel
                       </button>
                     </td>
@@ -206,14 +222,13 @@ const AdminProducts = () => {
                     <td>{prod.old_price}</td>
                     <td>{prod.description}</td>
                     <td>
-                      <button
-                        className="btn btn-warning"
-                        onClick={() => startEdit(prod)}>
+                      <button className="btn btn-warning" onClick={() => startEdit(prod)}>
                         Edit
                       </button>{" "}
                       <button
                         className="table-button table-button--delete btn btn-danger"
-                        onClick={() => handleDelete(prod.id)}>
+                        onClick={() => handleDelete(prod.id)}
+                      >
                         Delete
                       </button>
                     </td>

@@ -5,17 +5,23 @@ const AdminComplaints = () => {
   const [complaints, setComplaints] = useState([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/complaints/")
+      .get("http://127.0.0.1:8000/api/complaints/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setComplaints(res.data))
       .catch((err) => console.error("Error fetching complaints:", err));
   }, []);
 
   const handleStatusChange = async (complaintId, newStatus) => {
+    const token = localStorage.getItem("access");
     try {
-      await axios.put(`http://127.0.0.1:8000/api/complaints/${complaintId}/`, {
-        status: newStatus,
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/complaints/${complaintId}/`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setComplaints((prev) =>
         prev.map((c) =>
           c.id === complaintId ? { ...c, status: newStatus } : c
@@ -29,10 +35,11 @@ const AdminComplaints = () => {
   const handleDelete = async (complaintId) => {
     if (!window.confirm("Are you sure you want to delete this complaint?"))
       return;
+    const token = localStorage.getItem("access");
     try {
-      await axios.delete(
-        `http://127.0.0.1:8000/api/complaints/${complaintId}/`
-      );
+      await axios.delete(`http://127.0.0.1:8000/api/complaints/${complaintId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setComplaints((prev) => prev.filter((c) => c.id !== complaintId));
     } catch (error) {
       console.error("Error deleting complaint:", error);
@@ -66,7 +73,8 @@ const AdminComplaints = () => {
                 <td>
                   <select
                     value={c.status}
-                    onChange={(e) => handleStatusChange(c.id, e.target.value)}>
+                    onChange={(e) => handleStatusChange(c.id, e.target.value)}
+                  >
                     <option value="pending">pending</option>
                     <option value="accepted">accepted</option>
                     <option value="rejected">rejected</option>
@@ -75,7 +83,8 @@ const AdminComplaints = () => {
                 <td>
                   <button
                     className="table-button table-button--delete btn btn-danger"
-                    onClick={() => handleDelete(c.id)}>
+                    onClick={() => handleDelete(c.id)}
+                  >
                     Delete
                   </button>
                 </td>

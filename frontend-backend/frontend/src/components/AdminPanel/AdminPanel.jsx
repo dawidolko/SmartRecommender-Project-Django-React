@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
@@ -11,15 +11,17 @@ import "./AdminPanel.scss";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-
   const storedUser = localStorage.getItem("loggedUser");
-  let user = null;
-  if (storedUser) {
-    user = JSON.parse(storedUser);
-  }
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+  // Redirect to login if the user is not an admin
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   if (!user || user.role !== "admin") {
-    navigate("/login");
     return null;
   }
 

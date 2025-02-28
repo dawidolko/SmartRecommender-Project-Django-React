@@ -17,10 +17,11 @@ const AdminSidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedUser"); 
-    navigate("/login", { replace: true }); 
-    window.location.reload(); 
+    // Remove authentication token and user data from localStorage
+    localStorage.removeItem("access");
+    localStorage.removeItem("loggedUser");
+    navigate("/login", { replace: true });
+    window.location.reload();
   };
 
   const toggleSidebar = () => {
@@ -31,7 +32,8 @@ const AdminSidebar = () => {
     <aside
       className={`admin-aside ${
         isOpen ? "admin-aside--open" : "admin-aside--closed"
-      }`}>
+      }`}
+    >
       <div className="admin-aside__header">
         <button className="admin-aside__toggle" onClick={toggleSidebar}>
           <FiMenu />
@@ -48,7 +50,8 @@ const AdminSidebar = () => {
                 "admin-aside__link " +
                 (isActive ? "admin-aside__link--active" : "")
               }
-              end>
+              end
+            >
               <FiHome className="admin-aside__link-icon" />
               {isOpen && <span>Home</span>}
             </NavLink>
@@ -59,7 +62,8 @@ const AdminSidebar = () => {
               className={({ isActive }) =>
                 "admin-aside__link " +
                 (isActive ? "admin-aside__link--active" : "")
-              }>
+              }
+            >
               <FiShoppingCart className="admin-aside__link-icon" />
               {isOpen && <span>Orders</span>}
             </NavLink>
@@ -70,7 +74,8 @@ const AdminSidebar = () => {
               className={({ isActive }) =>
                 "admin-aside__link " +
                 (isActive ? "admin-aside__link--active" : "")
-              }>
+              }
+            >
               <FiBox className="admin-aside__link-icon" />
               {isOpen && <span>Products</span>}
             </NavLink>
@@ -81,7 +86,8 @@ const AdminSidebar = () => {
               className={({ isActive }) =>
                 "admin-aside__link " +
                 (isActive ? "admin-aside__link--active" : "")
-              }>
+              }
+            >
               <FiUsers className="admin-aside__link-icon" />
               {isOpen && <span>Customers</span>}
             </NavLink>
@@ -92,7 +98,8 @@ const AdminSidebar = () => {
               className={({ isActive }) =>
                 "admin-aside__link " +
                 (isActive ? "admin-aside__link--active" : "")
-              }>
+              }
+            >
               <FiList className="admin-aside__link-icon" />
               {isOpen && <span>Complaints</span>}
             </NavLink>
@@ -107,7 +114,8 @@ const AdminSidebar = () => {
           <li>
             <button
               className="admin-aside__link admin-aside__link--logout"
-              onClick={handleLogout}>
+              onClick={handleLogout}
+            >
               <FiLogOut className="admin-aside__link-icon" />
               {isOpen && <span>Logout</span>}
             </button>
