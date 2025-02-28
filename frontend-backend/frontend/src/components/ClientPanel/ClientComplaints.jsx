@@ -6,8 +6,11 @@ const ClientComplaints = () => {
   const [complaints, setComplaints] = useState([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/complaints/")
+      .get("http://127.0.0.1:8000/api/complaints/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setComplaints(res.data))
       .catch((err) => console.error("Error fetching complaints:", err));
   }, []);

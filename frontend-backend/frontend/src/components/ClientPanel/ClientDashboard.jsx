@@ -1,3 +1,4 @@
+// ClientDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CountUp from "react-countup";
@@ -10,8 +11,13 @@ const ClientDashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/client-stats/")
+      .get("http://127.0.0.1:8000/api/client-stats/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setPurchasedItems(res.data.purchased_items);
         setComplaints(res.data.complaints);

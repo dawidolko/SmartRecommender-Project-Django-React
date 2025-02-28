@@ -15,7 +15,7 @@ const ClientSidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
     navigate("/login", { replace: true });
   };
@@ -39,8 +39,11 @@ const ClientSidebar = () => {
           <li>
             <NavLink
               to=""
-              className={({ isActive }) => "client-aside__link " + (isActive ? "client-aside__link--active" : "")}
-              end>
+              className={({ isActive }) =>
+                "client-aside__link " + (isActive ? "client-aside__link--active" : "")
+              }
+              end
+            >
               <FiHome className="client-aside__link-icon" />
               {isOpen && <span>Dashboard</span>}
             </NavLink>
@@ -48,7 +51,10 @@ const ClientSidebar = () => {
           <li>
             <NavLink
               to="orders"
-              className={({ isActive }) => "client-aside__link " + (isActive ? "client-aside__link--active" : "")}>
+              className={({ isActive }) =>
+                "client-aside__link " + (isActive ? "client-aside__link--active" : "")
+              }
+            >
               <FiShoppingCart className="client-aside__link-icon" />
               {isOpen && <span>My Orders</span>}
             </NavLink>
@@ -56,7 +62,10 @@ const ClientSidebar = () => {
           <li>
             <NavLink
               to="complaints"
-              className={({ isActive }) => "client-aside__link " + (isActive ? "client-aside__link--active" : "")}>
+              className={({ isActive }) =>
+                "client-aside__link " + (isActive ? "client-aside__link--active" : "")
+              }
+            >
               <FiList className="client-aside__link-icon" />
               {isOpen && <span>Complaints</span>}
             </NavLink>
@@ -64,7 +73,10 @@ const ClientSidebar = () => {
           <li>
             <NavLink
               to="account"
-              className={({ isActive }) => "client-aside__link " + (isActive ? "client-aside__link--active" : "")}>
+              className={({ isActive }) =>
+                "client-aside__link " + (isActive ? "client-aside__link--active" : "")
+              }
+            >
               <FiUser className="client-aside__link-icon" />
               {isOpen && <span>Account</span>}
             </NavLink>

@@ -5,7 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem("token") || null);
+    const [token, setToken] = useState(localStorage.getItem("access") || null);
 
     useEffect(() => {
         if (token) {
@@ -21,8 +21,7 @@ export const AuthProvider = ({ children }) => {
     }, [token]);
 
     const fetchUserData = async (authToken) => {
-        console.log("[AuthContext] Fetching user data...");  
-    
+        console.log("[AuthContext] Fetching user data...");
         try {
             const response = await fetch("http://127.0.0.1:8000/api/user/", {
                 method: "GET",
@@ -31,13 +30,10 @@ export const AuthProvider = ({ children }) => {
                     "Authorization": `Bearer ${authToken}`,
                 },
             });
-    
             console.log("[AuthContext] API Response Status:", response.status);
-    
             if (!response.ok) {
                 throw new Error("Failed to fetch user data");
             }
-    
             const data = await response.json();
             console.log("[AuthContext] User Data:", data);
             setUser(data);
@@ -45,10 +41,9 @@ export const AuthProvider = ({ children }) => {
             console.error("Error fetching user data:", error);
         }
     };
-    
 
     const login = (newToken) => {
-        localStorage.setItem("token", newToken);
+        localStorage.setItem("access", newToken);
         const decoded = jwtDecode(newToken);
         console.log("[AuthContext] Logged in user:", decoded);
         setUser(decoded);
@@ -58,7 +53,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         console.log("[AuthContext] Logging out...");
-        localStorage.removeItem("token");
+        localStorage.removeItem("access");
         setUser(null);
         setToken(null);
     };

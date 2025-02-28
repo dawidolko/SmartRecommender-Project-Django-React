@@ -1,28 +1,10 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import CartItem
-from .serializers import CartItemSerializer
-from rest_framework.generics import (
-    RetrieveAPIView,
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-    ListAPIView,
-    DestroyAPIView,
-)
-from django.http import HttpResponse
-from django.contrib.auth import get_user_model, authenticate
-from rest_framework import viewsets
-from django.contrib.auth.hashers import make_password
-from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
-from .permissions import IsAdminUser
-from django.db.models import Q
-
-from .models import Product, Category, Order, Complaint, Tag, User as MyUser
+from .models import CartItem, Product, Category, Order, Complaint, OrderProduct, Tag, User as MyUser
 from .serializers import (
+    CartItemSerializer,
     ProductSerializer,
     ProductDetailSerializer,
     OrderSerializer,
@@ -31,19 +13,36 @@ from .serializers import (
     MyTokenObtainPairSerializer,
     TagSerializer,
 )
-
-from django.db.models import Q
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model, authenticate
+from rest_framework.generics import (
+    RetrieveAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    ListAPIView,
+    DestroyAPIView,
+)
+from rest_framework import status
+from .permissions import (
+    IsAdminUser,
+)  # Custom permission checking for administrator rights
+from django.contrib.auth.hashers import make_password
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 User = get_user_model()
 
+# ----------------------------------
+# TOKEN HANDLING
+# ----------------------------------
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
-
         data["user"] = {
             "id": user.id,
             "email": user.email,
@@ -53,6 +52,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -60,50 +60,71 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
-# ---------------------------
-# KATEGORIE
-# ---------------------------
+
+# ----------------------------------
+# CATEGORIES - Public Access
+# ----------------------------------
+
+
 class CategoriesAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
         categories = Category.objects.values("name")
         return Response(categories)
 
 
-# ---------------------------
-# PRODUKTY
-# ---------------------------
+# ----------------------------------
+# PRODUCTS
+# Public product list view; creation/modification is allowed only for admin users.
+# ----------------------------------
+
+
 class ProductsAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
-        products = Product.objects.prefetch_related("categories", "photoproduct_set").all()
+        products = Product.objects.prefetch_related(
+            "categories", "photoproduct_set"
+        ).all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
 
 class RandomProductsAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
-        all_products = Product.objects.annotate(photo_count=Count('photoproduct')).filter(photo_count__gt=0)
+        all_products = Product.objects.annotate(
+            photo_count=Count("photoproduct")
+        ).filter(photo_count__gt=0)
         random_products = sample(list(all_products), min(9, len(all_products)))
         serializer = ProductSerializer(random_products, many=True)
         return Response(serializer.data)
 
 
 class ProductDetailAPIView(RetrieveAPIView):
+    permission_classes = [AllowAny]
     queryset = Product.objects.prefetch_related(
         "categories", "photoproduct_set", "opinion_set", "specification_set"
     )
     serializer_class = ProductDetailSerializer
 
 
-# ---------------------------
-# STRONA GŁÓWNA
-# ---------------------------
+# ----------------------------------
+# HOME PAGE - Public Access
+# ----------------------------------
+
+
 def home_view(request):
     return HttpResponse("Welcome to the Product Recommendation System!")
 
 
-# ---------------------------
-# LOGOWANIE
-# ---------------------------
+# ----------------------------------
+# LOGIN - Public Access
+# ----------------------------------
+
+
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -111,7 +132,6 @@ class UserLoginView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
         user = authenticate(username=email, password=password)
-
         if user:
             refresh = RefreshToken.for_user(user)
             return Response(
@@ -130,11 +150,16 @@ class UserLoginView(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
-        return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
-# ---------------------------
-# REJESTRACJA
-# ---------------------------
+
+# ----------------------------------
+# REGISTRATION - Public Access
+# ----------------------------------
+
+
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -145,13 +170,16 @@ class UserRegisterView(APIView):
         first_name = request.data.get("first_name", "")
         last_name = request.data.get("last_name", "")
         role = request.data.get("role", "client")
-
         if User.objects.filter(email=email).exists():
-            return Response({"error": "Email is already registered"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(
+                {"error": "Email is already registered"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if len(password) < 8:
-            return Response({"error": "Password must be at least 8 characters long"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(
+                {"error": "Password must be at least 8 characters long"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         try:
             user = User.objects.create(
                 username=nickname,
@@ -175,63 +203,121 @@ class UserRegisterView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
-# ---------------------------
-# CRUD ENDPOINTY
-# ---------------------------
+# ----------------------------------
+# CRUD ENDPOINTS - Authentication Required
+# ----------------------------------
+
+
+# Products - creation, modification, and deletion allowed only for admin users
 class ProductListCreateAPIView(ListCreateAPIView):
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
+    queryset = Product.objects.all()
+
+    def get_permissions(self):
+        # For GET requests, public access is allowed; only POST (creation) requires admin privileges
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated(), IsAdminUser()]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        ids = self.request.query_params.get("ids")
+        if ids:
+            try:
+                id_list = [int(x) for x in ids.split(",") if x.isdigit()]
+                queryset = queryset.filter(id__in=id_list)
+            except Exception as e:
+                pass  # Optionally log the error here
+        return queryset
 
 
 class ProductRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 
-class OrderListAPIView(ListAPIView):
-    queryset = Order.objects.select_related("user").all()
+# Orders - A user can view and modify only their own orders; admin can access all orders.
+class OrderListCreateAPIView(ListCreateAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin' or user.is_staff:
+            return Order.objects.all()
+        return Order.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        items = self.request.data.get("items", {})
+        # Save order with status "Pending"
+        order = serializer.save(user=self.request.user, status="Pending")
+        for product_id, quantity in items.items():
+            try:
+                product = Product.objects.get(id=product_id)
+                OrderProduct.objects.create(order=order, product=product, quantity=quantity)
+            except Product.DoesNotExist:
+                continue
 
 
 class OrderUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.select_related("user").all()
     serializer_class = OrderSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == "admin" or user.is_staff:
+            return Order.objects.all()
+        return Order.objects.filter(user=user)
 
 
+# Users - Only admin can manage users.
 class UserListAPIView(ListAPIView):
-    """Lista użytkowników (np. do panelu admina)."""
     queryset = MyUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 
 class UserDestroyAPIView(DestroyAPIView):
-    """Usuwanie użytkownika (np. przez admina)."""
     queryset = MyUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 
+# Complaints - A user can see only their own complaints; admin can see all.
 class ComplaintListCreateAPIView(ListCreateAPIView):
-    queryset = Complaint.objects.select_related("order").all()
     serializer_class = ComplaintSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == "admin" or user.is_staff:
+            return Complaint.objects.all()
+        return Complaint.objects.filter(order__user=user)
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 class ComplaintRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Complaint.objects.select_related("order").all()
     serializer_class = ComplaintSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == "admin" or user.is_staff:
+            return Complaint.objects.all()
+        return Complaint.objects.filter(order__user=user)
+
+
+# Admin statistics - accessible only by administrators.
 class AdminStatsView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
         data = {
@@ -243,83 +329,27 @@ class AdminStatsView(APIView):
         return Response(data)
 
 
+# Current user - accessible only for authenticated users.
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        print(f"Received request from: {request.user}")
-        print(f"🔹 Headers: {request.headers}") 
         if request.user.is_anonymous:
             return Response({"error": "Not authenticated"}, status=401)
         user = request.user
-        return Response({
-            "id": user.id,
-            "email": user.email,
-            "role": user.role,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-        }, status=status.HTTP_200_OK)
-
-class ProductSearchAPIView(APIView):
-    def get(self, request):
-        query = request.GET.get("q", "")
-        if query:
-            products = Product.objects.filter(
-                Q(name__icontains=query) |
-                Q(description__icontains=query) |
-                Q(specification_set__parameter_name__icontains=query) |
-                Q(specification_set__specification__icontains=query) |
-                Q(opinion_set__content__icontains=query)
-            ).distinct()
-            serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data)
-        return Response({"error": "No query provided"}, status=400)
-
-class ClientStatsView(APIView):
-    permission_classes = [AllowAny] 
-
-    def get(self, request):
-        purchased_items_count = Order.objects.count()  
-        complaints_count = Complaint.objects.count() 
-
-        data = {
-            "purchased_items": purchased_items_count,
-            "complaints": complaints_count,
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "id": user.id,
+                "email": user.email,
+                "role": user.role,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
-# class ProductAdminViewSet(viewsets.ModelViewSet):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#     permission_classes = [IsAuthenticated, IsAdminUser]  # Tylko dla admina
-
-class CartPreviewView(APIView):
-
-    def get(self, request):
-        cart_items = CartItem.objects.filter(user=request.user)[:3]  # Max 3 products
-        serializer = CartItemSerializer(cart_items, many=True)
-        return Response(serializer.data)
-
-    def patch(self, request, item_id):
-        """Products quantity update"""
-        cart_item = CartItem.objects.get(id=item_id, user=request.user)
-        action = request.data.get("action")
-
-        if action == "increase":
-            cart_item.quantity += 1
-        elif action == "decrease" and cart_item.quantity > 1:
-            cart_item.quantity -= 1
-        cart_item.save()
-
-        return Response({"message": "Quantity updated", "new_quantity": cart_item.quantity})
-
-    def delete(self, request, item_id):
-        """Product removal from cart"""
-        cart_item = CartItem.objects.get(id=item_id, user=request.user)
-        cart_item.delete()
-        return Response({"message": "Item removed"})
-    
+# Product search - public access.
 class ProductSearchAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -327,16 +357,75 @@ class ProductSearchAPIView(APIView):
         query = request.GET.get("q", "")
         if query:
             products = Product.objects.filter(
-                Q(name__icontains=query) |
-                Q(description__icontains=query) |
-                Q(categories__name__icontains=query)
+                Q(name__icontains=query)
+                | Q(description__icontains=query)
+                | Q(categories__name__icontains=query)
             ).distinct()
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return Response({"error": "No query provided"}, status=400)
-    
+
+
+# Client statistics - accessible only for authenticated users (pertaining to their own data).
+class ClientStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        purchased_items_count = Order.objects.filter(user=request.user).count()
+        complaints_count = Complaint.objects.filter(order__user=request.user).count()
+        data = {
+            "purchased_items": purchased_items_count,
+            "complaints": complaints_count,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+# Cart preview - accessible only for authenticated users.
+class CartPreviewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cart_items = CartItem.objects.filter(user=request.user)[:3]
+        serializer = CartItemSerializer(cart_items, many=True)
+        return Response(serializer.data)
+
+    def patch(self, request, item_id):
+        try:
+            cart_item = CartItem.objects.get(id=item_id, user=request.user)
+        except CartItem.DoesNotExist:
+            return Response(
+                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        action = request.data.get("action")
+        if action == "increase":
+            cart_item.quantity += 1
+        elif action == "decrease" and cart_item.quantity > 1:
+            cart_item.quantity -= 1
+        else:
+            return Response(
+                {"error": "Invalid action or quantity"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        cart_item.save()
+        return Response(
+            {"message": "Quantity updated", "new_quantity": cart_item.quantity}
+        )
+
+    def delete(self, request, item_id):
+        try:
+            cart_item = CartItem.objects.get(id=item_id, user=request.user)
+        except CartItem.DoesNotExist:
+            return Response(
+                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        cart_item.delete()
+        return Response({"message": "Item removed"})
+
+
+# Tags - public access.
 class TagsAPIView(APIView):
-# Api returns all available tags in the system.
+    permission_classes = [AllowAny]
+
     def get(self, request, *args, **kwargs):
         tags = Tag.objects.all()
         serializer = TagSerializer(tags, many=True)

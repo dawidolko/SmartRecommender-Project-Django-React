@@ -1,8 +1,7 @@
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer } from "react-toastify";
-import React from "react";
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 import ScrollToTop from "./utils/ScrollToTop";
@@ -25,24 +24,16 @@ import ProductSection from "./pages/ProductSection";
 import LoginPanel from "./components/panelLogin/LoginPanel";
 import RegisterPanel from "./components/panelLogin/RegisterPanel";
 import SearchResults from "./components/Search/SearchResults";
-
+import PublicRoute from "./components/PublicRoute/PublicRoute";
 
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
 
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
-
+  
+  if (!user) return <Navigate to="/login" replace />;
   console.log("[PrivateRoute] Checking user:", user);
-
-  if (user === null) {
-    return <p>Loading...</p>;
-  }
-
-  if (!user) {
-    console.warn("[PrivateRoute] User not authenticated, redirecting...");
-    return <Navigate to="/login" replace />;
-  }
 
   if (!user.role || (roles && !roles.includes(user.role))) {
     console.warn("[PrivateRoute] Unauthorized access, redirecting...");
@@ -89,8 +80,22 @@ function App() {
               <Route path="/category/:category" element={<Shop />} />
               <Route path="/search/:query" element={<SearchResults />} />
 
-              <Route path="/login" element={<LoginPanel />} />
-              <Route path="/signup" element={<RegisterPanel />} />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <LoginPanel />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <RegisterPanel />
+                  </PublicRoute>
+                }
+              />
 
               <Route
                 path="/admin/*"
@@ -100,7 +105,6 @@ function App() {
                   </PrivateRoute>
                 }
               />
-
               <Route
                 path="/client/*"
                 element={
@@ -109,8 +113,6 @@ function App() {
                   </PrivateRoute>
                 }
               />
-
-              {/* 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

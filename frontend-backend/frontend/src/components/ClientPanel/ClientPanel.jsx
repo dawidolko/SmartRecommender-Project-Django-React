@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
 import ClientDashboard from "./ClientDashboard";
@@ -6,24 +6,23 @@ import ClientOrders from "./ClientOrders";
 import ClientComplaints from "./ClientComplaints";
 import ClientAccount from "./ClientAccount";
 import "./ClientPanel.scss";
+import { AuthContext } from "../../context/AuthContext";
 
 const ClientPanel = () => {
-  console.log("[ClientPanel] Component rendered");
+  const { user, token } = useContext(AuthContext);
 
-  const storedUser = localStorage.getItem("loggedUser");
-  let user = null;
-  if (storedUser) {
-    try {
-      user = JSON.parse(storedUser);
-    } catch (error) {
-      console.error("[ClientPanel] Error parsing user data:", error);
-    }
+  // Jeśli nie ma tokenu – użytkownik nie jest zalogowany, przekieruj
+  if (!token) {
+    return <Navigate to="/login" replace />;
   }
 
-  console.log("[ClientPanel] User data:", user);
+  // Jeśli token jest, ale user jeszcze nie został zdekodowany, wyświetl loader
+  if (token && !user) {
+    return <div>Loading...</div>;
+  }
 
-  if (!user || user.role !== "client") {
-    console.warn("[ClientPanel] Unauthorized access, redirecting...");
+  // Gdy mamy już usera, sprawdzamy jego rolę
+  if (user.role !== "client") {
     return <Navigate to="/login" replace />;
   }
 

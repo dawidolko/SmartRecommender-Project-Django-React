@@ -27,9 +27,9 @@ const LoginPanel = () => {
   
       const { access } = response.data;
       login(access);
+      localStorage.setItem("access", access);
   
       const decoded = JSON.parse(atob(access.split(".")[1]));
-      
       console.log("Saving loggedUser:", decoded);
       localStorage.setItem("loggedUser", JSON.stringify(decoded));
   

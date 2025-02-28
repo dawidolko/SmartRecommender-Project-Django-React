@@ -63,9 +63,13 @@ class ProductSerializer(serializers.ModelSerializer):
 # ---------------------------
 
 class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    status = serializers.CharField(required=False)
+
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ["id", "user", "date_order", "status"]
+        read_only_fields = ["date_order"]
 
 # Item in cart
 class CartItemSerializer(serializers.ModelSerializer):

@@ -5,8 +5,11 @@ const ClientOrders = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/orders/")
+      .get("http://127.0.0.1:8000/api/orders/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setOrders(res.data))
       .catch((err) => console.error("Error fetching orders:", err));
   }, []);
