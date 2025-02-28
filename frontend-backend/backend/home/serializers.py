@@ -63,7 +63,9 @@ class ProductSerializer(serializers.ModelSerializer):
 # ---------------------------
 
 class OrderSerializer(serializers.ModelSerializer):
-    user_email = serializers.EmailField(source="user.email", read_only=True)
+    class Meta:
+        model = Order
+        fields = '__all__'
 
 # Item in cart
 class CartItemSerializer(serializers.ModelSerializer):
