@@ -1,8 +1,18 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
+from django.db.models.functions import TruncMonth
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import CartItem, Product, Category, Order, Complaint, OrderProduct, Tag, User as MyUser
+from .models import (
+    CartItem,
+    Product,
+    Category,
+    Order,
+    Complaint,
+    OrderProduct,
+    Tag,
+    User as MyUser,
+)
 from .serializers import (
     CartItemSerializer,
     ProductSerializer,
@@ -249,7 +259,7 @@ class OrderListCreateAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'admin' or user.is_staff:
+        if user.role == "admin" or user.is_staff:
             return Order.objects.all()
         return Order.objects.filter(user=user)
 
@@ -260,9 +270,19 @@ class OrderListCreateAPIView(ListCreateAPIView):
         for product_id, quantity in items.items():
             try:
                 product = Product.objects.get(id=product_id)
-                OrderProduct.objects.create(order=order, product=product, quantity=quantity)
+                OrderProduct.objects.create(
+                    order=order, product=product, quantity=quantity
+                )
             except Product.DoesNotExist:
                 continue
+
+
+class ClientOrderDetailAPIView(RetrieveAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
 
 class OrderUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
@@ -371,16 +391,67 @@ class ClientStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        purchased_items_count = Order.objects.filter(user=request.user).count()
+        orders = Order.objects.filter(user=request.user)
+
+        purchased_items = (
+            OrderProduct.objects.filter(order__in=orders).aggregate(
+                total=Sum("quantity")
+            )["total"]
+            or 0
+        )
+
         complaints_count = Complaint.objects.filter(order__user=request.user).count()
-        data = {
-            "purchased_items": purchased_items_count,
-            "complaints": complaints_count,
+
+        from django.db.models.functions import TruncMonth
+
+        orders_by_month = (
+            orders.annotate(month=TruncMonth("date_order"))
+            .values("month")
+            .annotate(total_quantity=Sum("orderproduct__quantity"))
+            .order_by("month")
+        )
+        trend_labels = [order["month"].strftime("%b %Y") for order in orders_by_month]
+        trend_data = [order["total_quantity"] for order in orders_by_month]
+        max_trend = max(trend_data, default=0)
+        order_trends = {
+            "labels": trend_labels,
+            "data": trend_data,
+            "y_axis_max": max_trend + 2,
         }
-        return Response(data, status=status.HTTP_200_OK)
+
+        category_distribution_qs = (
+            OrderProduct.objects.filter(order__in=orders)
+            .values("product__categories__name")
+            .annotate(total=Sum("quantity"))
+            .order_by("-total")
+        )
+        categories = list(category_distribution_qs)
+        top5 = categories[:5]
+        others = categories[5:]
+        others_sum = sum(item["total"] for item in others)
+        cat_labels = [
+            item["product__categories__name"]
+            for item in top5
+            if item["product__categories__name"]
+        ]
+        cat_data = [item["total"] for item in top5]
+        if others_sum > 0:
+            cat_labels.append("Others")
+            cat_data.append(others_sum)
+        category_distribution = {
+            "labels": cat_labels,
+            "data": cat_data,
+        }
+
+        data = {
+            "purchased_items": purchased_items,
+            "complaints": complaints_count,
+            "order_trends": order_trends,
+            "category_distribution": category_distribution,
+        }
+        return Response(data, status=200)
 
 
-# Cart preview - accessible only for authenticated users.
 class CartPreviewView(APIView):
     permission_classes = [IsAuthenticated]
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   FiHome,
@@ -13,6 +13,12 @@ import "./ClientPanel.scss";
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.innerWidth < 576) {
+      setIsOpen(false);
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("access");

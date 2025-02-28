@@ -1,0 +1,156 @@
+// Use Bootstrap container and grid system as base
+.container {
+    padding: 1rem;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  .client-dashboard{
+    height: 100%;
+  }
+  
+  .small-box {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    margin-bottom: 1.5rem;
+  
+    &:hover {
+      transform: translateY(-3px);
+    }
+  
+    .inner {
+      text-align: center;
+  
+      h3 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+  
+      p {
+        font-size: 1.1rem;
+        margin: 0;
+      }
+    }
+  }
+
+  .order-trends-chart, .category-distribution-chart {
+    margin-bottom: 30px;
+  }
+
+  .chart-container {
+    width: 60%;
+    height: 400px;
+  }
+  
+  .order-summary {
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+    }
+  
+    .summary-box {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      text-align: center;
+      margin-bottom: 1rem;
+  
+      .summary-title {
+        font-size: 2rem;
+        color: #555;
+        margin-bottom: 0.5rem;
+      }
+  
+      h3 {
+        font-size: 2rem;
+        color: #333;
+      }
+    }
+  }
+  
+  .dashboard-charts {
+    h2 {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+  
+    .chart-container {
+      max-width: 100%;
+      margin: 0 auto;
+      canvas {
+        width: 100% !important;
+        height: auto !important;
+      }
+    }
+  }
+  
+  .dashboard-recommendations {
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+  
+    .recommendations-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+  
+      .recommendation-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        text-align: center;
+        width: 250px;
+  
+        img {
+          max-width: 100%;
+          border-radius: 0.5rem;
+        }
+  
+        p {
+          margin-top: 0.5rem;
+          font-size: 1.9rem;
+          color: #333;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 1.8rem;
+    }
+  
+    .small-box {
+      .inner {
+        h3 {
+          font-size: 2rem;
+        }
+        p {
+          font-size: 1rem;
+        }
+      }
+    }
+  
+    .order-summary .summary-box {
+      padding: 0.8rem;
+    }
+  
+    .dashboard-recommendations .recommendations-grid {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  

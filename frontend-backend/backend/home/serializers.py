@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     Product, PhotoProduct, Opinion, Category, Specification,
-    Order, Complaint, User, CartItem, Tag
+    Order, Complaint, User, CartItem, Tag, OrderProduct
 )
 
 class PhotoProductSerializer(serializers.ModelSerializer):
@@ -62,14 +62,29 @@ class ProductSerializer(serializers.ModelSerializer):
 #   NEW SERIALIZERS
 # ---------------------------
 
+
+class OrderProductSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    class Meta:
+        model = OrderProduct
+        fields = ["id", "product", "quantity"]
+
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     status = serializers.CharField(required=False)
+    order_products = OrderProductSerializer(many=True, read_only=True)
+    total = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ["id", "user", "date_order", "status"]
+        fields = ["id", "user", "date_order", "status", "order_products", "total"]
         read_only_fields = ["date_order"]
+
+    def get_total(self, obj):
+        total_value = 0
+        for op in obj.orderproduct_set.all():
+            total_value += op.product.price * op.quantity
+        return total_value
 
 # Item in cart
 class CartItemSerializer(serializers.ModelSerializer):

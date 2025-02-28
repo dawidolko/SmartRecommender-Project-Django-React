@@ -1,8 +1,12 @@
+// ClientOrders.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 const ClientOrders = () => {
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("access");
@@ -14,8 +18,12 @@ const ClientOrders = () => {
       .catch((err) => console.error("Error fetching orders:", err));
   }, []);
 
+  const handleViewDetails = (orderId) => {
+    navigate(`/client/orders/${orderId}`);
+  };
+
   return (
-    <div className="container">
+    <div className="container client-orders">
       <h2>Your Orders</h2>
       <div className="table-responsive">
         <table className="table table-hover">
@@ -31,10 +39,12 @@ const ClientOrders = () => {
             {orders.map((order) => (
               <tr key={order.id}>
                 <td>{order.id}</td>
-                <td>{order.date_order}</td>
+                <td>{format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}</td>
                 <td>{order.status}</td>
                 <td>
-                  <button className="btn btn-primary">View Details</button>
+                  <button className="btn btn-primary" onClick={() => handleViewDetails(order.id)}>
+                    View Details
+                  </button>
                 </td>
               </tr>
             ))}

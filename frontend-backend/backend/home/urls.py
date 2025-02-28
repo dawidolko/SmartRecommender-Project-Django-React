@@ -27,6 +27,7 @@ from .views import (
     CartPreviewView,
     ProductSearchAPIView,
     TagsAPIView,
+    ClientOrderDetailAPIView,
 )
 
 urlpatterns = [
@@ -44,6 +45,7 @@ urlpatterns = [
     path("api/products/<int:pk>/", ProductRetrieveUpdateDestroyAPIView.as_view(), name="product-rud"),
     path("api/orders/", OrderListCreateAPIView.as_view(), name="orders-list-create"),
     path("api/orders/<int:pk>/", OrderUpdateDestroyAPIView.as_view(), name="orders-rud"),
+    path("api/client/orders/<int:pk>/", ClientOrderDetailAPIView.as_view(), name="client-order-detail"),
     path("api/users/", UserListAPIView.as_view(), name="users-list"),
     path("api/users/<int:pk>/", UserDestroyAPIView.as_view(), name="users-destroy"),
     path("api/complaints/", ComplaintListCreateAPIView.as_view(), name="complaint-list-create"),

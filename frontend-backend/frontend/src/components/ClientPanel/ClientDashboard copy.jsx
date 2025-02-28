@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CountUp from "react-countup";
 import { Line, Pie } from "react-chartjs-2";
-import "chart.js/auto";
+import "chart.js/auto"; // Required for Chart.js v3+
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
 import "./ClientDashboard.scss";
 
 const ClientDashboard = () => {
@@ -20,34 +19,44 @@ const ClientDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const navigate = useNavigate();
-
   const baseOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { display: true, position: "top" },
+      title: { display: true, text: "Order Trends" },
     },
   };
 
   useEffect(() => {
     const token = localStorage.getItem("access");
+    axios
+      .get("http://127.0.0.1:8000/api/orders/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const orders = res.data;
 
-    const ordersRequest = axios.get("http://127.0.0.1:8000/api/orders/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const clientStatsRequest = axios.get("http://127.0.0.1:8000/api/client-stats/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+        const totalPurchased = orders.reduce((sum, order) => {
+          if (order.order_products && Array.isArray(order.order_products)) {
+            return sum + order.order_products.reduce((s, op) => s + (op.quantity || 0), 0);
+          }
+          return sum;
+        }, 0);
+        setPurchasedItems(totalPurchased);
 
-    Promise.all([ordersRequest, clientStatsRequest])
-      .then(([ordersRes, clientStatsRes]) => {
-        const orders = ordersRes.data;
+        const totalComplaints = orders.reduce((sum, order) => {
+          return sum + (order.complaints ? order.complaints.length : 0);
+        }, 0);
+        setComplaints(totalComplaints);
 
         const trendsMap = {};
         orders.forEach((order) => {
           const monthLabel = format(new Date(order.date_order), "MMM yyyy");
-          trendsMap[monthLabel] = (trendsMap[monthLabel] || 0) + 1;
+          const orderTotal = order.order_products && Array.isArray(order.order_products)
+            ? order.order_products.reduce((s, op) => s + (op.quantity || 0), 0)
+            : 0;
+          trendsMap[monthLabel] = (trendsMap[monthLabel] || 0) + orderTotal;
         });
         const trendLabels = Object.keys(trendsMap);
         const trendData = Object.values(trendsMap);
@@ -57,7 +66,7 @@ const ClientDashboard = () => {
           labels: trendLabels,
           datasets: [
             {
-              label: "Orders",
+              label: "Purchased Items",
               data: trendData,
               fill: false,
               borderColor: "rgba(75,192,192,1)",
@@ -78,6 +87,38 @@ const ClientDashboard = () => {
         };
         setChartOptions(dynamicOptions);
 
+        const categoryMap = {};
+        orders.forEach((order) => {
+          if (order.order_products && Array.isArray(order.order_products)) {
+            order.order_products.forEach((op) => {
+              const cat = op.product__categories__name || op.product.categories?.[0]?.name; 
+              if (cat) {
+                categoryMap[cat] = (categoryMap[cat] || 0) + (op.quantity || 0);
+              }
+            });
+          }
+        });
+        const categoriesArray = Object.entries(categoryMap).map(([category, count]) => ({ category, count }));
+        categoriesArray.sort((a, b) => b.count - a.count);
+        const top5 = categoriesArray.slice(0, 5);
+        const othersSum = categoriesArray.slice(5).reduce((sum, item) => sum + item.count, 0);
+        const categoryLabels = top5.map((item) => item.category);
+        const categoryData = top5.map((item) => item.count);
+        if (othersSum > 0) {
+          categoryLabels.push("Others");
+          categoryData.push(othersSum);
+        }
+        const categoryDistribution = {
+          labels: categoryLabels,
+          datasets: [
+            {
+              data: categoryData,
+              backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#17a2b8"],
+            },
+          ],
+        };
+        setCategoryDistributionData(categoryDistribution);
+
         const currentMonth = format(new Date(), "MMM yyyy");
         const ordersThisMonth = orders.filter(
           (order) => format(new Date(order.date_order), "MMM yyyy") === currentMonth
@@ -86,33 +127,10 @@ const ClientDashboard = () => {
         const avgOrderValue = orders.length > 0 ? totalValue / orders.length : 0;
         setOrderSummary({ ordersThisMonth, avgOrderValue });
 
-        const stats = clientStatsRes.data;
-        setPurchasedItems(stats.purchased_items);
-        setComplaints(stats.complaints);
-
-        const catDist = stats.category_distribution;
-        const catChart = {
-          labels: catDist.labels,
-          datasets: [
-            {
-              data: catDist.data,
-              backgroundColor: [
-                "#007bff",
-                "#28a745",
-                "#ffc107",
-                "#dc3545",
-                "#6f42c1",
-                "#17a2b8",
-              ],
-            },
-          ],
-        };
-        setCategoryDistributionData(catChart);
-
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching data:", err);
+        console.error("Error fetching orders:", err);
         setError("Failed to fetch data. Please try again.");
         setLoading(false);
       });
@@ -128,14 +146,10 @@ const ClientDashboard = () => {
   return (
     <div className="container client-dashboard">
       <h1>Client Dashboard</h1>
-
+      
       <div className="row mt-4">
         <div className="col-md-6">
-          <div
-            className="small-box bg-primary"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/client/orders")}
-          >
+          <div className="small-box bg-primary">
             <div className="inner">
               <h3>
                 <CountUp end={purchasedItems} duration={1.5} />
@@ -145,11 +159,7 @@ const ClientDashboard = () => {
           </div>
         </div>
         <div className="col-md-6">
-          <div
-            className="small-box bg-danger"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/client/complaints")}
-          >
+          <div className="small-box bg-danger">
             <div className="inner">
               <h3>
                 <CountUp end={complaints} duration={1.5} />
@@ -181,46 +191,41 @@ const ClientDashboard = () => {
       </div>
 
       <div className="dashboard-charts my-4">
-        <div className="order-trends-chart">
-          <h2>Order Trends</h2>
-          <div className="chart-container">
-            {orderTrendsData && chartOptions ? (
-              <Line data={orderTrendsData} options={chartOptions} />
-            ) : (
-              <p>No order trends data available.</p>
-            )}
-          </div>
+        <h2>Order Trends</h2>
+        <div className="chart-container" style={{ height: "300px" }}>
+          {orderTrendsData && chartOptions ? (
+            <Line data={orderTrendsData} options={chartOptions} />
+          ) : (
+            <p>No order trends data available.</p>
+          )}
         </div>
-        <div className="category-distribution-chart">
-          <h2 className="mt-4">Category Distribution</h2>
-          <div className="chart-container">
-            {categoryDistributionData ? (
-              <Pie data={categoryDistributionData} options={baseOptions} />
-            ) : (
-              <p>No category distribution data available.</p>
-            )}
-          </div>
+        <h2 className="mt-4">Category Distribution</h2>
+        <div className="chart-container" style={{ height: "300px" }}>
+          {categoryDistributionData ? (
+            <Pie data={categoryDistributionData} options={baseOptions} />
+          ) : (
+            <p>No category distribution data available.</p>
+          )}
         </div>
       </div>
 
-      {/* Sekcja rekomendowanych produktów */}
       <div className="dashboard-recommendations my-4">
         <h2>Recommended For You</h2>
         <div className="recommendations-grid">
           <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
+            <img src="https://placehold.co/150" alt="Recommendation" />
             <p>Product Name</p>
           </div>
           <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
+            <img src="https://placehold.co/150" alt="Recommendation" />
             <p>Product Name</p>
           </div>
           <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
+            <img src="https://placehold.co/150" alt="Recommendation" />
             <p>Product Name</p>
           </div>
           <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
+            <img src="https://placehold.co/150" alt="Recommendation" />
             <p>Product Name</p>
           </div>
         </div>
