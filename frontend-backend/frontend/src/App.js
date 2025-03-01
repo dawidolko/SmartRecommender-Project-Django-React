@@ -28,10 +28,15 @@ import PublicRoute from "./components/PublicRoute/PublicRoute";
 
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
+import ClientDashboard from "./components/ClientPanel/ClientDashboard";
+import ClientOrders from "./components/ClientPanel/ClientOrders";
+import ClientOrderDetail from "./components/ClientPanel/ClientOrderDetail";
+import ClientComplaints from "./components/ClientPanel/ClientComplaints";
+import ClientAccount from "./components/ClientPanel/ClientAccount";
 
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
-  
+
   if (!user) return <Navigate to="/login" replace />;
   console.log("[PrivateRoute] Checking user:", user);
 
@@ -105,14 +110,17 @@ function App() {
                   </PrivateRoute>
                 }
               />
-              <Route
-                path="/client/*"
-                element={
-                  <PrivateRoute roles={["client"]}>
-                    <ClientPanel />
-                  </PrivateRoute>
-                }
-              />
+              <Route path="/client/*" element={
+                <PrivateRoute roles={["client"]}>
+                  <ClientPanel />
+                </PrivateRoute>
+              }>
+                <Route index element={<ClientDashboard />} />
+                <Route path="orders" element={<ClientOrders />} />
+                <Route path="orders/:id" element={<ClientOrderDetail />} />
+                <Route path="complaints" element={<ClientComplaints />} />
+                <Route path="account" element={<ClientAccount />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

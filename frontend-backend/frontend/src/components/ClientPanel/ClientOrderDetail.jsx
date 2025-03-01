@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { format } from "date-fns";
-import "./ClientOrderDetail.scss";
+import "./ClientPanel.scss";
 
 const ClientOrderDetail = () => {
     const { id } = useParams();
@@ -12,8 +12,7 @@ const ClientOrderDetail = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("access");
-        axios
-            .get(`http://127.0.0.1:8000/api/client/orders/${id}/`, {
+        axios.get(`http://127.0.0.1:8000/api/client/orders/${id}/`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {

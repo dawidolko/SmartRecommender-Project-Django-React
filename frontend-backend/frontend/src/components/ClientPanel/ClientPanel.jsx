@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
 import ClientDashboard from "./ClientDashboard";
-import ClientOrders from "./ClientOrders";
+import OrdersRoutes from "./OrdersRoutes";
 import ClientComplaints from "./ClientComplaints";
 import ClientAccount from "./ClientAccount";
-import ClientOrderDetail from "./ClientOrderDetail";
 import "./ClientPanel.scss";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -29,13 +28,7 @@ const ClientPanel = () => {
       <ClientSidebar />
       <div className="client-wrapper">
         <main className="client-main">
-          <Routes>
-            <Route path="/" element={<ClientDashboard />} />
-            <Route path="orders" element={<ClientOrders />} />
-            <Route path="orders/:id" element={<ClientOrderDetail />} />
-            <Route path="complaints" element={<ClientComplaints />} />
-            <Route path="account" element={<ClientAccount />} />
-          </Routes>
+          <Outlet />
         </main>
       </div>
     </div>

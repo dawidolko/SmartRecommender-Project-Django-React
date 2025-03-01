@@ -22,6 +22,7 @@ from .serializers import (
     UserSerializer,
     MyTokenObtainPairSerializer,
     TagSerializer,
+    UserUpdateSerializer,
 )
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model, authenticate
@@ -31,6 +32,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     ListAPIView,
     DestroyAPIView,
+    RetrieveUpdateAPIView,
 )
 from rest_framework import status
 from .permissions import (
@@ -501,3 +503,11 @@ class TagsAPIView(APIView):
         tags = Tag.objects.all()
         serializer = TagSerializer(tags, many=True)
         return Response(serializer.data)
+    
+
+class CurrentUserUpdateAPIView(RetrieveUpdateAPIView):
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

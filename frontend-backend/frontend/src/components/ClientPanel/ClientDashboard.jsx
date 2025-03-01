@@ -49,16 +49,26 @@ const ClientDashboard = () => {
           const monthLabel = format(new Date(order.date_order), "MMM yyyy");
           trendsMap[monthLabel] = (trendsMap[monthLabel] || 0) + 1;
         });
-        const trendLabels = Object.keys(trendsMap);
-        const trendData = Object.values(trendsMap);
-        const maxTrend = Math.max(...trendData, 0);
+
+        const trendArray = Object.entries(trendsMap);
+        trendArray.sort(([labelA], [labelB]) => {
+          const dateA = new Date(labelA);
+          const dateB = new Date(labelB);
+          return dateA - dateB;
+        });
+
+        const sortedLabels = trendArray.map(([label]) => label);
+        const sortedData = trendArray.map(([, count]) => count);
+
+        const maxTrend = Math.max(...sortedData, 0);
         const dynamicMax = maxTrend + 2;
+
         const orderTrends = {
-          labels: trendLabels,
+          labels: sortedLabels,
           datasets: [
             {
               label: "Orders",
-              data: trendData,
+              data: sortedData,
               fill: false,
               borderColor: "rgba(75,192,192,1)",
             },
@@ -203,7 +213,6 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      {/* Sekcja rekomendowanych produktów */}
       <div className="dashboard-recommendations my-4">
         <h2>Recommended For You</h2>
         <div className="recommendations-grid">
