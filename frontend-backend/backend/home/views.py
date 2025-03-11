@@ -23,6 +23,7 @@ from .serializers import (
     MyTokenObtainPairSerializer,
     TagSerializer,
     UserUpdateSerializer,
+    UserRegisterSerializer,
 )
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model, authenticate
@@ -176,31 +177,9 @@ class UserRegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-        nickname = request.data.get("nickname")
-        first_name = request.data.get("first_name", "")
-        last_name = request.data.get("last_name", "")
-        role = request.data.get("role", "client")
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"error": "Email is already registered"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if len(password) < 8:
-            return Response(
-                {"error": "Password must be at least 8 characters long"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        try:
-            user = User.objects.create(
-                username=nickname,
-                email=email,
-                password=make_password(password),
-                role=role,
-                first_name=first_name,
-                last_name=last_name,
-            )
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
             return Response(
                 {
                     "message": "User registered successfully",
@@ -214,9 +193,10 @@ class UserRegisterView(APIView):
                 },
                 status=status.HTTP_201_CREATED,
             )
-        except Exception as e:
+        else:
             return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
@@ -244,7 +224,7 @@ class ProductListCreateAPIView(ListCreateAPIView):
                 id_list = [int(x) for x in ids.split(",") if x.isdigit()]
                 queryset = queryset.filter(id__in=id_list)
             except Exception as e:
-                pass  # Optionally log the error here
+                pass
         return queryset
 
 

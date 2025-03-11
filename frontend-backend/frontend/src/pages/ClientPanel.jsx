@@ -1,5 +1,7 @@
-import React from "react";
+// ClientPanel.jsx
+import React, { useContext } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import ClientSidebar from "../components/ClientPanel/ClientSidebar";
 import ClientDashboard from "../components/ClientPanel/ClientDashboard";
 import ClientOrders from "../components/ClientPanel/ClientOrders";
@@ -8,9 +10,8 @@ import ClientAccount from "../components/ClientPanel/ClientAccount";
 import "../components/ClientPanel/ClientPanel.scss";
 
 const ClientPanel = () => {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const storedUser = localStorage.getItem("loggedUser");
-  const user = storedUser ? JSON.parse(storedUser) : null;
 
   if (!user || user.role !== "client") {
     navigate("/login");

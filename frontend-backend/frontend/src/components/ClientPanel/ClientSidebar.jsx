@@ -23,7 +23,7 @@ const ClientSidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
-    navigate("/login", { replace: true });
+    window.location.href = "/login";
   };
 
   const toggleSidebar = () => {

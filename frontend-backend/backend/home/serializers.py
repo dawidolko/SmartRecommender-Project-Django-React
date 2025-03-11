@@ -1,3 +1,6 @@
+import re
+from django.core.validators import EmailValidator
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
@@ -134,6 +137,43 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = User
         fields = ["first_name", "last_name", "email", "password"]
 
+    def validate_first_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("First name cannot be empty.")
+        if len(value) > 50:
+            raise serializers.ValidationError("First name must not exceed 50 characters.")
+        if not re.match(r'^[A-Za-z]+$', value):
+            raise serializers.ValidationError("First name can contain only letters.")
+        return value
+
+    def validate_last_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Last name cannot be empty.")
+        if len(value) > 50:
+            raise serializers.ValidationError("Last name must not exceed 50 characters.")
+        if not re.match(r'^[A-Za-z]+$', value):
+            raise serializers.ValidationError("Last name can contain only letters.")
+        return value
+
+    def validate_email(self, value):
+        validator = EmailValidator()
+        try:
+            validator(value)
+        except Exception:
+            raise serializers.ValidationError("Enter a valid email address.")
+        return value
+
+    def validate_password(self, value):
+        if value == "":
+            return value  # If field is empty, we don't update
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must have at least 8 characters.")
+        if not re.search(r'\d', value):
+            raise serializers.ValidationError("Password must contain at least one digit.")
+        return value
+
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
@@ -143,3 +183,65 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    nickname = serializers.CharField(source="username", required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ["nickname", "email", "first_name", "last_name", "password"]
+
+    def validate_first_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("First name cannot be empty.")
+        if len(value) > 50:
+            raise serializers.ValidationError("First name must not exceed 50 characters.")
+        if not re.match(r'^[A-Za-z]+$', value):
+            raise serializers.ValidationError("First name can contain only letters.")
+        return value
+
+    def validate_last_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Last name cannot be empty.")
+        if len(value) > 50:
+            raise serializers.ValidationError("Last name must not exceed 50 characters.")
+        if not re.match(r'^[A-Za-z]+$', value):
+            raise serializers.ValidationError("Last name can contain only letters.")
+        return value
+
+    def validate_email(self, value):
+        validator = EmailValidator()
+        try:
+            validator(value)
+        except Exception:
+            raise serializers.ValidationError("Enter a valid email address.")
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already registered.")
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        if not re.search(r'\d', value):
+            raise serializers.ValidationError("Password must contain at least one digit.")
+        return value
+
+    def create(self, validated_data):
+        username = validated_data.get("username")
+        email = validated_data.get("email")
+        first_name = validated_data.get("first_name")
+        last_name = validated_data.get("last_name")
+        password = validated_data.get("password")
+        user = User.objects.create(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            role="client"
+        )
+        user.set_password(password)
+        user.save()
+        return user

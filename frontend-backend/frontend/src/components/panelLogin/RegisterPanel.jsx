@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "./PanelLogin.scss";
+import { useNavigate } from "react-router-dom";
+import "./RegisterPanel.scss";
 
 const RegisterPanel = () => {
+  const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -11,28 +13,51 @@ const RegisterPanel = () => {
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
 
+  const validateForm = () => {
+    if (!nickname.trim()) {
+      return "Nickname is required.";
+    }
+    if (!firstName.trim()) {
+      return "First name is required.";
+    }
+    if (firstName.length > 50) {
+      return "First name must not exceed 50 characters.";
+    }
+    if (!/^[A-Za-z]+$/.test(firstName)) {
+      return "First name can contain only letters.";
+    }
+    if (!lastName.trim()) {
+      return "Last name is required.";
+    }
+    if (lastName.length > 50) {
+      return "Last name must not exceed 50 characters.";
+    }
+    if (!/^[A-Za-z]+$/.test(lastName)) {
+      return "Last name can contain only letters.";
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return "Enter a valid email address.";
+    }
+    if (password1.length < 8) {
+      return "Password must have at least 8 characters.";
+    }
+    if (!/\d/.test(password1)) {
+      return "Password must contain at least one digit.";
+    }
+    if (password1 !== password2) {
+      return "Passwords do not match.";
+    }
+    return "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (password1 !== password2) {
-      toast.error("Passwords do not match.");
-      console.log("[RegisterPanel] Passwords do not match.");
+    const error = validateForm();
+    if (error) {
+      toast.error(error);
       return;
     }
-
-    if (!nickname) {
-      toast.error("Nickname is required.");
-      console.log("[RegisterPanel] Nickname is empty; cannot register.");
-      return;
-    }
-    console.log("[RegisterPanel] Sending register data:", {
-      nickname,
-      email,
-      first_name: firstName,
-      last_name: lastName,
-      password: password1,
-    });
-
     try {
       const response = await axios.post("http://127.0.0.1:8000/api/register/", {
         nickname,
@@ -41,130 +66,114 @@ const RegisterPanel = () => {
         last_name: lastName,
         password: password1,
       });
-
-      console.log("[RegisterPanel] Response from /api/register:", response);
-
       toast.success(response.data.message || "Registered successfully!");
-
       setNickname("");
       setEmail("");
       setFirstName("");
       setLastName("");
       setPassword1("");
       setPassword2("");
-
       setTimeout(() => {
-        window.location.href = "/login";
+        navigate("/login");
       }, 1000);
     } catch (error) {
-      console.log("[RegisterPanel] Error while registering:", error);
-
       if (!error.response) {
         toast.error("Cannot connect to the server. Check network console.");
         return;
       }
-
       toast.error(error.response.data?.error || "An error occurred.");
     }
   };
 
   return (
     <div className="registerPanel">
-      <div className="registerPanel__content">
-        <h2 className="registerPanel__title">Create an account</h2>
-        <p className="registerPanel__subtitle">Enter your details below.</p>
-
-        <button className="registerPanel__googleBtn">
-          <img
-            className="registerPanel__googleIcon"
-            src="https://static.cdnlogo.com/logos/g/35/google-icon.svg"
-            alt="Google"
-          />
-          Sign Up with Google
-        </button>
-
-        <div className="registerPanel__divider">
-          <span>or</span>
-        </div>
-
+      <div className="registerPanel__container">
+        <div className="registerPanel__image"></div>
         <form className="registerPanel__form" onSubmit={handleSubmit}>
-          <div className="registerPanel__inputGroup">
+          <h2>Create an account</h2>
+          <p>Enter your details below.</p>
+
+          <div className="floating-label">
             <input
               type="text"
-              className="registerPanel__input"
+              id="nickname"
+              name="nickname"
               placeholder="Nickname"
-              required
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              required
             />
           </div>
-          <div className="registerPanel__inputGroup">
+          <div className="floating-label">
             <input
               type="email"
-              className="registerPanel__input"
+              id="email"
+              name="email"
               placeholder="Email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
-          <div className="registerPanel__inputGroup">
+          <div className="floating-label">
             <input
               type="text"
-              className="registerPanel__input"
+              id="firstName"
+              name="firstName"
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              required
             />
           </div>
-          <div className="registerPanel__inputGroup">
+          <div className="floating-label">
             <input
               type="text"
-              className="registerPanel__input"
+              id="lastName"
+              name="lastName"
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              required
             />
           </div>
-          <div className="registerPanel__inputGroup">
+          <div className="floating-label">
             <input
               type="password"
-              className="registerPanel__input"
+              id="password1"
+              name="password1"
               placeholder="Password"
-              required
               value={password1}
               onChange={(e) => setPassword1(e.target.value)}
+              required
             />
           </div>
-          <div className="registerPanel__inputGroup">
+          <div className="floating-label">
             <input
               type="password"
-              className="registerPanel__input"
+              id="password2"
+              name="password2"
               placeholder="Confirm Password"
-              required
               value={password2}
               onChange={(e) => setPassword2(e.target.value)}
+              required
             />
           </div>
 
-          <button type="submit" className="registerPanel__submitBtn">
-            Create Account
-          </button>
+          <div className="registerPanel__buttons">
+            <button type="submit">Create Account</button>
+          </div>
+
+          <div className="registerPanel__footer">
+            <p>
+              Already have an account?{" "}
+              <a href="/login" className="registerPanel__link">
+                Login
+              </a>
+              .
+            </p>
+          </div>
         </form>
-
-        <div className="registerPanel__footer">
-          <p>
-            Already have an account?{" "}
-            <a href="/login" className="registerPanel__link">
-              Login
-            </a>
-            .
-          </p>
-        </div>
-      </div>
-
-      <div className="registerPanel__imageWrapper">
-        <div className="registerPanel__overlay" />
       </div>
     </div>
   );
