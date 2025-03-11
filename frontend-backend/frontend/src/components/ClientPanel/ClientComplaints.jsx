@@ -1,4 +1,3 @@
-// ClientComplaints.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +6,8 @@ import "./ClientPanel.scss";
 
 const ClientComplaints = () => {
   const [complaints, setComplaints] = useState([]);
+  const [sortKey, setSortKey] = useState("date");
+  const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +24,32 @@ const ClientComplaints = () => {
     navigate(`/client/complaints/${complaintId}`);
   };
 
+  const handleSort = (column) => {
+    if (sortKey === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(column);
+      setSortOrder("asc");
+    }
+  };
+
+  const renderSortIndicator = (column) => {
+    if (sortKey === column) {
+      return sortOrder === "asc" ? " ▲" : " ▼";
+    }
+    return "";
+  };
+
+  const sortedComplaints = [...complaints].sort((a, b) => {
+    let comp = 0;
+    if (sortKey === "date") {
+      comp = new Date(a.submission_date) - new Date(b.submission_date);
+    } else if (sortKey === "status") {
+      comp = a.status.localeCompare(b.status);
+    }
+    return sortOrder === "asc" ? comp : -comp;
+  });
+
   return (
     <div className="container client-complaints">
       <h1>My Complaints</h1>
@@ -33,13 +60,17 @@ const ClientComplaints = () => {
               <th>#</th>
               <th>Order ID</th>
               <th>Cause</th>
-              <th>Status</th>
-              <th>Submission Date</th>
+              <th style={{ cursor: "pointer" }} onClick={() => handleSort("status")}>
+                Status{renderSortIndicator("status")}
+              </th>
+              <th style={{ cursor: "pointer" }} onClick={() => handleSort("date")}>
+                Submission Date{renderSortIndicator("date")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {complaints.map((complaint) => (
+            {sortedComplaints.map((complaint) => (
               <tr key={complaint.id}>
                 <td>{complaint.id}</td>
                 <td>{complaint.order}</td>

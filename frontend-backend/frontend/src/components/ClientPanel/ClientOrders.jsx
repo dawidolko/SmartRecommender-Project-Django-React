@@ -1,4 +1,3 @@
-// ClientOrders.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
@@ -6,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 const ClientOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [sortKey, setSortKey] = useState("date");
+  const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +23,32 @@ const ClientOrders = () => {
     navigate(`/client/orders/${orderId}`);
   };
 
+  const handleSort = (column) => {
+    if (sortKey === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(column);
+      setSortOrder("asc");
+    }
+  };
+
+  const renderSortIndicator = (column) => {
+    if (sortKey === column) {
+      return sortOrder === "asc" ? " ▲" : " ▼";
+    }
+    return "";
+  };
+
+  const sortedOrders = [...orders].sort((a, b) => {
+    let comp = 0;
+    if (sortKey === "date") {
+      comp = new Date(a.date_order) - new Date(b.date_order);
+    } else if (sortKey === "status") {
+      comp = a.status.localeCompare(b.status);
+    }
+    return sortOrder === "asc" ? comp : -comp;
+  });
+
   return (
     <div className="container client-orders">
       <h2>Your Orders</h2>
@@ -30,13 +57,17 @@ const ClientOrders = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th>Date</th>
-              <th>Status</th>
+              <th style={{ cursor: "pointer" }} onClick={() => handleSort("date")}>
+                Date{renderSortIndicator("date")}
+              </th>
+              <th style={{ cursor: "pointer" }} onClick={() => handleSort("status")}>
+                Status{renderSortIndicator("status")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {sortedOrders.map((order) => (
               <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>{format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}</td>

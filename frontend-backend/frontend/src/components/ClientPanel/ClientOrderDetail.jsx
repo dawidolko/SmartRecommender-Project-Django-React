@@ -33,11 +33,11 @@ const ClientOrderDetail = () => {
     return (
         <div className="container client-order-detail">
             <h2>Order #{order.id} Details</h2>
-            <p>Date: {format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}</p>
-            <p>Status: {order.status}</p>
-            <p>Total: ${order.total.toFixed(2)}</p>
+            <p><strong>Date: </strong>{format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}</p>
+            <p><strong>Status: </strong>{order.status}</p>
+            <p><strong>Total:</strong>${order.total.toFixed(2)}</p>
 
-            <h3>Products</h3>
+            <h3 style={{marginTop: '1rem'}}>Ordered Products:</h3>
             <table className="table table-hover">
                 <thead>
                     <tr>
@@ -56,12 +56,12 @@ const ClientOrderDetail = () => {
                                 : "https://via.placeholder.com/150";
                         return (
                             <tr key={op.id}>
-                                <td>
+                                <td style={{ display: "flex", justifyContent: "center" }}>
                                     <img src={imgSrc} alt={product.name} style={{ width: "100px" }} />
                                 </td>
                                 <td>{product.name}</td>
                                 <td>{op.quantity}</td>
-                                <td>${product.price.toFixed(2)}</td>
+                                <td>${Number(product.price).toFixed(2)}</td>
                             </tr>
                         );
                     })}
