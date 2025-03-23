@@ -324,12 +324,61 @@ class AdminStatsView(APIView):
     def get(self, request):
         data = {
             "products": Product.objects.count(),
-            "clients": MyUser.objects.filter(role="client").count(),
+            "clients": User.objects.filter(role="client").count(),
             "orders": Order.objects.count(),
             "complaints": Complaint.objects.count(),
         }
         return Response(data)
 
+class AdminDashboardStatsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        orders = Order.objects.all()
+        total_sales = OrderProduct.objects.aggregate(total=Sum("product__price", field="product__price * quantity"))["total"] or 0
+        new_users = User.objects.filter(date_joined__gte=timezone.now() - timedelta(days=30)).count()
+        total_products = Product.objects.count()
+
+        clients = User.objects.filter(role="client").count()
+        conversion_rate = round((orders.count() / clients * 100), 1) if clients else 0
+
+        orders_by_month = orders.annotate(month=TruncMonth("date_order")).values("month").annotate(
+            total_quantity=Sum("orderproduct__quantity")
+        ).order_by("month")
+        trend_labels = [order["month"].strftime("%b %Y") for order in orders_by_month]
+        trend_data = [order["total_quantity"] for order in orders_by_month]
+        max_trend = max(trend_data, default=0)
+
+        category_qs = OrderProduct.objects.values("product__categories__name").annotate(
+            total=Sum("quantity")
+        ).order_by("-total")
+        top5 = list(category_qs)[:5]
+        cat_labels = [item["product__categories__name"] for item in top5 if item["product__categories__name"]]
+        cat_data = [item["total"] for item in top5]
+
+        sales_channels = [
+            {"name": "Website", "value": orders.filter(status__iexact="website").count()},
+            {"name": "Mobile App", "value": orders.filter(status__iexact="mobile").count()},
+            {"name": "Marketplace", "value": orders.filter(status__iexact="marketplace").count()},
+            {"name": "Social Media", "value": orders.filter(status__iexact="social").count()},
+        ]
+
+        return Response({
+            "totalSales": total_sales,
+            "newUsers": new_users,
+            "totalProducts": total_products,
+            "conversionRate": f"{conversion_rate}%",
+            "trend": {
+                "labels": trend_labels,
+                "data": trend_data,
+                "y_axis_max": max_trend + 2,
+            },
+            "category_distribution": {
+                "labels": cat_labels,
+                "data": cat_data,
+            },
+            "sales_channels": sales_channels,
+        })
 
 # Current user - accessible only for authenticated users.
 class CurrentUserView(APIView):
