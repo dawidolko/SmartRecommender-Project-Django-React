@@ -13,11 +13,11 @@ const AdminHeader = ({ title }) => {
   return (
     <header className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border-b border-gray-700">
       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        {/* Tytuł projektu */}
-        <h1 className="text-2xl font-semibold text-gray-100">{title}</h1>
-        {/* Dane użytkownika */}
+        {/* Project Title */}
+        <h1 className="admin-top-header">{title}</h1>
+        {/* User Data */}
         {user && (
-          <div className="flex items-center">
+          <div className="welcome-text">
             
             <span className="text-gray-100">Witaj, {displayName}</span>
           </div>

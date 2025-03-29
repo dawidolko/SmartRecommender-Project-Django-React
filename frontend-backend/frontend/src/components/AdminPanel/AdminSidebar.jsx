@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./AdminPanel.scss";
 
 const SIDEBAR_ITEMS = [
-  { name: "Overview", icon: BarChart2, color: "#6366f1", href: "/admin" },
+  { name: "Dashboard", icon: BarChart2, color: "#6366f1", href: "/admin" },
   { name: "Products", icon: ShoppingBag, color: "#8B5CF6", href: "/admin/products" },
   { name: "Customers", icon: Users, color: "#EC4899", href: "/admin/customers" },
   { name: "Orders", icon: ShoppingCart, color: "#F59E0B", href: "/admin/orders" },
@@ -24,7 +24,7 @@ const AdminSidebar = () => {
   return (
     <motion.div
       className={`admin-aside ${isOpen ? "admin-aside--open" : "admin-aside--closed"}`}
-      animate={{ width: isOpen ? 256 : 80 }}
+      animate={{ width: isOpen ? 300 : 80 }}
       transition={{ duration: 0.3 }}
     >
       <div className="admin-aside__header">

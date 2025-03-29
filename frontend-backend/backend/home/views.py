@@ -1,5 +1,6 @@
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import TruncMonth
+from django.utils import timezone
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -25,7 +26,7 @@ from .serializers import (
     UserUpdateSerializer,
     UserRegisterSerializer,
 )
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.generics import (
     RetrieveAPIView,
@@ -335,50 +336,61 @@ class AdminDashboardStatsView(APIView):
 
     def get(self, request):
         orders = Order.objects.all()
-        total_sales = OrderProduct.objects.aggregate(total=Sum("product__price", field="product__price * quantity"))["total"] or 0
-        new_users = User.objects.filter(date_joined__gte=timezone.now() - timedelta(days=30)).count()
+
+        total_sales = OrderProduct.objects.aggregate(
+            total=Sum('product__price')
+        )['total'] or 0
+
+        new_users = User.objects.filter(
+            date_joined__gte=timezone.now() - timedelta(days=30)
+        ).count()
+
         total_products = Product.objects.count()
 
         clients = User.objects.filter(role="client").count()
         conversion_rate = round((orders.count() / clients * 100), 1) if clients else 0
 
-        orders_by_month = orders.annotate(month=TruncMonth("date_order")).values("month").annotate(
-            total_quantity=Sum("orderproduct__quantity")
+        orders_by_month = OrderProduct.objects.annotate(
+            month=TruncMonth("order__date_order")
+        ).values("month").annotate(
+            total_sales=Sum('product__price')
         ).order_by("month")
-        trend_labels = [order["month"].strftime("%b %Y") for order in orders_by_month]
-        trend_data = [order["total_quantity"] for order in orders_by_month]
-        max_trend = max(trend_data, default=0)
 
-        category_qs = OrderProduct.objects.values("product__categories__name").annotate(
-            total=Sum("quantity")
-        ).order_by("-total")
-        top5 = list(category_qs)[:5]
-        cat_labels = [item["product__categories__name"] for item in top5 if item["product__categories__name"]]
-        cat_data = [item["total"] for item in top5]
+        trend_labels = [order["month"].strftime("%b %Y") for order in orders_by_month]
+        trend_data = [float(order["total_sales"]) for order in orders_by_month]
+        max_trend = max(trend_data, default=0) if trend_data else 0
+
+        category_distribution = OrderProduct.objects.values(
+            'product__categories__name'
+        ).annotate(
+            total_quantity=Sum('quantity')
+        ).order_by('-total_quantity')
+
+        cat_labels = [item['product__categories__name'] for item in category_distribution if item['product__categories__name']]
+        cat_data = [item['total_quantity'] for item in category_distribution]
 
         sales_channels = [
-            {"name": "Website", "value": orders.filter(status__iexact="website").count()},
-            {"name": "Mobile App", "value": orders.filter(status__iexact="mobile").count()},
-            {"name": "Marketplace", "value": orders.filter(status__iexact="marketplace").count()},
-            {"name": "Social Media", "value": orders.filter(status__iexact="social").count()},
+            {"name": "Online", "value": orders.count()},
+            {"name": "Offline", "value": 0}
         ]
 
         return Response({
-            "totalSales": total_sales,
+            "totalSales": float(total_sales),
             "newUsers": new_users,
             "totalProducts": total_products,
             "conversionRate": f"{conversion_rate}%",
             "trend": {
                 "labels": trend_labels,
                 "data": trend_data,
-                "y_axis_max": max_trend + 2,
+                "y_axis_max": max_trend + (max_trend * 0.1) if max_trend > 0 else 10
             },
             "category_distribution": {
                 "labels": cat_labels,
-                "data": cat_data,
+                "data": cat_data
             },
-            "sales_channels": sales_channels,
+            "sales_channels": sales_channels
         })
+
 
 # Current user - accessible only for authenticated users.
 class CurrentUserView(APIView):

@@ -1,14 +1,15 @@
-import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 
 const SalesOverviewChart = ({ data }) => {
-  const chartData = data.labels.map((label, index) => ({
-    name: label,
-    sales: data.data[index],
-  }));
+  const chartData = data && data.labels && data.data
+    ? data.labels.map((label, index) => ({
+        name: label,
+        sales: data.data[index] || 0,
+      }))
+    : [];
 
-  const yAxisMax = data.y_axis_max || Math.max(...chartData.map(d => d.sales), 0) + 100;
+  console.log("Chart Data:", chartData);
 
   return (
     <motion.div
@@ -18,30 +19,38 @@ const SalesOverviewChart = ({ data }) => {
       transition={{ delay: 0.2 }}
     >
       <h2 className="text-lg font-medium mb-4 text-gray-100">Sales Overview</h2>
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
-            <XAxis dataKey="name" stroke="#9ca3af" />
-            <YAxis stroke="#9ca3af" domain={[0, yAxisMax]} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "rgba(31, 41, 55, 0.8)",
-                borderColor: "#4B5563",
-              }}
-              itemStyle={{ color: "#E5E7EB" }}
-            />
-            <Line
-              type="monotone"
-              dataKey="sales"
-              stroke="#6366F1"
-              strokeWidth={3}
-              dot={{ fill: "#6366F1", strokeWidth: 2, r: 6 }}
-              activeDot={{ r: 8, strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      
+      {chartData.length === 0 ? (
+        <div className="h-80 flex items-center justify-center text-gray-400">
+          No sales data available
+        </div>
+      ) : (
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <XAxis dataKey="name" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" domain={[0, data.y_axis_max || 'auto']} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(31, 41, 55, 0.8)",
+                  borderColor: "#4B5563",
+                }}
+                itemStyle={{ color: "#E5E7EB" }}
+                formatter={(value) => [`$${value.toLocaleString()}`, "Sales"]}
+              />
+              <Line
+                type="monotone"
+                dataKey="sales"
+                stroke="#6366F1"
+                strokeWidth={3}
+                dot={{ fill: "#6366F1", strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </motion.div>
   );
 };
