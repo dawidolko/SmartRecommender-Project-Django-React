@@ -1,37 +1,42 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
-const COLORS = ["#6366F1", "#8B5CF6", "#EC4899", "#10B981", "#F59E0B"];
+const COLORS = ["#8B5CF6", "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"];
 
-const CategoryDistributionChart = ({ data }) => {
-  const chartData = data.labels.map((label, index) => ({
+const CategoryDistributionChart = ({ category_distribution }) => {
+  if (!category_distribution || !category_distribution.labels || !category_distribution.data) {
+    return (
+      <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700">
+        <h2 className="text-xl font-semibold mb-4">Category Distribution</h2>
+        <div className="flex items-center justify-center" style={{ height: 300 }}>
+          <p className="text-gray-400">No data to display</p>
+        </div>
+      </div>
+    );
+  }
+
+  const data = category_distribution.labels.map((label, index) => ({
     name: label,
-    value: data.data[index],
+    value: category_distribution.data[index],
   }));
 
   return (
-    <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
-    >
-      <h2 className="text-lg font-medium mb-4 text-gray-100">Category Distribution</h2>
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height={300}>
+    <div className="category-distribution-chart">
+      <h2 className="text-xl font-semibold mb-4">Category Distribution</h2>
+      <div style={{ width: "100%", height: 400 }}>
+        <ResponsiveContainer>
           <PieChart>
             <Pie
-              data={chartData}
+              data={data}
               cx="50%"
               cy="50%"
-              labelLine={false}
-              outerRadius={100}
+              labelLine={true}
+              outerRadius={80}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
             >
-              {chartData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -46,7 +51,7 @@ const CategoryDistributionChart = ({ data }) => {
           </PieChart>
         </ResponsiveContainer>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

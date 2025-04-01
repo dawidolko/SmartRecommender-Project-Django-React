@@ -1,6 +1,7 @@
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, Sum, F, FloatField
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
+from datetime import timedelta
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -212,30 +213,51 @@ class ProductListCreateAPIView(ListCreateAPIView):
     queryset = Product.objects.all()
 
     def get_permissions(self):
-        # For GET requests, public access is allowed; only POST (creation) requires admin privileges
         if self.request.method == "GET":
             return [AllowAny()]
         return [IsAuthenticated(), IsAdminUser()]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        ids = self.request.query_params.get("ids")
-        if ids:
-            try:
-                id_list = [int(x) for x in ids.split(",") if x.isdigit()]
-                queryset = queryset.filter(id__in=id_list)
-            except Exception as e:
-                pass
-        return queryset
+    def perform_create(self, serializer):
+        tags = self.request.data.get("tags", [])
+        categories = self.request.data.get("categories", [])
+        photos = self.request.data.get("photos", [])
 
+        if not tags:
+            raise ValidationError("Tags are required.")
+        if not categories:
+            raise ValidationError("Categories are required.")
+
+        try:
+            product = serializer.save()
+
+            if tags:
+                tags_objects = Tag.objects.filter(id__in=tags)
+                product.tags.set(tags_objects)
+
+            if categories:
+                categories_objects = Category.objects.filter(name__in=categories)
+                product.categories.set(categories_objects)
+
+            if photos:
+                for photo_path in photos:
+                    photo_product = PhotoProduct.objects.create(path=photo_path)
+                    product.photoproduct_set.add(photo_product)
+
+            return Response(serializer.data, status=201)
+
+        except Exception as e:
+            raise ValidationError(f"Error occurred during product creation: {str(e)}")
+        
 
 class ProductRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
 
+    def perform_update(self, serializer):
+        serializer.save()
 
-# Orders - A user can view and modify only their own orders; admin can access all orders.
+
 class OrderListCreateAPIView(ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
@@ -335,10 +357,8 @@ class AdminDashboardStatsView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
-        orders = Order.objects.all()
-
         total_sales = OrderProduct.objects.aggregate(
-            total=Sum('product__price')
+            total=Sum(F('product__price') * F('quantity'), output_field=FloatField())
         )['total'] or 0
 
         new_users = User.objects.filter(
@@ -348,12 +368,13 @@ class AdminDashboardStatsView(APIView):
         total_products = Product.objects.count()
 
         clients = User.objects.filter(role="client").count()
-        conversion_rate = round((orders.count() / clients * 100), 1) if clients else 0
+
+        conversion_rate = round((Order.objects.count() / clients * 100), 1) if clients else 0
 
         orders_by_month = OrderProduct.objects.annotate(
             month=TruncMonth("order__date_order")
         ).values("month").annotate(
-            total_sales=Sum('product__price')
+            total_sales=Sum(F('product__price') * F('quantity'), output_field=FloatField())
         ).order_by("month")
 
         trend_labels = [order["month"].strftime("%b %Y") for order in orders_by_month]
@@ -366,13 +387,22 @@ class AdminDashboardStatsView(APIView):
             total_quantity=Sum('quantity')
         ).order_by('-total_quantity')
 
-        cat_labels = [item['product__categories__name'] for item in category_distribution if item['product__categories__name']]
+        cat_labels = [
+            item['product__categories__name']
+            for item in category_distribution
+            if item['product__categories__name']
+        ]
         cat_data = [item['total_quantity'] for item in category_distribution]
 
-        sales_channels = [
-            {"name": "Online", "value": orders.count()},
-            {"name": "Offline", "value": 0}
-        ]
+        top_selling_data = OrderProduct.objects.values('product').annotate(
+            total_sold=Sum('quantity')
+        ).order_by('-total_sold').first()
+        top_selling = top_selling_data['total_sold'] if top_selling_data else 0
+
+        churned_users = User.objects.filter(
+            last_login__lte=timezone.now() - timedelta(days=30)
+        ).count()
+        churn_rate = round((churned_users / clients * 100), 1) if clients else 0
 
         return Response({
             "totalSales": float(total_sales),
@@ -388,7 +418,8 @@ class AdminDashboardStatsView(APIView):
                 "labels": cat_labels,
                 "data": cat_data
             },
-            "sales_channels": sales_channels
+            "topSelling": top_selling,
+            "churnRate": f"{churn_rate}%",
         })
 
 

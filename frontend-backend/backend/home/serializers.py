@@ -49,13 +49,29 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
 
 class ProductSerializer(serializers.ModelSerializer):
-    photos = PhotoProductSerializer(source='photoproduct_set', many=True)
-    tags = serializers.StringRelatedField(many=True)
-    categories = serializers.SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field='name'
-    )
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, required=False)
+    categories = serializers.SlugRelatedField(queryset=Category.objects.all(), many=True, slug_field='name', required=False)
+    photos = PhotoProductSerializer(source='photoproduct_set', many=True, required=False)
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.price = validated_data.get('price', instance.price)
+        instance.old_price = validated_data.get('old_price', instance.old_price)
+        instance.description = validated_data.get('description', instance.description)
+
+        if 'tags' in validated_data:
+            instance.tags.set(validated_data['tags'])
+        if 'photos' in validated_data:
+            instance.photoproduct_set.set(validated_data['photos'])
+        if 'categories' in validated_data:
+            instance.categories.set(validated_data['categories'])
+
+        instance.save()
+        return instance
+
 
     class Meta:
         model = Product
