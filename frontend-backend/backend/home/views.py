@@ -9,6 +9,7 @@ from .models import (
     CartItem,
     Product,
     Category,
+    Opinion,
     Order,
     Complaint,
     OrderProduct,
@@ -26,6 +27,7 @@ from .serializers import (
     TagSerializer,
     UserUpdateSerializer,
     UserRegisterSerializer,
+    AdminUserSerializer,
 )
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import get_user_model, authenticate
@@ -55,6 +57,8 @@ User = get_user_model()
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = "email"
+
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
@@ -302,15 +306,14 @@ class OrderUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 
 # Users - Only admin can manage users.
-class UserListAPIView(ListAPIView):
+class UserListCreateAPIView(ListCreateAPIView):
     queryset = MyUser.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = AdminUserSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
 
-
-class UserDestroyAPIView(DestroyAPIView):
+class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = MyUser.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = AdminUserSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
 
 
@@ -409,6 +412,39 @@ class AdminDashboardStatsView(APIView):
         ).count()
         churn_rate = round((churned_users / clients * 100), 1) if clients else 0
 
+        total_opinions = Opinion.objects.count()
+
+        # averageRating
+        from django.db.models import Avg
+        avg_rating_dict = Opinion.objects.aggregate(avg_rating=Avg('rating'))
+        average_rating = avg_rating_dict['avg_rating'] or 0
+
+        # topCategoryName
+        top_category_name = None
+        if cat_summary:
+            sorted_cats = sorted(cat_summary.items(), key=lambda x: x[1], reverse=True)
+            top_category_name = sorted_cats[0][0]
+
+        product_sales_qs = (
+            OrderProduct.objects
+            .values('product')
+            .annotate(total_sold=Sum('quantity'))
+        )
+        product_sales_dict = {x['product']: x['total_sold'] for x in product_sales_qs}
+
+        tag_summary = {}
+        for tag in Tag.objects.prefetch_related('product_set'):
+            sum_sold_for_tag = 0
+            for prod in tag.product_set.all():
+                sum_sold_for_tag += product_sales_dict.get(prod.id, 0)
+            tag_summary[tag.name] = sum_sold_for_tag
+
+        top_tag_name = None
+        if tag_summary:
+            sorted_tags = sorted(tag_summary.items(), key=lambda x: x[1], reverse=True)
+            top_tag_name = sorted_tags[0][0]
+        # -----------------------------------
+
         return Response({
             "totalSales": float(total_sales),
             "newUsers": new_users,
@@ -424,7 +460,12 @@ class AdminDashboardStatsView(APIView):
                 "data": cat_data
             },
             "topSelling": top_selling,
-            "churnRate": f"{churn_rate}%",
+            "churnRate": f"{churn_rate}%", 
+
+            "totalOpinions": total_opinions,
+            "averageRating": round(average_rating, 2),
+            "topCategoryName": top_category_name or "",
+            "topTagName": top_tag_name or "",
         })
 
 

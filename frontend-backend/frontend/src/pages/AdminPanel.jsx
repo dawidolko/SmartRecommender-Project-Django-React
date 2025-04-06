@@ -11,7 +11,7 @@ import AdminHeader from "../components/AdminPanel/AdminHeader";
 import AdminDashboard from "../components/AdminPanel/AdminDashboard";
 import AdminProducts from "../components/AdminPanel/AdminProducts";
 import AdminOrders from "../components/AdminPanel/AdminOrders";
-import AdminCustomers from "../components/AdminPanel/AdminCustomers";
+import AdminUsers from "../components/AdminPanel/AdminUsers";
 import AdminComplaints from "../components/AdminPanel/AdminComplaints";
 
 import "../components/AdminPanel/AdminPanel.scss";
@@ -39,8 +39,8 @@ const AdminPanel = () => {
         return "Products";
       case "/admin/orders":
         return "Orders";
-      case "/admin/customers":
-        return "Customers";
+      case "/admin/users":
+        return "Users";
       case "/admin/complaints":
         return "Complaints";
       default:
@@ -60,7 +60,7 @@ const AdminPanel = () => {
               <Route path="/" element={<AdminDashboard />} />
               <Route path="/products" element={<AdminProducts />} />
               <Route path="/orders" element={<AdminOrders />} />
-              <Route path="/customers" element={<AdminCustomers />} />
+              <Route path="/users" element={<AdminUsers />} />
               <Route path="/complaints" element={<AdminComplaints />} />
               <Route
                 path="*"

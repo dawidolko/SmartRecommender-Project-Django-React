@@ -7,7 +7,7 @@ import "./AdminPanel.scss";
 const SIDEBAR_ITEMS = [
   { name: "Dashboard", icon: BarChart2, color: "#6366f1", href: "/admin" },
   { name: "Products", icon: ShoppingBag, color: "#8B5CF6", href: "/admin/products" },
-  { name: "Customers", icon: Users, color: "#EC4899", href: "/admin/customers" },
+  { name: "Users", icon: Users, color: "#EC4899", href: "/admin/users" },
   { name: "Orders", icon: ShoppingCart, color: "#F59E0B", href: "/admin/orders" },
   { name: "Complaints", icon: List, color: "#10B981", href: "/admin/complaints" },
 ];

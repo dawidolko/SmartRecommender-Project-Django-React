@@ -134,6 +134,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "email", "username", "role", "first_name", "last_name"]
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = "email"
+    
     def get_token(self, user):
         token = super().get_token(user)
         token["role"] = user.role
@@ -196,6 +198,31 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.email = validated_data.get("email", instance.email)
         password = validated_data.get("password")
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
+    
+class AdminUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name", "role", "password"]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        instance.username = validated_data.get("username", instance.username)
+        instance.email = validated_data.get("email", instance.email)
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.role = validated_data.get("role", instance.role)
         if password:
             instance.set_password(password)
         instance.save()
