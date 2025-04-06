@@ -371,6 +371,7 @@ class AdminDashboardStatsView(APIView):
 
         conversion_rate = round((Order.objects.count() / clients * 100), 1) if clients else 0
 
+        # Trend (Sales by Month)
         orders_by_month = OrderProduct.objects.annotate(
             month=TruncMonth("order__date_order")
         ).values("month").annotate(
@@ -381,19 +382,23 @@ class AdminDashboardStatsView(APIView):
         trend_data = [float(order["total_sales"]) for order in orders_by_month]
         max_trend = max(trend_data, default=0) if trend_data else 0
 
-        category_distribution = OrderProduct.objects.values(
+        category_distribution_qs = OrderProduct.objects.values(
             'product__categories__name'
         ).annotate(
             total_quantity=Sum('quantity')
-        ).order_by('-total_quantity')
+        )
 
-        cat_labels = [
-            item['product__categories__name']
-            for item in category_distribution
-            if item['product__categories__name']
-        ]
-        cat_data = [item['total_quantity'] for item in category_distribution]
+        cat_summary = {}
+        for item in category_distribution_qs:
+            full_name = item['product__categories__name']
+            if full_name:
+                main_cat = full_name.split('.')[0]
+                cat_summary[main_cat] = cat_summary.get(main_cat, 0) + item['total_quantity']
 
+        cat_labels = list(cat_summary.keys())
+        cat_data = list(cat_summary.values())
+
+        # TOP SELLING
         top_selling_data = OrderProduct.objects.values('product').annotate(
             total_sold=Sum('quantity')
         ).order_by('-total_sold').first()

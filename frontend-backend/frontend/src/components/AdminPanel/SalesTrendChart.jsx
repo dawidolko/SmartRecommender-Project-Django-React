@@ -23,8 +23,8 @@ const SalesTrendChart = ({ trend }) => {
       <h2 className="text-xl font-semibold text-gray-100 mb-4">Sales Trend</h2>
       <div style={{ width: "90%", height: 300, margin: "0 auto" }}>
         <ResponsiveContainer>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <LineChart data={data} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="4 4" stroke="#374151" />
             <XAxis dataKey="month" stroke="#9CA3AF" />
             <YAxis stroke="#9CA3AF" />
             <Tooltip

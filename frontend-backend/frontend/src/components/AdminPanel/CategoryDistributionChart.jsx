@@ -23,7 +23,7 @@ const CategoryDistributionChart = ({ category_distribution }) => {
   return (
     <div className="category-distribution-chart">
       <h2 className="text-xl font-semibold mb-4">Category Distribution</h2>
-      <div style={{ width: "100%", height: 400 }}>
+      <div style={{ width: "100%", height: 470 }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
@@ -31,7 +31,7 @@ const CategoryDistributionChart = ({ category_distribution }) => {
               cx="50%"
               cy="50%"
               labelLine={true}
-              outerRadius={80}
+              outerRadius={150}
               fill="#8884d8"
               dataKey="value"
               label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
