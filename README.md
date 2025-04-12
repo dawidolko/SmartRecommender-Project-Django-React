@@ -168,7 +168,7 @@ This project was created as part of an engineering thesis under the supervision 
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache License 2.0](LICENSE).
 
 ---
 
