@@ -1,0 +1,59 @@
+# === PYTHON / DJANGO ===
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.DS_Store
+
+# Django specific
+/staticfiles/
+/media/
+/local_settings.py
+/secrets.json
+
+# VSCode
+.vscode/
+
+# Migrations (jeśli chcesz kontrolować – możesz wyjąć z ignore)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# === NODE / REACT ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/build
+/dist
+
+# === SYSTEM FILES ===
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+.idea/
+*.iml
+*.bak
+
+# === DATABASE ===
+*.pgsql
+*.psql
+
+# === TESTS ===
+.coverage
+.tox/
+.pytest_cache/
+htmlcov/
+
+# === STREAMLIT ===
+.streamlit/

@@ -2,7 +2,7 @@ import "./Accordion.scss";
 import accordionData from "./AccordionData";
 import { useState } from "react";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
-import faq from "../../assets/faq.webp";
+import faq from "../../assets/faq1.webp";
 
 const Accordion = () => {
   const [activeIndex, setActiveIndex] = useState(null);

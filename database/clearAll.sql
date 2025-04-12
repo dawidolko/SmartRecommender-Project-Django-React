@@ -1,5 +1,3 @@
-/* 
-
 DO $$
 BEGIN
     -- Drop all foreign key constraints
@@ -63,5 +61,3 @@ BEGIN
     EXECUTE 'GRANT ALL ON SCHEMA public TO postgres';
     EXECUTE 'GRANT ALL ON SCHEMA public TO public';
 END $$;
-
-*/

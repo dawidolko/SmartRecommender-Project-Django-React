@@ -2,7 +2,14 @@ import "./AboutContent.scss";
 import { GiCheckMark } from "react-icons/gi";
 import PropTypes from "prop-types";
 
-const AboutContent = ({ img, alt, title, span, text, showIcons }) => {
+const AboutContent = ({
+  img,
+  alt,
+  title,
+  span = "",
+  text,
+  showIcons = true,
+}) => {
   return (
     <section className="about container">
       <div className="about__container container">
@@ -44,11 +51,6 @@ AboutContent.propTypes = {
   span: PropTypes.string,
   text: PropTypes.string.isRequired,
   showIcons: PropTypes.bool,
-};
-
-AboutContent.defaultProps = {
-  showIcons: true,
-  span: "",
 };
 
 export default AboutContent;

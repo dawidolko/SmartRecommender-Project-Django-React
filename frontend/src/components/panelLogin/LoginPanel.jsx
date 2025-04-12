@@ -1,130 +1,91 @@
-// src/components/panelLogin/LoginPanel.jsx
-
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 import "./PanelLogin.scss";
-import accountData from "./AccountData";
 
-/**
- * Panel logowania.
- * Sprawdza zarówno "wbudowanych" userów (accountData),
- * jak i tych zarejestrowanych w localStorage (key: "registeredUsers").
- */
 const LoginPanel = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Pobieramy zarejestrowanych userów z localStorage
-    const storedUsers = localStorage.getItem("registeredUsers");
-    let customUsersArray = [];
-
-    if (storedUsers) {
-      try {
-        customUsersArray = JSON.parse(storedUsers);
-        if (!Array.isArray(customUsersArray)) {
-          customUsersArray = [];
-        }
-      } catch (err) {
-        customUsersArray = [];
-      }
+    if (!email || !password) {
+      toast.error("Please enter email and password.");
+      return;
     }
 
-    // 2. Łączymy accountData + customUsersArray w jedną tablicę
-    const allUsers = [...accountData, ...customUsersArray];
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
+        email,
+        password,
+      });
 
-    // 3. Szukamy usera po emailu i haśle
-    const foundUser = allUsers.find(
-      (item) => item.email === email && item.password === password
-    );
+      const { access } = response.data;
+      login(access);
+      localStorage.setItem("access", access);
 
-    if (foundUser) {
-      // Ustawiamy w localStorage info o zalogowanym userze
-      const userData = {
-        id: foundUser.id,
-        email: foundUser.email,
-        role: foundUser.role,
-      };
-      localStorage.setItem("loggedUser", JSON.stringify(userData));
+      const decoded = JSON.parse(atob(access.split(".")[1]));
+      localStorage.setItem("loggedUser", JSON.stringify(decoded));
 
-      // Przekierowanie w zależności od roli
-      if (foundUser.role === "Admin") {
-        window.location.href = "/admin";
-      } else {
-        window.location.href = "/client";
-      }
-    } else {
-      setErrorMsg("Invalid email or password.");
+      toast.success("Logged in successfully!");
+
+      setTimeout(() => {
+        navigate(decoded.role === "admin" ? "/admin" : "/client");
+      }, 500);
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Invalid email or password.");
     }
   };
 
   return (
     <div className="loginPanel">
-      <div className="loginPanel__content">
-        <h2 className="loginPanel__title">Welcome back</h2>
-        <p className="loginPanel__subtitle">
-          Welcome back, please enter your details.
-        </p>
-
-        <button className="loginPanel__googleBtn">
-          <img
-            className="loginPanel__googleIcon"
-            src="https://static.cdnlogo.com/logos/g/35/google-icon.svg"
-            alt="Google"
-          />
-          Log in with Google
-        </button>
-
-        <div className="loginPanel__divider">
-          <span>or</span>
-        </div>
-
-        {errorMsg && (
-          <div style={{ color: "red", marginBottom: "1em" }}>{errorMsg}</div>
-        )}
+      <div className="loginPanel__container">
+        <div className="loginPanel__image"></div>
 
         <form className="loginPanel__form" onSubmit={handleSubmit}>
-          <div className="loginPanel__inputGroup">
+          <h2>Welcome back</h2>
+          <p>Please enter your details to log in.</p>
+
+          <div className="floating-label">
             <input
               type="email"
-              className="loginPanel__input"
+              id="email"
+              name="email"
               placeholder="Email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
-          <div className="loginPanel__inputGroup">
+
+          <div className="floating-label">
             <input
               type="password"
-              className="loginPanel__input"
+              id="password"
+              name="password"
               placeholder="Password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <button type="submit" className="loginPanel__submitBtn">
-            Log in
-          </button>
+          <div className="loginPanel__buttons">
+            <button type="submit">Log in</button>
+            <span className="loginPanel__or">OR</span>
+            <button
+              type="button"
+              className="loginPanel__signupBtn"
+              onClick={() => navigate("/signup")}>
+              Sign Up
+            </button>
+          </div>
         </form>
-
-        <div className="loginPanel__footer">
-          <p>
-            If you have not created an account yet, please{" "}
-            <a href="/signup" className="loginPanel__link">
-              Sign up for free
-            </a>
-            .
-          </p>
-        </div>
-      </div>
-
-      <div className="loginPanel__imageWrapper">
-        <div className="loginPanel__overlay" />
       </div>
     </div>
   );

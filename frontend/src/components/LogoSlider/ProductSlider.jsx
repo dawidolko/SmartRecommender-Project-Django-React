@@ -4,16 +4,24 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import "./ProductSlider.scss";
-import shopData from "../ShopContent/ShopData";
+import axios from "axios";
 import ProductSliderItem from "./ProductSliderItem";
 
 const ProductSlider = () => {
   const [randomProducts, setRandomProducts] = useState([]);
 
   useEffect(() => {
-    const shuffled = [...shopData].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 10);
-    setRandomProducts(selected);
+    const fetchRandomProducts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/random-products/"
+        );
+        setRandomProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching random products:", error);
+      }
+    };
+    fetchRandomProducts();
   }, []);
 
   const settings = {

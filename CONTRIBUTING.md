@@ -43,7 +43,7 @@ If the idea is a good fit, maintainers or contributors can help refine and discu
 
 2. **Branch Naming**
 
-   - Create a new branch off `master` for your work, following these naming conventions:
+   - Create a new branch off `main` for your work, following these naming conventions:
      - **feature/your-feature** if you’re adding a feature
      - **bugfix/your-fix** if you’re fixing a bug
 
@@ -70,7 +70,7 @@ If the idea is a good fit, maintainers or contributors can help refine and discu
 
 ## Pull Request Guidelines
 
-- The `master` branch reflects the latest **stable** release, so do not submit pull requests directly to `master` without good reason.
+- The `main` branch reflects the latest **stable** release, so do not submit pull requests directly to `main` without good reason.
 - Update **documentation** if your changes alter the API or usage of TechByte.
 - Keep changes **atomic** and **focused**—small pull requests are easier to review and merge.
 

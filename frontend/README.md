@@ -55,11 +55,10 @@ This React-based frontend is designed to provide a highly interactive user inter
 ## Getting Started
 
 1. **Install Dependencies**
+
    ```bash
    npm install
    ```
-
-````
 
 2. **Run Development Server**
    ```bash
@@ -71,4 +70,3 @@ This React-based frontend is designed to provide a highly interactive user inter
    ```
 
 Feel free to adjust configurations in the `.env` or `config.js` files for custom endpoints, environment variables, or styling preferences.
-````

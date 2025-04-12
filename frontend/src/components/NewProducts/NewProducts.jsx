@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import shopData from "../ShopContent/ShopData";
+import { useState, useEffect, useRef } from "react";
 import ShopProduct from "../ShopContent/ShopProduct";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
+import axios from "axios";
 
 const NewProducts = () => {
   const [randomProducts, setRandomProducts] = useState([]);
@@ -13,10 +12,28 @@ const NewProducts = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Shuffle the products array and select the first 9 products
-    const shuffledProducts = [...shopData].sort(() => Math.random() - 0.5);
-    const selectedProducts = shuffledProducts.slice(0, 9);
-    setRandomProducts(selectedProducts);
+    const fetchRandomProducts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/random-products/"
+        );
+        const formattedProducts = response.data.map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: parseFloat(product.price),
+          old_price: product.old_price ? parseFloat(product.old_price) : null,
+          imgs: product.photos.map(
+            (photo) => `http://localhost:8000/media/${photo.path}`
+          ),
+          category: product.categories[0] || "N/A",
+        }));
+        setRandomProducts(formattedProducts.slice(0, 9));
+      } catch (error) {
+        console.error("Error fetching random products:", error);
+      }
+    };
+
+    fetchRandomProducts();
   }, []);
 
   return (
@@ -28,9 +45,13 @@ const NewProducts = () => {
       className="shop container">
       <h2 className="shop__title">Our Latest Products</h2>
       <div className="shop__products">
-        {randomProducts.map((product) => (
-          <ShopProduct key={product.id} {...product} />
-        ))}
+        {randomProducts.length > 0 ? (
+          randomProducts.map((product) => (
+            <ShopProduct key={product.id} {...product} />
+          ))
+        ) : (
+          <p>Loading products...</p>
+        )}
       </div>
       <button onClick={() => navigate("/shop")} className="shop__navigate">
         Explore All Products

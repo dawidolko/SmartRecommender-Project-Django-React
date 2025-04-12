@@ -1,28 +1,26 @@
 import "./Navbar.scss";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
-import {
-  AiOutlineClose,
-  AiOutlineHeart,
-  AiOutlineSearch,
-} from "react-icons/ai";
-import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import { AiOutlineClose, AiOutlineHeart } from "react-icons/ai";
+import { FaUserCircle } from "react-icons/fa";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
-import accountData from "../panelLogin/AccountData";
+import CartPreview from "../CartContent/CartPreview";
+import axios from "axios";
 
-const Navbar = ({ categories = [] }) => {
-  const { totalCartItems } = useContext(CartContext);
+const Navbar = () => {
+  useContext(CartContext);
   const { favorites } = useFavorites();
+  const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
   const [navBgc, setNavBgc] = useState(false);
   const [searchInput, setSearchInput] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
+  useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [showCartDropdown, setShowCartDropdown] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedUser");
@@ -41,6 +39,13 @@ const Navbar = ({ categories = [] }) => {
     };
   }, []);
 
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/categories/")
+      .then((res) => setCategories(res.data))
+      .catch((err) => console.error("Error fetching categories:", err));
+  }, []);
+
   const handleClick = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
 
@@ -52,29 +57,29 @@ const Navbar = ({ categories = [] }) => {
     setShowUserDropdown(false);
   };
 
-  const handleCartHover = () => {
-    setShowCartDropdown(true);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      navigate(`/search/${searchInput}`);
+      setSearchInput("");
+    }
   };
-
-  const handleCartLeave = () => {
-    setShowCartDropdown(false);
-  };
-
-  const toggleSearch = () => setShowSearch(!showSearch);
 
   const handleLogout = () => {
+    localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
     setLoggedUser(null);
     setShowUserDropdown(false);
-    window.location.href = "/";
+    window.location.href = "/login";
   };
+
+  // Ustal prefiks panelu w zależności od roli
+  const panelPrefix =
+    loggedUser && loggedUser.role === "admin" ? "/admin" : "/client";
 
   const getUserRedirect = () => {
     if (loggedUser) {
-      const user = accountData.find((user) => user.email === loggedUser.email);
-      if (user) {
-        return user.role === "Admin" ? "/admin" : "/client";
-      }
+      return panelPrefix;
     }
     return "/login";
   };
@@ -82,26 +87,24 @@ const Navbar = ({ categories = [] }) => {
   return (
     <nav className={navBgc ? "navbar navbar__bgc" : "navbar"}>
       <div className="navbar__container container">
-        <div className="navbar__search-wrapper">
-          <button className="navbar__search-icon" onClick={toggleSearch}>
-            <AiOutlineSearch />
-          </button>
-          {showSearch && (
-            <div className="navbar__search">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-              <button className="navbar__search-button">Search</button>
-            </div>
-          )}
-        </div>
         <Link to="/" className="navbar__logo">
           <p className="navbar__logo-text"></p>
         </Link>
-
+        <div className="navbar__search-wrapper">
+          <form className="search-bar" onSubmit={handleSearchSubmit}>
+            <input
+              type="search"
+              name="search"
+              placeholder="Search products..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              required
+            />
+            <button className="search-btn" type="submit">
+              <span>Search</span>
+            </button>
+          </form>
+        </div>
         <ul
           className={
             isOpen ? "navbar__links navbar__links-active" : "navbar__links"
@@ -131,17 +134,94 @@ const Navbar = ({ categories = [] }) => {
               BLOG
             </NavLink>
           </li>
-
-          <li className="navbar__categories">
-            <NavLink
-              className="navbar__link"
-              to="/categories"
-              onClick={closeNav}>
-              CATEGORIES
-            </NavLink>
+          <li
+            className="navbar__categories"
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}>
+            <p className="navbar__link">CATEGORY</p>
+            <div className={`navbar__dropdown ${isOpen ? "active" : ""}`}>
+              {Object.entries(
+                categories.reduce((acc, category) => {
+                  const [main, sub] = category.name.split(".");
+                  if (!acc[main]) acc[main] = [];
+                  if (sub) acc[main].push(sub);
+                  return acc;
+                }, {})
+              ).map(([mainCategory, subCategories]) => (
+                <div
+                  key={mainCategory}
+                  className="navbar__main-category"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.classList.add("hover");
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.classList.remove("hover");
+                  }}>
+                  <p className="navbar__main-category-name">
+                    {mainCategory.toUpperCase()}
+                  </p>
+                  <div className="navbar__subcategories">
+                    {subCategories.map((subCategory) => (
+                      <NavLink
+                        key={subCategory}
+                        to={`/category/${mainCategory}.${subCategory}`}
+                        className="navbar__dropdown-item"
+                        onClick={closeNav}>
+                        {subCategory}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </li>
-
+          {/* User Icon i dropdown */}
           <li className="navbar__icons">
+            <div
+              className="navbar__user"
+              onMouseEnter={handleUserIconHover}
+              onMouseLeave={handleUserIconLeave}
+              style={{ cursor: "pointer" }}>
+              <FaUserCircle
+                className="navbar__user-icon"
+                onClick={() => (window.location.href = getUserRedirect())}
+              />
+              {showUserDropdown && (
+                <div className="navbar__user-dropdown">
+                  {loggedUser ? (
+                    <>
+                      <Link
+                        to={`${panelPrefix}/account`}
+                        className="navbar__dropdown-link">
+                        Your Account
+                      </Link>
+                      <Link
+                        to={`${panelPrefix}/orders`}
+                        className="navbar__dropdown-link">
+                        Orders
+                      </Link>
+                      <Link to={panelPrefix} className="navbar__dropdown-link">
+                        Go to Panel
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="navbar__logoutBtn">
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" className="navbar__dropdown-link">
+                        Login
+                      </Link>
+                      <Link to="/signup" className="navbar__dropdown-link">
+                        Register
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             <NavLink
               className="navbar__favorites-link"
               to="/favorites"
@@ -151,56 +231,9 @@ const Navbar = ({ categories = [] }) => {
                 <AiOutlineHeart className="navbar__heart" />
               </div>
             </NavLink>
-
-            <div
-              className="navbar__cart"
-              onMouseEnter={handleCartHover}
-              onMouseLeave={handleCartLeave}
-              onClick={() => (window.location.href = "/cart")}
-              style={{ cursor: "pointer" }}>
-              <span className="navbar__quantity">{totalCartItems()}</span>
-              <FaShoppingCart className="navbar__basket" />
-              {showCartDropdown && (
-                <div className="navbar__cart-dropdown">
-                  {totalCartItems() === 0 ? (
-                    <p>Your cart is empty.</p>
-                  ) : (
-                    <p>You have {totalCartItems()} items in your cart.</p>
-                  )}
-                  <Link to="/cart" className="navbar__cart-button">
-                    Go to cart
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="navbar__user"
-              onMouseEnter={handleUserIconHover}
-              onMouseLeave={handleUserIconLeave}
-              onClick={() => (window.location.href = getUserRedirect())}
-              style={{ cursor: "pointer" }}>
-              <FaUserCircle className="navbar__user-icon" />
-              {showUserDropdown && (
-                <div className="navbar__user-dropdown">
-                  <Link to="/account" className="navbar__dropdown-link">
-                    Your Account
-                  </Link>
-                  <Link to="/orders" className="navbar__dropdown-link">
-                    Orders
-                  </Link>
-                  <Link to="/settings" className="navbar__dropdown-link">
-                    Settings
-                  </Link>
-                  <button onClick={handleLogout} className="navbar__logoutBtn">
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+            <CartPreview />
           </li>
         </ul>
-
         <div className="navbar__hamburger" onClick={handleClick}>
           {isOpen ? <AiOutlineClose /> : <GiHamburgerMenu />}
         </div>

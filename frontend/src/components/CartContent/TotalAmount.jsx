@@ -4,20 +4,22 @@ import { CartContext } from "../ShopContext/ShopContext";
 import CartModal from "./CartModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const TotalAmount = () => {
-  const { totalAmount, totalCartItems, resetCart, items } =
-    useContext(CartContext);
+  const { totalAmount, totalCartItems, resetCart, items } = useContext(CartContext);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const formattedTotalAmount =
     typeof totalAmount() === "number" ? totalAmount().toFixed(2) : "0.00";
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    // Retrieve logged-in user and token from localStorage
     const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
+    const token = localStorage.getItem("access");
 
-    if (!loggedUser) {
+    if (!loggedUser || !token) {
       toast.error("You must be logged in to complete the purchase.", {
         position: "top-center",
         autoClose: 3000,
@@ -31,18 +33,33 @@ const TotalAmount = () => {
       return;
     }
 
-    const clientOrders = JSON.parse(localStorage.getItem("clientOrders")) || [];
-    const newOrder = {
-      id: Date.now(),
-      userId: loggedUser.id,
-      items: items,
-      total: totalAmount(),
-    };
+    try {
+      // Send POST request with Authorization header
+      await axios.post(
+        "http://localhost:8000/api/orders/",
+        {
+          items,
+          total: totalAmount(),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    clientOrders.push(newOrder);
-    localStorage.setItem("clientOrders", JSON.stringify(clientOrders));
-
-    openModal();
+      openModal();
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      toast.error("Checkout failed. Please try again.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
   };
 
   const openModal = () => {

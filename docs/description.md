@@ -1,30 +1,35 @@
-Opis metod stosowanych w projekcie:
+### Description of methods used in the project:
 
 1. Collaborative Filtering (CF)
 
-   - Analizuje podobieństwa między użytkownikami (lub między produktami) na podstawie historii zakupów i ocen.
-   - W projekcie posłuży do sugerowania produktów, które kupili inni, podobni klienci (User-Based CF) lub produktów powiązanych ze sobą w historii zakupów (Item-Based CF).
+- Analyzes similarities between users (or between products) based on purchase history and ratings.
+- In the project, it will be used to suggest products that other, similar customers have bought (User-Based CF) or products related to each other in the purchase history (Item-Based CF).
 
 2. Content-Based Filtering (CBF)
 
-   - Skupia się na cechach produktu (np. kategoria, słowa kluczowe, opis).
-   - W projekcie będzie proponować produkty podobne do tych, które użytkownik już polubił/kupił, bazując na analizie ich atrybutów (np. TF-IDF w opisach).
+- Focuses on product features (e.g. category, keywords, description).
 
-3. Modele Probabilistyczne (Naive Bayes)
+- In the project, it will suggest products similar to those that the user has already liked/bought, based on the analysis of their attributes (e.g. TF-IDF in descriptions).
 
-   - Wykorzystują dane o użytkownikach i produktach do szacowania prawdopodobieństwa zainteresowania konkretną ofertą.
-   - W projekcie pomogą określać, z jakim prawdopodobieństwem użytkownik kupi dany produkt, co pozwoli lepiej priorytetyzować rekomendacje.
+3. Probabilistic Models (Naive Bayes)
 
-4. Fuzzy Decision Systems (Logika Rozmyta)
+- Use data on users and products to estimate the probability of interest in a specific offer.
+- In the project, they will help determine the probability with which a user will buy a given product, which will allow for better prioritization of recommendations.
 
-   - Wprowadza pojęcia „stopnia przynależności” (np. produkt może być „trochę drogi” albo „umiarkowanie tani”), co pozwala lepiej oddać subiektywne cechy.
-   - W projekcie umożliwi bardziej elastyczne reguły rekomendacyjne, np. łączenie atrybutów takich jak „niska cena” i „wysoka jakość” w celu wybrania najlepszych ofert.
+4. Fuzzy Decision Systems (Fuzzy Logic)
+
+- Introduces the concepts of "degree of belonging" (e.g. a product can be "a bit expensive" or "moderately cheap"), which allows for better reflection of subjective features.
+
+- In the project, it will enable more flexible recommendation rules, e.g. combining attributes such as "low price" and "high quality" in order to select the best offers.
 
 5. Sentiment-Based Recommendations
 
-   - Analizuje opinie i recenzje użytkowników, aby określić ich wydźwięk (pozytywny/negatywny).
-   - W projekcie pozwoli proponować produkty, które zbierają głównie pozytywne komentarze, jednocześnie filtrując te z negatywnymi opiniami.
+- Analyzes user opinions and reviews to determine their tone (positive/negative).
 
-6. Reguły Asocjacyjne
-   - Wykrywają zależności między produktami na podstawie analizy transakcji, co umożliwia identyfikację produktów często kupowanych razem.
-   - W projekcie pozwalają na identyfikację powiązanych produktów, które mogą być rekomendowane klientom.
+- In the project, it will allow to recommend products that collect mainly positive comments, while filtering those with negative opinions.
+
+6. Association Rules
+
+- Detect dependencies between products based on transaction analysis, which allows to identify products often purchased together.
+
+- In the project, they allow to identify related products that can be recommended to customers.

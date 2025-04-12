@@ -1,8 +1,14 @@
 import "./Testimonials.scss";
 import { useNavigate } from "react-router-dom";
 
-const TestimonialsItem = (props) => {
-  const { id, imgs, name, price, category, isNew } = props;
+const TestimonialsItem = ({
+  id,
+  photos,
+  name,
+  price,
+  old_price,
+  categories,
+}) => {
   const navigate = useNavigate();
 
   const handleBoxClick = () => {
@@ -11,17 +17,37 @@ const TestimonialsItem = (props) => {
     }
   };
 
+  const formattedPrice =
+    typeof price === "string" && !isNaN(parseFloat(price))
+      ? `$${parseFloat(price).toFixed(2)}`
+      : "Price not available";
+
+  const formattedOldPrice =
+    typeof old_price === "string" && !isNaN(parseFloat(old_price))
+      ? `$${parseFloat(old_price).toFixed(2)}`
+      : null;
+
   return (
     <div className="testimonials__box" onClick={handleBoxClick}>
-      {isNew && <span className="testimonials__label">NEW</span>}
-
-      <img src={imgs?.[0]} alt={name} className="testimonials__img" />
-
+      <img
+        src={
+          photos?.[0]?.path
+            ? `http://localhost:8000/media/${photos[0].path}`
+            : "/placeholder.jpg"
+        }
+        alt={name}
+        className="testimonials__img"
+      />
       <p className="testimonials__category">
-        CATEGORY: {category?.toUpperCase()}
+        CATEGORY: {categories?.[0]?.toUpperCase() || "N/A"}
       </p>
       <p className="testimonials__name">{name}</p>
-      <p className="testimonials__price">${price}</p>
+      <p className="testimonials__price">
+        {formattedOldPrice && (
+          <span className="testimonials__old-price">{formattedOldPrice}</span>
+        )}
+        <span className="testimonials__current-price">{formattedPrice}</span>
+      </p>
     </div>
   );
 };

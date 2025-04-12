@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
@@ -7,23 +7,15 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ShopProduct = (props) => {
-  const { id, imgs, name, price, category, isNew } = props;
+  const { id, imgs, name, price, old_price, category } = props;
   const { items, addToCart } = useContext(CartContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const itemsInfo = items[id];
+  const itemsInfo = items ? items[id] : 0;
 
   const [favorite, setFavorite] = useState(isFavorite(id));
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
-  const [oldPrice, setOldPrice] = useState(null);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const difference = Math.floor(Math.random() * 51);
-    if (difference > 0) {
-      setOldPrice(parseFloat(price) + difference);
-    }
-  }, [price]);
 
   const handleBoxClick = () => {
     if (!isImageEnlarged) {
@@ -98,7 +90,6 @@ const ShopProduct = (props) => {
   return (
     <div className="shop__product" key={id} onClick={handleBoxClick}>
       <div className="shop__image" onClick={(e) => e.stopPropagation()}>
-        {isNew && <span className="shop__label">NEW</span>}
         <img
           className="shop__img"
           src={imgs[0]}
@@ -124,17 +115,19 @@ const ShopProduct = (props) => {
       </div>
 
       <div className="shop__content" onClick={(e) => e.stopPropagation()}>
-        <p className="shop__category">{`CATEGORY: ${category.toUpperCase()}`}</p>
+      <p className="shop__category">{`CATEGORY: ${category.replace(".", " > ").toUpperCase()}`}</p>
 
         <p className="shop__name" onClick={handleNameClick}>
           {name}
         </p>
 
         <div className="shop__prices">
-          {oldPrice && (
-            <p className="shop__price--discounted">${oldPrice.toFixed(2)}</p>
+          {old_price && (
+            <p className="shop__price--discounted">
+              ${parseFloat(old_price).toFixed(2)}
+            </p>
           )}
-          <p className="shop__price">${price}</p>
+          <p className="shop__price">${parseFloat(price).toFixed(2)}</p>
         </div>
 
         <button className="shop__btn" onClick={handleAddToCart}>

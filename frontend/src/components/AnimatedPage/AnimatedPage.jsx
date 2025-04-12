@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 
-const AnimatedPage = ({ children, animationVariants, transition }) => {
+const AnimatedPage = ({
+  children,
+  animationVariants = null,
+  transition = null,
+}) => {
   const defaultAnimation = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -24,11 +28,6 @@ AnimatedPage.propTypes = {
   children: PropTypes.node.isRequired,
   animationVariants: PropTypes.object,
   transition: PropTypes.object,
-};
-
-AnimatedPage.defaultProps = {
-  animationVariants: null,
-  transition: null,
 };
 
 export default AnimatedPage;

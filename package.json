@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "jwt-decode": "^4.0.0",
-    "react-countup": "^6.5.3",
-    "react-router-dom": "^7.1.5"
-  }
-}

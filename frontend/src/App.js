@@ -1,7 +1,10 @@
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer } from "react-toastify";
+import React, { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
+
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -19,14 +22,36 @@ import ShopContext from "./components/ShopContext/ShopContext";
 import ProductSection from "./pages/ProductSection";
 import LoginPanel from "./components/panelLogin/LoginPanel";
 import RegisterPanel from "./components/panelLogin/RegisterPanel";
+import SearchResults from "./components/Search/SearchResults";
+import PublicRoute from "./components/PublicRoute/PublicRoute";
+
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
+import ClientDashboard from "./components/ClientPanel/ClientDashboard";
+import ClientOrders from "./components/ClientPanel/ClientOrders";
+import ClientOrderDetail from "./components/ClientPanel/ClientOrderDetail";
+import ClientComplaints from "./components/ClientPanel/ClientComplaints";
+import ClientAccount from "./components/ClientPanel/ClientAccount";
+
+function PrivateRoute({ children, roles }) {
+  const { user } = useContext(AuthContext);
+
+  if (!user) return <Navigate to="/login" replace />;
+
+  if (!user.role || (roles && !roles.includes(user.role))) {
+    console.warn("[PrivateRoute] Unauthorized access, redirecting...");
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
 
 function App() {
   const location = useLocation();
 
   return (
     <>
+      {/* <ScrollToTop /> */}
       <FavoritesProvider>
         <ShopContext>
           <Navbar />
@@ -55,10 +80,47 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/product/:id" element={<ProductSection />} />
-              <Route path="/login" element={<LoginPanel />} />
-              <Route path="/signup" element={<RegisterPanel />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/client" element={<ClientPanel />} />
+              <Route path="/category/:category" element={<Shop />} />
+              <Route path="/search/:query" element={<SearchResults />} />
+
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <LoginPanel />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <RegisterPanel />
+                  </PublicRoute>
+                }
+              />
+
+              <Route
+                path="/admin/*"
+                element={
+                  <PrivateRoute roles={["admin"]}>
+                    <AdminPanel />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/client/*"
+                element={
+                  <PrivateRoute roles={["client"]}>
+                    <ClientPanel />
+                  </PrivateRoute>
+                }>
+                <Route index element={<ClientDashboard />} />
+                <Route path="orders" element={<ClientOrders />} />
+                <Route path="orders/:id" element={<ClientOrderDetail />} />
+                <Route path="complaints" element={<ClientComplaints />} />
+                <Route path="account" element={<ClientAccount />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

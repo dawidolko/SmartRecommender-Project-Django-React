@@ -1,5 +1,6 @@
-# Tematyka pracy projektu
+# Project work topics
 
-Tematyka i podział problematyki poszczególnych metód na dwie osoby:
+Topics and division of the problems of individual methods into two people:
+
 - Dawid Olko
 - Piotr Smoła

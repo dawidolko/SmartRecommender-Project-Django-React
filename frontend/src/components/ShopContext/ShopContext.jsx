@@ -1,66 +1,63 @@
 import { createContext, useEffect, useState } from "react";
-import shopData from "../ShopContent/ShopData";
+import axios from "axios";
 
 export const CartContext = createContext(null);
 
-const getDefaultCart = () => {
-  let cart = {};
-  for (let i = 1; i < shopData.length + 1; i++) {
-    cart[i] = 0;
-  }
-  return cart;
-};
-
 const getStoredCart = () => {
   const storedCart = localStorage.getItem("cart");
-  return storedCart ? JSON.parse(storedCart) : getDefaultCart();
+  return storedCart ? JSON.parse(storedCart) : {};
 };
 
 const ShopContext = (props) => {
   const [items, setItems] = useState(getStoredCart());
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/products/");
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(items));
   }, [items]);
 
   const addToCart = (itemId) => {
-    setItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+    setItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
   };
 
   const removeFromCart = (itemId) => {
-    setItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setItems((prev) => ({
+      ...prev,
+      [itemId]: Math.max((prev[itemId] || 0) - 1, 0),
+    }));
   };
 
   const totalAmount = () => {
-    let total = 0;
-    for (const itemId in items) {
-      if (items[itemId] > 0) {
-        const totalInfo = shopData.find(
-          (product) => product.id === Number(itemId)
-        );
-        total += items[itemId] * totalInfo.price;
-      }
-    }
-    return total;
+    return Object.entries(items).reduce((total, [itemId, quantity]) => {
+      const product = products.find((product) => product.id === Number(itemId));
+      return product ? total + product.price * quantity : total;
+    }, 0);
   };
 
   const totalCartItems = () => {
-    let totalItem = 0;
-    for (const itemId in items) {
-      if (items[itemId] > 0) {
-        totalItem += items[itemId];
-      }
-    }
-    return totalItem;
+    return Object.values(items).reduce((sum, quantity) => sum + quantity, 0);
   };
 
   const singleProductAmount = (itemId) => {
-    const priceInfo = shopData.find((product) => product.id === Number(itemId));
-    return priceInfo ? items[itemId] * priceInfo.price : 0;
+    const product = products.find((product) => product.id === Number(itemId));
+    return product ? items[itemId] * product.price : 0;
   };
 
   const resetCart = () => {
-    setItems(getDefaultCart());
+    setItems({});
   };
 
   const contextValue = {
