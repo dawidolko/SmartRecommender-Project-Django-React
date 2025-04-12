@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "./RegisterPanel.scss";
+import config from "../../config/config";
 
 const RegisterPanel = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ const RegisterPanel = () => {
       return;
     }
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/register/", {
+      const response = await axios.post(`${config.apiUrl}/api/register/`, {
         nickname,
         email,
         first_name: firstName,

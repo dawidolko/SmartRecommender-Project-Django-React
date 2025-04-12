@@ -12,6 +12,7 @@ import {
 } from "react-icons/ai";
 import { FaStar } from "react-icons/fa";
 import "./ProductPage.scss";
+import config from "../../config/config";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -27,9 +28,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/api/product/${id}/`
-        );
+        const response = await fetch(`${config.apiUrl}/api/product/${id}/`);
         if (!response.ok) {
           throw new Error("Failed to fetch product details.");
         }
@@ -64,7 +63,7 @@ const ProductPage = () => {
     } else {
       addToFavorites({
         id: product.id,
-        img: `http://localhost:8000/media/${product.photos[0]?.path}`,
+        img: `${config.apiUrl}/media/${product.photos[0]?.path}`,
         name: product.name,
         price: product.price,
       });
@@ -122,7 +121,7 @@ const ProductPage = () => {
               <AiOutlineLeft />
             </button>
             <img
-              src={`http://localhost:8000/media/${product.photos[currentIndex]?.path}`}
+              src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
               alt={product.name}
               className="productPage__main-img"
               onClick={handleImageEnlarge}
@@ -138,7 +137,7 @@ const ProductPage = () => {
             {product.photos.map((photo, idx) => (
               <img
                 key={photo.id || photo.path || idx}
-                src={`http://localhost:8000/media/${photo.path}`}
+                src={`${config.apiUrl}/media/${photo.path}`}
                 alt={`Thumbnail ${idx + 1}`}
                 className={`productPage__thumbnail ${
                   idx === currentIndex ? "active" : ""
@@ -158,7 +157,7 @@ const ProductPage = () => {
             </button>
             <img
               className="productPage__overlay-image"
-              src={`http://localhost:8000/media/${product.photos[currentIndex]?.path}`}
+              src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
               alt={product.name}
             />
           </div>

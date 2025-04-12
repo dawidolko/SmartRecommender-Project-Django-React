@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import config from "../../config/config";
 
 const AdminComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -7,7 +8,7 @@ const AdminComplaints = () => {
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/complaints/", {
+      .get(`${config.apiUrl}/api/complaints/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setComplaints(res.data))
@@ -18,7 +19,7 @@ const AdminComplaints = () => {
     const token = localStorage.getItem("access");
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/complaints/${complaintId}/`,
+        `${config.apiUrl}/api/complaints/${complaintId}/`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -37,12 +38,9 @@ const AdminComplaints = () => {
       return;
     const token = localStorage.getItem("access");
     try {
-      await axios.delete(
-        `http://127.0.0.1:8000/api/complaints/${complaintId}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`${config.apiUrl}/api/complaints/${complaintId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setComplaints((prev) => prev.filter((c) => c.id !== complaintId));
     } catch (error) {
       console.error("Error deleting complaint:", error);

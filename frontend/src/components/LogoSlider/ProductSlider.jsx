@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import config from "../../config/config";
 
 import "./ProductSlider.scss";
 import axios from "axios";
@@ -14,7 +15,7 @@ const ProductSlider = () => {
     const fetchRandomProducts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/random-products/"
+          `${config.apiUrl}/api/random-products/`
         );
         setRandomProducts(response.data);
       } catch (error) {

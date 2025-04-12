@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import "./ClientAccount.scss";
+import config from "../../config/config";
 
 const ClientAccount = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -82,13 +83,13 @@ const ClientAccount = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMessage("");
-    
+
     const validationError = validateForm();
     if (validationError) {
       setErrorMessage(validationError);
       return;
     }
-    
+
     const token = localStorage.getItem("access");
 
     let payload = {};
@@ -111,7 +112,7 @@ const ClientAccount = () => {
     }
 
     axios
-      .patch("http://127.0.0.1:8000/api/me/", payload, {
+      .patch(`${config.apiUrl}/api/me/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

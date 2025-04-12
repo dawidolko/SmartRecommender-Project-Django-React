@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
 import axios from "axios";
+import config from "../../config/config";
 
 const NewProducts = () => {
   const [randomProducts, setRandomProducts] = useState([]);
@@ -15,7 +16,7 @@ const NewProducts = () => {
     const fetchRandomProducts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/random-products/"
+          `${config.apiUrl}/api/random-products/`
         );
         const formattedProducts = response.data.map((product) => ({
           id: product.id,
@@ -23,7 +24,7 @@ const NewProducts = () => {
           price: parseFloat(product.price),
           old_price: product.old_price ? parseFloat(product.old_price) : null,
           imgs: product.photos.map(
-            (photo) => `http://localhost:8000/media/${photo.path}`
+            (photo) => `${config.apiUrl}/media/${photo.path}`
           ),
           category: product.categories[0] || "N/A",
         }));

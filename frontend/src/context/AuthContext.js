@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import config from "../config/config";
 
 export const AuthContext = createContext();
 
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (authToken) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/user/", {
+      const response = await fetch(`${config.apiUrl}/api/user/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

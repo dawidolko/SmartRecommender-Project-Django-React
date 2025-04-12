@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import "./ClientComplaintDetail.scss";
+import config from "../../config/config";
 
 const ClientComplaintDetail = () => {
   const { id } = useParams();
@@ -14,7 +15,7 @@ const ClientComplaintDetail = () => {
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
-      .get(`http://127.0.0.1:8000/api/complaints/${id}/`, {
+      .get(`${config.apiUrl}/api/complaints/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -48,7 +49,9 @@ const ClientComplaintDetail = () => {
         <strong>Submission Date:</strong>{" "}
         {format(new Date(complaint.submission_date), "dd MMM yyyy, HH:mm")}
       </p>
-      <button className="btn btn-primary back_button" onClick={() => navigate(-1)}>
+      <button
+        className="btn btn-primary back_button"
+        onClick={() => navigate(-1)}>
         Back to Complaints
       </button>
     </div>

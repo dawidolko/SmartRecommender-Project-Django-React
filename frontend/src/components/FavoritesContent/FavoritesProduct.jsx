@@ -1,9 +1,10 @@
 import React from "react";
+import config from "../../config/config";
 
 const FavoritesProduct = ({ product, onMoveToCart }) => {
   const { id, photos, name } = product;
   const imageUrl = photos?.[0]?.path
-    ? `http://localhost:8000/media/${photos[0].path}`
+    ? `${config.apiUrl}/media/${photos[0].path}`
     : "https://via.placeholder.com/150";
 
   return (

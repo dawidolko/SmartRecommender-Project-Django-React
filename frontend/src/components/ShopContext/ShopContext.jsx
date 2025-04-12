@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
+import config from "../../config/config";
 
 export const CartContext = createContext(null);
 
@@ -15,7 +16,7 @@ const ShopContext = (props) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/products/");
+        const response = await axios.get(`${config.apiUrl}/api/products/`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

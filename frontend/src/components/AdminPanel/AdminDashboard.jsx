@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-
+import config from "../../config/config";
 import StatCard from "./StatCard";
 import SalesOverviewChart from "./SalesOverviewChart";
 import CategoryDistributionChart from "./CategoryDistributionChart";
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
     const token = localStorage.getItem("access");
 
     axios
-      .get("http://127.0.0.1:8000/api/admin-dashboard-stats/", {
+      .get(`${config.apiUrl}/api/admin-dashboard-stats/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

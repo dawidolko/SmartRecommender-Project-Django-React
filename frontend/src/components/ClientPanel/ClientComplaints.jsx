@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import "./ClientPanel.scss";
+import config from "../../config/config";
 
 const ClientComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -13,7 +14,7 @@ const ClientComplaints = () => {
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/complaints/", {
+      .get(`${config.apiUrl}/api/complaints/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setComplaints(res.data))
@@ -60,10 +61,14 @@ const ClientComplaints = () => {
               <th>#</th>
               <th>Order ID</th>
               <th>Cause</th>
-              <th style={{ cursor: "pointer" }} onClick={() => handleSort("status")}>
+              <th
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSort("status")}>
                 Status{renderSortIndicator("status")}
               </th>
-              <th style={{ cursor: "pointer" }} onClick={() => handleSort("date")}>
+              <th
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSort("date")}>
                 Submission Date{renderSortIndicator("date")}
               </th>
               <th>Actions</th>
@@ -76,9 +81,16 @@ const ClientComplaints = () => {
                 <td>{complaint.order}</td>
                 <td>{complaint.cause}</td>
                 <td>{complaint.status}</td>
-                <td>{format(new Date(complaint.submission_date), "dd MMM yyyy, HH:mm")}</td>
                 <td>
-                  <button className="btn btn-primary" onClick={() => handleViewDetails(complaint.id)}>
+                  {format(
+                    new Date(complaint.submission_date),
+                    "dd MMM yyyy, HH:mm"
+                  )}
+                </td>
+                <td>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleViewDetails(complaint.id)}>
                     View Details
                   </button>
                 </td>

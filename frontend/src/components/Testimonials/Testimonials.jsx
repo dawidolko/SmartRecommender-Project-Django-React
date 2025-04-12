@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./Testimonials.scss";
 import TestimonialsItem from "./TestimonialsItem";
+import config from "../../config/config";
 
 const Testimonials = () => {
   const [randomProducts, setRandomProducts] = useState([]);
@@ -13,7 +14,7 @@ const Testimonials = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/random-products/"
+          `${config.apiUrl}/api/random-products/`
         );
         setRandomProducts(response.data);
       } catch (error) {

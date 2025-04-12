@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import config from "../../config/config";
 
 const ClientOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -12,7 +13,7 @@ const ClientOrders = () => {
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/orders/", {
+      .get(`${config.apiUrl}/api/orders/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setOrders(res.data))
@@ -57,10 +58,14 @@ const ClientOrders = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th style={{ cursor: "pointer" }} onClick={() => handleSort("date")}>
+              <th
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSort("date")}>
                 Date{renderSortIndicator("date")}
               </th>
-              <th style={{ cursor: "pointer" }} onClick={() => handleSort("status")}>
+              <th
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSort("status")}>
                 Status{renderSortIndicator("status")}
               </th>
               <th>Actions</th>
@@ -70,10 +75,14 @@ const ClientOrders = () => {
             {sortedOrders.map((order) => (
               <tr key={order.id}>
                 <td>{order.id}</td>
-                <td>{format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}</td>
+                <td>
+                  {format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}
+                </td>
                 <td>{order.status}</td>
                 <td>
-                  <button className="btn btn-primary" onClick={() => handleViewDetails(order.id)}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleViewDetails(order.id)}>
                     View Details
                   </button>
                 </td>

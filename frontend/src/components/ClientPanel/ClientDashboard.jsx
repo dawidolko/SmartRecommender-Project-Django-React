@@ -6,6 +6,7 @@ import "chart.js/auto";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import "./ClientDashboard.scss";
+import config from "../../config/config";
 
 const ClientDashboard = () => {
   const [purchasedItems, setPurchasedItems] = useState(0);
@@ -35,15 +36,12 @@ const ClientDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("access");
 
-    const ordersRequest = axios.get("http://127.0.0.1:8000/api/orders/", {
+    const ordersRequest = axios.get(`${config.apiUrl}/api/orders/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const clientStatsRequest = axios.get(
-      "http://127.0.0.1:8000/api/client-stats/",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const clientStatsRequest = axios.get(`${config.apiUrl}/api/client-stats/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     Promise.all([ordersRequest, clientStatsRequest])
       .then(([ordersRes, clientStatsRes]) => {

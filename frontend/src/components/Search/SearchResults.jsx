@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "../ShopContent/ShopContent.scss";
 import ShopProduct from "../ShopContent/ShopProduct";
+import config from "../../config/config";
 
 const SearchResults = () => {
   const { query } = useParams();
@@ -11,7 +12,9 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/products/search/?q=${query}`);
+        const response = await fetch(
+          `${config.apiUrl}/api/products/search/?q=${query}`
+        );
         const data = await response.json();
         setProducts(data);
         setIsLoading(false);
@@ -40,7 +43,7 @@ const SearchResults = () => {
               price={product.price}
               old_price={product.old_price}
               imgs={product.photos.map(
-                (photo) => `http://localhost:8000/media/${photo.path}`
+                (photo) => `${config.apiUrl}/media/${photo.path}`
               )}
               category={product.categories[0] || "N/A"}
             />

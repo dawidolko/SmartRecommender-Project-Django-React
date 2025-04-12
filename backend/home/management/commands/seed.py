@@ -32,16 +32,15 @@ class Command(BaseCommand):
         seed_complaints()
         self.stdout.write(Fore.BLUE + 'Database seeding completed.')
 
-def reset_sequences():
-    with connection.cursor() as cursor:
-        tables = ["auth_user", "home_order", "home_complaint", "home_opinion", "home_orderproduct"]
-        for table in tables:
-            try:
-                cursor.execute(f"ALTER SEQUENCE {table}_id_seq RESTART WITH 1;")
-                print(Fore.GREEN + f"Reset sequence for table {table}.")
-            except Exception as e:
-                print(Fore.RED + f"Failed to reset sequence for table {table}: {e}")
-
+# def reset_sequences():
+#     with connection.cursor() as cursor:
+#         tables = ["auth_user", "home_order", "home_complaint", "home_opinion", "home_orderproduct"]
+#         for table in tables:
+#             try:
+#                 cursor.execute(f"ALTER SEQUENCE {table}_id_seq RESTART WITH 1;")
+#                 print(Fore.GREEN + f"Reset sequence for table {table}.")
+#             except Exception as e:
+#                 print(Fore.RED + f"Failed to reset sequence for table {table}: {e}")
 
 def seed_categories():
     Category.objects.all().delete()
@@ -85,6 +84,16 @@ def seed_categories():
         {"id": 36, "name": "peripherals.soundCards", "description": "soundCards"},
         {"id": 37, "name": "gaming.consoles", "description": "consoles"},
         {"id": 38, "name": "storage.usbFlashDrives", "description": "usbFlashDrives"},
+        {"id": 39, "name": "cameras.stabilizers", "description": "stabilizers"},
+        {"id": 40, "name": "vacuum.cleaners", "description": "vacuumCleaners"},
+        {"id": 41, "name": "drones", "description": "drones"},
+        {"id": 42, "name": "power.strips", "description": "powerStrips"},
+        {"id": 43, "name": "gadgets", "description": "gadgets"},
+        {"id": 44, "name": "office.accessories", "description": "officeAccessories"},
+        {"id": 45, "name": "monitoring.cameras", "description": "monitoringCameras"},
+        {"id": 46, "name": "cleaning.supplies", "description": "cleaningSupplies"},
+        {"id": 47, "name": "laptop.hubs", "description": "laptopHubs"},
+        {"id": 48, "name": "camera.accessories", "description": "cameraAccessories"}
     ]
 
     for category_data in tqdm(categories, desc="Seeding Categories", unit="category"):
@@ -138,6 +147,24 @@ def seed_product_categories():
         (306, 36), (307, 36), (308, 36), (309, 36), (310, 36), (311, 36), (312, 36), (313, 36), (314, 36), (315, 36),
         (316, 37), (317, 37), (318, 37), (319, 37), (320, 37), (321, 37), (322, 37), (323, 37), (324, 37), (325, 37),
         (326, 38), (327, 38), (328, 38), (329, 38), (330, 38), (331, 38), (332, 38), (333, 38), (334, 38), (335, 38),
+        (336, 39), (337, 39), (338, 39), (339, 39), (340, 39), (341, 39), (342, 39), (343, 39), (344, 39), (345, 39),  
+        (346, 40), (347, 40), (348, 40), (349, 40), (350, 40), (351, 40), (352, 40), (353, 40), (354, 40), (355, 40), 
+        (356, 41), (357, 41), (358, 41), (359, 41), (360, 41), (361, 41), (362, 41), (363, 41), (364, 41), (365, 41),  
+        (366, 42), (367, 42), (368, 42), (369, 42), (370, 42), (371, 42), (372, 42), (373, 42), (374, 42), (375, 42), 
+        (376, 42), (377, 42), (378, 42), (379, 42), (380, 42), (381, 42), (382, 42), (383, 42), (384, 42), (385, 42),  
+        (386, 43), (387, 43), (388, 43), (389, 43), (390, 43), (391, 43), (392, 43), (393, 43), (394, 43), (395, 43),  
+        (396, 43), (397, 43), (398, 43), (399, 43), (400, 43), (401, 43), (402, 43), (403, 43), (404, 43), (405, 43),  
+        (406, 44), (407, 44), (408, 44), (409, 44), (410, 44), (411, 44), (412, 44), (413, 44), (414, 44), (415, 44),  
+        (416, 44), (417, 44), (418, 44), (419, 44), (420, 44), (421, 44), (422, 44), (423, 44), (424, 44), (425, 44), 
+        (426, 45), (427, 45), (428, 45), (429, 45), (430, 45), (431, 45), (432, 45), (433, 45), (434, 45), (435, 45),
+        (436, 45), (437, 45), (438, 45), (439, 45), (440, 45), (441, 45), (442, 45), (443, 45), (444, 45), (445, 45),   
+        (446, 46), (447, 46), (448, 46), (449, 46), (450, 46), (451, 46), (452, 46), (453, 46), (454, 46), (455, 46), 
+        (456, 46), (457, 46), (458, 46), (459, 46), (460, 46), (461, 46), (462, 46), (463, 46), (464, 46), (465, 46), 
+        (466, 47), (467, 47), (468, 47), (469, 47), (470, 47), (471, 47), (472, 47), (473, 47), (474, 47), (475, 47),  
+        (476, 47), (477, 47), (478, 47), (479, 47), (480, 47), (481, 47), (482, 47), (483, 47), (484, 47), (485, 47), 
+        (486, 48), (487, 48), (488, 48), (489, 48), (490, 48), (491, 48), (492, 48), (493, 48), (494, 48), (495, 48), 
+        (496, 48), (497, 48), (498, 48), (499, 48), (500, 48)  
+
     ]
 
     for product_id, category_id in tqdm(product_categories, desc="Seeding ProductCategories", unit="relation"):
@@ -157,36 +184,56 @@ def seed_sales():
     Sale.objects.all().delete()
 
     promotions = [
-        {"id": 1, "discount_amount": 25.00, "start_date": "2024-05-01", "end_date": "2025-05-01"},
-        {"id": 2, "discount_amount": 15.00, "start_date": "2024-05-05", "end_date": "2025-05-05"},
-        {"id": 3, "discount_amount": 30.00, "start_date": "2024-06-01", "end_date": "2025-06-01"},
-        {"id": 4, "discount_amount": 20.00, "start_date": "2024-06-15", "end_date": "2025-06-15"},
-        {"id": 5, "discount_amount": 10.00, "start_date": "2024-07-01", "end_date": "2025-07-01"},
-        {"id": 6, "discount_amount": 50.00, "start_date": "2024-07-20", "end_date": "2025-07-20"},
-        {"id": 7, "discount_amount": 35.00, "start_date": "2024-08-01", "end_date": "2025-08-01"},
-        {"id": 8, "discount_amount": 18.00, "start_date": "2024-08-15", "end_date": "2025-08-15"},
-        {"id": 9, "discount_amount": 22.00, "start_date": "2024-09-01", "end_date": "2025-09-01"},
+        {"id": 1, "discount_amount": 40.00, "start_date": "2024-05-01", "end_date": "2025-05-01"},
+        {"id": 2, "discount_amount": 10.00, "start_date": "2024-05-05", "end_date": "2025-05-05"},
+        {"id": 3, "discount_amount": 36.00, "start_date": "2024-06-01", "end_date": "2025-06-01"},
+        {"id": 4, "discount_amount": 11.00, "start_date": "2024-06-15", "end_date": "2025-06-15"},
+        {"id": 5, "discount_amount": 20.00, "start_date": "2024-07-01", "end_date": "2025-07-01"},
+        {"id": 6, "discount_amount": 20.00, "start_date": "2024-07-20", "end_date": "2025-07-20"},
+        {"id": 7, "discount_amount": 5.00, "start_date": "2024-08-01", "end_date": "2025-08-01"},
+        {"id": 8, "discount_amount": 20.00, "start_date": "2024-08-15", "end_date": "2025-08-15"},
+        {"id": 9, "discount_amount": 30.00, "start_date": "2024-09-01", "end_date": "2025-09-01"},
         {"id": 10, "discount_amount": 40.00, "start_date": "2024-09-20", "end_date": "2025-09-20"},
-        {"id": 11, "discount_amount": 12.00, "start_date": "2024-10-01", "end_date": "2025-10-01"},
-        {"id": 12, "discount_amount": 28.00, "start_date": "2024-10-15", "end_date": "2025-10-15"},
-        {"id": 13, "discount_amount": 8.00, "start_date": "2024-11-01", "end_date": "2025-11-01"},
-        {"id": 14, "discount_amount": 45.00, "start_date": "2024-11-20", "end_date": "2025-11-20"},
-        {"id": 15, "discount_amount": 19.00, "start_date": "2024-12-01", "end_date": "2025-12-01"},
-        {"id": 16, "discount_amount": 27.00, "start_date": "2025-01-01", "end_date": "2025-01-31"},
-        {"id": 17, "discount_amount": 33.00, "start_date": "2025-02-01", "end_date": "2025-02-28"},
-        {"id": 18, "discount_amount": 21.00, "start_date": "2025-03-01", "end_date": "2025-03-31"},
-        {"id": 19, "discount_amount": 11.00, "start_date": "2025-04-01", "end_date": "2025-04-30"},
-        {"id": 20, "discount_amount": 26.00, "start_date": "2025-05-01", "end_date": "2025-05-31"},
-        {"id": 21, "discount_amount": 17.00, "start_date": "2025-06-01", "end_date": "2025-06-30"},
-        {"id": 22, "discount_amount": 37.00, "start_date": "2025-07-01", "end_date": "2025-07-31"},
-        {"id": 23, "discount_amount": 14.00, "start_date": "2025-08-01", "end_date": "2025-08-31"},
-        {"id": 24, "discount_amount": 29.00, "start_date": "2025-09-01", "end_date": "2025-09-30"},
-        {"id": 25, "discount_amount": 24.00, "start_date": "2025-10-01", "end_date": "2025-10-31"},
-        {"id": 26, "discount_amount": 15.00, "start_date": "2025-11-01", "end_date": "2025-11-30"},
-        {"id": 27, "discount_amount": 32.00, "start_date": "2025-12-01", "end_date": "2025-12-31"},
-        {"id": 28, "discount_amount": 38.00, "start_date": "2026-01-01", "end_date": "2026-01-31"},
-        {"id": 29, "discount_amount": 20.00, "start_date": "2026-02-01", "end_date": "2026-02-28"},
-        {"id": 30, "discount_amount": 16.00, "start_date": "2026-03-01", "end_date": "2026-03-31"},
+        {"id": 11, "discount_amount": 50.00, "start_date": "2024-10-01", "end_date": "2025-10-01"},
+        {"id": 12, "discount_amount": 10.00, "start_date": "2024-10-15", "end_date": "2025-10-15"},
+        {"id": 13, "discount_amount": 5.00, "start_date": "2024-11-01", "end_date": "2025-11-01"},
+        {"id": 14, "discount_amount": 60.00, "start_date": "2024-11-20", "end_date": "2025-11-20"},
+        {"id": 15, "discount_amount": 20.00, "start_date": "2024-12-01", "end_date": "2025-12-01"},
+        {"id": 16, "discount_amount": 10.00, "start_date": "2025-01-01", "end_date": "2025-01-31"},
+        {"id": 17, "discount_amount": 30.00, "start_date": "2025-02-01", "end_date": "2025-02-28"},
+        {"id": 18, "discount_amount": 50.00, "start_date": "2025-03-01", "end_date": "2025-03-31"},
+        {"id": 19, "discount_amount": 100.00, "start_date": "2025-04-01", "end_date": "2025-04-30"},
+        {"id": 20, "discount_amount": 200.00, "start_date": "2025-05-01", "end_date": "2025-05-31"},
+        {"id": 21, "discount_amount": 50.00, "start_date": "2025-06-01", "end_date": "2025-06-30"},
+        {"id": 22, "discount_amount": 50.00, "start_date": "2025-07-01", "end_date": "2025-07-31"},
+        {"id": 23, "discount_amount": 10.00, "start_date": "2025-08-01", "end_date": "2025-08-31"},
+        {"id": 24, "discount_amount": 10.00, "start_date": "2025-09-01", "end_date": "2025-09-30"},
+        {"id": 25, "discount_amount": 20.00, "start_date": "2025-10-01", "end_date": "2025-10-31"},
+        {"id": 26, "discount_amount": 10.00, "start_date": "2025-11-01", "end_date": "2025-11-30"},
+        {"id": 27, "discount_amount": 10.00, "start_date": "2025-12-01", "end_date": "2025-12-31"},
+        {"id": 28, "discount_amount": 10.00, "start_date": "2026-01-01", "end_date": "2026-01-31"},
+        {"id": 29, "discount_amount": 5.00, "start_date": "2026-02-01", "end_date": "2026-02-28"},
+        {"id": 30, "discount_amount": 30.00, "start_date": "2026-03-01", "end_date": "2026-03-31"},
+        {"id": 31, "discount_amount": 10.00, "start_date": "2026-04-01", "end_date": "2026-04-30"},
+        {"id": 32, "discount_amount": 100.00, "start_date": "2026-05-01", "end_date": "2026-05-31"},
+        {"id": 33, "discount_amount": 100.00, "start_date": "2026-06-01", "end_date": "2026-06-30"},
+        {"id": 34, "discount_amount": 100.00, "start_date": "2026-07-01", "end_date": "2026-07-31"},
+        {"id": 35, "discount_amount": 50.00, "start_date": "2026-08-01", "end_date": "2026-08-31"},
+        {"id": 36, "discount_amount": 70.00, "start_date": "2026-09-01", "end_date": "2026-09-30"},
+        {"id": 37, "discount_amount": 30.00, "start_date": "2026-10-01", "end_date": "2026-10-31"},
+        {"id": 38, "discount_amount": 10.00, "start_date": "2026-11-01", "end_date": "2026-11-30"},
+        {"id": 39, "discount_amount": 10.00, "start_date": "2026-12-01", "end_date": "2026-12-31"},
+        {"id": 40, "discount_amount": 10.00, "start_date": "2027-01-01", "end_date": "2027-01-31"},
+        {"id": 41, "discount_amount": 20.00, "start_date": "2027-02-01", "end_date": "2027-02-28"},
+        {"id": 42, "discount_amount": 10.00, "start_date": "2027-03-01", "end_date": "2027-03-31"},
+        {"id": 43, "discount_amount": 5.00, "start_date": "2027-04-01", "end_date": "2027-04-30"},
+        {"id": 44, "discount_amount": 10.00, "start_date": "2027-05-01", "end_date": "2027-05-31"},
+        {"id": 45, "discount_amount": 50.00, "start_date": "2027-06-01", "end_date": "2027-06-30"},
+        {"id": 46, "discount_amount": 100.00, "start_date": "2027-07-01", "end_date": "2027-07-31"},
+        {"id": 47, "discount_amount": 20.00, "start_date": "2027-08-01", "end_date": "2027-08-31"},
+        {"id": 48, "discount_amount": 50.00, "start_date": "2027-09-01", "end_date": "2027-09-30"},
+        {"id": 49, "discount_amount": 30.00, "start_date": "2027-10-01", "end_date": "2027-10-31"},
+        {"id": 50, "discount_amount": 3.00, "start_date": "2027-11-01", "end_date": "2027-11-30"}
     ]
 
     for promotion in tqdm(promotions, desc="Seeding promotions", unit="promotion"):
@@ -251,7 +298,9 @@ def seed_tags():
         "Portable", "Fast Charging", "MagSafe Compatible", "Wireless",
         "Mechanical Keyboard", "Noise Cancelling", "Fitness", "Waterproof",
         "Wearable", "Stylus Support", "High Resolution", "Hi-Fi", "Studio",
-        "4K", "HDR", "Curved", "Mesh Networking", "WiFi 6"
+        "4K", "HDR", "Curved", "Mesh Networking", "WiFi 6","Camera Stabilizer", 
+        "4K Recording", "Portable Vacuum", "Drone", "Wireless Camera", 
+        "Home Office", "Smart Security", "Compact Design", "USB-C Hub", "Photography Gear"
     ]
 
     for tag_name in tag_names:
@@ -6281,6 +6330,2051 @@ def seed_products():
                     <p>Compatible with UHS-II and UHS-I devices, this card works seamlessly with a wide range of professional cameras and camcorders.</p>""",
             "sale_id": 30,
         },
+                {
+            "id": 336,
+            "name": "Pentax 17",
+            "price": 899.99,
+            "old_price": 1099.99,
+            "description": """<h2>Compact and Durable Design</h2>
+                              <p>The Pentax 17 is designed for those looking for a reliable and compact camera. Its weather-sealed body makes it ideal for outdoor photography.</p>
+                              <h2>Great for Travel</h2>
+                              <p>Weighing just 400g, this camera is lightweight, perfect for travel enthusiasts.</p>
+                              <h2>Sharp and Detailed Photos</h2>
+                              <p>Equipped with a 16MP sensor, it captures sharp, detailed images, whether in daylight or low-light settings.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 337,
+            "name": "Sony ZV-E10 II body",
+            "price": 749.99,
+            "old_price": 899.99,
+            "description": """<h2>Designed for Vloggers</h2>
+                              <p>The Sony ZV-E10 II body is made for content creators, offering excellent video quality and features like a flip-out screen for selfies.</p>
+                              <h2>Advanced Autofocus</h2>
+                              <p>With Real-Time Eye Autofocus, you’ll always be in focus for smooth, professional-looking videos.</p>
+                              <h2>4K Video Recording</h2>
+                              <p>Capture stunning 4K video with crisp details and vibrant colors for your YouTube channel or vlogs.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 338,
+            "name": "Sony ZV-E10 + 16-50mm",
+            "price": 899.99,
+            "old_price": 1099.99,
+            "description": """<h2>Perfect for Vlogging</h2>
+                              <p>Complete your vlogging setup with the Sony ZV-E10 + 16-50mm lens combo. Capture stunning video and high-quality stills in one package.</p>
+                              <h2>Fast and Accurate Autofocus</h2>
+                              <p>Stay sharp and in focus even while moving, thanks to Sony’s fast autofocus technology for video recording and live streaming.</p>
+                              <h2>High-Resolution Photos</h2>
+                              <p>Get beautiful images with vivid colors, even in low-light conditions, with the 24.2MP sensor and the versatile 16-50mm lens.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 339,
+            "name": "Polaroid Go Gen 2 biały",
+            "price": 99.99,
+            "old_price": 129.99,
+            "description": """<h2>Compact and Stylish</h2>
+                              <p>Polaroid Go is the smallest instant camera available today. Its compact size makes it easy to carry anywhere and its bold design stands out from the crowd.</p>
+                              <h2>Instant Photo Printing</h2>
+                              <p>Capture moments in an instant with Polaroid Go’s easy-to-use instant printing features.</p>
+                              <h2>Perfect for Sharing Memories</h2>
+                              <p>Whether it's a birthday, vacation, or a special moment, instantly print your photos and share them with friends and family.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 340,
+            "name": "Polaroid Go Gen 2 czarny",
+            "price": 99.99,
+            "old_price": 129.99,
+            "description": """<h2>Ultra-Compact Instant Camera</h2>
+                              <p>Polaroid Go is small but mighty, designed for those who want to capture life’s moments on the go. It’s perfect for any occasion, whether at a party or on vacation.</p>
+                              <h2>Easy to Use</h2>
+                              <p>Polaroid Go makes instant photo printing easy with a simple point-and-shoot operation.</p>
+                              <h2>Modern Features</h2>
+                              <p>The black color version of this camera is perfect for modern, sleek designs. It's a great choice for both photography and style enthusiasts.</p>""",
+            "sale_id": 31,
+        },
+        {
+            "id": 341,
+            "name": "Sony Alpha A7 III + SEL 28-70mm",
+            "price": 2499.99,
+            "old_price": 2999.99,
+            "description": """<h2>Full-Frame Excellence</h2>
+                              <p>The Sony Alpha A7 III features a full-frame 24.2MP sensor with 4K video capture, offering outstanding performance and image quality in any situation.</p>
+                              <h2>Versatile Lens</h2>
+                              <p>The included 28-70mm lens provides a wide range of focal lengths, making it ideal for everything from portraits to landscapes.</p>
+                              <h2>Great Low-Light Performance</h2>
+                              <p>With its high ISO capabilities, the A7 III performs excellently even in low light, ensuring you get great shots no matter the lighting conditions.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 342,
+            "name": "Fujifilm Instax Mini 12 zielony",
+            "price": 79.99,
+            "old_price": 99.99,
+            "description": """<h2>Fun Instant Photography</h2>
+                              <p>Capture fun memories instantly with the Fujifilm Instax Mini 12. This instant camera is available in a stylish green color, making it a fun and functional addition to any event.</p>
+                              <h2>Compact Design</h2>
+                              <p>The compact and lightweight design makes it easy to take the Instax Mini 12 everywhere you go. Perfect for parties and vacations!</p>
+                              <h2>Instant Prints</h2>
+                              <p>Print photos instantly and share your memories with your friends and family.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 343,
+            "name": "Nikon Z fc Vlogger Kit",
+            "price": 1099.99,
+            "old_price": 1299.99,
+            "description": """<h2>Retro Design with Modern Features</h2>
+                              <p>The Nikon Z fc offers a retro-inspired design with modern features for both photography and video content creators. It’s perfect for vloggers who need both style and functionality.</p>
+                              <h2>4K Video Recording</h2>
+                              <p>Record beautiful 4K UHD video with the Z fc and take your video content to the next level.</p>
+                              <h2>High-Quality Imaging</h2>
+                              <p>With a 20.9MP sensor, you can capture sharp, high-quality photos and videos in any lighting condition.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 344,
+            "name": "Canon EOS R100 + RF-S 18-45mm f/4.5-6.3 IS STM",
+            "price": 499.99,
+            "old_price": 599.99,
+            "description": """<h2>Affordable Full-Frame Camera</h2>
+                              <p>The Canon EOS R100 offers a full-frame sensor and interchangeable lenses, making it a great entry-level camera for those looking to explore more advanced photography.</p>
+                              <h2>Optical Image Stabilization</h2>
+                              <p>The included RF-S 18-45mm lens features optical image stabilization, which helps reduce camera shake and ensures crisp images even in low-light conditions.</p>
+                              <h2>Great for Beginners</h2>
+                              <p>With its user-friendly controls and automatic features, this camera is perfect for newcomers to photography.</p>""",
+            "sale_id": 32,
+        },
+        {
+            "id": 345,
+            "name": "Canon EOS RP body",
+            "price": 1299.99,
+            "old_price": 1599.99,
+            "description": """<h2>Full-Frame Image Quality</h2>
+                              <p>The Canon EOS RP delivers full-frame photo quality at an affordable price, making it a great option for both amateur and experienced photographers.</p>
+                              <h2>4K Video Recording</h2>
+                              <p>Record stunning 4K UHD video with this versatile full-frame camera, which is perfect for both photography and videography.</p>
+                              <h2>Compact and Lightweight</h2>
+                              <p>Despite its full-frame sensor, the EOS RP is one of the most compact and lightweight full-frame mirrorless cameras on the market.</p>""",
+            "sale_id": None,
+        },
+                {
+            "id": 346,
+            "name": "Dreame L20 Ultra Complete",
+            "price": 499.99,
+            "old_price": 599.99,
+            "description": """<h2>Powerful Suction</h2><p>The Dreame L20 Ultra Complete offers an impressive 450W of suction power to clean every surface with ease.</p><h2>Advanced Filtration</h2><p>Features a HEPA filtration system that captures up to 99.99% of dust and allergens.</p><h2>Long Battery Life</h2><p>With up to 120 minutes of runtime, this vacuum ensures a deep clean across large areas.</p>""",
+            "sale_id": 33,
+        },
+        {
+            "id": 347,
+            "name": "Dreame F9 Pro",
+            "price": 299.99,
+            "old_price": 349.99,
+            "description": """<h2>High-Efficiency Cleaning</h2><p>Equipped with a powerful motor, the Dreame F9 Pro delivers strong suction for thorough cleaning.</p><h2>Smart Mapping</h2><p>Uses smart mapping technology to optimize cleaning paths and avoid obstacles.</p><h2>Long Battery Life</h2><p>Offers up to 100 minutes of continuous cleaning for larger homes.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 348,
+            "name": "Dreame L10s Ultra Gen 2",
+            "price": 399.99,
+            "old_price": 499.99,
+            "description": """<h2>Next-Gen Suction</h2><p>With 3000Pa suction power, the L10s Ultra Gen 2 ensures powerful deep cleaning for both carpets and hard floors.</p><h2>Advanced AI Navigation</h2><p>AI-powered navigation enables smart obstacle avoidance and optimized cleaning routes.</p><h2>Long-lasting Battery</h2><p>Enjoy up to 150 minutes of runtime on a single charge for uninterrupted cleaning.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 349,
+            "name": "Xiaomi Robot Vacuum S20+ White EU",
+            "price": 249.99,
+            "old_price": 299.99,
+            "description": """<h2>Smart Mapping</h2><p>The Xiaomi Robot Vacuum S20+ uses advanced laser mapping to cover your home with precision.</p><h2>Efficient Cleaning</h2><p>Capable of sweeping, mopping, and vacuuming to ensure all-around cleanliness.</p><h2>Quiet Operation</h2><p>Works quietly with minimal noise, so it won’t disturb your home environment.</p>""",
+            "sale_id": 34,
+        },
+        {
+            "id": 350,
+            "name": "Roborock Q8 Max Black",
+            "price": 599.99,
+            "old_price": 699.99,
+            "description": """<h2>Strong Suction Power</h2><p>The Roborock Q8 Max delivers up to 2700Pa of suction power for efficient cleaning on all surfaces.</p><h2>Advanced Navigation</h2><p>Uses precision mapping and smart navigation to clean every corner of your home.</p><h2>Auto Emptying Bin</h2><p>Equipped with an auto-emptying dustbin that reduces the frequency of manual emptying.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 351,
+            "name": "Dreame L10s Plus",
+            "price": 349.99,
+            "old_price": 399.99,
+            "description": """<h2>Efficient Suction</h2><p>With 2500Pa suction power, the L10s Plus ensures superior cleaning performance on carpets and hard floors.</p><h2>Smart Features</h2><p>Uses advanced sensors and mapping technology to navigate and clean efficiently.</p><h2>Extended Battery Life</h2><p>With up to 120 minutes of cleaning, this vacuum is perfect for large spaces.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 352,
+            "name": "Roborock Qrevo Edge 5V1 biały",
+            "price": 329.99,
+            "old_price": 399.99,
+            "description": """<h2>Comprehensive Cleaning</h2><p>The Roborock Qrevo Edge offers a combination of vacuuming and mopping for complete floor care.</p><h2>Edge Detection</h2><p>Specialized edge cleaning technology ensures corners and walls are cleaned thoroughly.</p><h2>Quiet Operation</h2><p>Quiet cleaning mode ensures minimal disturbance while it works.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 353,
+            "name": "Roborock Qrevo Curv 5A1",
+            "price": 279.99,
+            "old_price": 349.99,
+            "description": """<h2>Intelligent Cleaning</h2><p>Roborock's Qrevo Curv 5A1 uses AI to optimize its cleaning path and ensure high-efficiency cleaning.</p><h2>All-in-One Design</h2><p>Vacuum and mop simultaneously for faster and more efficient floor cleaning.</p><h2>App Control</h2><p>Control your vacuum remotely using the dedicated smartphone app for convenience.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 354,
+            "name": "Roborock Q5 Pro+ Black",
+            "price": 379.99,
+            "old_price": 449.99,
+            "description": """<h2>Powerful Suction</h2><p>With a 2700Pa suction power, the Q5 Pro+ ensures deep cleaning on all floor types.</p><h2>Smart Navigation</h2><p>Advanced navigation system for efficient and systematic cleaning patterns.</p><h2>Long Battery Life</h2><p>Up to 180 minutes of continuous cleaning on a single charge for large homes.</p>""",
+            "sale_id": 35,
+        },
+        {
+            "id": 355,
+            "name": "Roborock Q8 Max+ White",
+            "price": 649.99,
+            "old_price": 749.99,
+            "description": """<h2>Max Suction Power</h2><p>The Q8 Max+ boasts up to 3000Pa of suction power, making it one of the most powerful vacuums on the market.</p><h2>Efficient Cleaning</h2><p>Advanced mapping and zoning technology ensures thorough and efficient cleaning throughout your home.</p><h2>Automatic Bin Emptying</h2><p>Includes a self-emptying dustbin, so you don't have to worry about frequent emptying.</p>""",
+            "sale_id": None,
+        },
+        {
+            "id": 356,
+            "name": "DJI Care Refresh do NEO (2 lata)",
+            "price": 89.99,
+            "old_price": 129.99,
+            "description": """<h2>2 Years of Protection</h2><p>DJI Care Refresh offers two years of protection for your DJI NEO drone, including accidental damage coverage and fast replacement services.</p><h2>Extended Coverage</h2><p>Accidents happen, but with DJI Care Refresh, you can rest easy knowing your drone is covered for two full years.</p><h2>Easy Replacement</h2><p>Enjoy fast and easy replacement of damaged components to keep your drone flying smoothly.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 357,
+            "name": "DJI Akumulator do FLIP",
+            "price": 79.99,
+            "old_price": 99.99,
+            "description": """<h2>Extended Flight Time</h2><p>This battery for the DJI FLIP drone provides extended flight time for an enhanced flying experience.</p><h2>Reliable Power</h2><p>Designed to be long-lasting and reliable, this battery ensures your drone remains powered during your most exciting flights.</p><h2>Quick Recharge</h2><p>Recharge your DJI FLIP battery quickly for minimal downtime between flights.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 358,
+            "name": "DJI Dwukierunkowy hub ładujący do FLIP",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>Dual Charging Hub</h2><p>This two-way charging hub allows you to charge multiple DJI FLIP batteries at once, ensuring you’re ready for extended flying sessions.</p><h2>Efficient Charging</h2><p>Charges two batteries simultaneously with smart power management, ensuring optimal battery health.</p><h2>Compact Design</h2><p>The compact design makes it easy to transport, perfect for on-the-go drone enthusiasts.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 359,
+            "name": "DJI Goggles N3",
+            "price": 299.99,
+            "old_price": 399.99,
+            "description": """<h2>Immersive Experience</h2><p>DJI Goggles N3 provide an immersive, first-person view of your drone’s flight, enhancing your flying experience with high-definition visuals.</p><h2>Long Battery Life</h2><p>Enjoy up to 6 hours of continuous use on a single charge, so you can focus on your drone without interruptions.</p><h2>Lightweight and Comfortable</h2><p>The lightweight design ensures comfort, even during extended flights.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 360,
+            "name": "DJI Care Refresh do NEO (1 rok)",
+            "price": 49.99,
+            "old_price": 79.99,
+            "description": """<h2>1 Year of Protection</h2><p>DJI Care Refresh offers one year of protection for your DJI NEO drone, providing fast and easy replacements for damaged components.</p><h2>Accident Coverage</h2><p>With one year of protection, you’ll have peace of mind knowing that your drone is covered for accidents and unexpected damage.</p><h2>Fast Service</h2><p>Get your drone back in the air quickly with DJI's fast replacement services.</p>""",
+            "sale_id": 36
+        },
+        {
+            "id": 361,
+            "name": "DJI Akumulator do Air 3S",
+            "price": 99.99,
+            "old_price": 119.99,
+            "description": """<h2>Extended Flight Time</h2><p>This battery for the DJI Air 3S allows you to enjoy longer flight times, giving you more time to capture breathtaking shots from the sky.</p><h2>High Performance</h2><p>Built for performance, this battery offers reliable power to keep your drone flying at its best.</p><h2>Fast Charging</h2><p>Recharges quickly to minimize downtime and keep you flying for longer periods.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 362,
+            "name": "DJI Mini 4K Fly More Combo",
+            "price": 449.99,
+            "old_price": 499.99,
+            "description": """<h2>4K Video</h2><p>The DJI Mini 4K Fly More Combo offers incredible 4K video quality, perfect for capturing stunning aerial footage.</p><h2>Lightweight Design</h2><p>Weighing only 249 grams, the DJI Mini is ultra-portable, making it ideal for travel and outdoor adventures.</p><h2>Complete Combo</h2><p>The Fly More Combo includes extra batteries, propellers, and a carrying case to ensure you're fully equipped for your flights.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 363,
+            "name": "DJI Mavic 3 Enterprise Fly More Kit",
+            "price": 1899.99,
+            "old_price": 2299.99,
+            "description": """<h2>Professional Performance</h2><p>The DJI Mavic 3 Enterprise provides exceptional video and photography quality, perfect for professional applications like surveying, inspections, and mapping.</p><h2>Long Battery Life</h2><p>With up to 46 minutes of flight time, you can capture more without having to worry about running out of battery.</p><h2>Advanced Features</h2><p>Includes intelligent flight modes and obstacle sensing for safer flights and enhanced creativity.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 364,
+            "name": "DJI Care Refresh do Air 3S (2 lata)",
+            "price": 129.99,
+            "old_price": 159.99,
+            "description": """<h2>2 Years of Protection</h2><p>This 2-year DJI Care Refresh for Air 3S covers accidental damage and provides fast replacement services, ensuring your drone stays in top condition.</p><h2>Accident Coverage</h2><p>With DJI Care Refresh, enjoy peace of mind knowing you're covered for unexpected damage during your flights.</p><h2>Easy Replacements</h2><p>DJI’s fast replacement process gets you back in the air quickly.</p>""",
+            "sale_id": 37
+        },
+        {
+            "id": 365,
+            "name": "DJI Air 3S Fly More Combo (RC 2)",
+            "price": 1149.99,
+            "old_price": 1299.99,
+            "description": """<h2>4K Video and Advanced Features</h2><p>The DJI Air 3S offers 4K video capture with enhanced features for professional-level content creation.</p><h2>Lightweight and Portable</h2><p>Weighing only 595 grams, the Air 3S is ultra-portable while still offering powerful performance.</p><h2>Complete Combo</h2><p>The Fly More Combo includes extra batteries, propellers, and a carrying case to keep your drone ready for action.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 366,
+            "name": "Ever Optima - 6 Sockets, 1.5m, Black",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>6 Sockets</h2>
+                            <p>Ever Optima provides 6 power sockets to meet all your charging needs, perfect for home or office use. With 6 outlets, you can easily power multiple devices simultaneously, making it ideal for various electronics such as computers, lamps, and more.</p>
+                            <h2>Compact Design</h2>
+                            <p>Featuring a 1.5-meter long cable, this power strip offers flexibility while keeping your setup neat and organized. It’s designed to be easily positioned without taking up too much space, and the cable length ensures it can reach distant outlets.</p>
+                            <h2>High Safety Standards</h2>
+                            <p>Equipped with advanced safety features to prevent short circuits and overloads, this power strip ensures safe and reliable operation for all your devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 367,
+            "name": "Hama 'STANDARD' Extension Cord 2M",
+            "price": 19.99,
+            "old_price": 29.99,
+            "description": """<h2>Standard Extension</h2>
+                            <p>This 2-meter Hama extension cord is designed to extend the reach of your devices to distant power outlets, providing convenience and accessibility in any room. Ideal for use in living rooms, offices, and more.</p>
+                            <h2>Durable Build</h2>
+                            <p>Made from high-quality materials, this extension cord is built for durability and longevity, withstanding everyday wear and tear while maintaining performance over time.</p>
+                            <h2>Plug and Play</h2>
+                            <p>Simple to use, just plug it in and you’re ready to go. It’s perfect for a wide range of devices, including household electronics and appliances.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 368,
+            "name": "HSK DATA Acar S8 - 8 Sockets, 1.5m, Black",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>8 Power Sockets</h2>
+                            <p>This HSK power strip features 8 power sockets, making it an excellent choice for workspaces or setups with multiple devices that require power. Its extended capacity ensures you can connect everything you need with ease.</p>
+                            <h2>High Capacity</h2>
+                            <p>With a 1.5-meter cable, you have ample reach to plug in devices at a distance, and its robust build ensures it can handle the power requirements of more demanding electronics.</p>
+                            <h2>Safe and Reliable</h2>
+                            <p>Equipped with overload protection and surge protection, this power strip is designed to keep your valuable electronics safe from electrical damage and power fluctuations.</p>""",
+            "sale_id": 38
+        },
+        {
+            "id": 369,
+            "name": "Hama 'STANDARD' Extension Cord 10M",
+            "price": 49.99,
+            "old_price": 59.99,
+            "description": """<h2>10 Meter Cable</h2>
+                            <p>When you need an extended reach, this 10-meter Hama extension cord offers ultimate flexibility and convenience, allowing you to power devices far from the power source.</p>
+                            <h2>Heavy Duty Design</h2>
+                            <p>Built to handle high-capacity devices, this extension cord is ideal for workshops, offices, and any environment that requires a powerful and durable solution for powering multiple electronics.</p>
+                            <h2>Durable and Reliable</h2>
+                            <p>Designed to last, this extension cord is made of high-quality materials that ensure long-term reliability, even with frequent use in demanding environments.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 370,
+            "name": "Hama 'STANDARD' Extension Cord 5M",
+            "price": 34.99,
+            "old_price": 44.99,
+            "description": """<h2>5 Meter Cable</h2>
+                            <p>This extension cord provides a perfect 5-meter length, ideal for home and office environments where a little extra reach is needed without going overboard. It offers versatility and ease of use for all your electrical appliances.</p>
+                            <h2>Reliable and Safe</h2>
+                            <p>With built-in overload protection, this extension cord is safe to use with multiple devices simultaneously, including computers, TVs, and lamps.</p>
+                            <h2>Simple to Use</h2>
+                            <p>Its plug-and-play design makes it perfect for quick and easy installation, offering reliable power where you need it most.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 371,
+            "name": "Baseus PowerCombo 100W (Black)",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>Fast Charging</h2>
+                            <p>The Baseus PowerCombo supports up to 100W power output, making it perfect for rapidly charging your devices such as laptops, tablets, and smartphones without any delays.</p>
+                            <h2>Compact and Efficient Design</h2>
+                            <p>Its compact and lightweight design makes it an ideal addition to your desk or travel bag, providing the power you need without taking up much space.</p>
+                            <h2>Safe Charging</h2>
+                            <p>Equipped with multiple protection features, the Baseus PowerCombo ensures that your devices charge safely, preventing overcharging, overheating, and short circuits.</p>""",
+            "sale_id": 39
+        },
+        {
+            "id": 372,
+            "name": "UGREEN Power Strip 65W USB/USB C + 3x AC Outlets CD268",
+            "price": 49.99,
+            "old_price": 59.99,
+            "description": """<h2>USB & AC Ports</h2>
+                            <p>This UGREEN power strip offers 3 AC outlets and 2 USB ports (USB-C and USB-A) for convenient charging of multiple devices at once, perfect for use at home, office, or on-the-go.</p>
+                            <h2>Compact Design</h2>
+                            <p>Despite its small size, it packs 65W total power output, which is perfect for charging everything from laptops to smartphones without cluttering your workspace.</p>
+                            <h2>Durable and Safe</h2>
+                            <p>Features built-in surge protection to safeguard your valuable electronics from power surges and overloads, ensuring safe and reliable usage.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 373,
+            "name": "Ever Protect - 4 Sockets USB-A & USB-C 1.5m",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Multiple Ports</h2>
+                            <p>The Ever Protect power strip offers 4 outlets, including USB-A and USB-C ports, providing versatile charging options for all your devices in one convenient location.</p>
+                            <h2>Safety Features</h2>
+                            <p>Built with surge protection, overload protection, and overcurrent protection to ensure safe charging and prevent damage to your valuable devices.</p>
+                            <h2>Compact and Portable</h2>
+                            <p>The 1.5-meter cable ensures you can position the power strip anywhere you need it, while the compact form factor makes it easy to carry or store when not in use.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 374,
+            "name": "Ever Optima - 6 Sockets, 3m, Black",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>6 Sockets</h2>
+                            <p>Perfect for large office or home setups that require many power sources, the 3-meter cord ensures the power strip reaches distant outlets with ease.</p>
+                            <h2>Safety Features</h2>
+                            <p>Equipped with built-in overload protection and fire resistance for secure usage in any environment.</p>
+                            <h2>Durable Design</h2>
+                            <p>Constructed with high-quality materials for durability and long-lasting performance, making it suitable for heavy-duty use.</p>""",
+            "sale_id": 40
+        },
+        {
+            "id": 375,
+            "name": "Hama Premium Surge Protector - 4 Sockets, 1.5m",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>4 Sockets</h2>
+                            <p>This premium surge protector from Hama offers 4 power sockets and a 1.5-meter cable, perfect for home and office electronics.</p>
+                            <h2>Surge Protection</h2>
+                            <p>Safeguard your devices from power surges, ensuring that your equipment is protected from electrical faults.</p>
+                            <h2>Compact and Efficient</h2>
+                            <p>Compact yet powerful, it’s easy to position and use while providing full protection for your connected devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 376,
+            "name": "Ever Protect - 5 Sockets 3m White",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>5 Power Outlets</h2>
+                            <p>Offering 5 power outlets and a 3-meter cable, this power strip is perfect for home entertainment setups and workspaces.</p>
+                            <h2>Overload Protection</h2>
+                            <p>Features overload protection for safety, ensuring your devices are always protected.</p>
+                            <h2>Space-saving Design</h2>
+                            <p>The white, compact design makes it a great choice for clean and modern setups.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 377,
+            "name": "Qoltec Aluminum Power Strip RACK PDU 19'' 1U 16A 6xFR",
+            "price": 79.99,
+            "old_price": 99.99,
+            "description": """<h2>Rackmount Design</h2>
+                            <p>Built for professional server rooms and data centers, this 19” 1U rackmount power strip features 6 FR outlets.</p>
+                            <h2>Heavy Duty</h2>
+                            <p>16A rated for industrial and commercial use, making it ideal for demanding environments.</p>
+                            <h2>Durable Build</h2>
+                            <p>Aluminum construction ensures durability and long-term reliability even in harsh conditions.</p>""",
+            "sale_id": 41
+        },
+        {
+            "id": 378,
+            "name": "Gembird Schuko - 5 Sockets, 3m",
+            "price": 24.99,
+            "old_price": 34.99,
+            "description": """<h2>5 Sockets</h2>
+                            <p>This Gembird power strip comes with 5 power sockets and a 3-meter cable, perfect for large electronic setups.</p>
+                            <h2>Safety Features</h2>
+                            <p>Includes surge protection to ensure the safety of your devices, protecting them from power surges.</p>
+                            <h2>Reliable Design</h2>
+                            <p>Built for high capacity, making it ideal for homes and small offices with multiple devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 379,
+            "name": "Brennenstuhl Eco-Line - 3 Sockets, 3m Black",
+            "price": 19.99,
+            "old_price": 29.99,
+            "description": """<h2>3 Power Outlets</h2>
+                            <p>This black power strip provides 3 outlets and a 3-meter cable, perfect for compact spaces and basic needs.</p>
+                            <h2>Eco-Friendly</h2>
+                            <p>Made from eco-friendly materials, this power strip is perfect for environmentally conscious users who need reliable power access.</p>
+                            <h2>Basic Protection</h2>
+                            <p>Includes basic surge protection for your devices, ensuring their safety against electrical faults.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 380,
+            "name": "Qoltec Aluminum Power Strip PDU for 10'' Rack 1U 16A 4xFR",
+            "price": 59.99,
+            "old_price": 79.99,
+            "description": """<h2>10'' Rackmount Design</h2>
+                            <p>Compact 10'' rackmount power strip with 4 FR outlets and 16A rated for commercial and industrial use.</p>
+                            <h2>Heavy Duty</h2>
+                            <p>Ideal for server rooms, data centers, and other professional environments that demand robust power solutions.</p>
+                            <h2>Durable Construction</h2>
+                            <p>Aluminum casing ensures longevity and ruggedness in industrial environments where reliability is critical.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 381,
+            "name": "Verbatim Multi-Socket Power Tower EU EUPT-01 11xAC 2xUSB 2xUSB-C",
+            "price": 49.99,
+            "old_price": 69.99,
+            "description": """<h2>11 AC Sockets</h2>
+                            <p>Verbatim offers a tower power strip with 11 AC sockets, plus 2 USB and 2 USB-C ports, ideal for charging and powering numerous devices.</p>
+                            <h2>USB Ports</h2>
+                            <p>Charge your phones, tablets, and other electronics easily with 4 USB ports (2x USB-A and 2x USB-C), providing convenient connectivity for various devices.</p>
+                            <h2>Space-Saving Design</h2>
+                            <p>The vertical tower design saves space while offering high capacity, perfect for offices, entertainment areas, and other settings with numerous devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 382,
+            "name": "Hama Premium Surge Protector - 6 Sockets, 1.5m",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>6 Power Sockets</h2>
+                            <p>With 6 power outlets and a 1.5-meter cord, this premium surge protector ensures safety for all your connected devices, whether at home or in the office.</p>
+                            <h2>Surge Protection</h2>
+                            <p>Protects against power spikes and surges, ensuring your devices are always safe from electrical damage.</p>
+                            <h2>Compact Design</h2>
+                            <p>Its compact design makes it easy to position in tight spaces while providing full protection for all connected devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 383,
+            "name": "Brennenstuhl BREMOUNTA - 4 Sockets, 1.5m White",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>4 Sockets</h2>
+                            <p>The Brennenstuhl BREMOUNTA offers 4 sockets with surge protection, ideal for use in both home and office environments, providing flexibility for your devices.</p>
+                            <h2>White Design</h2>
+                            <p>The sleek white design fits seamlessly with most setups and décor, adding a clean look to your workspace.</p>
+                            <h2>Surge Protection</h2>
+                            <p>Protects connected devices from power surges, ensuring safety and longevity for your equipment.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 384,
+            "name": "Hama Premium Surge Protector - 4 Sockets, 3m",
+            "price": 34.99,
+            "old_price": 44.99,
+            "description": """<h2>4 Power Outlets</h2>
+                            <p>Offering 4 power outlets and a 3-meter cord, this surge protector ensures safety for larger setups that require longer reach for power connections.</p>
+                            <h2>Full Protection</h2>
+                            <p>Equipped with advanced surge protection, this power strip keeps your devices safe from unexpected power surges and spikes.</p>
+                            <h2>Long Cable</h2>
+                            <p>The 3-meter cable provides ample reach for distant power outlets, making it an excellent choice for larger rooms and office spaces.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 385,
+            "name": "Brennenstuhl ECO-LINE Power Strip 3 Sockets, 1.5m White No Switch",
+            "price": 19.99,
+            "old_price": 29.99,
+            "description": """<h2>3 Sockets</h2>
+                            <p>This Eco-Line power strip is made from environmentally-friendly materials and offers 3 outlets and a 1.5-meter cable, making it perfect for everyday use and travel.</p>
+                            <h2>Basic Protection</h2>
+                            <p>Provides essential protection from electrical faults and surges, ensuring your devices stay safe during use.</p>
+                            <h2>Compact Design</h2>
+                            <p>The small, lightweight design makes it easy to store and transport, making it ideal for home or travel use.</p>""",
+            "sale_id": 42
+        },
+        {
+            "id": 386,
+            "name": "Nintendo Sound Clock Alarmo",
+            "price": 49.99,
+            "old_price": 59.99,
+            "description": """<h2>Sound Alarm</h2>
+                            <p>The Nintendo Sound Clock Alarmo brings fun and functionality to your morning routine. With iconic sounds and customizable alarms, it’s perfect for Nintendo fans.</p>
+                            <h2>Iconic Sounds</h2>
+                            <p>Choose from a range of nostalgic Nintendo sounds to start your day on a high note.</p>
+                            <h2>Modern Design</h2>
+                            <p>The sleek, modern design makes it a perfect addition to your desk or bedside table.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 387,
+            "name": "Merch Darth Vader A New Hope Cable Guys R.E.S.T Collectable Figure",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>Unique Collectible</h2>
+                            <p>This Darth Vader Cable Guys figure is perfect for any Star Wars fan. Use it as a phone holder or simply display it as a collectible.</p>
+                            <h2>Premium Design</h2>
+                            <p>Made with high-quality materials and great attention to detail, this figure will stand out in your collection.</p>
+                            <h2>Multifunctional</h2>
+                            <p>It’s not just a figure – it doubles as a cable holder to keep your cords neat and organized.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 388,
+            "name": "Funko POP Movies: Despicable Me 4 - Mega Minion Gus",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Adorable Minion</h2>
+                            <p>Get your hands on the Mega Minion Gus from Despicable Me 4, a must-have for Funko POP collectors!</p>
+                            <h2>Perfect for Collecting</h2>
+                            <p>Part of the Funko POP Movies series, this figure is an essential addition to your collection.</p>
+                            <h2>Iconic Design</h2>
+                            <p>Featuring Gus in his iconic yellow minion form, this collectible captures all the charm of the Despicable Me universe.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 389,
+            "name": "Merch Game Art Chronicles Puzzle: The Witcher Geralt & Vincent van",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Epic Puzzle</h2>
+                            <p>This Game Art Chronicles puzzle features Geralt of Rivia from The Witcher series and Vincent van Gogh's famous artwork, combining gaming with art.</p>
+                            <h2>High-Quality Pieces</h2>
+                            <p>The puzzle is made of durable material with vibrant colors that capture the stunning art and character details.</p>
+                            <h2>Perfect for Collectors</h2>
+                            <p>An ideal gift for fans of both The Witcher and art history, combining the worlds of gaming and classic art.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 390,
+            "name": "Funko POP Marvel: Deadpool 3 - Deadpool",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Deadpool 3</h2>
+                            <p>This Funko POP figure of Deadpool from the Deadpool 3 movie is a must-have for any Marvel fan!</p>
+                            <h2>Highly Detailed</h2>
+                            <p>Featuring Deadpool in his iconic red and black suit, this figure is packed with details that make it a true collector's item.</p>
+                            <h2>Exclusive Figure</h2>
+                            <p>Perfect for fans of the Deadpool series, this limited edition POP is a great way to show off your love for the character.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 391,
+            "name": "Funko POP Animation: Naruto - Itachi",
+            "price": 17.99,
+            "old_price": 22.99,
+            "description": """<h2>Naruto - Itachi</h2>
+                            <p>This Funko POP figure of Itachi Uchiha from the Naruto anime series is a great addition to any anime fan's collection.</p>
+                            <h2>Iconic Character</h2>
+                            <p>Itachi is one of the most beloved characters in the Naruto series, and this figure perfectly captures his mysterious aura.</p>
+                            <h2>Great for Display</h2>
+                            <p>The figure features Itachi in his iconic black cloak, making it an eye-catching display piece for fans.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 392,
+            "name": "Funko POP Games: Spider-Man 2 - MILES MORALES",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Spider-Man 2 - Miles Morales</h2>
+                            <p>Get your hands on the Miles Morales Funko POP figure from Spider-Man 2. A great gift for fans of the game!</p>
+                            <h2>Iconic Outfit</h2>
+                            <p>This figure shows Miles Morales in his iconic Spider-Man suit, ready to take on his enemies in style.</p>
+                            <h2>Must-Have for Gamers</h2>
+                            <p>If you're a fan of the Spider-Man series, this figure is a must-have addition to your collection.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 393,
+            "name": "PALADONE Lampka Marvel Iron Man ścienno-biurkowa",
+            "price": 34.99,
+            "old_price": 44.99,
+            "description": """<h2>Marvel Iron Man Lamp</h2>
+                            <p>This wall-mountable and desk-friendly Iron Man lamp adds a stylish touch to any room, perfect for Marvel fans.</p>
+                            <h2>LED Technology</h2>
+                            <p>The lamp uses energy-efficient LED technology, providing a bright and long-lasting light source.</p>
+                            <h2>Iconic Design</h2>
+                            <p>Featuring Iron Man in his iconic armor, this lamp brings the Marvel Universe to life in your home.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 394,
+            "name": "PALADONE Kubek Playstation PS5 DualSense - biały",
+            "price": 14.99,
+            "old_price": 19.99,
+            "description": """<h2>PlayStation PS5 Mug</h2>
+                            <p>This white PlayStation PS5 DualSense mug is perfect for gamers who enjoy their coffee while gaming.</p>
+                            <h2>Official Merchandise</h2>
+                            <p>This mug features the iconic PlayStation DualSense controller design, a must-have for PlayStation fans.</p>
+                            <h2>Durable Material</h2>
+                            <p>Made from high-quality ceramic, this mug is both microwave and dishwasher safe for everyday use.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 395,
+            "name": "Promise Wielka księga Mario Wyd. 2. Kompletny przewodnik",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Super Mario Encyclopedia</h2>
+                            <p>The ultimate guide to Super Mario, this book covers everything you need to know about the Mario universe.</p>
+                            <h2>Comprehensive Guide</h2>
+                            <p>Includes detailed information on all Mario games, characters, and stages, perfect for fans of the series.</p>
+                            <h2>Beautiful Artwork</h2>
+                            <p>The book features high-quality artwork and illustrations from the iconic Super Mario franchise.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 396,
+            "name": "Funko POP Star Wars: PM 25th - Battle Droid",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Star Wars - Battle Droid</h2>
+                            <p>This Battle Droid Funko POP figure from the Star Wars universe celebrates the 25th anniversary of the Phantom Menace.</p>
+                            <h2>Iconic Star Wars Character</h2>
+                            <p>Featuring the menacing Battle Droid, this figure is a perfect addition to any Star Wars fan's collection.</p>
+                            <h2>Collector's Edition</h2>
+                            <p>A must-have for Star Wars collectors, this figure commemorates one of the most iconic characters in the prequel trilogy.</p>""",
+            "sale_id": 43
+        },
+        {
+            "id": 397,
+            "name": "Funko POP Star Wars: Mandalorian - The Child w/Frog",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>The Mandalorian - The Child</h2>
+                            <p>This adorable Funko POP figure features The Child (Baby Yoda) from The Mandalorian, complete with a frog in his hands.</p>
+                            <h2>Perfect for Fans</h2>
+                            <p>The figure captures the charm and cuteness of The Child, a fan-favorite from the Star Wars universe.</p>
+                            <h2>Must-Have for Collectors</h2>
+                            <p>This is a must-have addition for any Star Wars or Mandalorian fan’s Funko collection.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 398,
+            "name": "Funko POP Marvel: Deadpool - Bowling",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Deadpool Bowling</h2>
+                            <p>Deadpool takes a break from fighting to go bowling in this hilarious Funko POP figure.</p>
+                            <h2>Comedic Design</h2>
+                            <p>This figure features Deadpool in his classic costume, ready to strike on the bowling lanes.</p>
+                            <h2>For Marvel Fans</h2>
+                            <p>A great gift for fans of the Deadpool movies and Marvel comics.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 399,
+            "name": "FR-TEC Rękawice do simracingu FT7014",
+            "price": 89.99,
+            "old_price": 119.99,
+            "description": """<h2>Sim Racing Gloves</h2>
+                            <p>Designed for sim racing, these gloves provide enhanced grip and comfort during intense gaming sessions.</p>
+                            <h2>Durable and Comfortable</h2>
+                            <p>Made from high-quality materials, these gloves are built to last and provide maximum comfort.</p>
+                            <h2>Perfect Fit</h2>
+                            <p>The ergonomic design ensures a snug and comfortable fit, allowing for precise control during racing simulations.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 400,
+            "name": "Funko POP Vinyl: MND S9 – Grogu w/Prama",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Grogu with Prama</h2>
+                            <p>This Funko POP vinyl figure features Grogu from The Mandalorian with his adorable Prama, a perfect addition for any collector.</p>
+                            <h2>Charming Design</h2>
+                            <p>The figure captures Grogu’s cuteness and his signature look from the popular series.</p>
+                            <h2>Collector’s Item</h2>
+                            <p>A great item for fans of The Mandalorian and those who love collectible Funko POP figures.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 401,
+            "name": "Good Loot Wisząca figurka Cyberpunk 2077 - Johnny Silverhand",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Cyberpunk 2077 - Johnny Silverhand</h2>
+                            <p>This hanging figure of Johnny Silverhand from Cyberpunk 2077 will add a cool touch to your room or workspace.</p>
+                            <h2>High-Quality Design</h2>
+                            <p>Made with great attention to detail, this figure perfectly captures the essence of Johnny Silverhand from the game.</p>
+                            <h2>Perfect for Cyberpunk Fans</h2>
+                            <p>An ideal collectible for anyone who loves the Cyberpunk 2077 universe.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 402,
+            "name": "Nintendo amiibo Zelda - Ganondorf (Tears of the Kingdom)",
+            "price": 19.99,
+            "old_price": 29.99,
+            "description": """<h2>Ganondorf Amiibo</h2>
+                            <p>This Ganondorf amiibo figure from The Legend of Zelda series unlocks in-game content and serves as a collector's item.</p>
+                            <h2>Detailed Figure</h2>
+                            <p>The figure captures the menacing presence of Ganondorf in stunning detail.</p>
+                            <h2>Unlock In-Game Content</h2>
+                            <p>Scan this amiibo in your game to unlock exclusive content and bonuses for your adventure.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 403,
+            "name": "Nintendo amiibo Super Mario - Wedding Peach",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Wedding Peach Amiibo</h2>
+                            <p>Celebrate Mario's wedding with this Wedding Peach amiibo. Unlock in-game content and display this beautifully crafted figure.</p>
+                            <h2>Elegant Design</h2>
+                            <p>Wedding Peach is elegantly dressed for the big day, making this amiibo a fantastic collector's piece.</p>
+                            <h2>Unlock Bonus Content</h2>
+                            <p>Use this amiibo to unlock exclusive items and bonuses in your game.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 404,
+            "name": "Merch Imagination: Rafał Olbiński The Shape of Color Green Puzzles",
+            "price": 24.99,
+            "old_price": 34.99,
+            "description": """<h2>The Shape of Color</h2>
+                            <p>Immerse yourself in the artistic world of Rafał Olbiński with this puzzle, which features his renowned "The Shape of Color" artwork.</p>
+                            <h2>Perfect for Art Lovers</h2>
+                            <p>This puzzle is ideal for collectors and fans of modern art, offering a challenging and rewarding experience.</p>
+                            <h2>High-Quality Pieces</h2>
+                            <p>The puzzle pieces are made from durable material, ensuring that the vibrant colors and intricate details remain sharp.</p>""",
+            "sale_id": 44
+        },
+        {
+            "id": 405,
+            "name": "Merch Rafał Olbiński Defence Against Banality Puzzles 1000",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Defence Against Banality</h2>
+                            <p>This challenging 1000-piece puzzle showcases Rafał Olbiński’s artistic masterpiece "Defence Against Banality," perfect for puzzle enthusiasts.</p>
+                            <h2>Artistic Design</h2>
+                            <p>The artwork features unique and colorful designs that come together to form a beautiful final image.</p>
+                            <h2>Great for Puzzle Lovers</h2>
+                            <p>A great gift for art and puzzle lovers, this puzzle provides a satisfying and intellectually stimulating experience.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 406,
+            "name": "Fellowes LX41",
+            "price": 49.99,
+            "old_price": 69.99,
+            "description": """<h2>Fellowes LX41</h2>
+                            <p>The Fellowes LX41 is a high-quality paper shredder designed for home or small office use. It offers cross-cut shredding for confidential documents.</p>
+                            <h2>Cross-Cut Shredding</h2>
+                            <p>This shredder can handle up to 10 sheets of paper at once, providing a higher level of security for your sensitive documents.</p>
+                            <h2>Compact Design</h2>
+                            <p>Its small footprint ensures it fits easily into any office space while still providing powerful performance.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 407,
+            "name": "Sencor Desk Calculator",
+            "price": 12.99,
+            "old_price": 16.99,
+            "description": """<h2>Sencor Desk Calculator</h2>
+                            <p>The Sencor desk calculator is a reliable tool for everyday calculations. With a large LCD display, it's easy to read and use for office tasks.</p>
+                            <h2>Large Display</h2>
+                            <p>The calculator's large display makes it easy to read numbers, even from a distance.</p>
+                            <h2>Basic Functions</h2>
+                            <p>Perfect for basic office tasks, it includes all the essential functions for calculations and quick computations.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 408,
+            "name": "Sencor Desk Calculator",
+            "price": 14.99,
+            "old_price": 19.99,
+            "description": """<h2>Sencor Desk Calculator</h2>
+                            <p>Reliable and easy-to-use, this Sencor desk calculator provides accurate results for all your office needs.</p>
+                            <h2>Practical Design</h2>
+                            <p>The sleek design makes it ideal for desk spaces, while the large keys ensure smooth operation.</p>
+                            <h2>Essential Functions</h2>
+                            <p>Offers standard functions for calculations, including addition, subtraction, multiplication, and division.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 409,
+            "name": "Sencor Pocket Calculator",
+            "price": 7.99,
+            "old_price": 9.99,
+            "description": """<h2>Sencor Pocket Calculator</h2>
+                            <p>Compact and portable, the Sencor pocket calculator is ideal for those on the go. It offers basic calculations in a small, easy-to-carry design.</p>
+                            <h2>Compact Size</h2>
+                            <p>Its small size makes it easy to store in your bag or pocket, ensuring you always have a calculator on hand.</p>
+                            <h2>Simple Operation</h2>
+                            <p>This calculator is easy to use, with a clear display and simple functions for basic calculations.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 410,
+            "name": "Sencor Pocket Calculator",
+            "price": 9.99,
+            "old_price": 12.99,
+            "description": """<h2>Sencor Pocket Calculator</h2>
+                            <p>Designed for convenience, this pocket calculator from Sencor is perfect for quick and easy calculations wherever you are.</p>
+                            <h2>Small and Lightweight</h2>
+                            <p>Its small and lightweight design allows you to take it anywhere, ideal for students and professionals alike.</p>
+                            <h2>Clear Display</h2>
+                            <p>With a clear, easy-to-read display, it ensures accurate results every time.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 411,
+            "name": "SafeScan 2210 G2",
+            "price": 199.99,
+            "old_price": 249.99,
+            "description": """<h2>SafeScan 2210 G2</h2>
+                            <p>The SafeScan 2210 G2 is a high-performance currency counter designed to quickly and accurately count cash, saving time in retail environments.</p>
+                            <h2>Fast Counting</h2>
+                            <p>It can count up to 1000 notes per minute, making it ideal for businesses that need to handle large amounts of cash.</p>
+                            <h2>Built-in Detection</h2>
+                            <p>Features built-in counterfeit detection to ensure the accuracy and security of your cash handling process.</p>""",
+            "sale_id": 45
+        },
+        {
+            "id": 412,
+            "name": "Brother ADS4700W",
+            "price": 299.99,
+            "old_price": 399.99,
+            "description": """<h2>Brother ADS4700W</h2>
+                            <p>The Brother ADS4700W is a wireless document scanner that combines high-speed scanning with advanced security features for your office needs.</p>
+                            <h2>Wireless Connectivity</h2>
+                            <p>Scan documents directly to cloud services, email, or network folders with Wi-Fi and Ethernet connectivity.</p>
+                            <h2>High-Speed Scanning</h2>
+                            <p>Supports scanning up to 35 pages per minute, helping you keep up with a busy office workflow.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 413,
+            "name": "Brother DS740",
+            "price": 129.99,
+            "old_price": 179.99,
+            "description": """<h2>Brother DS740</h2>
+                            <p>The Brother DS740 is a compact and portable document scanner, ideal for home offices or on-the-go scanning needs.</p>
+                            <h2>Portable Design</h2>
+                            <p>Its slim and lightweight design makes it easy to transport and store, perfect for mobile scanning.</p>
+                            <h2>Fast and Reliable</h2>
+                            <p>Scans both sides of documents quickly with high-quality results, ensuring reliable performance.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 414,
+            "name": "Fellowes 10M",
+            "price": 89.99,
+            "old_price": 119.99,
+            "description": """<h2>Fellowes 10M</h2>
+                            <p>The Fellowes 10M is a micro-cut paper shredder designed to securely destroy documents and keep your sensitive information safe.</p>
+                            <h2>Micro-Cut Shredding</h2>
+                            <p>Shreds paper into tiny pieces, offering higher security for confidential documents.</p>
+                            <h2>Large Capacity</h2>
+                            <p>Can handle up to 10 sheets at once and has a 23L bin for easy disposal of shreds.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 415,
+            "name": "Fellowes AutoMax 100M",
+            "price": 249.99,
+            "old_price": 299.99,
+            "description": """<h2>Fellowes AutoMax 100M</h2>
+                            <p>The Fellowes AutoMax 100M is an auto-feed paper shredder that can automatically shred up to 100 sheets of paper at once, saving time and effort.</p>
+                            <h2>Auto-Feed Feature</h2>
+                            <p>Simply load the paper and the shredder does the rest, offering hands-free operation for busy offices.</p>
+                            <h2>Micro-Cut Shredding</h2>
+                            <p>Micro-cut technology ensures that sensitive information is destroyed securely and efficiently.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 416,
+            "name": "Fellowes LX65",
+            "price": 109.99,
+            "old_price": 139.99,
+            "description": """<h2>Fellowes LX65</h2>
+                            <p>The Fellowes LX65 is a cross-cut paper shredder that can handle both paper and credit cards for secure document destruction.</p>
+                            <h2>Cross-Cut Technology</h2>
+                            <p>Shreds paper into small particles, providing a higher level of security compared to strip-cut shredders.</p>
+                            <h2>Durable and Reliable</h2>
+                            <p>Built for long-lasting use, it features a 22L bin and can shred up to 10 sheets of paper at once.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 417,
+            "name": "Epson WorkForce ES-580W",
+            "price": 299.99,
+            "old_price": 399.99,
+            "description": """<h2>Epson WorkForce ES-580W</h2>
+                            <p>The Epson WorkForce ES-580W is a wireless document scanner designed for high-volume scanning with quick speeds and excellent image quality.</p>
+                            <h2>Wireless Connectivity</h2>
+                            <p>Wirelessly scan documents directly to cloud services, email, or network folders for quick and efficient document management.</p>
+                            <h2>Fast Scanning</h2>
+                            <p>Supports scanning up to 35 pages per minute, making it ideal for businesses with high document scanning needs.</p>""",
+            "sale_id": 46
+        },
+        {
+            "id": 418,
+            "name": "Sumup Mobile Payment Terminal Air Bundle Multi",
+            "price": 129.99,
+            "old_price": 159.99,
+            "description": """<h2>Sumup Air Payment Terminal</h2>
+                            <p>The Sumup Air Bundle Multi is a mobile payment terminal that enables businesses to accept card payments quickly and securely.</p>
+                            <h2>Compact Design</h2>
+                            <p>The terminal is small, lightweight, and easy to carry, making it perfect for businesses on the go.</p>
+                            <h2>Multiple Payment Options</h2>
+                            <p>Supports contactless, chip, and PIN transactions for convenience and flexibility in payment options.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 419,
+            "name": "Sumup Mobile Payment Terminal AIR",
+            "price": 99.99,
+            "old_price": 139.99,
+            "description": """<h2>Sumup AIR Payment Terminal</h2>
+                            <p>Sumup AIR is a compact mobile payment terminal that allows businesses to process card payments anywhere, anytime.</p>
+                            <h2>Easy-to-Use</h2>
+                            <p>With Bluetooth connectivity, it pairs seamlessly with your phone or tablet, making payments quick and efficient.</p>
+                            <h2>Secure Transactions</h2>
+                            <p>Ensures safe and secure transactions with advanced encryption technology.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 420,
+            "name": "Fellowes LX220",
+            "price": 179.99,
+            "old_price": 229.99,
+            "description": """<h2>Fellowes LX220</h2>
+                            <p>The Fellowes LX220 is a high-performance cross-cut paper shredder with the capacity to shred up to 22 sheets of paper at once.</p>
+                            <h2>High Security</h2>
+                            <p>Shreds documents into small particles, providing a higher level of security for your sensitive materials.</p>
+                            <h2>Large Bin Capacity</h2>
+                            <p>It includes a 40L bin, making it ideal for large offices or high-volume shredding tasks.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 421,
+            "name": "Sumup Mobile Payment Terminal Solo",
+            "price": 69.99,
+            "old_price": 99.99,
+            "description": """<h2>Sumup Solo Payment Terminal</h2>
+                            <p>Sumup Solo is a simple and affordable payment terminal that allows businesses to accept card payments on the go.</p>
+                            <h2>Compact and Lightweight</h2>
+                            <p>Designed for portability, it can easily fit into your pocket or small bag, making it perfect for businesses that travel.</p>
+                            <h2>Secure Payments</h2>
+                            <p>Ensures secure payment processing with encryption and fraud protection built into the terminal.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 422,
+            "name": "Fellowes LX200",
+            "price": 59.99,
+            "old_price": 79.99,
+            "description": """<h2>Fellowes LX200</h2>
+                            <p>The Fellowes LX200 is a reliable cross-cut shredder that can shred up to 6 sheets of paper at a time, ideal for home or small office use.</p>
+                            <h2>Cross-Cut Shredding</h2>
+                            <p>Offers a high level of security by cutting paper into small pieces.</p>
+                            <h2>Compact Design</h2>
+                            <p>Perfect for smaller spaces, with a 12L bin for easy disposal of paper shreds.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 423,
+            "name": "Fellowes LX201 Black",
+            "price": 89.99,
+            "old_price": 109.99,
+            "description": """<h2>Fellowes LX201 Black</h2>
+                            <p>The Fellowes LX201 Black is a cross-cut paper shredder that provides secure document shredding for your home office.</p>
+                            <h2>Cross-Cut Shredding</h2>
+                            <p>Offers a high level of security with cross-cut shredding, ideal for confidential documents.</p>
+                            <h2>Durable Design</h2>
+                            <p>The 22L bin holds a large amount of paper waste, making it great for continuous use.</p>""",
+            "sale_id": 47
+        },
+        {
+            "id": 424,
+            "name": "Fellowes LX211 White",
+            "price": 99.99,
+            "old_price": 129.99,
+            "description": """<h2>Fellowes LX211 White</h2>
+                            <p>The Fellowes LX211 White is a cross-cut paper shredder that ensures your documents are securely destroyed with ease.</p>
+                            <h2>Cross-Cut Shredding</h2>
+                            <p>Provides a higher level of security for your sensitive documents by shredding them into small particles.</p>
+                            <h2>Large Capacity</h2>
+                            <p>The 30L bin is designed for high-volume shredding, making it suitable for small to medium offices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 425,
+            "name": "Fellowes LX211 Black",
+            "price": 99.99,
+            "old_price": 129.99,
+            "description": """<h2>Fellowes LX211 Black</h2>
+                            <p>The Fellowes LX211 Black is a cross-cut paper shredder designed for secure, high-volume shredding of paper and documents.</p>
+                            <h2>Cross-Cut Shredding</h2>
+                            <p>Shreds paper into small particles, offering a high level of security for confidential information.</p>
+                            <h2>Large Bin Capacity</h2>
+                            <p>The 30L bin holds a large amount of paper shreds, making it ideal for busy offices or environments with high document destruction needs.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 426,
+            "name": "Imou Cruiser SE+ 3mp",
+            "price": 129.99,
+            "old_price": 169.99,
+            "description": """<h2>Imou Cruiser SE+ 3mp</h2>
+                            <p>The Imou Cruiser SE+ 3MP camera offers high-definition video surveillance, providing clear images for home or business security.</p>
+                            <h2>3MP High Definition</h2>
+                            <p>Provides high-resolution 3MP video for enhanced clarity and detail.</p>
+                            <h2>Smart Detection</h2>
+                            <p>Features smart detection capabilities, including motion detection and night vision for continuous monitoring.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 427,
+            "name": "TP-Link Tapo C520WS SI Zewnętrzna, obrotowa kamera WiFi",
+            "price": 149.99,
+            "old_price": 199.99,
+            "description": """<h2>TP-Link Tapo C520WS SI</h2>
+                            <p>This Wi-Fi-enabled rotating outdoor camera ensures comprehensive surveillance, offering flexible positioning and high-quality video streaming.</p>
+                            <h2>Pan & Tilt</h2>
+                            <p>360° pan and 90° tilt provide full range monitoring of your property.</p>
+                            <h2>Night Vision</h2>
+                            <p>Equipped with advanced night vision to capture clear images in low-light conditions.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 428,
+            "name": "Xiaomi Inteligentna wewnętrzna kamera C500 PRO",
+            "price": 89.99,
+            "old_price": 119.99,
+            "description": """<h2>Xiaomi Inteligentna C500 PRO</h2>
+                            <p>Designed for indoor use, the Xiaomi C500 PRO offers intelligent monitoring features like facial recognition and two-way audio.</p>
+                            <h2>High-Definition Video</h2>
+                            <p>With 1080p HD resolution, it captures clear and detailed images, day or night.</p>
+                            <h2>Smart Features</h2>
+                            <p>Supports AI features such as motion detection and human recognition for advanced monitoring.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 429,
+            "name": "ORLLO Inteligentna kamera zewnętrzna Z1-UV",
+            "price": 109.99,
+            "old_price": 139.99,
+            "description": """<h2>ORLLO Z1-UV</h2>
+                            <p>The ORLLO Z1-UV is an outdoor smart camera that offers reliable surveillance with built-in UV protection for all-weather use.</p>
+                            <h2>UV Protection</h2>
+                            <p>Designed to withstand harsh environmental conditions, with UV protection for durability.</p>
+                            <h2>1080p Video</h2>
+                            <p>Records in 1080p high-definition to ensure sharp video quality even in dim light.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 430,
+            "name": "Reolink Inteligentna wewnętrzna kamera obrotowa E330",
+            "price": 129.99,
+            "old_price": 169.99,
+            "description": """<h2>Reolink E330</h2>
+                            <p>The Reolink E330 is an intelligent indoor rotating camera that provides full HD video and a 355° pan range for comprehensive coverage.</p>
+                            <h2>HD Video</h2>
+                            <p>Offers full 1080p HD video for clear and detailed monitoring.</p>
+                            <h2>Rotating Functionality</h2>
+                            <p>360° rotation allows you to cover large areas with one camera, reducing blind spots.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 431,
+            "name": "Imou Cruiser SIM 4G 2mp",
+            "price": 149.99,
+            "old_price": 199.99,
+            "description": """<h2>Imou Cruiser SIM 4G 2mp</h2>
+                            <p>The Imou Cruiser SIM 4G is a wireless surveillance camera designed for remote locations, with 2MP resolution and SIM card support for easy setup.</p>
+                            <h2>2MP High Definition</h2>
+                            <p>Provides clear video quality with 2MP resolution, even in remote locations.</p>
+                            <h2>4G Connectivity</h2>
+                            <p>Works on 4G networks, allowing you to monitor your property from virtually anywhere.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 432,
+            "name": "Imou Rex VT 5mp",
+            "price": 169.99,
+            "old_price": 219.99,
+            "description": """<h2>Imou Rex VT 5mp</h2>
+                            <p>The Imou Rex VT is a high-definition 5MP security camera for both indoor and outdoor use, providing sharp and detailed footage.</p>
+                            <h2>5MP Video Quality</h2>
+                            <p>Captures high-definition 5MP video, ensuring detailed surveillance footage.</p>
+                            <h2>Smart Motion Detection</h2>
+                            <p>Equipped with smart motion detection to alert you instantly when suspicious activity is detected.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 433,
+            "name": "Reolink Inteligentna zewnętrzna kamera obrotowa P434",
+            "price": 199.99,
+            "old_price": 249.99,
+            "description": """<h2>Reolink P434</h2>
+                            <p>Designed for outdoor use, the Reolink P434 provides 4K resolution and a 355° rotation to cover all angles of your property.</p>
+                            <h2>4K Ultra HD</h2>
+                            <p>With 4K resolution, it provides ultra-clear images, making it ideal for monitoring large areas.</p>
+                            <h2>Smart Features</h2>
+                            <p>Equipped with AI-powered features like person detection and night vision for 24/7 surveillance.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 434,
+            "name": "Imou Ranger Dual 6MP",
+            "price": 179.99,
+            "old_price": 229.99,
+            "description": """<h2>Imou Ranger Dual 6MP</h2>
+                            <p>The Imou Ranger Dual offers dual-lens 6MP video quality for advanced surveillance with panoramic coverage and high-definition clarity.</p>
+                            <h2>Dual-Lens System</h2>
+                            <p>Capture a wider field of view with dual lenses, ensuring greater coverage.</p>
+                            <h2>6MP HD Video</h2>
+                            <p>Provides sharp and detailed 6MP video footage, even at night.</p>""",
+            "sale_id": 48
+        },
+        {
+            "id": 435,
+            "name": "Reolink Inteligentna zewnętrzna kamera obrotowa E540",
+            "price": 199.99,
+            "old_price": 249.99,
+            "description": """<h2>Reolink E540</h2>
+                            <p>Outdoor 4K surveillance camera offering wide coverage with pan and tilt functionality, plus advanced motion detection.</p>
+                            <h2>4K Ultra HD</h2>
+                            <p>Experience high-quality, sharp 4K video surveillance for your property.</p>
+                            <h2>Pan & Tilt</h2>
+                            <p>Fully rotatable, covering a 355° horizontal field and 90° vertical range for comprehensive monitoring.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 436,
+            "name": "Imou Ranger dual 8MP",
+            "price": 219.99,
+            "old_price": 269.99,
+            "description": """<h2>Imou Ranger Dual 8MP</h2>
+                            <p>Dual-lens camera system providing 8MP high-definition video, ensuring high-quality surveillance with a wide field of view.</p>
+                            <h2>8MP Ultra HD</h2>
+                            <p>Capture ultra-high-definition footage with the 8MP camera for greater detail.</p>
+                            <h2>Wide Coverage</h2>
+                            <p>The dual-lens design allows you to cover a wider area with fewer cameras.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 437,
+            "name": "Imou Cruiser Dual 8MP",
+            "price": 239.99,
+            "old_price": 289.99,
+            "description": """<h2>Imou Cruiser Dual 8MP</h2>
+                            <p>The Imou Cruiser Dual offers a dual-lens system with 8MP resolution for superior surveillance performance.</p>
+                            <h2>8MP High Definition</h2>
+                            <p>Provides ultra-sharp 8MP video for clear and detailed images at all times.</p>
+                            <h2>Dual-Lens Design</h2>
+                            <p>Ensures a wider monitoring angle for enhanced surveillance coverage.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 438,
+            "name": "Imou Cruiser 2 5MP",
+            "price": 179.99,
+            "old_price": 229.99,
+            "description": """<h2>Imou Cruiser 2 5MP</h2>
+                            <p>The Imou Cruiser 2 offers 5MP video quality and a motorized pan/tilt function to ensure full coverage of any area.</p>
+                            <h2>5MP Video</h2>
+                            <p>Provides 5MP high-definition video to ensure sharp and clear images for all surveillance needs.</p>
+                            <h2>Pan & Tilt</h2>
+                            <p>With motorized pan and tilt functions, you can monitor wide areas with ease.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 439,
+            "name": "Reolink Inteligentna zewnętrzna kamera obrotowa B420",
+            "price": 159.99,
+            "old_price": 199.99,
+            "description": """<h2>Reolink B420</h2>
+                            <p>The Reolink B420 is an intelligent outdoor camera with 4MP resolution, providing crystal-clear video and wide-area coverage.</p>
+                            <h2>4MP Ultra HD</h2>
+                            <p>Capture sharp and clear footage with 4MP video resolution.</p>
+                            <h2>Pan & Tilt</h2>
+                            <p>Allows for full 355° rotation and 90° vertical tilt for versatile monitoring.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 440,
+            "name": "Reolink Inteligentna kamera zewnętrzna W320",
+            "price": 129.99,
+            "old_price": 159.99,
+            "description": """<h2>Reolink W320</h2>
+                            <p>The Reolink W320 is a high-definition outdoor security camera with 1080p resolution and smart detection features.</p>
+                            <h2>1080p Video</h2>
+                            <p>Provides clear, high-definition video for both day and night surveillance.</p>
+                            <h2>Smart Detection</h2>
+                            <p>Equipped with smart detection to notify you of any unusual activity instantly.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 441,
+            "name": "Imou Ranger 2C 3mp",
+            "price": 89.99,
+            "old_price": 119.99,
+            "description": """<h2>Imou Ranger 2C 3mp</h2>
+                            <p>The Imou Ranger 2C offers 3MP high-definition video with smart motion detection, perfect for monitoring both indoor and outdoor spaces.</p>
+                            <h2>3MP Video</h2>
+                            <p>Provides crisp and clear video with 3MP resolution.</p>
+                            <h2>Smart Motion Detection</h2>
+                            <p>Automatically detects motion and alerts you to any suspicious activity.</p>""",
+            "sale_id": 49
+        },
+        {
+            "id": 442,
+            "name": "TP-Link VIGI C340(6mm) kamera Bullet 4MP FullColor",
+            "price": 179.99,
+            "old_price": 229.99,
+            "description": """<h2>TP-Link VIGI C340(6mm)</h2>
+                            <p>The TP-Link VIGI C340 Bullet camera offers 4MP resolution with FullColor technology for enhanced surveillance.</p>
+                            <h2>4MP Full HD</h2>
+                            <p>Records in 4MP resolution for high-definition, clear images at all times.</p>
+                            <h2>FullColor</h2>
+                            <p>Enhanced FullColor technology ensures vivid color imaging during both day and night.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 443,
+            "name": "TP-Link VIGI C540(4mm) obrotowa kamera 4MP FullColor",
+            "price": 199.99,
+            "old_price": 249.99,
+            "description": """<h2>TP-Link VIGI C540(4mm)</h2>
+                            <p>This PTZ camera offers 4MP Full HD resolution and advanced pan and tilt functions for flexible surveillance coverage.</p>
+                            <h2>Pan & Tilt</h2>
+                            <p>Rotates 355° horizontally and tilts 90° vertically for full coverage.</p>
+                            <h2>4MP Full HD</h2>
+                            <p>Provides crystal-clear 4MP video with exceptional clarity for all security needs.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 444,
+            "name": "Synology BC500 5MP",
+            "price": 249.99,
+            "old_price": 299.99,
+            "description": """<h2>Synology BC500 5MP</h2>
+                            <p>The Synology BC500 is a 5MP network camera that offers high-definition video with smart detection features for indoor and outdoor use.</p>
+                            <h2>5MP Ultra HD</h2>
+                            <p>5MP resolution ensures high-definition video quality, capturing even the finest details.</p>
+                            <h2>Smart Detection</h2>
+                            <p>AI-powered smart detection capabilities alert you to any unusual activity in your monitored area.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 445,
+            "name": "Tesla Smart Kamera Baby B200",
+            "price": 59.99,
+            "old_price": 89.99,
+            "description": """<h2>Tesla Smart Kamera Baby B200</h2>
+                            <p>The Tesla Smart Baby B200 camera is designed for baby monitoring, providing clear HD video with two-way audio for communication.</p>
+                            <h2>HD Video</h2>
+                            <p>Captures clear 720p video for monitoring your baby in real time.</p>
+                            <h2>Two-Way Audio</h2>
+                            <p>Allows for two-way communication with your baby, enabling comforting audio interaction.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 446,
+            "name": "Silver Monkey Sprężone powietrze 600ml",
+            "price": 7.99,
+            "old_price": 9.99,
+            "description": """<h2>Silver Monkey Sprężone powietrze 600ml</h2>
+                            <p>This 600ml compressed air is perfect for cleaning dust from sensitive electronic equipment, keyboards, and more.</p>
+                            <h2>High Pressure</h2>
+                            <p>Provides strong air pressure to blow away dust and debris without damaging your devices.</p>
+                            <h2>Safe for Electronics</h2>
+                            <p>Non-flammable, making it safe for use on electronic devices and components.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 447,
+            "name": "Silver Monkey IPA alkohol izopropylowy 100ml",
+            "price": 4.99,
+            "old_price": 6.99,
+            "description": """<h2>Silver Monkey IPA alkohol izopropylowy 100ml</h2>
+                            <p>Isopropyl alcohol for cleaning electronics, removing fingerprints, oils, and grime from screens and keyboards.</p>
+                            <h2>100% Isopropyl Alcohol</h2>
+                            <p>Quickly evaporates to leave a streak-free finish.</p>
+                            <h2>Multi-Purpose</h2>
+                            <p>Perfect for cleaning electronics, including phones, tablets, and computers.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 448,
+            "name": "Silver Monkey IPA 250ml",
+            "price": 6.99,
+            "old_price": 8.99,
+            "description": """<h2>Silver Monkey IPA 250ml</h2>
+                            <p>250ml of high-quality isopropyl alcohol, ideal for cleaning electronics without leaving residue.</p>
+                            <h2>Safe for Sensitive Electronics</h2>
+                            <p>Perfect for cleaning delicate electronics such as screens, keyboards, and circuit boards.</p>
+                            <h2>Quick Drying</h2>
+                            <p>Fast drying formula ensures no moisture is left behind.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 449,
+            "name": "Silver Monkey Sprężone powietrze 400ml",
+            "price": 5.99,
+            "old_price": 7.99,
+            "description": """<h2>Silver Monkey Sprężone powietrze 400ml</h2>
+                            <p>This 400ml can of compressed air is ideal for cleaning dust from computers, cameras, and other electronic devices.</p>
+                            <h2>Powerful Airflow</h2>
+                            <p>Generates powerful airflow to remove dust from hard-to-reach areas without damaging components.</p>
+                            <h2>Environmentally Friendly</h2>
+                            <p>Non-toxic and environmentally safe, ideal for sensitive equipment cleaning.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 450,
+            "name": "Silver Monkey LCD Ultra Clean Set 250 ml - zestaw czyszczący",
+            "price": 9.99,
+            "old_price": 12.99,
+            "description": """<h2>Silver Monkey LCD Ultra Clean Set 250 ml</h2>
+                            <p>This cleaning kit includes a 250ml cleaner designed for cleaning LCD and LED screens without streaks.</p>
+                            <h2>Gentle on Screens</h2>
+                            <p>Safe for all types of screens including TV, laptops, and monitors.</p>
+                            <h2>Streak-Free Formula</h2>
+                            <p>Provides a streak-free shine with every use, keeping your screens looking brand new.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 451,
+            "name": "Silver Monkey Cleaning Kit 20in1",
+            "price": 14.99,
+            "old_price": 19.99,
+            "description": """<h2>Silver Monkey Cleaning Kit 20in1</h2>
+                            <p>This 20-in-1 cleaning kit is perfect for electronics and includes brushes, wipes, and cleaning solutions for all your needs.</p>
+                            <h2>Comprehensive Cleaning</h2>
+                            <p>Includes multiple tools for cleaning various types of electronics, from keyboards to cameras.</p>
+                            <h2>Safe and Effective</h2>
+                            <p>Uses safe materials that won't scratch or damage sensitive surfaces.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 452,
+            "name": "Mozos XB1-ECO przenośna dmuchawa do elektroniki kurzu",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Mozos XB1-ECO</h2>
+                            <p>The Mozos XB1-ECO is a portable electronic dust blower designed to easily remove dust from keyboards, computers, and other electronic devices.</p>
+                            <h2>Eco-Friendly</h2>
+                            <p>Uses environmentally friendly methods for dust removal without the use of compressed air.</p>
+                            <h2>Portable and Lightweight</h2>
+                            <p>Compact and easy to use, making it perfect for cleaning on the go.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 453,
+            "name": "Silver Monkey Żel do matryc LCD 250ml (LCD Cleaning Gel)",
+            "price": 8.99,
+            "old_price": 12.99,
+            "description": """<h2>Silver Monkey LCD Cleaning Gel 250ml</h2>
+                            <p>This 250ml LCD cleaning gel is designed for use on LCD and LED screens, leaving them clean and streak-free.</p>
+                            <h2>Gentle Formula</h2>
+                            <p>Safe for all screen types, providing effective cleaning without damaging the surface.</p>
+                            <h2>Quick Drying</h2>
+                            <p>Dries quickly without leaving residue, keeping your screens sparkling clean.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 454,
+            "name": "Silver Monkey LCD Ultra Clean Set 100ml - zestaw czyszczący",
+            "price": 6.99,
+            "old_price": 9.99,
+            "description": """<h2>Silver Monkey LCD Ultra Clean Set 100ml</h2>
+                            <p>The Silver Monkey LCD Ultra Clean Set includes a 100ml cleaning solution for screens, perfect for quick and effective cleaning.</p>
+                            <h2>Streak-Free Finish</h2>
+                            <p>Provides a streak-free shine on your screens, leaving them looking brand new.</p>
+                            <h2>Easy to Use</h2>
+                            <p>Simple to apply and safe for use on all types of screens including TVs, monitors, and smartphones.</p>""",
+            "sale_id": 50
+        },
+        {
+            "id": 455,
+            "name": "Mobile Origin Multifunctional Cleaning Kit 20in1",
+            "price": 19.99,
+            "old_price": 24.99,
+            "description": """<h2>Mobile Origin Multifunctional Cleaning Kit 20in1</h2>
+                            <p>This multifunctional 20-in-1 kit includes various tools to clean your electronics, from screens to keyboards and phones.</p>
+                            <h2>Complete Kit</h2>
+                            <p>Includes brushes, wipes, and cleaning solution to tackle a variety of cleaning tasks.</p>
+                            <h2>Gentle and Effective</h2>
+                            <p>Uses safe materials to ensure effective cleaning without damaging sensitive surfaces.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 456,
+            "name": "Whoosh GO XL - spray do czyszczenia ekranów 100ml + ściereczka",
+            "price": 14.99,
+            "old_price": 18.99,
+            "description": """<h2>Whoosh GO XL</h2>
+                            <p>The Whoosh GO XL screen cleaner kit includes a 100ml spray bottle and a microfiber cloth for cleaning screens and electronics.</p>
+                            <h2>Streak-Free Cleaning</h2>
+                            <p>Ensures a streak-free, spotless finish for your screens and electronic devices.</p>
+                            <h2>Eco-Friendly</h2>
+                            <p>Environmentally friendly formula that is safe for all types of screens.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 457,
+            "name": "Whoosh 3XL Tech Cleaning Cloths - antybakteryjna ściereczka 3szt.",
+            "price": 9.99,
+            "old_price": 12.99,
+            "description": """<h2>Whoosh 3XL Tech Cleaning Cloths</h2>
+                            <p>Pack of three antibacterial cleaning cloths for screens and electronics, perfect for keeping your devices clean and safe.</p>
+                            <h2>Antibacterial Protection</h2>
+                            <p>Provides antibacterial protection while cleaning your screens and electronics.</p>
+                            <h2>Large Cloths</h2>
+                            <p>Large-sized cloths that are effective for cleaning large screens and surfaces.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 458,
+            "name": "Whoosh Eco refill - kartridż uzupełniający do Screeshine 2 x 500ml",
+            "price": 17.99,
+            "old_price": 22.99,
+            "description": """<h2>Whoosh Eco Refill</h2>
+                            <p>This eco-friendly refill set contains two 500ml bottles of cleaning solution for the Whoosh Screen Shine.</p>
+                            <h2>Environmentally Friendly</h2>
+                            <p>Uses eco-friendly ingredients to clean screens and electronic devices without harming the environment.</p>
+                            <h2>Streak-Free Formula</h2>
+                            <p>Ensures a streak-free finish for your screens and electronic devices every time.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 459,
+            "name": "Silver Monkey Pianka do czyszczenia plastiku 400ml",
+            "price": 8.99,
+            "old_price": 11.99,
+            "description": """<h2>Silver Monkey Pianka do czyszczenia plastiku 400ml</h2>
+                            <p>This 400ml foam cleaner is specifically designed for cleaning plastic surfaces, removing dirt and dust easily.</p>
+                            <h2>Safe for Plastics</h2>
+                            <p>Perfect for cleaning plastic parts of electronic devices, including cases, keyboards, and accessories.</p>
+                            <h2>Quick and Easy</h2>
+                            <p>Foam formula ensures quick application and effective cleaning.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 460,
+            "name": "Whoosh Wipes - chusteczki do czyszczenia ekranów (70 sztuk)",
+            "price": 14.99,
+            "old_price": 18.99,
+            "description": """<h2>Whoosh Wipes</h2>
+                            <p>Pack of 70 cleaning wipes designed for cleaning screens and electronic devices.</p>
+                            <h2>Convenient Cleaning</h2>
+                            <p>Portable and easy to use, perfect for on-the-go cleaning of devices like phones, tablets, and laptops.</p>
+                            <h2>Streak-Free Formula</h2>
+                            <p>Leaves your screens spotless without streaks or residue.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 461,
+            "name": "Silver Monkey Zestaw do czyszczenia klawiatury i słuchawek 3w1",
+            "price": 9.99,
+            "old_price": 12.99,
+            "description": """<h2>Silver Monkey 3-in-1 Keyboard and Headset Cleaning Kit</h2>
+                            <p>This 3-in-1 cleaning kit is perfect for maintaining clean keyboards and headsets with specialized tools.</p>
+                            <h2>Includes Brushes and Wipes</h2>
+                            <p>Comes with brushes and wipes to clean the hard-to-reach areas of your keyboard and headset.</p>
+                            <h2>Safe and Gentle</h2>
+                            <p>Uses safe materials to clean delicate electronic parts without causing any damage.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 462,
+            "name": "Baseus Szczoteczka do czyszczenia elektroniki",
+            "price": 4.99,
+            "old_price": 7.99,
+            "description": """<h2>Baseus Electronic Cleaning Brush</h2>
+                            <p>This cleaning brush is perfect for removing dust and dirt from delicate electronics such as phones, laptops, and cameras.</p>
+                            <h2>Soft Bristles</h2>
+                            <p>Soft bristles that are gentle on electronics but effective in removing dust and dirt.</p>
+                            <h2>Compact and Convenient</h2>
+                            <p>Portable and easy to use for quick and efficient cleaning.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 463,
+            "name": "Mozos XBLOWER dmuchawa do elektroniki do kurzu",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Mozos XBLOWER Electronic Dust Blower</h2>
+                            <p>This electronic dust blower is designed to safely remove dust from your electronics using a strong, directed airflow.</p>
+                            <h2>Eco-Friendly</h2>
+                            <p>Reusable, environmentally friendly solution for cleaning your electronics.</p>
+                            <h2>Portable</h2>
+                            <p>Compact and easy to use, perfect for cleaning computers, keyboards, and other delicate equipment.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 464,
+            "name": "Silver Monkey LCD Cleaning Gel Set - Żel do matryc LCD 250ml",
+            "price": 10.99,
+            "old_price": 14.99,
+            "description": """<h2>Silver Monkey LCD Cleaning Gel Set</h2>
+                            <p>Includes a 250ml bottle of cleaning gel designed specifically for cleaning LCD screens and monitors.</p>
+                            <h2>Non-Streak Formula</h2>
+                            <p>Ensures a streak-free shine on your LCD displays and monitors after each use.</p>
+                            <h2>Safe for Screens</h2>
+                            <p>Gentle formula safe for all types of LCD and LED screens.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 465,
+            "name": "Silver Monkey Pianka do czyszczenia szkła 400ml",
+            "price": 8.99,
+            "old_price": 11.99,
+            "description": """<h2>Silver Monkey Glass Cleaning Foam 400ml</h2>
+                            <p>This foam cleaner is specifically designed for cleaning glass surfaces, providing an easy way to remove fingerprints, smudges, and grime.</p>
+                            <h2>Streak-Free Shine</h2>
+                            <p>Leaves glass surfaces clean and streak-free after every use.</p>
+                            <h2>Safe for All Glass Surfaces</h2>
+                            <p>Safe for use on TV screens, glass monitors, and other glass surfaces without damage.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 466,
+            "name": "Silver Monkey USB-A 4x USB 3.0 (Black)",
+            "price": 19.99,
+            "old_price": 29.99,
+            "description": """<h2>Silver Monkey USB-A 4x USB 3.0 (Black)</h2>
+                            <p>Four USB 3.0 ports for fast data transfer, designed in a sleek black color for modern aesthetics.</p>
+                            <h2>Fast Data Transfer</h2>
+                            <p>USB 3.0 ports provide fast data transfer speeds, ensuring efficient connections with all your devices.</p>
+                            <h2>Universal Compatibility</h2>
+                            <p>Compatible with a variety of devices including laptops, PCs, and more.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 467,
+            "name": "Silver Monkey USB-C - 1x USB 3.0 + 3x USB 2.0",
+            "price": 14.99,
+            "old_price": 22.99,
+            "description": """<h2>Silver Monkey USB-C - 1x USB 3.0 + 3x USB 2.0</h2>
+                            <p>This USB-C hub provides one USB 3.0 port and three USB 2.0 ports for versatile device connections.</p>
+                            <h2>Multi-Device Support</h2>
+                            <p>Connect multiple devices simultaneously with fast and reliable data transfer.</p>
+                            <h2>Compact Design</h2>
+                            <p>Portable design makes it perfect for travel and workspace setups.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 468,
+            "name": "Silver Monkey Switch Box HUB 4 x USB 3.1 + USB-C (DC) (for 2 Computers)",
+            "price": 39.99,
+            "old_price": 49.99,
+            "description": """<h2>Silver Monkey Switch Box HUB</h2>
+                            <p>This hub allows connection of two computers with four USB 3.1 ports and one USB-C port, ideal for multi-tasking.</p>
+                            <h2>Dual Computer Support</h2>
+                            <p>Switch between two computers seamlessly with this multi-functional hub.</p>
+                            <h2>High-Speed Connectivity</h2>
+                            <p>USB 3.1 and USB-C ports ensure fast data transfer and efficient performance.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 469,
+            "name": "Silver Monkey USB-A - 1x USB 3.0 + 3x USB 2.0",
+            "price": 12.99,
+            "old_price": 18.99,
+            "description": """<h2>Silver Monkey USB-A - 1x USB 3.0 + 3x USB 2.0</h2>
+                            <p>This compact USB hub provides one USB 3.0 port and three USB 2.0 ports for a variety of uses.</p>
+                            <h2>Multiple Connections</h2>
+                            <p>Expand your device connectivity with additional ports, making it perfect for office setups and home use.</p>
+                            <h2>Efficient Data Transfer</h2>
+                            <p>USB 3.0 port offers fast data transfer speeds, while USB 2.0 ports are ideal for peripheral connections.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 470,
+            "name": "Silver Monkey USB-A 4x USB 3.0 (Silver)",
+            "price": 24.99,
+            "old_price": 34.99,
+            "description": """<h2>Silver Monkey USB-A 4x USB 3.0 (Silver)</h2>
+                            <p>Four USB 3.0 ports in a stylish silver design to complement modern devices and setups.</p>
+                            <h2>High-Speed Data Transfer</h2>
+                            <p>USB 3.0 ports allow for fast data transfer speeds, making this hub ideal for high-performance tasks.</p>
+                            <h2>Universal Compatibility</h2>
+                            <p>Compatible with various devices such as laptops, tablets, and desktops.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 471,
+            "name": "Orico Hub USB-C 4x USB-A 3.1",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Orico Hub USB-C 4x USB-A 3.1</h2>
+                            <p>This USB-C hub provides four USB-A 3.1 ports for high-speed data transfer, designed for efficient connectivity.</p>
+                            <h2>Premium Design</h2>
+                            <p>Made with high-quality materials and a sleek design, this hub complements your devices perfectly.</p>
+                            <h2>Fast Performance</h2>
+                            <p>USB 3.1 ports ensure optimal speed and reliability for your connected devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 472,
+            "name": "ICY BOX Hub USB-A - 4x USB-A Aluminum",
+            "price": 27.99,
+            "old_price": 36.99,
+            "description": """<h2>ICY BOX Hub USB-A - 4x USB-A Aluminum</h2>
+                            <p>This aluminum USB-A hub offers four high-speed USB-A ports, perfect for data transfer and charging.</p>
+                            <h2>Aluminum Build</h2>
+                            <p>The sleek aluminum body offers durability and a modern, stylish look for any workspace.</p>
+                            <h2>Fast Data Transfer</h2>
+                            <p>Supports USB 3.0 speeds for quick data transfer and multi-device connectivity.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 473,
+            "name": "Anker PowerExpand 8-in-1 USB-C PD 10Gbps Data Hub",
+            "price": 49.99,
+            "old_price": 69.99,
+            "description": """<h2>Anker PowerExpand 8-in-1 USB-C PD 10Gbps Data Hub</h2>
+                            <p>PowerExpand 8-in-1 hub with 10Gbps data transfer, perfect for expanding your device’s connectivity options.</p>
+                            <h2>Multiple Ports</h2>
+                            <p>Includes USB-C PD, HDMI, USB-A, and Ethernet ports for a complete hub experience.</p>
+                            <h2>Fast Charging & Data Transfer</h2>
+                            <p>Supports high-speed data transfer and fast charging for your devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 474,
+            "name": "Anker PowerExpand 3-in-1 USB-C PD Hub",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Anker PowerExpand 3-in-1 USB-C PD Hub</h2>
+                            <p>This compact 3-in-1 hub provides USB-A, USB-C PD, and HDMI ports for a versatile connection experience.</p>
+                            <h2>Compact and Efficient</h2>
+                            <p>Portable and lightweight, ideal for on-the-go use with laptops, tablets, and other devices.</p>
+                            <h2>High-Speed Data Transfer</h2>
+                            <p>Enjoy fast data transfer speeds through USB 3.0 and HDMI ports.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 475,
+            "name": "ICY BOX HUB USB-B - 10x USB-A (7x USB 3.2 Gen1)",
+            "price": 79.99,
+            "old_price": 99.99,
+            "description": """<h2>ICY BOX HUB USB-B - 10x USB-A (7x USB 3.2 Gen1)</h2>
+                            <p>10 USB-A ports, including seven USB 3.2 Gen1 ports, ideal for heavy data transfer and multiple devices.</p>
+                            <h2>Multiple Connections</h2>
+                            <p>Simultaneously connect multiple devices, from external drives to peripherals, with fast data speeds.</p>
+                            <h2>Professional-Grade Hub</h2>
+                            <p>Designed for office and professional use, this hub offers reliable performance for demanding tasks.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 476,
+            "name": "Gigabyte 7 in 1 HUB USB HDMI RJ-45 (Type C)",
+            "price": 39.99,
+            "old_price": 59.99,
+            "description": """<h2>Gigabyte 7 in 1 HUB USB HDMI RJ-45</h2>
+                            <p>This hub provides seven ports, including HDMI, USB, and RJ-45 for versatile connectivity options.</p>
+                            <h2>All-in-One Hub</h2>
+                            <p>Connect your devices, monitor, and network with this powerful hub, all through a single Type-C connection.</p>
+                            <h2>4K HDMI Output</h2>
+                            <p>Supports 4K resolution through HDMI for high-quality displays.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 477,
+            "name": "Unitek Hub Bi-Directional USB-C/USB-A - 4x USB-A",
+            "price": 19.99,
+            "old_price": 27.99,
+            "description": """<h2>Unitek Hub Bi-Directional USB-C/USB-A - 4x USB-A</h2>
+                            <p>4 USB-A ports for both USB-C and USB-A devices with bi-directional switching capability for maximum versatility.</p>
+                            <h2>Multi-Device Connectivity</h2>
+                            <p>Allows for seamless switching between two devices connected via USB-A or USB-C ports.</p>
+                            <h2>Fast Data Transfer</h2>
+                            <p>USB 3.0 ports offer fast data speeds for transferring files efficiently.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 478,
+            "name": "ICY BOX Hub 4-port USB-A",
+            "price": 14.99,
+            "old_price": 19.99,
+            "description": """<h2>ICY BOX Hub 4-port USB-A</h2>
+                            <p>This 4-port USB-A hub offers efficient and reliable connectivity for your devices and peripherals.</p>
+                            <h2>Compact Design</h2>
+                            <p>Space-saving design allows for easy portability and usage in any setting.</p>
+                            <h2>Fast Data Transfer</h2>
+                            <p>Supports USB 3.0 speeds for fast and smooth file transfers.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 479,
+            "name": "ICY BOX HUB 17-port with USB 3.2 Gen 1 Type-A Port",
+            "price": 89.99,
+            "old_price": 119.99,
+            "description": """<h2>ICY BOX HUB 17-port with USB 3.2 Gen 1 Type-A Port</h2>
+                            <p>This 17-port USB hub offers an extensive range of connections with USB 3.2 Gen 1 for fast data transfer.</p>
+                            <h2>Large-Scale Connectivity</h2>
+                            <p>Designed for professionals needing to connect multiple devices simultaneously with reliable speed and performance.</p>
+                            <h2>Space Efficient</h2>
+                            <p>Perfect for office or studio environments where multiple peripherals are needed.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 480,
+            "name": "ICY BOX Desktop Hub 4-port USB-A",
+            "price": 12.99,
+            "old_price": 16.99,
+            "description": """<h2>ICY BOX Desktop Hub 4-port USB-A</h2>
+                            <p>This 4-port USB-A hub is perfect for expanding the connectivity of your desktop or laptop.</p>
+                            <h2>Compact and Stylish</h2>
+                            <p>Simple and elegant design fits seamlessly into any workspace.</p>
+                            <h2>High-Speed Data Transfer</h2>
+                            <p>USB 3.0 ports ensure fast and smooth data transfer for your connected devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 481,
+            "name": "ICY BOX Hub 4-port USB-A",
+            "price": 14.99,
+            "old_price": 18.99,
+            "description": """<h2>ICY BOX Hub 4-port USB-A</h2>
+                            <p>Four high-speed USB-A ports for connecting various peripherals and devices.</p>
+                            <h2>Compact Size</h2>
+                            <p>Space-efficient and easy to transport, ideal for both home and office use.</p>
+                            <h2>USB 3.0 Performance</h2>
+                            <p>Enjoy quick file transfers with USB 3.0 speed, compatible with a variety of devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 482,
+            "name": "UGREEN Revodok CM498 3x USB-A 3.0 HDMI VGA RJ45 SD/TF AUX3.5mm PD",
+            "price": 49.99,
+            "old_price": 69.99,
+            "description": """<h2>UGREEN Revodok CM498 Hub</h2>
+                            <p>This 3x USB-A hub comes with HDMI, VGA, RJ45, SD/TF card readers, and AUX input for complete device connectivity.</p>
+                            <h2>Multi-Functional</h2>
+                            <p>Offers diverse ports to connect a wide range of devices, including monitors, laptops, and smartphones.</p>
+                            <h2>Fast Data Transfer</h2>
+                            <p>USB 3.0 ports provide high-speed transfer for large files and efficient connections.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 483,
+            "name": "Green Cell HUB USB-C 7w1 GC Connect PD 85W",
+            "price": 59.99,
+            "old_price": 79.99,
+            "description": """<h2>Green Cell HUB USB-C 7w1 GC Connect PD 85W</h2>
+                            <p>This 7-in-1 USB-C hub offers PD charging, HDMI, USB 3.0, and more, perfect for expanding connectivity.</p>
+                            <h2>Full Connectivity</h2>
+                            <p>Offers ports for charging, data transfer, and video output, making it ideal for workstations and travel.</p>
+                            <h2>High-Power PD Charging</h2>
+                            <p>Supports 85W power delivery for fast and efficient charging of your devices.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 484,
+            "name": "Verbatim USB-C - 3xUSB 3.2, USB-C PD, 2xHDMI, VGA, RJ45, Audio, SD",
+            "price": 69.99,
+            "old_price": 89.99,
+            "description": """<h2>Verbatim USB-C Hub</h2>
+                            <p>This versatile USB-C hub features 3x USB 3.2 ports, 2x HDMI, VGA, RJ45, Audio, and SD card slots.</p>
+                            <h2>Ultra Connectivity</h2>
+                            <p>Connect multiple peripherals, displays, and network connections with this all-in-one hub.</p>
+                            <h2>4K HDMI Support</h2>
+                            <p>Supports 4K output through HDMI, perfect for video presentations and high-definition displays.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 485,
+            "name": "UGREEN USB - 4 x USB 3.0",
+            "price": 14.99,
+            "old_price": 22.99,
+            "description": """<h2>UGREEN USB - 4 x USB 3.0</h2>
+                            <p>This 4-port USB 3.0 hub provides fast and reliable connectivity for various devices and peripherals.</p>
+                            <h2>Efficient Data Transfer</h2>
+                            <p>Enjoy fast data transfers and seamless connections with USB 3.0 technology.</p>
+                            <h2>Portable Design</h2>
+                            <p>Compact and lightweight, ideal for use at home, work, or on the go.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 486,
+            "name": "DJI OM 7P (Osmo Mobile 7P)",
+            "price": 179.99,
+            "old_price": 219.99,
+            "description": """<h2>DJI OM 7P (Osmo Mobile 7P)</h2>
+                            <p>The DJI OM 7P is a compact and lightweight stabilizer for smartphones, designed for capturing smooth and cinematic video footage.</p>
+                            <h2>3-Axis Stabilization</h2>
+                            <p>Provides stable and smooth footage, reducing camera shake and vibrations during filming.</p>
+                            <h2>Portable & Foldable</h2>
+                            <p>Compact and foldable design, easy to carry for on-the-go shooting.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 487,
+            "name": "DJI OM 7 (Osmo Mobile 7)",
+            "price": 169.99,
+            "old_price": 209.99,
+            "description": """<h2>DJI OM 7 (Osmo Mobile 7)</h2>
+                            <p>The DJI OM 7 is a 3-axis smartphone stabilizer, designed for easy video shooting with your mobile device.</p>
+                            <h2>Advanced Stabilization</h2>
+                            <p>Achieves smooth, professional-grade footage with its advanced stabilization technology.</p>
+                            <h2>Creative Control</h2>
+                            <p>Offers a range of intelligent shooting modes, such as ActiveTrack, Timelapse, and more.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 488,
+            "name": "Fujifilm Wkład Instax Mini Heart Sketch 10 szt.",
+            "price": 12.99,
+            "old_price": 16.99,
+            "description": """<h2>Fujifilm Instax Mini Heart Sketch Film</h2>
+                            <p>10 sheets of Instax Mini film with a heart sketch design, perfect for creating instant memories with a touch of creativity.</p>
+                            <h2>Instant Photos</h2>
+                            <p>Capture moments and print them instantly with your Instax Mini camera.</p>
+                            <h2>Creative Design</h2>
+                            <p>Each photo features a unique heart sketch, adding a special touch to your pictures.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 489,
+            "name": "DJI RS 3 Mini",
+            "price": 439.99,
+            "old_price": 499.99,
+            "description": """<h2>DJI RS 3 Mini</h2>
+                            <p>The DJI RS 3 Mini is a lightweight, compact gimbal that provides 3-axis stabilization for a variety of camera setups.</p>
+                            <h2>Professional Stabilization</h2>
+                            <p>Ensure smooth, cinematic shots with professional-grade stabilization technology.</p>
+                            <h2>Lightweight & Portable</h2>
+                            <p>Weighs only 795g, making it perfect for both professionals and hobbyists on the go.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 490,
+            "name": "Marumi Prime Plasma Sputtering CPL 82mm",
+            "price": 99.99,
+            "old_price": 119.99,
+            "description": """<h2>Marumi Prime Plasma Sputtering CPL 82mm</h2>
+                            <p>A high-quality circular polarizer filter that reduces reflections and enhances color saturation.</p>
+                            <h2>Advanced Optical Coating</h2>
+                            <p>Plasma Sputtering coating ensures better light transmission and minimal distortion.</p>
+                            <h2>Precise Control</h2>
+                            <p>Adjust the filter to eliminate unwanted reflections and enhance contrast in your images.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 491,
+            "name": "Marumi Prime Plasma Sputtering CPL 67mm",
+            "price": 89.99,
+            "old_price": 109.99,
+            "description": """<h2>Marumi Prime Plasma Sputtering CPL 67mm</h2>
+                            <p>Premium CPL filter designed to reduce reflections, improve colors, and enhance image quality.</p>
+                            <h2>Premium Coating</h2>
+                            <p>Plasma Sputtering coating helps in achieving sharper, clearer images with more vibrant colors.</p>
+                            <h2>High-Performance</h2>
+                            <p>Optimized for professional photographers seeking the best results in various lighting conditions.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 492,
+            "name": "Marumi Prime Plasma Sputtering CPL 77mm",
+            "price": 94.99,
+            "old_price": 114.99,
+            "description": """<h2>Marumi Prime Plasma Sputtering CPL 77mm</h2>
+                            <p>Professional-grade CPL filter that improves color saturation and reduces glare and reflections.</p>
+                            <h2>Advanced Plasma Sputtering Technology</h2>
+                            <p>Helps in providing high-quality image results with improved optical performance.</p>
+                            <h2>Durable and Reliable</h2>
+                            <p>Made with high-quality materials, ensuring durability and long-lasting use in demanding conditions.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 493,
+            "name": "Marumi Prime Plasma Sputtering CPL 58mm",
+            "price": 69.99,
+            "old_price": 89.99,
+            "description": """<h2>Marumi Prime Plasma Sputtering CPL 58mm</h2>
+                            <p>High-quality CPL filter designed to reduce reflections and improve image sharpness and color saturation.</p>
+                            <h2>Plasma Sputtering Coating</h2>
+                            <p>Advanced coating enhances light transmission, reducing optical distortions for clearer photos.</p>
+                            <h2>Compact and Effective</h2>
+                            <p>Perfect for photographers seeking maximum performance in a compact, portable form.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 494,
+            "name": "Newell DL-USB-C do akumulatorów EN-EL25 do Nikon",
+            "price": 29.99,
+            "old_price": 39.99,
+            "description": """<h2>Newell DL-USB-C Battery Charger for Nikon EN-EL25</h2>
+                            <p>Compact USB-C battery charger designed for Nikon EN-EL25 batteries.</p>
+                            <h2>Fast Charging</h2>
+                            <p>Supports fast and reliable charging, so you're ready to shoot when you need to be.</p>
+                            <h2>USB-C Connectivity</h2>
+                            <p>Compatible with modern USB-C charging cables for a more efficient charging experience.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 495,
+            "name": "Marumi Prime Plasma Sputtering CPL 72mm",
+            "price": 89.99,
+            "old_price": 109.99,
+            "description": """<h2>Marumi Prime Plasma Sputtering CPL 72mm</h2>
+                            <p>Professional CPL filter designed to enhance contrast and saturation, while reducing reflections and glare.</p>
+                            <h2>Advanced Optical Performance</h2>
+                            <p>Features Plasma Sputtering coating for better clarity and less distortion.</p>
+                            <h2>Optimal for Photography</h2>
+                            <p>Ideal for outdoor and nature photography, ensuring vibrant, clear images.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 496,
+            "name": "Marumi Prime Plasma Sputtering CPL 62mm",
+            "price": 79.99,
+            "old_price": 99.99,
+            "description": """<h2>Marumi Prime Plasma Sputtering CPL 62mm</h2>
+                            <p>Premium CPL filter to reduce reflections and enhance image quality by improving color saturation.</p>
+                            <h2>High-Quality Coating</h2>
+                            <p>Plasma Sputtering coating provides superior optical performance and reduces distortion.</p>
+                            <h2>Professional-Grade Results</h2>
+                            <p>Perfect for professional photographers looking for clear, vivid images in bright conditions.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 497,
+            "name": "Zhiyun Smooth 5S AI",
+            "price": 289.99,
+            "old_price": 359.99,
+            "description": """<h2>Zhiyun Smooth 5S AI</h2>
+                            <p>AI-powered smartphone stabilizer that offers smooth and cinematic footage with intelligent tracking and shooting modes.</p>
+                            <h2>3-Axis Stabilization</h2>
+                            <p>Ensure shake-free and professional-quality video with advanced stabilization technology.</p>
+                            <h2>AI Tracking</h2>
+                            <p>Track subjects with the intelligent AI system, ideal for vlogs and dynamic videos.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 498,
+            "name": "Marumi FS Plus 72 mm",
+            "price": 59.99,
+            "old_price": 79.99,
+            "description": """<h2>Marumi FS Plus 72 mm</h2>
+                            <p>High-quality UV filter designed to reduce ultraviolet light and prevent haze in outdoor photos.</p>
+                            <h2>High-Performance Filter</h2>
+                            <p>Great for protecting your lens and improving overall image quality, especially in bright conditions.</p>
+                            <h2>Durable Construction</h2>
+                            <p>Made with durable materials, ensuring it lasts through heavy use in various environments.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 499,
+            "name": "Marumi FS Plus 52 mm",
+            "price": 49.99,
+            "old_price": 69.99,
+            "description": """<h2>Marumi FS Plus 52 mm</h2>
+                            <p>Premium UV filter to enhance image quality by blocking ultraviolet light and preventing haze in your photos.</p>
+                            <h2>Optimal Lens Protection</h2>
+                            <p>Protect your lens from dust, scratches, and damage with this high-quality filter.</p>
+                            <h2>Compact Design</h2>
+                            <p>Lightweight and compact, making it ideal for on-the-go photographers.</p>""",
+            "sale_id": None
+        },
+        {
+            "id": 500,
+            "name": "Marumi FS Plus 46 mm",
+            "price": 44.99,
+            "old_price": 59.99,
+            "description": """<h2>Marumi FS Plus 46 mm</h2>
+                            <p>A top-tier UV filter that reduces ultraviolet light and improves overall image clarity and contrast.</p>
+                            <h2>Lens Protection</h2>
+                            <p>Protects your lens from dust, moisture, and scratches while enhancing photo quality.</p>
+                            <h2>Compact and Lightweight</h2>
+                            <p>Compact design makes it easy to carry and use in various shooting scenarios.</p>""",
+            "sale_id": None
+        }
     ]
 
     for product_data in products:
@@ -7841,6 +9935,434 @@ def seed_product_photos():
 
         {"id": 1209, "product_id": 335, "path": "pendrive10v1.webp"},
         {"id": 1210, "product_id": 335, "path": "pendrive10v2.webp"},
+
+        {"id": 1211, "product_id": 336, "path": "aparat1v1.jpg"},
+        {"id": 1212, "product_id": 336, "path": "aparat1v2.jpg"},
+        {"id": 1213, "product_id": 336, "path": "aparat1v3.jpg"},
+        {"id": 1214, "product_id": 336, "path": "aparat1v4.jpg"},
+        {"id": 1215, "product_id": 336, "path": "aparat1v5.jpg"},
+
+        {"id": 1216, "product_id": 337, "path": "aparat2v1.webp"},
+        {"id": 1217, "product_id": 337, "path": "aparat2v2.webp"},
+        {"id": 1218, "product_id": 337, "path": "aparat2v3.jpg"},
+        {"id": 1219, "product_id": 337, "path": "aparat2v4.webp"},
+        {"id": 1220, "product_id": 337, "path": "aparat2v5.webp"},
+
+        {"id": 1221, "product_id": 338, "path": "aparat3v1.webp"},
+        {"id": 1222, "product_id": 338, "path": "aparat3v2.webp"},
+        {"id": 1223, "product_id": 338, "path": "aparat3v3.webp"},
+        {"id": 1224, "product_id": 338, "path": "aparat3v4.webp"},
+
+        {"id": 1225, "product_id": 339, "path": "aparat4v1.webp"},
+        {"id": 1226, "product_id": 339, "path": "aparat4v2.webp"},
+        {"id": 1227, "product_id": 339, "path": "aparat4v3.webp"},
+        {"id": 1228, "product_id": 339, "path": "aparat4v4.webp"},
+        {"id": 1229, "product_id": 339, "path": "aparat4v5.webp"},
+
+        {"id": 1230, "product_id": 340, "path": "aparat5v1.webp"},
+        {"id": 1231, "product_id": 340, "path": "aparat5v2.webp"},
+        {"id": 1232, "product_id": 340, "path": "aparat5v3.webp"},
+        {"id": 1233, "product_id": 340, "path": "aparat5v4.webp"},
+        {"id": 1234, "product_id": 340, "path": "aparat5v5.webp"},
+
+        {"id": 1235, "product_id": 341, "path": "aparat6v1.webp"},
+        {"id": 1236, "product_id": 341, "path": "aparat6v2.webp"},
+        {"id": 1237, "product_id": 341, "path": "aparat6v3.webp"},
+        {"id": 1238, "product_id": 341, "path": "aparat6v4.webp"},
+
+        {"id": 1239, "product_id": 342, "path": "aparat7v1.webp"},
+        {"id": 1240, "product_id": 342, "path": "aparat7v2.webp"},
+        {"id": 1241, "product_id": 342, "path": "aparat7v3.webp"},
+        {"id": 1242, "product_id": 342, "path": "aparat7v4.webp"},
+        {"id": 1243, "product_id": 342, "path": "aparat7v5.webp"},
+
+        {"id": 1244, "product_id": 343, "path": "aparat8v1.webp"},
+        {"id": 1245, "product_id": 343, "path": "aparat8v2.jpg"},
+        {"id": 1246, "product_id": 343, "path": "aparat8v3.jpg"},
+        {"id": 1247, "product_id": 343, "path": "aparat8v4.webp"},
+        {"id": 1248, "product_id": 343, "path": "aparat8v5.jpg"},
+
+        {"id": 1249, "product_id": 344, "path": "aparat9v1.webp"},
+        {"id": 1250, "product_id": 344, "path": "aparat9v2.webp"},
+        {"id": 1251, "product_id": 344, "path": "aparat9v3.webp"},
+        {"id": 1252, "product_id": 344, "path": "aparat9v4.webp"},
+        {"id": 1253, "product_id": 344, "path": "aparat9v5.webp"},
+
+        {"id": 1254, "product_id": 345, "path": "aparat10v1.webp"},
+        {"id": 1255, "product_id": 345, "path": "aparat10v2.webp"},
+        {"id": 1256, "product_id": 345, "path": "aparat10v3.webp"},
+        {"id": 1257, "product_id": 345, "path": "aparat10v4.webp"},
+        {"id": 1258, "product_id": 345, "path": "aparat10v5.webp"},
+
+        {"id": 1259, "product_id": 346, "path": "odkurzacz1v1.webp"},
+        {"id": 1260, "product_id": 346, "path": "odkurzacz1v2.webp"},
+        {"id": 1261, "product_id": 346, "path": "odkurzacz1v3.webp"},
+        {"id": 1262, "product_id": 346, "path": "odkurzacz1v4.webp"},
+        {"id": 1263, "product_id": 346, "path": "odkurzacz1v5.webp"},
+        
+        {"id": 1264, "product_id": 347, "path": "odkurzacz2v1.webp"},
+        {"id": 1265, "product_id": 347, "path": "odkurzacz2v2.webp"},
+        {"id": 1266, "product_id": 347, "path": "odkurzacz2v3.webp"},
+        {"id": 1267, "product_id": 347, "path": "odkurzacz2v4.webp"},
+        {"id": 1268, "product_id": 347, "path": "odkurzacz2v5.webp"},
+        
+        {"id": 1269, "product_id": 348, "path": "odkurzacz3v1.webp"},
+        {"id": 1270, "product_id": 348, "path": "odkurzacz3v2.webp"},
+        {"id": 1271, "product_id": 348, "path": "odkurzacz3v3.webp"},
+        {"id": 1272, "product_id": 348, "path": "odkurzacz3v4.webp"},
+        {"id": 1273, "product_id": 348, "path": "odkurzacz3v5.webp"},
+        
+        {"id": 1274, "product_id": 349, "path": "odkurzacz4v1.webp"},
+        {"id": 1275, "product_id": 349, "path": "odkurzacz4v2.webp"},
+        {"id": 1276, "product_id": 349, "path": "odkurzacz4v3.webp"},
+        {"id": 1277, "product_id": 349, "path": "odkurzacz4v4.webp"},
+        {"id": 1278, "product_id": 349, "path": "odkurzacz4v5.webp"},
+        
+        {"id": 1279, "product_id": 350, "path": "odkurzacz5v1.webp"},
+        {"id": 1280, "product_id": 350, "path": "odkurzacz5v2.webp"},
+        {"id": 1281, "product_id": 350, "path": "odkurzacz5v3.webp"},
+        {"id": 1282, "product_id": 350, "path": "odkurzacz5v4.webp"},
+        {"id": 1283, "product_id": 350, "path": "odkurzacz5v5.webp"},
+        
+        {"id": 1284, "product_id": 351, "path": "odkurzacz6v1.webp"},
+        {"id": 1285, "product_id": 351, "path": "odkurzacz6v2.webp"},
+        {"id": 1286, "product_id": 351, "path": "odkurzacz6v3.webp"},
+        {"id": 1287, "product_id": 351, "path": "odkurzacz6v4.webp"},
+        {"id": 1288, "product_id": 351, "path": "odkurzacz6v5.webp"},
+        
+        {"id": 1289, "product_id": 352, "path": "odkurzacz7v1.webp"},
+        {"id": 1290, "product_id": 352, "path": "odkurzacz7v2.webp"},
+        {"id": 1291, "product_id": 352, "path": "odkurzacz7v3.webp"},
+        {"id": 1292, "product_id": 352, "path": "odkurzacz7v4.webp"},
+        {"id": 1293, "product_id": 352, "path": "odkurzacz7v5.webp"},
+        
+        {"id": 1294, "product_id": 353, "path": "odkurzacz8v1.webp"},
+        {"id": 1295, "product_id": 353, "path": "odkurzacz8v2.webp"},
+        {"id": 1296, "product_id": 353, "path": "odkurzacz8v3.webp"},
+        {"id": 1297, "product_id": 353, "path": "odkurzacz8v4.webp"},
+        {"id": 1298, "product_id": 353, "path": "odkurzacz8v5.webp"},
+        
+        {"id": 1299, "product_id": 354, "path": "odkurzacz9v1.webp"},
+        {"id": 1300, "product_id": 354, "path": "odkurzacz9v2.webp"},
+        
+        {"id": 1301, "product_id": 355, "path": "odkurzacz10v1.webp"},
+        {"id": 1302, "product_id": 355, "path": "odkurzacz10v2.webp"},
+        {"id": 1303, "product_id": 355, "path": "odkurzacz10v3.webp"},
+        {"id": 1304, "product_id": 355, "path": "odkurzacz10v4.webp"},
+        {"id": 1305, "product_id": 355, "path": "odkurzacz10v5.webp"},
+
+        {"id": 1306, "product_id": 356, "path": "dron1v1.webp"},
+        
+        {"id": 1307, "product_id": 357, "path": "dron2v1.webp"},
+        {"id": 1308, "product_id": 357, "path": "dron2v2.webp"},
+        {"id": 1309, "product_id": 357, "path": "dron2v3.webp"},
+        {"id": 1310, "product_id": 357, "path": "dron2v4.webp"},
+        {"id": 1311, "product_id": 357, "path": "dron2v5.webp"},
+        
+        {"id": 1312, "product_id": 358, "path": "dron3v1.webp"},
+        {"id": 1313, "product_id": 358, "path": "dron3v2.webp"},
+        {"id": 1314, "product_id": 358, "path": "dron3v3.webp"},
+        {"id": 1315, "product_id": 358, "path": "dron3v4.webp"},
+        {"id": 1316, "product_id": 358, "path": "dron3v5.webp"},
+        
+        {"id": 1317, "product_id": 359, "path": "dron4v1.webp"},
+        {"id": 1318, "product_id": 359, "path": "dron4v2.webp"},
+        {"id": 1319, "product_id": 359, "path": "dron4v3.webp"},
+        {"id": 1320, "product_id": 359, "path": "dron4v4.webp"},
+        {"id": 1321, "product_id": 359, "path": "dron4v5.jpg"},
+        
+        {"id": 1322, "product_id": 360, "path": "dron5v1.webp"},
+        
+        {"id": 1323, "product_id": 361, "path": "dron6v1.webp"},
+        {"id": 1324, "product_id": 361, "path": "dron6v2.webp"},
+        {"id": 1325, "product_id": 361, "path": "dron6v3.webp"},
+        {"id": 1326, "product_id": 361, "path": "dron6v4.jpg"},
+        {"id": 1327, "product_id": 361, "path": "dron6v5.webp"},
+        
+        {"id": 1328, "product_id": 362, "path": "dron7v1.webp"},
+        {"id": 1329, "product_id": 362, "path": "dron7v2.webp"},
+        {"id": 1330, "product_id": 362, "path": "dron7v3.webp"},
+        {"id": 1331, "product_id": 362, "path": "dron7v4.webp"},
+        {"id": 1332, "product_id": 362, "path": "dron7v5.webp"},
+        
+        {"id": 1333, "product_id": 363, "path": "dron8v1.webp"},
+        
+        {"id": 1334, "product_id": 364, "path": "dron9v1.webp"},
+        
+        {"id": 1335, "product_id": 365, "path": "dron10v1.webp"},
+        {"id": 1336, "product_id": 365, "path": "dron10v2.webp"},
+        {"id": 1337, "product_id": 365, "path": "dron10v3.webp"},
+        {"id": 1338, "product_id": 365, "path": "dron10v4.webp"},
+        {"id": 1339, "product_id": 365, "path": "dron10v5.webp"},
+
+        {"id": 1340, "product_id": 366, "path": "listwa1v1.webp"},
+        {"id": 1341, "product_id": 367, "path": "listwa2v1.webp"},
+
+        {"id": 1342, "product_id": 368, "path": "listwa3v1.webp"},
+
+        {"id": 1343, "product_id": 369, "path": "listwa4v1.webp"},
+
+        {"id": 1344, "product_id": 370, "path": "listwa5v1.webp"},
+
+        {"id": 1345, "product_id": 371, "path": "listwa6v1.webp"},
+
+        {"id": 1346, "product_id": 372, "path": "listwa7v1.webp"},
+
+        {"id": 1347, "product_id": 373, "path": "listwa8v1.webp"},
+
+        {"id": 1348, "product_id": 374, "path": "listwa9v1.webp"},
+
+        {"id": 1349, "product_id": 375, "path": "listwa10v1.webp"},
+
+        {"id": 1350, "product_id": 376, "path": "listwa11v1.webp"},
+
+        {"id": 1351, "product_id": 377, "path": "listwa12v1.webp"},
+
+        {"id": 1352, "product_id": 378, "path": "listwa13v1.webp"},
+
+        {"id": 1353, "product_id": 379, "path": "listwa14v1.webp"},
+
+        {"id": 1354, "product_id": 380, "path": "listwa15v1.webp"},
+
+        {"id": 1355, "product_id": 381, "path": "listwa16v1.webp"},
+
+        {"id": 1356, "product_id": 382, "path": "listwa17v1.webp"},
+
+        {"id": 1357, "product_id": 383, "path": "listwa18v1.webp"},
+
+        {"id": 1358, "product_id": 384, "path": "listwa19v1.webp"},
+
+        {"id": 1359, "product_id": 385, "path": "listwa20v1.webp"},
+
+        {"id": 1360, "product_id": 386, "path": "gadzet1v1.webp"},
+
+        {"id": 1361, "product_id": 387, "path": "gadzet2v1.webp"},
+
+        {"id": 1362, "product_id": 388, "path": "gadzet3v1.webp"},
+
+        {"id": 1363, "product_id": 389, "path": "gadzet4v1.jpg"},
+
+        {"id": 1364, "product_id": 390, "path": "gadzet5v1.webp"},
+
+        {"id": 1365, "product_id": 391, "path": "gadzet6v1.webp"},
+
+        {"id": 1366, "product_id": 392, "path": "gadzet7v1.webp"},
+
+        {"id": 1367, "product_id": 393, "path": "gadzet8v1.webp"},
+        
+        {"id": 1368, "product_id": 394, "path": "gadzet9v1.webp"},
+
+        {"id": 1369, "product_id": 395, "path": "gadzet10v1.webp"},
+
+        {"id": 1370, "product_id": 396, "path": "gadzet11v1.webp"},
+
+        {"id": 1371, "product_id": 397, "path": "gadzet12v1.webp"},
+
+        {"id": 1372, "product_id": 398, "path": "gadzet13v1.webp"},
+
+        {"id": 1373, "product_id": 399, "path": "gadzet14v1.webp"},
+
+        {"id": 1374, "product_id": 400, "path": "gadzet15v1.webp"},
+
+        {"id": 1375, "product_id": 401, "path": "gadzet16v1.webp"},
+
+        {"id": 1376, "product_id": 402, "path": "gadzet17v1.webp"},
+
+        {"id": 1377, "product_id": 403, "path": "gadzet18v1.webp"},
+
+        {"id": 1378, "product_id": 404, "path": "gadzet19v1.webp"},
+
+        {"id": 1379, "product_id": 405, "path": "gadzet20v1.jpg"},
+
+        {"id": 1380, "product_id": 406, "path": "office_item1v1.webp"},
+
+        {"id": 1381, "product_id": 407, "path": "office_item2v1.webp"},
+
+        {"id": 1382, "product_id": 408, "path": "office_item3v1.webp"},
+
+        {"id": 1383, "product_id": 409, "path": "office_item4v1.webp"},
+
+        {"id": 1384, "product_id": 410, "path": "office_item5v1.webp"},
+
+        {"id": 1385, "product_id": 411, "path": "office_item6v1.webp"},
+
+        {"id": 1386, "product_id": 412, "path": "office_item7v1.webp"},
+
+        {"id": 1387, "product_id": 413, "path": "office_item8v1.webp"},
+
+        {"id": 1388, "product_id": 414, "path": "office_item9v1.webp"},
+
+        {"id": 1389, "product_id": 415, "path": "office_item10v1.webp"},
+
+        {"id": 1390, "product_id": 416, "path": "office_item11v1.webp"},
+
+        {"id": 1391, "product_id": 417, "path": "office_item12v1.webp"},
+
+        {"id": 1392, "product_id": 418, "path": "office_item13v1.webp"},
+
+        {"id": 1393, "product_id": 419, "path": "office_item14v1.webp"},
+
+        {"id": 1394, "product_id": 420, "path": "office_item15v1.webp"},
+
+        {"id": 1395, "product_id": 421, "path": "office_item16v1.webp"},
+
+        {"id": 1396, "product_id": 422, "path": "office_item17v1.webp"},
+
+        {"id": 1397, "product_id": 423, "path": "office_item18v1.webp"},
+
+        {"id": 1398, "product_id": 424, "path": "office_item19v1.webp"},
+
+        {"id": 1399, "product_id": 425, "path": "office_item20v1.webp"},
+
+        {"id": 1400, "product_id": 426, "path": "monitoring1v1.webp"},
+
+        {"id": 1401, "product_id": 427, "path": "monitoring2v1.webp"},
+
+        {"id": 1402, "product_id": 428, "path": "monitoring3v1.webp"},
+
+        {"id": 1403, "product_id": 429, "path": "monitoring4v1.webp"},
+
+        {"id": 1404, "product_id": 430, "path": "monitoring5v1.webp"},
+
+        {"id": 1405, "product_id": 431, "path": "monitoring6v1.webp"},
+
+        {"id": 1406, "product_id": 432, "path": "monitoring7v1.webp"},
+
+        {"id": 1407, "product_id": 433, "path": "monitoring8v1.webp"},
+
+        {"id": 1408, "product_id": 434, "path": "monitoring9v1.webp"},
+
+        {"id": 1409, "product_id": 435, "path": "monitoring10v1.webp"},
+
+        {"id": 1410, "product_id": 436, "path": "monitoring11v1.webp"},
+
+        {"id": 1411, "product_id": 437, "path": "monitoring12v1.webp"},
+
+        {"id": 1412, "product_id": 438, "path": "monitoring13v1.webp"},
+
+        {"id": 1413, "product_id": 439, "path": "monitoring14v1.webp"},
+
+        {"id": 1414, "product_id": 440, "path": "monitoring15v1.webp"},
+
+        {"id": 1415, "product_id": 441, "path": "monitoring16v1.webp"},
+
+        {"id": 1416, "product_id": 442, "path": "monitoring17v1.webp"},
+
+        {"id": 1417, "product_id": 443, "path": "monitoring18v1.webp"},
+
+        {"id": 1418, "product_id": 444, "path": "monitoring19v1.webp"},
+
+        {"id": 1419, "product_id": 445, "path": "monitoring20v1.webp"},
+
+        {"id": 1420, "product_id": 446, "path": "cleaning1v1.webp"},
+
+        {"id": 1421, "product_id": 447, "path": "cleaning2v1.webp"},
+
+        {"id": 1422, "product_id": 448, "path": "cleaning3v1.webp"},
+
+        {"id": 1423, "product_id": 449, "path": "cleaning4v1.webp"},
+
+        {"id": 1424, "product_id": 450, "path": "cleaning5v1.webp"},
+
+        {"id": 1425, "product_id": 451, "path": "cleaning6v1.webp"},
+
+        {"id": 1426, "product_id": 452, "path": "cleaning7v1.webp"},
+
+        {"id": 1427, "product_id": 453, "path": "cleaning8v1.webp"},
+
+        {"id": 1428, "product_id": 454, "path": "cleaning9v1.webp"},
+
+        {"id": 1429, "product_id": 455, "path": "cleaning10v1.webp"},
+
+        {"id": 1430, "product_id": 456, "path": "cleaning11v1.webp"},
+
+        {"id": 1431, "product_id": 457, "path": "cleaning12v1.webp"},
+
+        {"id": 1432, "product_id": 458, "path": "cleaning13v1.webp"},
+
+        {"id": 1433, "product_id": 459, "path": "cleaning14v1.webp"},
+
+        {"id": 1434, "product_id": 460, "path": "cleaning15v1.webp"},
+
+        {"id": 1435, "product_id": 461, "path": "cleaning16v1.webp"},
+
+        {"id": 1436, "product_id": 462, "path": "cleaning17v1.webp"},
+
+        {"id": 1437, "product_id": 463, "path": "cleaning18v1.webp"},
+
+        {"id": 1438, "product_id": 464, "path": "cleaning19v1.webp"},
+
+        {"id": 1439, "product_id": 465, "path": "cleaning20v1.webp"},
+
+        {"id": 1440, "product_id": 466, "path": "hubs1v1.webp"},
+
+        {"id": 1441, "product_id": 467, "path": "hubs2v1.webp"},
+
+        {"id": 1442, "product_id": 468, "path": "hubs3v1.webp"},
+
+        {"id": 1443, "product_id": 469, "path": "hubs4v1.webp"},
+
+        {"id": 1444, "product_id": 470, "path": "hubs5v1.webp"},
+
+        {"id": 1445, "product_id": 471, "path": "hubs6v1.webp"},
+
+        {"id": 1446, "product_id": 472, "path": "hubs7v1.webp"},
+
+        {"id": 1447, "product_id": 473, "path": "hubs8v1.webp"},
+
+        {"id": 1448, "product_id": 474, "path": "hubs9v1.webp"},
+
+        {"id": 1449, "product_id": 475, "path": "hubs10v1.webp"},
+
+        {"id": 1450, "product_id": 476, "path": "hubs11v1.webp"},
+
+        {"id": 1451, "product_id": 477, "path": "hubs12v1.webp"},
+
+        {"id": 1452, "product_id": 478, "path": "hubs13v1.webp"},
+
+        {"id": 1453, "product_id": 479, "path": "hubs14v1.webp"},
+
+        {"id": 1454, "product_id": 480, "path": "hubs15v1.webp"},
+
+        {"id": 1455, "product_id": 481, "path": "hubs16v1.webp"},
+
+        {"id": 1456, "product_id": 482, "path": "hubs17v1.webp"},
+
+        {"id": 1457, "product_id": 483, "path": "hubs18v1.webp"},
+
+        {"id": 1458, "product_id": 484, "path": "hubs19v1.webp"},
+
+        {"id": 1459, "product_id": 485, "path": "hubs20v1.webp"},
+
+        {"id": 1460, "product_id": 486, "path": "accesory1v1.webp"},
+
+        {"id": 1461, "product_id": 487, "path": "accesory2v1.webp"},
+
+        {"id": 1462, "product_id": 488, "path": "accesory3v1.webp"},
+
+        {"id": 1463, "product_id": 489, "path": "accesory4v1.webp"},
+
+        {"id": 1464, "product_id": 490, "path": "accesory5v1.webp"},
+
+        {"id": 1465, "product_id": 491, "path": "accesory6v1.webp"},
+
+        {"id": 1466, "product_id": 492, "path": "accesory7v1.webp"},
+
+        {"id": 1467, "product_id": 493, "path": "accesory8v1.webp"},
+
+        {"id": 1468, "product_id": 494, "path": "accesory9v1.webp"},
+
+        {"id": 1469, "product_id": 495, "path": "accesory10v1.webp"},
+
+        {"id": 1470, "product_id": 496, "path": "accesory11v1.webp"},
+
+        {"id": 1471, "product_id": 497, "path": "accesory12v1.webp"},
+
+        {"id": 1472, "product_id": 498, "path": "accesory13v1.webp"},
+
+        {"id": 1473, "product_id": 499, "path": "accesory14v1.webp"},
+
+        {"id": 1474, "product_id": 500, "path": "accesory15v1.webp"}
     ]
 
     photo_instances = []
@@ -7914,7 +10436,15 @@ def seed_product_tags():
             "usbFlashDrives": ["Portable", "High Speed"],
             "powerbanks": ["Portable", "Fast Charging"],
             "soundCards": ["Hi-Fi", "Gaming", "Studio"],
-            "consoles": ["Gaming", "4K", "Next-Gen"]
+            "consoles": ["Gaming", "4K", "Next-Gen"],
+            "stabilizers": ["Camera Stabilizer", "4K Recording"],
+            "vacuumCleaners": ["Portable Vacuum"],
+            "drones": ["Drone"],
+            "monitoring": ["Wireless Camera", "Smart Security"],
+            "officeAccessories": ["Home Office"],
+            "cleaningSupplies": ["Compact Design"],
+            "laptopHubs": ["USB-C Hub"],
+            "cameraAccessories": ["Photography Gear"],
         }
 
         product_categories = product.categories.all()
@@ -7940,6 +10470,14 @@ def seed_product_tags():
             "router": ["WiFi 6", "Mesh Networking"],
             "keyboard": ["Mechanical Keyboard", "RGB"],
             "monitor": ["4K", "HDR"],
+            "camera stabilizer": ["Camera Stabilizer", "4K Recording"],
+            "vacuum cleaner": ["Portable Vacuum"],
+            "drone": ["Drone"],
+            "monitoring camera": ["Wireless Camera", "Smart Security"],
+            "office accessory": ["Home Office"],
+            "cleaning supplies": ["Compact Design"],
+            "laptop hub": ["USB-C Hub"],
+            "camera accessory": ["Photography Gear"],
         }
 
         for keyword, tag_list in name_mappings.items():
@@ -7955,6 +10493,14 @@ def seed_product_tags():
             "noise cancelling": ["Noise Cancelling"],
             "fitness": ["Fitness"],
             "waterproof": ["Waterproof"],
+            "camera stabilizer": ["Camera Stabilizer", "4K Recording"],
+            "vacuum cleaner": ["Portable Vacuum"],
+            "drone": ["Drone"],
+            "monitoring camera": ["Wireless Camera", "Smart Security"],
+            "office accessory": ["Home Office"],
+            "cleaning supplies": ["Compact Design"],
+            "laptop hub": ["USB-C Hub"],
+            "camera accessory": ["Photography Gear"]
         }
 
         for keyword, tag_list in description_mappings.items():
@@ -12438,6 +14984,1559 @@ def seed_specifications():
         {"product_id": 335, "parameter_name": "Compatibility", "specification": "Windows, macOS"},
         {"product_id": 335, "parameter_name": "Additional Features", "specification": "Compact, Fast read speeds"},
         {"product_id": 335, "parameter_name": "Color", "specification": "Black"},
+
+        {"product_id": 336, "parameter_name": "Sensor", "specification": "CMOS"},
+        {"product_id": 336, "parameter_name": "Resolution", "specification": "24.2 MP"},
+        {"product_id": 336, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 336, "parameter_name": "ISO Range", "specification": "100-25600"},
+        {"product_id": 336, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 336, "parameter_name": "Weight", "specification": "499g"},
+        {"product_id": 336, "parameter_name": "Dimensions", "specification": "121.3 x 92.8 x 69.3 mm"},
+        {"product_id": 336, "parameter_name": "Lens Type", "specification": "Interchangeable lens"},
+
+        {"product_id": 337, "parameter_name": "Sensor", "specification": "APS-C CMOS"},
+        {"product_id": 337, "parameter_name": "Resolution", "specification": "24.2 MP"},
+        {"product_id": 337, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 337, "parameter_name": "ISO Range", "specification": "100-32000"},
+        {"product_id": 337, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 337, "parameter_name": "Weight", "specification": "343g"},
+        {"product_id": 337, "parameter_name": "Dimensions", "specification": "115.2 x 64.3 x 44.8 mm"},
+        {"product_id": 337, "parameter_name": "Lens Type", "specification": "Fixed lens"},
+
+        {"product_id": 338, "parameter_name": "Sensor", "specification": "APS-C CMOS"},
+        {"product_id": 338, "parameter_name": "Resolution", "specification": "24.2 MP"},
+        {"product_id": 338, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 338, "parameter_name": "ISO Range", "specification": "100-32000"},
+        {"product_id": 338, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 338, "parameter_name": "Weight", "specification": "361g"},
+        {"product_id": 338, "parameter_name": "Dimensions", "specification": "115.2 x 64.3 x 44.8 mm"},
+        {"product_id": 338, "parameter_name": "Lens Type", "specification": "Interchangeable lens"},
+
+        {"product_id": 339, "parameter_name": "Sensor", "specification": "CMOS"},
+        {"product_id": 339, "parameter_name": "Resolution", "specification": "20.0 MP"},
+        {"product_id": 339, "parameter_name": "Screen", "specification": "2.7-inch LCD"},
+        {"product_id": 339, "parameter_name": "ISO Range", "specification": "100-3200"},
+        {"product_id": 339, "parameter_name": "Video Resolution", "specification": "Full HD"},
+        {"product_id": 339, "parameter_name": "Weight", "specification": "242g"},
+        {"product_id": 339, "parameter_name": "Dimensions", "specification": "98.2 x 121.7 x 58.1 mm"},
+        {"product_id": 339, "parameter_name": "Lens Type", "specification": "Fixed lens"},
+
+        {"product_id": 340, "parameter_name": "Sensor", "specification": "CMOS"},
+        {"product_id": 340, "parameter_name": "Resolution", "specification": "12.0 MP"},
+        {"product_id": 340, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 340, "parameter_name": "ISO Range", "specification": "100-3200"},
+        {"product_id": 340, "parameter_name": "Video Resolution", "specification": "Full HD"},
+        {"product_id": 340, "parameter_name": "Weight", "specification": "169g"},
+        {"product_id": 340, "parameter_name": "Dimensions", "specification": "82.3 x 102.0 x 49.4 mm"},
+        {"product_id": 340, "parameter_name": "Lens Type", "specification": "Fixed lens"},
+
+        {"product_id": 341, "parameter_name": "Sensor", "specification": "Full-frame CMOS"},
+        {"product_id": 341, "parameter_name": "Resolution", "specification": "24.2 MP"},
+        {"product_id": 341, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 341, "parameter_name": "ISO Range", "specification": "100-25600"},
+        {"product_id": 341, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 341, "parameter_name": "Weight", "specification": "650g"},
+        {"product_id": 341, "parameter_name": "Dimensions", "specification": "127.4 x 95.6 x 74.8 mm"},
+        {"product_id": 341, "parameter_name": "Lens Type", "specification": "Interchangeable lens"},
+
+        {"product_id": 342, "parameter_name": "Sensor", "specification": "CMOS"},
+        {"product_id": 342, "parameter_name": "Resolution", "specification": "12.0 MP"},
+        {"product_id": 342, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 342, "parameter_name": "ISO Range", "specification": "100-3200"},
+        {"product_id": 342, "parameter_name": "Video Resolution", "specification": "HD"},
+        {"product_id": 342, "parameter_name": "Weight", "specification": "200g"},
+        {"product_id": 342, "parameter_name": "Dimensions", "specification": "107.9 x 65.1 x 47.4 mm"},
+        {"product_id": 342, "parameter_name": "Lens Type", "specification": "Fixed lens"},
+
+        {"product_id": 343, "parameter_name": "Sensor", "specification": "CMOS"},
+        {"product_id": 343, "parameter_name": "Resolution", "specification": "20.9 MP"},
+        {"product_id": 343, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 343, "parameter_name": "ISO Range", "specification": "100-51200"},
+        {"product_id": 343, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 343, "parameter_name": "Weight", "specification": "400g"},
+        {"product_id": 343, "parameter_name": "Dimensions", "specification": "124.0 x 93.5 x 60.0 mm"},
+        {"product_id": 343, "parameter_name": "Lens Type", "specification": "Interchangeable lens"},
+
+        {"product_id": 344, "parameter_name": "Sensor", "specification": "CMOS"},
+        {"product_id": 344, "parameter_name": "Resolution", "specification": "24.1 MP"},
+        {"product_id": 344, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 344, "parameter_name": "ISO Range", "specification": "100-25600"},
+        {"product_id": 344, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 344, "parameter_name": "Weight", "specification": "570g"},
+        {"product_id": 344, "parameter_name": "Dimensions", "specification": "122.0 x 92.6 x 60.2 mm"},
+        {"product_id": 344, "parameter_name": "Lens Type", "specification": "Interchangeable lens"},
+
+        {"product_id": 345, "parameter_name": "Sensor", "specification": "Full-frame CMOS"},
+        {"product_id": 345, "parameter_name": "Resolution", "specification": "26.2 MP"},
+        {"product_id": 345, "parameter_name": "Screen", "specification": "3.0-inch LCD"},
+        {"product_id": 345, "parameter_name": "ISO Range", "specification": "100-40000"},
+        {"product_id": 345, "parameter_name": "Video Resolution", "specification": "4K UHD"},
+        {"product_id": 345, "parameter_name": "Weight", "specification": "485g"},
+        {"product_id": 345, "parameter_name": "Dimensions", "specification": "132.5 x 85.1 x 70.0 mm"},
+        {"product_id": 345, "parameter_name": "Lens Type", "specification": "Interchangeable lens"},
+
+        {"product_id": 346, "parameter_name": "Vacuum Type", "specification": "Cordless"},
+        {"product_id": 346, "parameter_name": "Suction Power", "specification": "200 AW"},
+        {"product_id": 346, "parameter_name": "Battery Life", "specification": "Up to 120 minutes"},
+        {"product_id": 346, "parameter_name": "Weight", "specification": "2.5 kg"},
+        {"product_id": 346, "parameter_name": "Dimensions", "specification": "280 x 250 x 1150 mm"},
+        {"product_id": 346, "parameter_name": "Dust Capacity", "specification": "0.6L"},
+        {"product_id": 346, "parameter_name": "Charging Time", "specification": "4 hours"},
+        {"product_id": 346, "parameter_name": "Included Accessories", "specification": "Crevice tool, dusting brush, mini motorized tool"},
+
+        {"product_id": 347, "parameter_name": "Vacuum Type", "specification": "Robot Vacuum"},
+        {"product_id": 347, "parameter_name": "Suction Power", "specification": "2200 Pa"},
+        {"product_id": 347, "parameter_name": "Battery Life", "specification": "Up to 180 minutes"},
+        {"product_id": 347, "parameter_name": "Weight", "specification": "3.6 kg"},
+        {"product_id": 347, "parameter_name": "Dimensions", "specification": "350 x 350 x 97 mm"},
+        {"product_id": 347, "parameter_name": "Dust Capacity", "specification": "0.6L"},
+        {"product_id": 347, "parameter_name": "Charging Time", "specification": "4.5 hours"},
+        {"product_id": 347, "parameter_name": "Included Accessories", "specification": "Docking station, remote control"},
+
+        {"product_id": 348, "parameter_name": "Vacuum Type", "specification": "Robot Vacuum"},
+        {"product_id": 348, "parameter_name": "Suction Power", "specification": "2500 Pa"},
+        {"product_id": 348, "parameter_name": "Battery Life", "specification": "Up to 200 minutes"},
+        {"product_id": 348, "parameter_name": "Weight", "specification": "3.8 kg"},
+        {"product_id": 348, "parameter_name": "Dimensions", "specification": "350 x 350 x 98 mm"},
+        {"product_id": 348, "parameter_name": "Dust Capacity", "specification": "0.7L"},
+        {"product_id": 348, "parameter_name": "Charging Time", "specification": "5 hours"},
+        {"product_id": 348, "parameter_name": "Included Accessories", "specification": "Docking station, cleaning brush, side brushes"},
+
+        {"product_id": 349, "parameter_name": "Vacuum Type", "specification": "Corded Stick"},
+        {"product_id": 349, "parameter_name": "Suction Power", "specification": "150 AW"},
+        {"product_id": 349, "parameter_name": "Battery Life", "specification": "N/A (Corded)"},
+        {"product_id": 349, "parameter_name": "Weight", "specification": "2.4 kg"},
+        {"product_id": 349, "parameter_name": "Dimensions", "specification": "290 x 270 x 1120 mm"},
+        {"product_id": 349, "parameter_name": "Dust Capacity", "specification": "0.5L"},
+        {"product_id": 349, "parameter_name": "Included Accessories", "specification": "Crevice tool, floor tool, soft brush"},
+
+        {"product_id": 350, "parameter_name": "Vacuum Type", "specification": "Cordless Handheld"},
+        {"product_id": 350, "parameter_name": "Suction Power", "specification": "100 AW"},
+        {"product_id": 350, "parameter_name": "Battery Life", "specification": "Up to 40 minutes"},
+        {"product_id": 350, "parameter_name": "Weight", "specification": "1.5 kg"},
+        {"product_id": 350, "parameter_name": "Dimensions", "specification": "300 x 200 x 110 mm"},
+        {"product_id": 350, "parameter_name": "Dust Capacity", "specification": "0.35L"},
+        {"product_id": 350, "parameter_name": "Charging Time", "specification": "3 hours"},
+        {"product_id": 350, "parameter_name": "Included Accessories", "specification": "Nozzle tool, mini motorized tool, charger"},
+
+        {"product_id": 351, "parameter_name": "Vacuum Type", "specification": "Cordless Stick"},
+        {"product_id": 351, "parameter_name": "Suction Power", "specification": "150 AW"},
+        {"product_id": 351, "parameter_name": "Battery Life", "specification": "Up to 90 minutes"},
+        {"product_id": 351, "parameter_name": "Weight", "specification": "2.7 kg"},
+        {"product_id": 351, "parameter_name": "Dimensions", "specification": "295 x 280 x 1150 mm"},
+        {"product_id": 351, "parameter_name": "Dust Capacity", "specification": "0.6L"},
+        {"product_id": 351, "parameter_name": "Charging Time", "specification": "4 hours"},
+        {"product_id": 351, "parameter_name": "Included Accessories", "specification": "Wall mount, floor tool, crevice tool"},
+
+        {"product_id": 352, "parameter_name": "Vacuum Type", "specification": "Robot Vacuum"},
+        {"product_id": 352, "parameter_name": "Suction Power", "specification": "2500 Pa"},
+        {"product_id": 352, "parameter_name": "Battery Life", "specification": "Up to 240 minutes"},
+        {"product_id": 352, "parameter_name": "Weight", "specification": "4.0 kg"},
+        {"product_id": 352, "parameter_name": "Dimensions", "specification": "350 x 350 x 100 mm"},
+        {"product_id": 352, "parameter_name": "Dust Capacity", "specification": "0.8L"},
+        {"product_id": 352, "parameter_name": "Charging Time", "specification": "4 hours"},
+        {"product_id": 352, "parameter_name": "Included Accessories", "specification": "Remote control, extra side brushes, charging dock"},
+
+        {"product_id": 353, "parameter_name": "Vacuum Type", "specification": "Corded Stick"},
+        {"product_id": 353, "parameter_name": "Suction Power", "specification": "140 AW"},
+        {"product_id": 353, "parameter_name": "Battery Life", "specification": "N/A (Corded)"},
+        {"product_id": 353, "parameter_name": "Weight", "specification": "3.0 kg"},
+        {"product_id": 353, "parameter_name": "Dimensions", "specification": "280 x 270 x 1150 mm"},
+        {"product_id": 353, "parameter_name": "Dust Capacity", "specification": "0.4L"},
+        {"product_id": 353, "parameter_name": "Included Accessories", "specification": "Turbo brush, crevice tool, upholstery brush"},
+
+        {"product_id": 354, "parameter_name": "Vacuum Type", "specification": "Cordless Handheld"},
+        {"product_id": 354, "parameter_name": "Suction Power", "specification": "120 AW"},
+        {"product_id": 354, "parameter_name": "Battery Life", "specification": "Up to 30 minutes"},
+        {"product_id": 354, "parameter_name": "Weight", "specification": "1.3 kg"},
+        {"product_id": 354, "parameter_name": "Dimensions", "specification": "290 x 200 x 100 mm"},
+        {"product_id": 354, "parameter_name": "Dust Capacity", "specification": "0.3L"},
+        {"product_id": 354, "parameter_name": "Charging Time", "specification": "2.5 hours"},
+        {"product_id": 354, "parameter_name": "Included Accessories", "specification": "Crevice tool, charger"},
+
+        {"product_id": 355, "parameter_name": "Vacuum Type", "specification": "Cordless Handheld"},
+        {"product_id": 355, "parameter_name": "Suction Power", "specification": "120 AW"},
+        {"product_id": 355, "parameter_name": "Battery Life", "specification": "Up to 30 minutes"},
+        {"product_id": 355, "parameter_name": "Weight", "specification": "1.3 kg"},
+        {"product_id": 355, "parameter_name": "Dimensions", "specification": "290 x 200 x 100 mm"},
+        {"product_id": 355, "parameter_name": "Dust Capacity", "specification": "0.3L"},
+        {"product_id": 355, "parameter_name": "Charging Time", "specification": "2.5 hours"},
+        {"product_id": 355, "parameter_name": "Included Accessories", "specification": "Crevice tool, charger"},
+
+        {"product_id": 356, "parameter_name": "Model", "specification": "DJI Care Refresh do NEO (2 lata)"},
+        {"product_id": 356, "parameter_name": "Warranty", "specification": "2 Years"},
+        {"product_id": 356, "parameter_name": "Service Type", "specification": "Care Refresh Service"},
+        {"product_id": 356, "parameter_name": "Compatibility", "specification": "DJI NEO Drone"},
+        {"product_id": 356, "parameter_name": "Included Services", "specification": "Accidental Damage Coverage, Repair & Replacement"},
+        {"product_id": 356, "parameter_name": "Coverage", "specification": "Full Coverage with DJI Care Refresh"},
+
+        {"product_id": 357, "parameter_name": "Model", "specification": "DJI Akumulator do FLIP"},
+        {"product_id": 357, "parameter_name": "Capacity", "specification": "3500 mAh"},
+        {"product_id": 357, "parameter_name": "Voltage", "specification": "11.1 V"},
+        {"product_id": 357, "parameter_name": "Battery Type", "specification": "Lithium-Polymer"},
+        {"product_id": 357, "parameter_name": "Compatibility", "specification": "DJI FLIP Drone"},
+        {"product_id": 357, "parameter_name": "Charging Time", "specification": "90 minutes"},
+
+        {"product_id": 358, "parameter_name": "Model", "specification": "DJI Dwukierunkowy hub ładujący do FLIP"},
+        {"product_id": 358, "parameter_name": "Charging Ports", "specification": "2 Ports"},
+        {"product_id": 358, "parameter_name": "Input", "specification": "DC 12V"},
+        {"product_id": 358, "parameter_name": "Output", "specification": "DC 12.6V, 2.4A"},
+        {"product_id": 358, "parameter_name": "Charging Time", "specification": "2 hours"},
+        {"product_id": 358, "parameter_name": "Compatibility", "specification": "DJI FLIP Drone Battery"},
+
+        {"product_id": 359, "parameter_name": "Model", "specification": "DJI Goggles N3"},
+        {"product_id": 359, "parameter_name": "Display", "specification": "1920 x 1080p, Full HD"},
+        {"product_id": 359, "parameter_name": "Field of View", "specification": "110°"},
+        {"product_id": 359, "parameter_name": "Latency", "specification": "Less than 50ms"},
+        {"product_id": 359, "parameter_name": "Battery Life", "specification": "Up to 6 hours"},
+        {"product_id": 359, "parameter_name": "Compatibility", "specification": "DJI Mavic, Phantom 4 Pro V2.0"},
+
+        {"product_id": 360, "parameter_name": "Model", "specification": "DJI Care Refresh do NEO (1 rok)"},
+        {"product_id": 360, "parameter_name": "Warranty", "specification": "1 Year"},
+        {"product_id": 360, "parameter_name": "Service Type", "specification": "Care Refresh Service"},
+        {"product_id": 360, "parameter_name": "Compatibility", "specification": "DJI NEO Drone"},
+        {"product_id": 360, "parameter_name": "Included Services", "specification": "Accidental Damage Coverage, Repair & Replacement"},
+        {"product_id": 360, "parameter_name": "Coverage", "specification": "Full Coverage with DJI Care Refresh"},
+
+        {"product_id": 361, "parameter_name": "Model", "specification": "DJI Akumulator do Air 3S"},
+        {"product_id": 361, "parameter_name": "Capacity", "specification": "5000 mAh"},
+        {"product_id": 361, "parameter_name": "Voltage", "specification": "15.4 V"},
+        {"product_id": 361, "parameter_name": "Battery Type", "specification": "Lithium-Polymer"},
+        {"product_id": 361, "parameter_name": "Compatibility", "specification": "DJI Air 3S Drone"},
+        {"product_id": 361, "parameter_name": "Charging Time", "specification": "90 minutes"},
+
+        {"product_id": 362, "parameter_name": "Model", "specification": "DJI Mini 4K Fly More Combo"},
+        {"product_id": 362, "parameter_name": "Camera", "specification": "4K UHD Video"},
+        {"product_id": 362, "parameter_name": "Flight Time", "specification": "Up to 30 minutes"},
+        {"product_id": 362, "parameter_name": "Weight", "specification": "249g"},
+        {"product_id": 362, "parameter_name": "Controller", "specification": "DJI Smart Controller"},
+        {"product_id": 362, "parameter_name": "Battery", "specification": "3000mAh LiPo"},
+
+        {"product_id": 363, "parameter_name": "Model", "specification": "DJI Mavic 3 Enterprise Fly More Kit"},
+        {"product_id": 363, "parameter_name": "Camera", "specification": "4K HDR"},
+        {"product_id": 363, "parameter_name": "Flight Time", "specification": "45 minutes"},
+        {"product_id": 363, "parameter_name": "Weight", "specification": "895g"},
+        {"product_id": 363, "parameter_name": "Controller", "specification": "DJI RC Pro Controller"},
+        {"product_id": 363, "parameter_name": "Battery", "specification": "5000mAh LiPo"},
+
+        {"product_id": 364, "parameter_name": "Model", "specification": "DJI Care Refresh do Air 3S (2 lata)"},
+        {"product_id": 364, "parameter_name": "Warranty", "specification": "2 Years"},
+        {"product_id": 364, "parameter_name": "Service Type", "specification": "Care Refresh Service"},
+        {"product_id": 364, "parameter_name": "Compatibility", "specification": "DJI Air 3S Drone"},
+        {"product_id": 364, "parameter_name": "Included Services", "specification": "Accidental Damage Coverage, Repair & Replacement"},
+        {"product_id": 364, "parameter_name": "Coverage", "specification": "Full Coverage with DJI Care Refresh"},
+
+        {"product_id": 365, "parameter_name": "Model", "specification": "DJI Air 3S Fly More Combo (RC 2)"},
+        {"product_id": 365, "parameter_name": "Camera", "specification": "5.1K Video Recording"},
+        {"product_id": 365, "parameter_name": "Flight Time", "specification": "Up to 46 minutes"},
+        {"product_id": 365, "parameter_name": "Weight", "specification": "795g"},
+        {"product_id": 365, "parameter_name": "Controller", "specification": "DJI RC 2 Controller"},
+        {"product_id": 365, "parameter_name": "Battery", "specification": "5000mAh LiPo"},
+
+        {"product_id": 366, "parameter_name": "Model", "specification": "Ever Optima - 6 sockets, 1.5m, black"},
+        {"product_id": 366, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 366, "parameter_name": "Sockets", "specification": "6"},
+        {"product_id": 366, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 366, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 366, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 367, "parameter_name": "Model", "specification": "Hama EXTENSION CORD 'STANDARD' 2M"},
+        {"product_id": 367, "parameter_name": "Length", "specification": "2m"},
+        {"product_id": 367, "parameter_name": "Sockets", "specification": "2"},
+        {"product_id": 367, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 367, "parameter_name": "Type", "specification": "Extension Cord"},
+        {"product_id": 367, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 368, "parameter_name": "Model", "specification": "HSK DATA Acar S8 - 8 sockets, 1.5m, black"},
+        {"product_id": 368, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 368, "parameter_name": "Sockets", "specification": "8"},
+        {"product_id": 368, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 368, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 368, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 369, "parameter_name": "Model", "specification": "Hama EXTENSION CORD 'STANDARD' 10M"},
+        {"product_id": 369, "parameter_name": "Length", "specification": "10m"},
+        {"product_id": 369, "parameter_name": "Sockets", "specification": "4"},
+        {"product_id": 369, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 369, "parameter_name": "Type", "specification": "Extension Cord"},
+        {"product_id": 369, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 370, "parameter_name": "Model", "specification": "Hama EXTENSION CORD 'STANDARD' 5M"},
+        {"product_id": 370, "parameter_name": "Length", "specification": "5m"},
+        {"product_id": 370, "parameter_name": "Sockets", "specification": "5"},
+        {"product_id": 370, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 370, "parameter_name": "Type", "specification": "Extension Cord"},
+        {"product_id": 370, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 371, "parameter_name": "Model", "specification": "Baseus PowerCombo 100W (black)"},
+        {"product_id": 371, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 371, "parameter_name": "Sockets", "specification": "4 (2x AC, 2x USB)"},
+        {"product_id": 371, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 371, "parameter_name": "Type", "specification": "Power Strip with USB"},
+        {"product_id": 371, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 372, "parameter_name": "Model", "specification": "UGREEN Power Strip 65W USB/USB C + 3x AC sockets CD268"},
+        {"product_id": 372, "parameter_name": "Length", "specification": "1.8m"},
+        {"product_id": 372, "parameter_name": "Sockets", "specification": "3 (2x USB, 3x AC)"},
+        {"product_id": 372, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 372, "parameter_name": "Type", "specification": "Power Strip with USB and USB-C"},
+        {"product_id": 372, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 373, "parameter_name": "Model", "specification": "Ever Protect - 4 USB-A and USB-C sockets, 1.5m"},
+        {"product_id": 373, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 373, "parameter_name": "Sockets", "specification": "4 (2x USB-A, 2x USB-C)"},
+        {"product_id": 373, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 373, "parameter_name": "Type", "specification": "Power Strip with USB-A and USB-C"},
+        {"product_id": 373, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 374, "parameter_name": "Model", "specification": "Ever Optima - 6 sockets, 3m, black"},
+        {"product_id": 374, "parameter_name": "Length", "specification": "3m"},
+        {"product_id": 374, "parameter_name": "Sockets", "specification": "6"},
+        {"product_id": 374, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 374, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 374, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 375, "parameter_name": "Model", "specification": "Hama Premium Surge Protector - 4 sockets, 1.5m"},
+        {"product_id": 375, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 375, "parameter_name": "Sockets", "specification": "4"},
+        {"product_id": 375, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 375, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 375, "parameter_name": "Voltage", "specification": "230V"},
+
+        {"product_id": 376, "parameter_name": "Model", "specification": "Ever Protect - 5 sockets, 3m white"},
+        {"product_id": 376, "parameter_name": "Length", "specification": "3m"},
+        {"product_id": 376, "parameter_name": "Sockets", "specification": "5"},
+        {"product_id": 376, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 376, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 376, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 377, "parameter_name": "Model", "specification": "Qoltec Aluminum Power Strip RACK PDU 19'' 1U 16A 6xFR"},
+        {"product_id": 377, "parameter_name": "Length", "specification": "1U Rackmount"},
+        {"product_id": 377, "parameter_name": "Sockets", "specification": "6 (FR)"},
+        {"product_id": 377, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 377, "parameter_name": "Type", "specification": "PDU Rackmount"},
+        {"product_id": 377, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 378, "parameter_name": "Model", "specification": "Gembird Schuko - 5 sockets, 3m"},
+        {"product_id": 378, "parameter_name": "Length", "specification": "3m"},
+        {"product_id": 378, "parameter_name": "Sockets", "specification": "5"},
+        {"product_id": 378, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 378, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 378, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 379, "parameter_name": "Model", "specification": "Brennenstuhl Eco-Line - 3 sockets, 3m black"},
+        {"product_id": 379, "parameter_name": "Length", "specification": "3m"},
+        {"product_id": 379, "parameter_name": "Sockets", "specification": "3"},
+        {"product_id": 379, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 379, "parameter_name": "Type", "specification": "Power Strip"},
+        {"product_id": 379, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 380, "parameter_name": "Model", "specification": "Qoltec Aluminum Power Strip PDU for RACK 10'' 1U 16A 4xFR"},
+        {"product_id": 380, "parameter_name": "Length", "specification": "1U Rackmount"},
+        {"product_id": 380, "parameter_name": "Sockets", "specification": "4 (FR)"},
+        {"product_id": 380, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 380, "parameter_name": "Type", "specification": "PDU Rackmount"},
+        {"product_id": 380, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 381, "parameter_name": "Model", "specification": "Verbatim Multi-plug Power Tower EU EUPT-01 11xAC 2xUSB 2xUSB-C"},
+        {"product_id": 381, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 381, "parameter_name": "Sockets", "specification": "11 (AC) + 2 (USB) + 2 (USB-C)"},
+        {"product_id": 381, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 381, "parameter_name": "Type", "specification": "Multi-plug Power Tower"},
+        {"product_id": 381, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 382, "parameter_name": "Model", "specification": "Hama Premium Surge Protector - 6 sockets, 1.5m"},
+        {"product_id": 382, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 382, "parameter_name": "Sockets", "specification": "6"},
+        {"product_id": 382, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 382, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 382, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 383, "parameter_name": "Model", "specification": "Brennenstuhl BREMOUNTA - 4 sockets, 1.5m white"},
+        {"product_id": 383, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 383, "parameter_name": "Sockets", "specification": "4"},
+        {"product_id": 383, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 383, "parameter_name": "Type", "specification": "Power Strip"},
+        {"product_id": 383, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 384, "parameter_name": "Model", "specification": "Hama Premium Surge Protector - 4 sockets, 3m"},
+        {"product_id": 384, "parameter_name": "Length", "specification": "3m"},
+        {"product_id": 384, "parameter_name": "Sockets", "specification": "4"},
+        {"product_id": 384, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 384, "parameter_name": "Type", "specification": "Surge Protector"},
+        {"product_id": 384, "parameter_name": "Voltage", "specification": "230V"},
+        
+        {"product_id": 385, "parameter_name": "Model", "specification": "Brennenstuhl ECO-LINE - 3 sockets, 1.5m white without switch"},
+        {"product_id": 385, "parameter_name": "Length", "specification": "1.5m"},
+        {"product_id": 385, "parameter_name": "Sockets", "specification": "3"},
+        {"product_id": 385, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 385, "parameter_name": "Type", "specification": "Power Strip"},
+        {"product_id": 385, "parameter_name": "Voltage", "specification": "230V"},
+
+        {"product_id": 386, "parameter_name": "Model", "specification": "Nintendo Sound Clock Alarmo"},
+        {"product_id": 386, "parameter_name": "Type", "specification": "Clock Alarm"},
+        {"product_id": 386, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 386, "parameter_name": "Sound", "specification": "Nintendo Sounds"},
+        {"product_id": 386, "parameter_name": "Dimensions", "specification": "15 x 10 x 5 cm"},
+
+        {"product_id": 387, "parameter_name": "Model", "specification": "Darth Vader A New Hope Cable Guys R.E.S.T Collectable Figure"},
+        {"product_id": 387, "parameter_name": "Type", "specification": "Phone Holder & Collectible Figure"},
+        {"product_id": 387, "parameter_name": "Material", "specification": "Plastic & PVC"},
+        {"product_id": 387, "parameter_name": "Height", "specification": "18 cm"},
+        {"product_id": 387, "parameter_name": "Color", "specification": "Black"},
+
+        {"product_id": 388, "parameter_name": "Model", "specification": "Despicable Me 4 - Mega Minion Gus Funko POP"},
+        {"product_id": 388, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 388, "parameter_name": "Height", "specification": "9 cm"},
+        {"product_id": 388, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 388, "parameter_name": "Character", "specification": "Gus (Minion)"},
+
+        {"product_id": 389, "parameter_name": "Model", "specification": "Game Art Chronicles Puzzle: The Witcher Geralt & Vincent van"},
+        {"product_id": 389, "parameter_name": "Puzzle Pieces", "specification": "1000 pieces"},
+        {"product_id": 389, "parameter_name": "Dimensions", "specification": "50 x 70 cm"},
+        {"product_id": 389, "parameter_name": "Material", "specification": "Cardboard"},
+        {"product_id": 389, "parameter_name": "Theme", "specification": "Geralt & Vincent van Gogh Artwork"},
+
+        {"product_id": 390, "parameter_name": "Model", "specification": "Deadpool 3 Funko POP"},
+        {"product_id": 390, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 390, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 390, "parameter_name": "Height", "specification": "10 cm"},
+        {"product_id": 390, "parameter_name": "Character", "specification": "Deadpool"},
+
+        {"product_id": 391, "parameter_name": "Model", "specification": "Naruto - Itachi Funko POP"},
+        {"product_id": 391, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 391, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 391, "parameter_name": "Height", "specification": "10 cm"},
+        {"product_id": 391, "parameter_name": "Character", "specification": "Itachi Uchiha"},
+
+        {"product_id": 392, "parameter_name": "Model", "specification": "Spider-Man 2 - Miles Morales Funko POP"},
+        {"product_id": 392, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 392, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 392, "parameter_name": "Height", "specification": "10 cm"},
+        {"product_id": 392, "parameter_name": "Character", "specification": "Miles Morales"},
+
+        {"product_id": 393, "parameter_name": "Model", "specification": "Iron Man Wall-Mountable Lamp"},
+        {"product_id": 393, "parameter_name": "Type", "specification": "Lamp (Wall-Mountable & Desk)"},
+        {"product_id": 393, "parameter_name": "Material", "specification": "Plastic & Metal"},
+        {"product_id": 393, "parameter_name": "Power Source", "specification": "LED (Plug-in)"},
+        {"product_id": 393, "parameter_name": "Height", "specification": "25 cm"},
+
+        {"product_id": 394, "parameter_name": "Model", "specification": "Playstation PS5 DualSense Mug"},
+        {"product_id": 394, "parameter_name": "Material", "specification": "Ceramic"},
+        {"product_id": 394, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 394, "parameter_name": "Capacity", "specification": "300 ml"},
+        {"product_id": 394, "parameter_name": "Dishwasher Safe", "specification": "Yes"},
+
+        {"product_id": 395, "parameter_name": "Model", "specification": "Super Mario Encyclopedia Guide"},
+        {"product_id": 395, "parameter_name": "Type", "specification": "Book (Guide)"},
+        {"product_id": 395, "parameter_name": "Pages", "specification": "250 pages"},
+        {"product_id": 395, "parameter_name": "Material", "specification": "Paper (Hardcover)"},
+        {"product_id": 395, "parameter_name": "Theme", "specification": "Super Mario"},
+
+        {"product_id": 396, "parameter_name": "Model", "specification": "Battle Droid Funko POP"},
+        {"product_id": 396, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 396, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 396, "parameter_name": "Height", "specification": "10 cm"},
+        {"product_id": 396, "parameter_name": "Character", "specification": "Battle Droid"},
+
+        {"product_id": 397, "parameter_name": "Model", "specification": "The Child Funko POP"},
+        {"product_id": 397, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 397, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 397, "parameter_name": "Height", "specification": "9 cm"},
+        {"product_id": 397, "parameter_name": "Character", "specification": "The Child (Baby Yoda)"},
+
+        {"product_id": 398, "parameter_name": "Model", "specification": "Deadpool Bowling Funko POP"},
+        {"product_id": 398, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 398, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 398, "parameter_name": "Height", "specification": "10 cm"},
+        {"product_id": 398, "parameter_name": "Character", "specification": "Deadpool"},
+
+        {"product_id": 399, "parameter_name": "Model", "specification": "Sim Racing Gloves FT7014"},
+        {"product_id": 399, "parameter_name": "Type", "specification": "Sim Racing Gloves"},
+        {"product_id": 399, "parameter_name": "Material", "specification": "Textile & Silicone"},
+        {"product_id": 399, "parameter_name": "Size", "specification": "M, L, XL"},
+        {"product_id": 399, "parameter_name": "Color", "specification": "Black"},
+
+        {"product_id": 400, "parameter_name": "Model", "specification": "Grogu with Prama Funko POP"},
+        {"product_id": 400, "parameter_name": "Type", "specification": "Funko POP Figure"},
+        {"product_id": 400, "parameter_name": "Material", "specification": "Vinyl"},
+        {"product_id": 400, "parameter_name": "Height", "specification": "10 cm"},
+        {"product_id": 400, "parameter_name": "Character", "specification": "Grogu"},
+
+        {"product_id": 401, "parameter_name": "Model", "specification": "Johnny Silverhand Cyberpunk Figure"},
+        {"product_id": 401, "parameter_name": "Type", "specification": "Hanging Figure"},
+        {"product_id": 401, "parameter_name": "Material", "specification": "Plastic & PVC"},
+        {"product_id": 401, "parameter_name": "Height", "specification": "20 cm"},
+        {"product_id": 401, "parameter_name": "Character", "specification": "Johnny Silverhand"},
+
+        {"product_id": 402, "parameter_name": "Model", "specification": "Ganondorf Amiibo Zelda"},
+        {"product_id": 402, "parameter_name": "Type", "specification": "Amiibo Figure"},
+        {"product_id": 402, "parameter_name": "Material", "specification": "Acrylic & Plastic"},
+        {"product_id": 402, "parameter_name": "Height", "specification": "7 cm"},
+        {"product_id": 402, "parameter_name": "Character", "specification": "Ganondorf"},
+
+        {"product_id": 403, "parameter_name": "Model", "specification": "Wedding Peach Amiibo Super Mario"},
+        {"product_id": 403, "parameter_name": "Type", "specification": "Amiibo Figure"},
+        {"product_id": 403, "parameter_name": "Material", "specification": "Acrylic & Plastic"},
+        {"product_id": 403, "parameter_name": "Height", "specification": "7 cm"},
+        {"product_id": 403, "parameter_name": "Character", "specification": "Wedding Peach"},
+
+        {"product_id": 404, "parameter_name": "Model", "specification": "The Shape of Color Green Puzzle"},
+        {"product_id": 404, "parameter_name": "Puzzle Pieces", "specification": "1000 pieces"},
+        {"product_id": 404, "parameter_name": "Dimensions", "specification": "50 x 70 cm"},
+        {"product_id": 404, "parameter_name": "Material", "specification": "Cardboard"},
+        {"product_id": 404, "parameter_name": "Artist", "specification": "Rafał Olbiński"},
+
+        {"product_id": 405, "parameter_name": "Model", "specification": "Defence Against Banality Puzzle"},
+        {"product_id": 405, "parameter_name": "Puzzle Pieces", "specification": "1000 pieces"},
+        {"product_id": 405, "parameter_name": "Dimensions", "specification": "50 x 70 cm"},
+        {"product_id": 405, "parameter_name": "Material", "specification": "Cardboard"},
+        {"product_id": 405, "parameter_name": "Artist", "specification": "Rafał Olbiński"},
+
+        {"product_id": 406, "parameter_name": "Model", "specification": "Fellowes LX41"},
+        {"product_id": 406, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 406, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 406, "parameter_name": "Max Paper Capacity", "specification": "10 sheets"},
+        {"product_id": 406, "parameter_name": "Shred Speed", "specification": "Up to 5 minutes of continuous shredding"},
+        {"product_id": 406, "parameter_name": "Shred Size", "specification": "5 x 40 mm"},
+        {"product_id": 406, "parameter_name": "Bin Capacity", "specification": "20L"},
+        {"product_id": 406, "parameter_name": "Noise Level", "specification": "70 dB"},
+        {"product_id": 406, "parameter_name": "Dimensions", "specification": "34.3 x 21.4 x 44.5 cm"},
+        {"product_id": 406, "parameter_name": "Color", "specification": "Black"},
+
+        {"product_id": 407, "parameter_name": "Model", "specification": "Sencor Desk Calculator"},
+        {"product_id": 407, "parameter_name": "Type", "specification": "Desk Calculator"},
+        {"product_id": 407, "parameter_name": "Display", "specification": "LCD"},
+        {"product_id": 407, "parameter_name": "Display Size", "specification": "8 digits"},
+        {"product_id": 407, "parameter_name": "Power Source", "specification": "Solar and Battery"},
+        {"product_id": 407, "parameter_name": "Dimensions", "specification": "14 x 7.5 x 2.5 cm"},
+        {"product_id": 407, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 407, "parameter_name": "Functions", "specification": "Basic arithmetic functions"},
+        {"product_id": 407, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 407, "parameter_name": "Weight", "specification": "150g"},
+
+        {"product_id": 408, "parameter_name": "Model", "specification": "Sencor Desk Calculator"},
+        {"product_id": 408, "parameter_name": "Type", "specification": "Desk Calculator"},
+        {"product_id": 408, "parameter_name": "Display", "specification": "LCD"},
+        {"product_id": 408, "parameter_name": "Display Size", "specification": "12 digits"},
+        {"product_id": 408, "parameter_name": "Power Source", "specification": "Battery"},
+        {"product_id": 408, "parameter_name": "Dimensions", "specification": "16 x 8.5 x 2.5 cm"},
+        {"product_id": 408, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 408, "parameter_name": "Functions", "specification": "Basic and advanced functions"},
+        {"product_id": 408, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 408, "parameter_name": "Weight", "specification": "200g"},
+
+        {"product_id": 409, "parameter_name": "Model", "specification": "Sencor Pocket Calculator"},
+        {"product_id": 409, "parameter_name": "Type", "specification": "Pocket Calculator"},
+        {"product_id": 409, "parameter_name": "Display", "specification": "LCD"},
+        {"product_id": 409, "parameter_name": "Display Size", "specification": "8 digits"},
+        {"product_id": 409, "parameter_name": "Power Source", "specification": "Solar Powered"},
+        {"product_id": 409, "parameter_name": "Dimensions", "specification": "10 x 6 x 1.5 cm"},
+        {"product_id": 409, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 409, "parameter_name": "Functions", "specification": "Basic arithmetic functions"},
+        {"product_id": 409, "parameter_name": "Color", "specification": "Blue"},
+        {"product_id": 409, "parameter_name": "Weight", "specification": "80g"},
+
+        {"product_id": 410, "parameter_name": "Model", "specification": "Sencor Pocket Calculator"},
+        {"product_id": 410, "parameter_name": "Type", "specification": "Pocket Calculator"},
+        {"product_id": 410, "parameter_name": "Display", "specification": "LCD"},
+        {"product_id": 410, "parameter_name": "Display Size", "specification": "8 digits"},
+        {"product_id": 410, "parameter_name": "Power Source", "specification": "Battery"},
+        {"product_id": 410, "parameter_name": "Dimensions", "specification": "9 x 5.5 x 1.2 cm"},
+        {"product_id": 410, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 410, "parameter_name": "Functions", "specification": "Basic functions only"},
+        {"product_id": 410, "parameter_name": "Color", "specification": "Red"},
+        {"product_id": 410, "parameter_name": "Weight", "specification": "70g"},
+
+        {"product_id": 411, "parameter_name": "Model", "specification": "SafeScan 2210 G2"},
+        {"product_id": 411, "parameter_name": "Type", "specification": "Currency Counter"},
+        {"product_id": 411, "parameter_name": "Max Counting Speed", "specification": "1000 notes/min"},
+        {"product_id": 411, "parameter_name": "Capacity", "specification": "200 notes"},
+        {"product_id": 411, "parameter_name": "Counterfeit Detection", "specification": "Yes"},
+        {"product_id": 411, "parameter_name": "Power Source", "specification": "AC 100-240V"},
+        {"product_id": 411, "parameter_name": "Dimensions", "specification": "20 x 17 x 10 cm"},
+        {"product_id": 411, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 411, "parameter_name": "Weight", "specification": "3.5 kg"},
+        {"product_id": 411, "parameter_name": "Material", "specification": "Plastic and Metal"},
+
+        {"product_id": 412, "parameter_name": "Model", "specification": "Brother ADS4700W"},
+        {"product_id": 412, "parameter_name": "Type", "specification": "Document Scanner"},
+        {"product_id": 412, "parameter_name": "Scan Speed", "specification": "35 pages/min"},
+        {"product_id": 412, "parameter_name": "Scan Resolution", "specification": "600 x 600 dpi"},
+        {"product_id": 412, "parameter_name": "Connectivity", "specification": "Wi-Fi, Ethernet, USB"},
+        {"product_id": 412, "parameter_name": "Max Scan Size", "specification": "A4"},
+        {"product_id": 412, "parameter_name": "Duplex Scanning", "specification": "Yes"},
+        {"product_id": 412, "parameter_name": "Dimensions", "specification": "29.2 x 16.5 x 15.7 cm"},
+        {"product_id": 412, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 412, "parameter_name": "Weight", "specification": "3.8 kg"},
+
+        {"product_id": 413, "parameter_name": "Model", "specification": "Brother DS740"},
+        {"product_id": 413, "parameter_name": "Type", "specification": "Document Scanner"},
+        {"product_id": 413, "parameter_name": "Scan Speed", "specification": "16 pages/min"},
+        {"product_id": 413, "parameter_name": "Scan Resolution", "specification": "600 x 600 dpi"},
+        {"product_id": 413, "parameter_name": "Connectivity", "specification": "USB 3.0"},
+        {"product_id": 413, "parameter_name": "Max Scan Size", "specification": "A4"},
+        {"product_id": 413, "parameter_name": "Duplex Scanning", "specification": "Yes"},
+        {"product_id": 413, "parameter_name": "Dimensions", "specification": "29.2 x 7.1 x 5.4 cm"},
+        {"product_id": 413, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 413, "parameter_name": "Weight", "specification": "0.55 kg"},
+
+        {"product_id": 414, "parameter_name": "Model", "specification": "Fellowes 10M"},
+        {"product_id": 414, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 414, "parameter_name": "Max Paper Capacity", "specification": "10 sheets"},
+        {"product_id": 414, "parameter_name": "Cut Type", "specification": "Micro-Cut"},
+        {"product_id": 414, "parameter_name": "Shred Size", "specification": "2 x 15 mm"},
+        {"product_id": 414, "parameter_name": "Bin Capacity", "specification": "23L"},
+        {"product_id": 414, "parameter_name": "Noise Level", "specification": "68 dB"},
+        {"product_id": 414, "parameter_name": "Dimensions", "specification": "36 x 25.2 x 44.5 cm"},
+        {"product_id": 414, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 414, "parameter_name": "Weight", "specification": "6.6 kg"},
+
+        {"product_id": 415, "parameter_name": "Model", "specification": "Fellowes AutoMax 100M"},
+        {"product_id": 415, "parameter_name": "Type", "specification": "Auto Feed Paper Shredder"},
+        {"product_id": 415, "parameter_name": "Max Paper Capacity", "specification": "100 sheets"},
+        {"product_id": 415, "parameter_name": "Cut Type", "specification": "Micro-Cut"},
+        {"product_id": 415, "parameter_name": "Shred Size", "specification": "2 x 15 mm"},
+        {"product_id": 415, "parameter_name": "Bin Capacity", "specification": "40L"},
+        {"product_id": 415, "parameter_name": "Noise Level", "specification": "70 dB"},
+        {"product_id": 415, "parameter_name": "Dimensions", "specification": "39.4 x 28.4 x 56.2 cm"},
+        {"product_id": 415, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 415, "parameter_name": "Weight", "specification": "11.2 kg"},
+
+        {"product_id": 416, "parameter_name": "Model", "specification": "Fellowes LX65"},
+        {"product_id": 416, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 416, "parameter_name": "Max Paper Capacity", "specification": "10 sheets"},
+        {"product_id": 416, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 416, "parameter_name": "Shred Size", "specification": "4 x 50 mm"},
+        {"product_id": 416, "parameter_name": "Bin Capacity", "specification": "22L"},
+        {"product_id": 416, "parameter_name": "Noise Level", "specification": "70 dB"},
+        {"product_id": 416, "parameter_name": "Dimensions", "specification": "34.3 x 20.8 x 48.8 cm"},
+        {"product_id": 416, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 416, "parameter_name": "Weight", "specification": "5.3 kg"},
+
+        {"product_id": 417, "parameter_name": "Model", "specification": "Epson WorkForce ES-580W"},
+        {"product_id": 417, "parameter_name": "Type", "specification": "Document Scanner"},
+        {"product_id": 417, "parameter_name": "Scan Speed", "specification": "35 pages/min"},
+        {"product_id": 417, "parameter_name": "Scan Resolution", "specification": "600 x 600 dpi"},
+        {"product_id": 417, "parameter_name": "Connectivity", "specification": "Wi-Fi, Ethernet, USB"},
+        {"product_id": 417, "parameter_name": "Max Scan Size", "specification": "A4"},
+        {"product_id": 417, "parameter_name": "Duplex Scanning", "specification": "Yes"},
+        {"product_id": 417, "parameter_name": "Dimensions", "specification": "29.2 x 16.5 x 15.7 cm"},
+        {"product_id": 417, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 417, "parameter_name": "Weight", "specification": "3.8 kg"},
+
+        {"product_id": 418, "parameter_name": "Model", "specification": "Sumup Mobile Payment Terminal Air Bundle Multi"},
+        {"product_id": 418, "parameter_name": "Type", "specification": "Mobile Payment Terminal"},
+        {"product_id": 418, "parameter_name": "Connectivity", "specification": "Bluetooth"},
+        {"product_id": 418, "parameter_name": "Payment Methods", "specification": "Contactless, Chip & PIN, Swipe"},
+        {"product_id": 418, "parameter_name": "Battery Life", "specification": "Up to 500 transactions"},
+        {"product_id": 418, "parameter_name": "Charging Time", "specification": "2 hours"},
+        {"product_id": 418, "parameter_name": "Dimensions", "specification": "8.6 x 5.4 x 1.6 cm"},
+        {"product_id": 418, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 418, "parameter_name": "Weight", "specification": "220g"},
+        {"product_id": 418, "parameter_name": "Material", "specification": "Plastic"},
+
+        {"product_id": 419, "parameter_name": "Model", "specification": "Sumup Mobile Payment Terminal AIR"},
+        {"product_id": 419, "parameter_name": "Type", "specification": "Mobile Payment Terminal"},
+        {"product_id": 419, "parameter_name": "Connectivity", "specification": "Bluetooth"},
+        {"product_id": 419, "parameter_name": "Payment Methods", "specification": "Contactless, Chip & PIN"},
+        {"product_id": 419, "parameter_name": "Battery Life", "specification": "Up to 500 transactions"},
+        {"product_id": 419, "parameter_name": "Charging Time", "specification": "2 hours"},
+        {"product_id": 419, "parameter_name": "Dimensions", "specification": "8.5 x 5.5 x 1.5 cm"},
+        {"product_id": 419, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 419, "parameter_name": "Weight", "specification": "200g"},
+        {"product_id": 419, "parameter_name": "Material", "specification": "Plastic"},
+
+        {"product_id": 420, "parameter_name": "Model", "specification": "Fellowes LX220"},
+        {"product_id": 420, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 420, "parameter_name": "Max Paper Capacity", "specification": "22 sheets"},
+        {"product_id": 420, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 420, "parameter_name": "Shred Size", "specification": "4 x 50 mm"},
+        {"product_id": 420, "parameter_name": "Bin Capacity", "specification": "40L"},
+        {"product_id": 420, "parameter_name": "Noise Level", "specification": "70 dB"},
+        {"product_id": 420, "parameter_name": "Dimensions", "specification": "38.7 x 26.2 x 53.4 cm"},
+        {"product_id": 420, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 420, "parameter_name": "Weight", "specification": "9.2 kg"},
+
+        {"product_id": 421, "parameter_name": "Model", "specification": "Sumup Mobile Payment Terminal Solo"},
+        {"product_id": 421, "parameter_name": "Type", "specification": "Mobile Payment Terminal"},
+        {"product_id": 421, "parameter_name": "Connectivity", "specification": "Bluetooth"},
+        {"product_id": 421, "parameter_name": "Payment Methods", "specification": "Contactless, Chip & PIN, Swipe"},
+        {"product_id": 421, "parameter_name": "Battery Life", "specification": "Up to 500 transactions"},
+        {"product_id": 421, "parameter_name": "Charging Time", "specification": "2 hours"},
+        {"product_id": 421, "parameter_name": "Dimensions", "specification": "8.2 x 5.3 x 1.5 cm"},
+        {"product_id": 421, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 421, "parameter_name": "Weight", "specification": "180g"},
+        {"product_id": 421, "parameter_name": "Material", "specification": "Plastic"},
+
+        {"product_id": 422, "parameter_name": "Model", "specification": "Fellowes LX200"},
+        {"product_id": 422, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 422, "parameter_name": "Max Paper Capacity", "specification": "6 sheets"},
+        {"product_id": 422, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 422, "parameter_name": "Shred Size", "specification": "4 x 30 mm"},
+        {"product_id": 422, "parameter_name": "Bin Capacity", "specification": "12L"},
+        {"product_id": 422, "parameter_name": "Noise Level", "specification": "65 dB"},
+        {"product_id": 422, "parameter_name": "Dimensions", "specification": "28 x 20 x 45 cm"},
+        {"product_id": 422, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 422, "parameter_name": "Weight", "specification": "4.2 kg"},
+
+        {"product_id": 423, "parameter_name": "Model", "specification": "Fellowes LX201 Black"},
+        {"product_id": 423, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 423, "parameter_name": "Max Paper Capacity", "specification": "8 sheets"},
+        {"product_id": 423, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 423, "parameter_name": "Shred Size", "specification": "4 x 40 mm"},
+        {"product_id": 423, "parameter_name": "Bin Capacity", "specification": "20L"},
+        {"product_id": 423, "parameter_name": "Noise Level", "specification": "68 dB"},
+        {"product_id": 423, "parameter_name": "Dimensions", "specification": "35.2 x 23.5 x 45.4 cm"},
+        {"product_id": 423, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 423, "parameter_name": "Weight", "specification": "6.1 kg"},
+
+        {"product_id": 424, "parameter_name": "Model", "specification": "Fellowes LX211 White"},
+        {"product_id": 424, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 424, "parameter_name": "Max Paper Capacity", "specification": "12 sheets"},
+        {"product_id": 424, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 424, "parameter_name": "Shred Size", "specification": "4 x 50 mm"},
+        {"product_id": 424, "parameter_name": "Bin Capacity", "specification": "30L"},
+        {"product_id": 424, "parameter_name": "Noise Level", "specification": "69 dB"},
+        {"product_id": 424, "parameter_name": "Dimensions", "specification": "40 x 25 x 55 cm"},
+        {"product_id": 424, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 424, "parameter_name": "Weight", "specification": "7.9 kg"},
+
+        {"product_id": 425, "parameter_name": "Model", "specification": "Fellowes LX211 Black"},
+        {"product_id": 425, "parameter_name": "Type", "specification": "Paper Shredder"},
+        {"product_id": 425, "parameter_name": "Max Paper Capacity", "specification": "12 sheets"},
+        {"product_id": 425, "parameter_name": "Cut Type", "specification": "Cross-Cut"},
+        {"product_id": 425, "parameter_name": "Shred Size", "specification": "4 x 50 mm"},
+        {"product_id": 425, "parameter_name": "Bin Capacity", "specification": "30L"},
+        {"product_id": 425, "parameter_name": "Noise Level", "specification": "69 dB"},
+        {"product_id": 425, "parameter_name": "Dimensions", "specification": "40 x 25 x 55 cm"},
+        {"product_id": 425, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 425, "parameter_name": "Weight", "specification": "8.1 kg"},
+
+        {"product_id": 426, "parameter_name": "Model", "specification": "Imou Cruiser SE+ 3mp"},
+        {"product_id": 426, "parameter_name": "Type", "specification": "Security Camera"},
+        {"product_id": 426, "parameter_name": "Resolution", "specification": "3MP"},
+        {"product_id": 426, "parameter_name": "Night Vision", "specification": "Yes"},
+        {"product_id": 426, "parameter_name": "Smart Features", "specification": "Motion Detection"},
+        {"product_id": 426, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 426, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 426, "parameter_name": "Viewing Angle", "specification": "90°"},
+        {"product_id": 426, "parameter_name": "Dimensions", "specification": "120 x 85 x 65 mm"},
+        {"product_id": 426, "parameter_name": "Color", "specification": "White"},
+
+        {"product_id": 427, "parameter_name": "Model", "specification": "TP-Link Tapo C520WS SI"},
+        {"product_id": 427, "parameter_name": "Type", "specification": "Rotating Outdoor Camera"},
+        {"product_id": 427, "parameter_name": "Resolution", "specification": "1080p"},
+        {"product_id": 427, "parameter_name": "Pan & Tilt", "specification": "360° Pan, 90° Tilt"},
+        {"product_id": 427, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 427, "parameter_name": "Night Vision", "specification": "Yes, 30m range"},
+        {"product_id": 427, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 427, "parameter_name": "Dimensions", "specification": "115 x 110 x 155 mm"},
+        {"product_id": 427, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 427, "parameter_name": "Weight", "specification": "400g"},
+
+        {"product_id": 428, "parameter_name": "Model", "specification": "Xiaomi Inteligentna C500 PRO"},
+        {"product_id": 428, "parameter_name": "Type", "specification": "Indoor Camera"},
+        {"product_id": 428, "parameter_name": "Resolution", "specification": "1080p"},
+        {"product_id": 428, "parameter_name": "Field of View", "specification": "130°"},
+        {"product_id": 428, "parameter_name": "Two-Way Audio", "specification": "Yes"},
+        {"product_id": 428, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 428, "parameter_name": "Power Supply", "specification": "DC 5V"},
+        {"product_id": 428, "parameter_name": "Dimensions", "specification": "70 x 70 x 110 mm"},
+        {"product_id": 428, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 428, "parameter_name": "Weight", "specification": "200g"},
+
+        {"product_id": 429, "parameter_name": "Model", "specification": "ORLLO Z1-UV"},
+        {"product_id": 429, "parameter_name": "Type", "specification": "Outdoor Camera"},
+        {"product_id": 429, "parameter_name": "Resolution", "specification": "1080p"},
+        {"product_id": 429, "parameter_name": "Smart Features", "specification": "Motion Detection"},
+        {"product_id": 429, "parameter_name": "UV Protection", "specification": "Yes"},
+        {"product_id": 429, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 429, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 429, "parameter_name": "Dimensions", "specification": "120 x 90 x 65 mm"},
+        {"product_id": 429, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 429, "parameter_name": "Weight", "specification": "300g"},
+
+        {"product_id": 430, "parameter_name": "Model", "specification": "Reolink E330"},
+        {"product_id": 430, "parameter_name": "Type", "specification": "Rotating Camera"},
+        {"product_id": 430, "parameter_name": "Resolution", "specification": "1080p"},
+        {"product_id": 430, "parameter_name": "Pan & Tilt", "specification": "355° Pan, 90° Tilt"},
+        {"product_id": 430, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 430, "parameter_name": "Night Vision", "specification": "Yes, 30m range"},
+        {"product_id": 430, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 430, "parameter_name": "Dimensions", "specification": "110 x 100 x 130 mm"},
+        {"product_id": 430, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 430, "parameter_name": "Weight", "specification": "450g"},
+
+        {"product_id": 431, "parameter_name": "Model", "specification": "Imou Cruiser SIM 4G 2mp"},
+        {"product_id": 431, "parameter_name": "Type", "specification": "Outdoor Camera"},
+        {"product_id": 431, "parameter_name": "Resolution", "specification": "2MP"},
+        {"product_id": 431, "parameter_name": "Connectivity", "specification": "4G"},
+        {"product_id": 431, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 431, "parameter_name": "Power Supply", "specification": "Battery Powered"},
+        {"product_id": 431, "parameter_name": "Dimensions", "specification": "120 x 80 x 75 mm"},
+        {"product_id": 431, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 431, "parameter_name": "Weight", "specification": "350g"},
+        {"product_id": 431, "parameter_name": "Night Vision", "specification": "Yes"},
+
+        {"product_id": 432, "parameter_name": "Model", "specification": "Imou Rex VT 5mp"},
+        {"product_id": 432, "parameter_name": "Type", "specification": "Indoor/Outdoor Camera"},
+        {"product_id": 432, "parameter_name": "Resolution", "specification": "5MP"},
+        {"product_id": 432, "parameter_name": "Night Vision", "specification": "Yes"},
+        {"product_id": 432, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 432, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 432, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 432, "parameter_name": "Dimensions", "specification": "110 x 85 x 80 mm"},
+        {"product_id": 432, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 432, "parameter_name": "Weight", "specification": "500g"},
+
+        {"product_id": 433, "parameter_name": "Model", "specification": "Reolink P434"},
+        {"product_id": 433, "parameter_name": "Type", "specification": "Outdoor Rotating Camera"},
+        {"product_id": 433, "parameter_name": "Resolution", "specification": "4K"},
+        {"product_id": 433, "parameter_name": "Pan & Tilt", "specification": "355° Pan, 90° Tilt"},
+        {"product_id": 433, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 433, "parameter_name": "Smart Features", "specification": "Person Detection, Motion Alerts"},
+        {"product_id": 433, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 433, "parameter_name": "Dimensions", "specification": "130 x 120 x 150 mm"},
+        {"product_id": 433, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 433, "parameter_name": "Weight", "specification": "650g"},
+
+        {"product_id": 434, "parameter_name": "Model", "specification": "Imou Ranger Dual 6MP"},
+        {"product_id": 434, "parameter_name": "Type", "specification": "Dual-Lens Camera"},
+        {"product_id": 434, "parameter_name": "Resolution", "specification": "6MP"},
+        {"product_id": 434, "parameter_name": "Night Vision", "specification": "Yes, 30m range"},
+        {"product_id": 434, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 434, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 434, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 434, "parameter_name": "Dimensions", "specification": "140 x 105 x 120 mm"},
+        {"product_id": 434, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 434, "parameter_name": "Weight", "specification": "700g"},
+
+        {"product_id": 435, "parameter_name": "Model", "specification": "Reolink E540"},
+        {"product_id": 435, "parameter_name": "Type", "specification": "Outdoor Camera"},
+        {"product_id": 435, "parameter_name": "Resolution", "specification": "4K"},
+        {"product_id": 435, "parameter_name": "Pan & Tilt", "specification": "355° Pan, 90° Tilt"},
+        {"product_id": 435, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 435, "parameter_name": "Smart Features", "specification": "Person Detection, Motion Alerts"},
+        {"product_id": 435, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 435, "parameter_name": "Dimensions", "specification": "145 x 120 x 160 mm"},
+        {"product_id": 435, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 435, "parameter_name": "Weight", "specification": "750g"},
+
+        {"product_id": 436, "parameter_name": "Model", "specification": "Imou Ranger dual 8MP"},
+        {"product_id": 436, "parameter_name": "Type", "specification": "Dual-Lens Camera"},
+        {"product_id": 436, "parameter_name": "Resolution", "specification": "8MP"},
+        {"product_id": 436, "parameter_name": "Night Vision", "specification": "Yes, 30m range"},
+        {"product_id": 436, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 436, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 436, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 436, "parameter_name": "Dimensions", "specification": "150 x 120 x 140 mm"},
+        {"product_id": 436, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 436, "parameter_name": "Weight", "specification": "800g"},
+
+        {"product_id": 437, "parameter_name": "Model", "specification": "Imou Cruiser Dual 8MP"},
+        {"product_id": 437, "parameter_name": "Type", "specification": "Dual-Lens Camera"},
+        {"product_id": 437, "parameter_name": "Resolution", "specification": "8MP"},
+        {"product_id": 437, "parameter_name": "Night Vision", "specification": "Yes, 30m range"},
+        {"product_id": 437, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 437, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 437, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 437, "parameter_name": "Dimensions", "specification": "160 x 130 x 120 mm"},
+        {"product_id": 437, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 437, "parameter_name": "Weight", "specification": "800g"},
+
+        {"product_id": 438, "parameter_name": "Model", "specification": "Imou Cruiser 2 5MP"},
+        {"product_id": 438, "parameter_name": "Type", "specification": "Outdoor Camera"},
+        {"product_id": 438, "parameter_name": "Resolution", "specification": "5MP"},
+        {"product_id": 438, "parameter_name": "Night Vision", "specification": "Yes, 30m range"},
+        {"product_id": 438, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 438, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 438, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 438, "parameter_name": "Dimensions", "specification": "130 x 105 x 90 mm"},
+        {"product_id": 438, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 438, "parameter_name": "Weight", "specification": "450g"},
+
+        {"product_id": 439, "parameter_name": "Model", "specification": "Reolink B420"},
+        {"product_id": 439, "parameter_name": "Type", "specification": "Outdoor Camera"},
+        {"product_id": 439, "parameter_name": "Resolution", "specification": "4MP"},
+        {"product_id": 439, "parameter_name": "Pan & Tilt", "specification": "355° Pan, 90° Tilt"},
+        {"product_id": 439, "parameter_name": "Smart Features", "specification": "Motion Detection, Person Detection"},
+        {"product_id": 439, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 439, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 439, "parameter_name": "Dimensions", "specification": "120 x 105 x 115 mm"},
+        {"product_id": 439, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 439, "parameter_name": "Weight", "specification": "600g"},
+
+        {"product_id": 440, "parameter_name": "Model", "specification": "Reolink W320"},
+        {"product_id": 440, "parameter_name": "Type", "specification": "Outdoor Camera"},
+        {"product_id": 440, "parameter_name": "Resolution", "specification": "1080p"},
+        {"product_id": 440, "parameter_name": "Night Vision", "specification": "Yes, 20m range"},
+        {"product_id": 440, "parameter_name": "Smart Features", "specification": "Motion Detection"},
+        {"product_id": 440, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 440, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 440, "parameter_name": "Dimensions", "specification": "115 x 95 x 85 mm"},
+        {"product_id": 440, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 440, "parameter_name": "Weight", "specification": "500g"},
+
+        {"product_id": 441, "parameter_name": "Model", "specification": "Imou Ranger 2C 3MP"},
+        {"product_id": 441, "parameter_name": "Type", "specification": "Indoor/Outdoor Camera"},
+        {"product_id": 441, "parameter_name": "Resolution", "specification": "3MP"},
+        {"product_id": 441, "parameter_name": "Smart Features", "specification": "Motion Detection, Two-Way Audio"},
+        {"product_id": 441, "parameter_name": "Night Vision", "specification": "Yes, 20m range"},
+        {"product_id": 441, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 441, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 441, "parameter_name": "Dimensions", "specification": "110 x 80 x 90 mm"},
+        {"product_id": 441, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 441, "parameter_name": "Weight", "specification": "250g"},
+
+        {"product_id": 442, "parameter_name": "Model", "specification": "TP-Link VIGI C340(6mm)"},
+        {"product_id": 442, "parameter_name": "Type", "specification": "Bullet Camera"},
+        {"product_id": 442, "parameter_name": "Resolution", "specification": "4MP"},
+        {"product_id": 442, "parameter_name": "FullColor", "specification": "Yes"},
+        {"product_id": 442, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 442, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 442, "parameter_name": "Dimensions", "specification": "120 x 80 x 120 mm"},
+        {"product_id": 442, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 442, "parameter_name": "Weight", "specification": "450g"},
+        {"product_id": 442, "parameter_name": "Smart Features", "specification": "Motion Detection"},
+
+        {"product_id": 443, "parameter_name": "Model", "specification": "TP-Link VIGI C540(4mm)"},
+        {"product_id": 443, "parameter_name": "Type", "specification": "Rotating Camera"},
+        {"product_id": 443, "parameter_name": "Resolution", "specification": "4MP"},
+        {"product_id": 443, "parameter_name": "FullColor", "specification": "Yes"},
+        {"product_id": 443, "parameter_name": "Pan & Tilt", "specification": "355° Pan, 90° Tilt"},
+        {"product_id": 443, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 443, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 443, "parameter_name": "Dimensions", "specification": "125 x 85 x 125 mm"},
+        {"product_id": 443, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 443, "parameter_name": "Weight", "specification": "550g"},
+
+        {"product_id": 444, "parameter_name": "Model", "specification": "Synology BC500"},
+        {"product_id": 444, "parameter_name": "Type", "specification": "Network Camera"},
+        {"product_id": 444, "parameter_name": "Resolution", "specification": "5MP"},
+        {"product_id": 444, "parameter_name": "Smart Features", "specification": "Motion Detection, AI Recognition"},
+        {"product_id": 444, "parameter_name": "Connectivity", "specification": "Ethernet, Wi-Fi"},
+        {"product_id": 444, "parameter_name": "Power Supply", "specification": "DC 12V"},
+        {"product_id": 444, "parameter_name": "Dimensions", "specification": "95 x 65 x 115 mm"},
+        {"product_id": 444, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 444, "parameter_name": "Weight", "specification": "350g"},
+        {"product_id": 444, "parameter_name": "Night Vision", "specification": "Yes"},
+
+        {"product_id": 445, "parameter_name": "Model", "specification": "Tesla Smart Kamera Baby B200"},
+        {"product_id": 445, "parameter_name": "Type", "specification": "Baby Monitoring Camera"},
+        {"product_id": 445, "parameter_name": "Resolution", "specification": "720p"},
+        {"product_id": 445, "parameter_name": "Two-Way Audio", "specification": "Yes"},
+        {"product_id": 445, "parameter_name": "Smart Features", "specification": "Motion Detection, Sleep Mode"},
+        {"product_id": 445, "parameter_name": "Connectivity", "specification": "Wi-Fi"},
+        {"product_id": 445, "parameter_name": "Power Supply", "specification": "DC 5V"},
+        {"product_id": 445, "parameter_name": "Dimensions", "specification": "80 x 80 x 120 mm"},
+        {"product_id": 445, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 445, "parameter_name": "Weight", "specification": "300g"},
+
+        {"product_id": 446, "parameter_name": "Model", "specification": "Silver Monkey Compressed Air 600ml"},
+        {"product_id": 446, "parameter_name": "Type", "specification": "Compressed Air"},
+        {"product_id": 446, "parameter_name": "Capacity", "specification": "600ml"},
+        {"product_id": 446, "parameter_name": "Usage", "specification": "Electronics Cleaning"},
+        {"product_id": 446, "parameter_name": "Pressure", "specification": "High Pressure"},
+        {"product_id": 446, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 446, "parameter_name": "Dimensions", "specification": "100 x 100 x 210 mm"},
+        {"product_id": 446, "parameter_name": "Color", "specification": "Blue"},
+        {"product_id": 446, "parameter_name": "Weight", "specification": "400g"},
+        {"product_id": 446, "parameter_name": "Environmentally Safe", "specification": "Yes"},
+
+        {"product_id": 447, "parameter_name": "Model", "specification": "Silver Monkey IPA Isopropyl Alcohol 100ml"},
+        {"product_id": 447, "parameter_name": "Type", "specification": "Isopropyl Alcohol"},
+        {"product_id": 447, "parameter_name": "Volume", "specification": "100ml"},
+        {"product_id": 447, "parameter_name": "Purity", "specification": "99%"},
+        {"product_id": 447, "parameter_name": "Uses", "specification": "Electronics Cleaning"},
+        {"product_id": 447, "parameter_name": "Drying Time", "specification": "Fast"},
+        {"product_id": 447, "parameter_name": "Non-Flammable", "specification": "Yes"},
+        {"product_id": 447, "parameter_name": "Dimensions", "specification": "50 x 50 x 150 mm"},
+        {"product_id": 447, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 447, "parameter_name": "Weight", "specification": "120g"},
+
+        {"product_id": 448, "parameter_name": "Model", "specification": "Silver Monkey IPA 250ml"},
+        {"product_id": 448, "parameter_name": "Type", "specification": "Isopropyl Alcohol"},
+        {"product_id": 448, "parameter_name": "Volume", "specification": "250ml"},
+        {"product_id": 448, "parameter_name": "Purity", "specification": "99%"},
+        {"product_id": 448, "parameter_name": "Uses", "specification": "Electronics Cleaning"},
+        {"product_id": 448, "parameter_name": "Quick Dry", "specification": "Yes"},
+        {"product_id": 448, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 448, "parameter_name": "Dimensions", "specification": "65 x 65 x 180 mm"},
+        {"product_id": 448, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 448, "parameter_name": "Weight", "specification": "180g"},
+
+        {"product_id": 449, "parameter_name": "Model", "specification": "Silver Monkey Compressed Air 400ml"},
+        {"product_id": 449, "parameter_name": "Type", "specification": "Compressed Air"},
+        {"product_id": 449, "parameter_name": "Capacity", "specification": "400ml"},
+        {"product_id": 449, "parameter_name": "Usage", "specification": "Electronics Cleaning"},
+        {"product_id": 449, "parameter_name": "Pressure", "specification": "High Pressure"},
+        {"product_id": 449, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 449, "parameter_name": "Dimensions", "specification": "95 x 95 x 195 mm"},
+        {"product_id": 449, "parameter_name": "Color", "specification": "Blue"},
+        {"product_id": 449, "parameter_name": "Weight", "specification": "350g"},
+        {"product_id": 449, "parameter_name": "Environmentally Safe", "specification": "Yes"},
+
+        {"product_id": 450, "parameter_name": "Model", "specification": "Silver Monkey LCD Ultra Clean Set 250 ml"},
+        {"product_id": 450, "parameter_name": "Type", "specification": "LCD Cleaning Set"},
+        {"product_id": 450, "parameter_name": "Volume", "specification": "250ml"},
+        {"product_id": 450, "parameter_name": "Uses", "specification": "LCD and LED Screen Cleaning"},
+        {"product_id": 450, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 450, "parameter_name": "Includes", "specification": "Microfiber Cloth"},
+        {"product_id": 450, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 450, "parameter_name": "Dimensions", "specification": "100 x 100 x 180 mm"},
+        {"product_id": 450, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 450, "parameter_name": "Weight", "specification": "250g"},
+
+        {"product_id": 451, "parameter_name": "Model", "specification": "Silver Monkey Cleaning Kit 20in1"},
+        {"product_id": 451, "parameter_name": "Type", "specification": "Cleaning Kit"},
+        {"product_id": 451, "parameter_name": "Tools Included", "specification": "20"},
+        {"product_id": 451, "parameter_name": "Uses", "specification": "Electronics and Office Cleaning"},
+        {"product_id": 451, "parameter_name": "Cleaning Materials", "specification": "Brushes, Wipes, and Solutions"},
+        {"product_id": 451, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 451, "parameter_name": "Dimensions", "specification": "200 x 150 x 250 mm"},
+        {"product_id": 451, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 451, "parameter_name": "Weight", "specification": "350g"},
+        {"product_id": 451, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+
+        {"product_id": 452, "parameter_name": "Model", "specification": "Mozos XB1-ECO Portable Air Blower"},
+        {"product_id": 452, "parameter_name": "Type", "specification": "Portable Air Blower"},
+        {"product_id": 452, "parameter_name": "Airflow", "specification": "Strong"},
+        {"product_id": 452, "parameter_name": "Battery", "specification": "Rechargeable Battery"},
+        {"product_id": 452, "parameter_name": "Dimensions", "specification": "250 x 150 x 90 mm"},
+        {"product_id": 452, "parameter_name": "Weight", "specification": "600g"},
+        {"product_id": 452, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 452, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 452, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 452, "parameter_name": "Color", "specification": "Black"},
+
+        {"product_id": 453, "parameter_name": "Model", "specification": "Silver Monkey LCD Cleaning Gel 250ml"},
+        {"product_id": 453, "parameter_name": "Type", "specification": "LCD Cleaning Gel"},
+        {"product_id": 453, "parameter_name": "Volume", "specification": "250ml"},
+        {"product_id": 453, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 453, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 453, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 453, "parameter_name": "Safe for Screens", "specification": "Yes"},
+        {"product_id": 453, "parameter_name": "Dimensions", "specification": "60 x 60 x 150 mm"},
+        {"product_id": 453, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 453, "parameter_name": "Weight", "specification": "300g"},
+
+        {"product_id": 454, "parameter_name": "Model", "specification": "Silver Monkey LCD Ultra Clean Set 100ml"},
+        {"product_id": 454, "parameter_name": "Type", "specification": "LCD Cleaning Set"},
+        {"product_id": 454, "parameter_name": "Volume", "specification": "100ml"},
+        {"product_id": 454, "parameter_name": "Uses", "specification": "LCD and LED Screen Cleaning"},
+        {"product_id": 454, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 454, "parameter_name": "Includes", "specification": "Microfiber Cloth"},
+        {"product_id": 454, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 454, "parameter_name": "Dimensions", "specification": "80 x 80 x 150 mm"},
+        {"product_id": 454, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 454, "parameter_name": "Weight", "specification": "200g"},
+
+        {"product_id": 455, "parameter_name": "Model", "specification": "Mobile Origin Multifunctional Cleaning Kit 20in1"},
+        {"product_id": 455, "parameter_name": "Type", "specification": "Cleaning Kit"},
+        {"product_id": 455, "parameter_name": "Tools Included", "specification": "20"},
+        {"product_id": 455, "parameter_name": "Uses", "specification": "Electronics Cleaning"},
+        {"product_id": 455, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 455, "parameter_name": "Dimensions", "specification": "200 x 150 x 250 mm"},
+        {"product_id": 455, "parameter_name": "Color", "specification": "White"},
+        {"product_id": 455, "parameter_name": "Weight", "specification": "350g"},
+        {"product_id": 455, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 455, "parameter_name": "Convenience", "specification": "Portable"},
+
+        {"product_id": 456, "parameter_name": "Model", "specification": "Whoosh GO XL Screen Cleaner 100ml"},
+        {"product_id": 456, "parameter_name": "Type", "specification": "Screen Cleaner Spray"},
+        {"product_id": 456, "parameter_name": "Volume", "specification": "100ml"},
+        {"product_id": 456, "parameter_name": "Includes", "specification": "Microfiber Cloth"},
+        {"product_id": 456, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 456, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 456, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 456, "parameter_name": "Dimensions", "specification": "50 x 50 x 150 mm"},
+        {"product_id": 456, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 456, "parameter_name": "Weight", "specification": "120g"},
+
+        {"product_id": 457, "parameter_name": "Model", "specification": "Whoosh 3XL Tech Cleaning Cloths - 3 Pack"},
+        {"product_id": 457, "parameter_name": "Type", "specification": "Tech Cleaning Cloths"},
+        {"product_id": 457, "parameter_name": "Quantity", "specification": "3 Cloths"},
+        {"product_id": 457, "parameter_name": "Antibacterial", "specification": "Yes"},
+        {"product_id": 457, "parameter_name": "Use", "specification": "Electronics, Glass, and Screens"},
+        {"product_id": 457, "parameter_name": "Size", "specification": "Large"},
+        {"product_id": 457, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 457, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 457, "parameter_name": "Material", "specification": "Microfiber"},
+        {"product_id": 457, "parameter_name": "Weight", "specification": "80g"},
+
+        {"product_id": 458, "parameter_name": "Model", "specification": "Whoosh Eco Refill - 2 x 500ml"},
+        {"product_id": 458, "parameter_name": "Type", "specification": "Screen Cleaner Refill"},
+        {"product_id": 458, "parameter_name": "Volume", "specification": "2 x 500ml"},
+        {"product_id": 458, "parameter_name": "Usage", "specification": "Screen Cleaning"},
+        {"product_id": 458, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 458, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 458, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 458, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 458, "parameter_name": "Weight", "specification": "1kg"},
+        {"product_id": 458, "parameter_name": "Safe for Screens", "specification": "Yes"},
+
+        {"product_id": 459, "parameter_name": "Model", "specification": "Silver Monkey Foam Cleaner for Plastic 400ml"},
+        {"product_id": 459, "parameter_name": "Type", "specification": "Foam Cleaner"},
+        {"product_id": 459, "parameter_name": "Volume", "specification": "400ml"},
+        {"product_id": 459, "parameter_name": "Use", "specification": "Plastic Surfaces"},
+        {"product_id": 459, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 459, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 459, "parameter_name": "Color", "specification": "White Foam"},
+        {"product_id": 459, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 459, "parameter_name": "Dimensions", "specification": "60 x 60 x 180 mm"},
+        {"product_id": 459, "parameter_name": "Weight", "specification": "250g"},
+
+        {"product_id": 460, "parameter_name": "Model", "specification": "Whoosh Wipes - 70 Pack"},
+        {"product_id": 460, "parameter_name": "Type", "specification": "Screen Cleaning Wipes"},
+        {"product_id": 460, "parameter_name": "Quantity", "specification": "70 Wipes"},
+        {"product_id": 460, "parameter_name": "Use", "specification": "Phones, Laptops, TVs"},
+        {"product_id": 460, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 460, "parameter_name": "Material", "specification": "Microfiber with Cleaning Solution"},
+        {"product_id": 460, "parameter_name": "Fragrance", "specification": "Fresh"},
+        {"product_id": 460, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 460, "parameter_name": "Dimensions", "specification": "7.5 x 10 cm (each wipe)"},
+        {"product_id": 460, "parameter_name": "Weight", "specification": "350g"},
+
+        {"product_id": 461, "parameter_name": "Model", "specification": "Silver Monkey Keyboard and Headset Cleaning Kit 3in1"},
+        {"product_id": 461, "parameter_name": "Type", "specification": "Cleaning Kit"},
+        {"product_id": 461, "parameter_name": "Includes", "specification": "Brush, Cloth, Cleaning Gel"},
+        {"product_id": 461, "parameter_name": "Use", "specification": "Keyboards and Headsets"},
+        {"product_id": 461, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 461, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 461, "parameter_name": "Dimensions", "specification": "150 x 120 x 80 mm"},
+        {"product_id": 461, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 461, "parameter_name": "Weight", "specification": "200g"},
+        {"product_id": 461, "parameter_name": "Cleaning Material", "specification": "Soft Cloth and Gentle Gel"},
+
+        {"product_id": 462, "parameter_name": "Model", "specification": "Baseus Electronics Cleaning Brush"},
+        {"product_id": 462, "parameter_name": "Type", "specification": "Cleaning Brush"},
+        {"product_id": 462, "parameter_name": "Usage", "specification": "Dusting and Cleaning Electronics"},
+        {"product_id": 462, "parameter_name": "Bristle Material", "specification": "Soft Synthetic Fibers"},
+        {"product_id": 462, "parameter_name": "Dimensions", "specification": "19 x 3 x 3 cm"},
+        {"product_id": 462, "parameter_name": "Weight", "specification": "50g"},
+        {"product_id": 462, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 462, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 462, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 462, "parameter_name": "Portable", "specification": "Yes"},
+
+        {"product_id": 463, "parameter_name": "Model", "specification": "Mozos XBLOWER Electronic Dust Blower"},
+        {"product_id": 463, "parameter_name": "Type", "specification": "Electronic Dust Blower"},
+        {"product_id": 463, "parameter_name": "Airflow", "specification": "Strong"},
+        {"product_id": 463, "parameter_name": "Power", "specification": "Rechargeable Battery"},
+        {"product_id": 463, "parameter_name": "Dimensions", "specification": "250 x 150 x 90 mm"},
+        {"product_id": 463, "parameter_name": "Weight", "specification": "600g"},
+        {"product_id": 463, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 463, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 463, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 463, "parameter_name": "Color", "specification": "Black"},
+
+        {"product_id": 464, "parameter_name": "Model", "specification": "Silver Monkey LCD Cleaning Gel Set 250ml"},
+        {"product_id": 464, "parameter_name": "Type", "specification": "LCD Cleaning Gel"},
+        {"product_id": 464, "parameter_name": "Volume", "specification": "250ml"},
+        {"product_id": 464, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 464, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 464, "parameter_name": "Eco-Friendly", "specification": "Yes"},
+        {"product_id": 464, "parameter_name": "Safe for Screens", "specification": "Yes"},
+        {"product_id": 464, "parameter_name": "Dimensions", "specification": "60 x 60 x 150 mm"},
+        {"product_id": 464, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 464, "parameter_name": "Weight", "specification": "300g"},
+
+        {"product_id": 465, "parameter_name": "Model", "specification": "Silver Monkey Glass Cleaning Foam 400ml"},
+        {"product_id": 465, "parameter_name": "Type", "specification": "Glass Cleaning Foam"},
+        {"product_id": 465, "parameter_name": "Volume", "specification": "400ml"},
+        {"product_id": 465, "parameter_name": "Use", "specification": "Glass and Screen Cleaning"},
+        {"product_id": 465, "parameter_name": "Non-Toxic", "specification": "Yes"},
+        {"product_id": 465, "parameter_name": "Streak-Free", "specification": "Yes"},
+        {"product_id": 465, "parameter_name": "Safe for Glass", "specification": "Yes"},
+        {"product_id": 465, "parameter_name": "Dimensions", "specification": "70 x 70 x 180 mm"},
+        {"product_id": 465, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 465, "parameter_name": "Weight", "specification": "350g"},
+
+        {"product_id": 466, "parameter_name": "Model", "specification": "Silver Monkey USB-A 4x USB 3.0 (Black)"},
+        {"product_id": 466, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 466, "parameter_name": "Ports", "specification": "4 USB 3.0 Ports"},
+        {"product_id": 466, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 466, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 466, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 466, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 466, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 466, "parameter_name": "Dimensions", "specification": "100 x 40 x 20 mm"},
+        {"product_id": 466, "parameter_name": "Weight", "specification": "120g"},
+
+        {"product_id": 467, "parameter_name": "Model", "specification": "Silver Monkey USB-C - 1x USB 3.0 + 3x USB 2.0"},
+        {"product_id": 467, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 467, "parameter_name": "Ports", "specification": "1 USB 3.0 Port + 3 USB 2.0 Ports"},
+        {"product_id": 467, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 467, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 467, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.0)"},
+        {"product_id": 467, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 467, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 467, "parameter_name": "Dimensions", "specification": "90 x 40 x 20 mm"},
+        {"product_id": 467, "parameter_name": "Weight", "specification": "110g"},
+
+        {"product_id": 468, "parameter_name": "Model", "specification": "Silver Monkey Switch Box HUB 4 x USB 3.1 + USB-C (DC) (for 2 Computers)"},
+        {"product_id": 468, "parameter_name": "Type", "specification": "Switch Box USB Hub"},
+        {"product_id": 468, "parameter_name": "Ports", "specification": "4 USB 3.1 Ports + 1 USB-C Port"},
+        {"product_id": 468, "parameter_name": "Compatibility", "specification": "2 Computers"},
+        {"product_id": 468, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 468, "parameter_name": "Power Supply", "specification": "DC Powered"},
+        {"product_id": 468, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 468, "parameter_name": "Material", "specification": "Metal"},
+        {"product_id": 468, "parameter_name": "Dimensions", "specification": "150 x 80 x 25 mm"},
+        {"product_id": 468, "parameter_name": "Weight", "specification": "200g"},
+
+        {"product_id": 469, "parameter_name": "Model", "specification": "Silver Monkey USB-A - 1x USB 3.0 + 3x USB 2.0"},
+        {"product_id": 469, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 469, "parameter_name": "Ports", "specification": "1 USB 3.0 Port + 3 USB 2.0 Ports"},
+        {"product_id": 469, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 469, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 469, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.0)"},
+        {"product_id": 469, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 469, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 469, "parameter_name": "Dimensions", "specification": "95 x 35 x 18 mm"},
+        {"product_id": 469, "parameter_name": "Weight", "specification": "105g"},
+
+        {"product_id": 470, "parameter_name": "Model", "specification": "Silver Monkey USB-A 4x USB 3.0 (Silver)"},
+        {"product_id": 470, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 470, "parameter_name": "Ports", "specification": "4 USB 3.0 Ports"},
+        {"product_id": 470, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 470, "parameter_name": "Material", "specification": "Aluminum"},
+        {"product_id": 470, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 470, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 470, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 470, "parameter_name": "Dimensions", "specification": "100 x 40 x 20 mm"},
+        {"product_id": 470, "parameter_name": "Weight", "specification": "130g"},
+
+        {"product_id": 471, "parameter_name": "Model", "specification": "Orico Hub USB-C 4x USB-A 3.1"},
+        {"product_id": 471, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 471, "parameter_name": "Ports", "specification": "4 USB-A 3.1 Ports"},
+        {"product_id": 471, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 471, "parameter_name": "Material", "specification": "Aluminum"},
+        {"product_id": 471, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 471, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 471, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 471, "parameter_name": "Dimensions", "specification": "100 x 40 x 20 mm"},
+        {"product_id": 471, "parameter_name": "Weight", "specification": "150g"},
+
+        {"product_id": 472, "parameter_name": "Model", "specification": "ICY BOX Hub USB-A - 4x USB-A Aluminum"},
+        {"product_id": 472, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 472, "parameter_name": "Ports", "specification": "4 USB-A Ports"},
+        {"product_id": 472, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 472, "parameter_name": "Material", "specification": "Aluminum"},
+        {"product_id": 472, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 472, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 472, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 472, "parameter_name": "Dimensions", "specification": "105 x 45 x 22 mm"},
+        {"product_id": 472, "parameter_name": "Weight", "specification": "175g"},
+
+        {"product_id": 473, "parameter_name": "Model", "specification": "Anker PowerExpand 8-in-1 USB-C PD 10Gbps Data Hub"},
+        {"product_id": 473, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 473, "parameter_name": "Ports", "specification": "8 Ports (USB-A, USB-C, HDMI, Ethernet)"},
+        {"product_id": 473, "parameter_name": "Data Transfer Speed", "specification": "Up to 10Gbps"},
+        {"product_id": 473, "parameter_name": "Power Delivery", "specification": "Yes, 85W"},
+        {"product_id": 473, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 473, "parameter_name": "Material", "specification": "Aluminum"},
+        {"product_id": 473, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 473, "parameter_name": "Dimensions", "specification": "120 x 65 x 25 mm"},
+        {"product_id": 473, "parameter_name": "Weight", "specification": "210g"},
+
+        {"product_id": 474, "parameter_name": "Model", "specification": "Anker PowerExpand 3-in-1 USB-C PD Hub"},
+        {"product_id": 474, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 474, "parameter_name": "Ports", "specification": "3 Ports (USB-A, USB-C PD, HDMI)"},
+        {"product_id": 474, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 474, "parameter_name": "Power Delivery", "specification": "Yes, 60W"},
+        {"product_id": 474, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 474, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 474, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 474, "parameter_name": "Dimensions", "specification": "80 x 40 x 20 mm"},
+        {"product_id": 474, "parameter_name": "Weight", "specification": "150g"},
+
+        {"product_id": 475, "parameter_name": "Model", "specification": "ICY BOX HUB USB-B - 10x USB-A (7x USB 3.2 Gen1)"},
+        {"product_id": 475, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 475, "parameter_name": "Ports", "specification": "10 USB-A Ports (7 USB 3.2 Gen1, 3 USB 2.0)"},
+        {"product_id": 475, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.2 Gen1)"},
+        {"product_id": 475, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 475, "parameter_name": "Material", "specification": "Metal"},
+        {"product_id": 475, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 475, "parameter_name": "Dimensions", "specification": "200 x 70 x 30 mm"},
+        {"product_id": 475, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 475, "parameter_name": "Weight", "specification": "300g"},
+
+        {"product_id": 476, "parameter_name": "Model", "specification": "Gigabyte 7 in 1 HUB USB HDMI RJ-45 (Type C)"},
+        {"product_id": 476, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 476, "parameter_name": "Ports", "specification": "7 Ports (USB-A, HDMI, RJ-45, USB-C)"},
+        {"product_id": 476, "parameter_name": "Video Output", "specification": "Supports 4K HDMI Output"},
+        {"product_id": 476, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 476, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 476, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 476, "parameter_name": "Dimensions", "specification": "130 x 65 x 30 mm"},
+        {"product_id": 476, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 476, "parameter_name": "Weight", "specification": "250g"},
+
+        {"product_id": 477, "parameter_name": "Model", "specification": "Unitek Hub Bi-Directional USB-C/USB-A - 4x USB-A"},
+        {"product_id": 477, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 477, "parameter_name": "Ports", "specification": "4 USB-A Ports"},
+        {"product_id": 477, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 477, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 477, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 477, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 477, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 477, "parameter_name": "Dimensions", "specification": "95 x 40 x 20 mm"},
+        {"product_id": 477, "parameter_name": "Weight", "specification": "120g"},
+
+        {"product_id": 478, "parameter_name": "Model", "specification": "ICY BOX Hub 4-port USB-A"},
+        {"product_id": 478, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 478, "parameter_name": "Ports", "specification": "4 USB-A Ports"},
+        {"product_id": 478, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 478, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 478, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 478, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 478, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 478, "parameter_name": "Dimensions", "specification": "95 x 40 x 18 mm"},
+        {"product_id": 478, "parameter_name": "Weight", "specification": "100g"},
+
+        {"product_id": 479, "parameter_name": "Model", "specification": "ICY BOX HUB 17-port with USB 3.2 Gen 1 Type-A Port"},
+        {"product_id": 479, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 479, "parameter_name": "Ports", "specification": "17 Ports (USB-A, USB 3.2 Gen1)"},
+        {"product_id": 479, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.2 Gen1)"},
+        {"product_id": 479, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 479, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 479, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 479, "parameter_name": "Material", "specification": "Metal"},
+        {"product_id": 479, "parameter_name": "Dimensions", "specification": "220 x 100 x 40 mm"},
+        {"product_id": 479, "parameter_name": "Weight", "specification": "450g"},
+
+        {"product_id": 480, "parameter_name": "Model", "specification": "ICY BOX Desktop Hub 4-port USB-A"},
+        {"product_id": 480, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 480, "parameter_name": "Ports", "specification": "4 USB-A Ports"},
+        {"product_id": 480, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 480, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 480, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 480, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 480, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 480, "parameter_name": "Dimensions", "specification": "90 x 40 x 20 mm"},
+        {"product_id": 480, "parameter_name": "Weight", "specification": "100g"},
+
+        {"product_id": 481, "parameter_name": "Model", "specification": "ICY BOX Hub 4-port USB-A"},
+        {"product_id": 481, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 481, "parameter_name": "Ports", "specification": "4 USB-A Ports"},
+        {"product_id": 481, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps"},
+        {"product_id": 481, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 481, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 481, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 481, "parameter_name": "Material", "specification": "Aluminum"},
+        {"product_id": 481, "parameter_name": "Dimensions", "specification": "110 x 45 x 20 mm"},
+        {"product_id": 481, "parameter_name": "Weight", "specification": "130g"},
+
+        {"product_id": 482, "parameter_name": "Model", "specification": "UGREEN Revodok CM498 3x USB-A 3.0 HDMI VGA RJ45 SD/TF AUX3.5mm PD"},
+        {"product_id": 482, "parameter_name": "Type", "specification": "Multi-functional Hub"},
+        {"product_id": 482, "parameter_name": "Ports", "specification": "3 USB-A 3.0 Ports, HDMI, VGA, RJ45, SD/TF, AUX 3.5mm, PD"},
+        {"product_id": 482, "parameter_name": "Power Delivery", "specification": "Yes, PD 85W"},
+        {"product_id": 482, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.0)"},
+        {"product_id": 482, "parameter_name": "Dimensions", "specification": "150 x 70 x 25 mm"},
+        {"product_id": 482, "parameter_name": "Color", "specification": "Gray"},
+        {"product_id": 482, "parameter_name": "Weight", "specification": "300g"},
+        {"product_id": 482, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 482, "parameter_name": "Material", "specification": "Aluminum"},
+
+        {"product_id": 483, "parameter_name": "Model", "specification": "Green Cell HUB USB-C 7w1 GC Connect PD 85W"},
+        {"product_id": 483, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 483, "parameter_name": "Ports", "specification": "7 Ports (USB-A, USB-C, HDMI, RJ-45)"},
+        {"product_id": 483, "parameter_name": "Power Delivery", "specification": "Yes, 85W PD"},
+        {"product_id": 483, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.0)"},
+        {"product_id": 483, "parameter_name": "Dimensions", "specification": "130 x 60 x 20 mm"},
+        {"product_id": 483, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 483, "parameter_name": "Weight", "specification": "200g"},
+        {"product_id": 483, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 483, "parameter_name": "Material", "specification": "Aluminum"},
+
+        {"product_id": 484, "parameter_name": "Model", "specification": "Verbatim USB-C - 3xUSB 3.2, USB-C PD, 2xHDMI, VGA, RJ45, Audio, SD"},
+        {"product_id": 484, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 484, "parameter_name": "Ports", "specification": "3 USB 3.2 Ports, 1 USB-C PD, 2 HDMI, VGA, RJ45, Audio, SD Card Slot"},
+        {"product_id": 484, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.2)"},
+        {"product_id": 484, "parameter_name": "Power Delivery", "specification": "Yes, USB-C PD"},
+        {"product_id": 484, "parameter_name": "HDMI Output", "specification": "Supports up to 4K resolution"},
+        {"product_id": 484, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 484, "parameter_name": "Dimensions", "specification": "160 x 70 x 25 mm"},
+        {"product_id": 484, "parameter_name": "Color", "specification": "Silver"},
+        {"product_id": 484, "parameter_name": "Weight", "specification": "280g"},
+
+        {"product_id": 485, "parameter_name": "Model", "specification": "UGREEN USB - 4 x USB 3.0"},
+        {"product_id": 485, "parameter_name": "Type", "specification": "USB Hub"},
+        {"product_id": 485, "parameter_name": "Ports", "specification": "4 USB 3.0 Ports"},
+        {"product_id": 485, "parameter_name": "Data Transfer Speed", "specification": "Up to 5Gbps (USB 3.0)"},
+        {"product_id": 485, "parameter_name": "Power Supply", "specification": "USB Powered"},
+        {"product_id": 485, "parameter_name": "Compatibility", "specification": "Windows, macOS, Linux"},
+        {"product_id": 485, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 485, "parameter_name": "Material", "specification": "Plastic"},
+        {"product_id": 485, "parameter_name": "Dimensions", "specification": "95 x 35 x 20 mm"},
+        {"product_id": 485, "parameter_name": "Weight", "specification": "120g"},
+
+        {"product_id": 486, "parameter_name": "Model", "specification": "DJI OM 7P (Osmo Mobile 7P)"},
+        {"product_id": 486, "parameter_name": "Type", "specification": "Smartphone Stabilizer"},
+        {"product_id": 486, "parameter_name": "Stabilization", "specification": "3-Axis"},
+        {"product_id": 486, "parameter_name": "Compatibility", "specification": "Smartphones"},
+        {"product_id": 486, "parameter_name": "Battery Life", "specification": "Up to 15 hours"},
+        {"product_id": 486, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 486, "parameter_name": "Material", "specification": "Plastic & Aluminum"},
+        {"product_id": 486, "parameter_name": "Weight", "specification": "340g"},
+        {"product_id": 486, "parameter_name": "Dimensions", "specification": "275 x 120 x 90 mm"},
+        {"product_id": 486, "parameter_name": "Included Accessories", "specification": "Tripod, USB-C Cable, Carrying Case"},
+
+        {"product_id": 487, "parameter_name": "Model", "specification": "DJI OM 7 (Osmo Mobile 7)"},
+        {"product_id": 487, "parameter_name": "Type", "specification": "Smartphone Stabilizer"},
+        {"product_id": 487, "parameter_name": "Stabilization", "specification": "3-Axis"},
+        {"product_id": 487, "parameter_name": "Compatibility", "specification": "Smartphones"},
+        {"product_id": 487, "parameter_name": "Battery Life", "specification": "Up to 15 hours"},
+        {"product_id": 487, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 487, "parameter_name": "Material", "specification": "Plastic & Aluminum"},
+        {"product_id": 487, "parameter_name": "Weight", "specification": "300g"},
+        {"product_id": 487, "parameter_name": "Dimensions", "specification": "260 x 115 x 90 mm"},
+        {"product_id": 487, "parameter_name": "Included Accessories", "specification": "Tripod, USB-C Cable, Carrying Case"},
+
+        {"product_id": 488, "parameter_name": "Model", "specification": "Fujifilm Instax Mini Heart Sketch Film"},
+        {"product_id": 488, "parameter_name": "Type", "specification": "Instant Film"},
+        {"product_id": 488, "parameter_name": "Sheet Count", "specification": "10 Sheets"},
+        {"product_id": 488, "parameter_name": "Film Size", "specification": "54mm x 86mm"},
+        {"product_id": 488, "parameter_name": "Frame Design", "specification": "Heart Sketch"},
+        {"product_id": 488, "parameter_name": "Compatibility", "specification": "Fujifilm Instax Mini Cameras"},
+        {"product_id": 488, "parameter_name": "Color", "specification": "White with Heart Sketch"},
+        {"product_id": 488, "parameter_name": "Material", "specification": "Film Paper"},
+        {"product_id": 488, "parameter_name": "Weight", "specification": "50g"},
+        {"product_id": 488, "parameter_name": "Package", "specification": "10 Sheets per Pack"},
+
+        {"product_id": 489, "parameter_name": "Model", "specification": "DJI RS 3 Mini"},
+        {"product_id": 489, "parameter_name": "Type", "specification": "Camera Stabilizer"},
+        {"product_id": 489, "parameter_name": "Stabilization", "specification": "3-Axis"},
+        {"product_id": 489, "parameter_name": "Weight", "specification": "795g"},
+        {"product_id": 489, "parameter_name": "Battery Life", "specification": "Up to 10 hours"},
+        {"product_id": 489, "parameter_name": "Compatibility", "specification": "Mirrorless & DSLR Cameras"},
+        {"product_id": 489, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 489, "parameter_name": "Dimensions", "specification": "240 x 100 x 230 mm"},
+        {"product_id": 489, "parameter_name": "Material", "specification": "Aluminum & Plastic"},
+        {"product_id": 489, "parameter_name": "Included Accessories", "specification": "Tripod, USB-C Cable, Carrying Case"},
+
+        {"product_id": 490, "parameter_name": "Model", "specification": "Marumi Prime Plasma Sputtering CPL 82mm"},
+        {"product_id": 490, "parameter_name": "Type", "specification": "Circular Polarizer Filter"},
+        {"product_id": 490, "parameter_name": "Size", "specification": "82mm"},
+        {"product_id": 490, "parameter_name": "Coating", "specification": "Plasma Sputtering"},
+        {"product_id": 490, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 490, "parameter_name": "Light Transmission", "specification": "High Transmission"},
+        {"product_id": 490, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 490, "parameter_name": "Weight", "specification": "85g"},
+        {"product_id": 490, "parameter_name": "Effect", "specification": "Reduces Reflections and Enhances Colors"},
+        {"product_id": 490, "parameter_name": "Application", "specification": "Outdoor Photography"},
+
+        {"product_id": 491, "parameter_name": "Model", "specification": "Marumi Prime Plasma Sputtering CPL 67mm"},
+        {"product_id": 491, "parameter_name": "Type", "specification": "Circular Polarizer Filter"},
+        {"product_id": 491, "parameter_name": "Size", "specification": "67mm"},
+        {"product_id": 491, "parameter_name": "Coating", "specification": "Plasma Sputtering"},
+        {"product_id": 491, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 491, "parameter_name": "Light Transmission", "specification": "High Transmission"},
+        {"product_id": 491, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 491, "parameter_name": "Weight", "specification": "75g"},
+        {"product_id": 491, "parameter_name": "Effect", "specification": "Reduces Reflections and Enhances Colors"},
+        {"product_id": 491, "parameter_name": "Application", "specification": "Outdoor Photography"},
+
+        {"product_id": 492, "parameter_name": "Model", "specification": "Marumi Prime Plasma Sputtering CPL 77mm"},
+        {"product_id": 492, "parameter_name": "Type", "specification": "Circular Polarizer Filter"},
+        {"product_id": 492, "parameter_name": "Size", "specification": "77mm"},
+        {"product_id": 492, "parameter_name": "Coating", "specification": "Plasma Sputtering"},
+        {"product_id": 492, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 492, "parameter_name": "Light Transmission", "specification": "High Transmission"},
+        {"product_id": 492, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 492, "parameter_name": "Weight", "specification": "90g"},
+        {"product_id": 492, "parameter_name": "Effect", "specification": "Reduces Reflections and Enhances Colors"},
+        {"product_id": 492, "parameter_name": "Application", "specification": "Outdoor Photography"},
+
+        {"product_id": 493, "parameter_name": "Model", "specification": "Marumi Prime Plasma Sputtering CPL 58mm"},
+        {"product_id": 493, "parameter_name": "Type", "specification": "Circular Polarizer Filter"},
+        {"product_id": 493, "parameter_name": "Size", "specification": "58mm"},
+        {"product_id": 493, "parameter_name": "Coating", "specification": "Plasma Sputtering"},
+        {"product_id": 493, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 493, "parameter_name": "Light Transmission", "specification": "High Transmission"},
+        {"product_id": 493, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 493, "parameter_name": "Weight", "specification": "60g"},
+        {"product_id": 493, "parameter_name": "Effect", "specification": "Reduces Reflections and Enhances Colors"},
+        {"product_id": 493, "parameter_name": "Application", "specification": "Outdoor Photography"},
+
+        {"product_id": 494, "parameter_name": "Model", "specification": "Newell DL-USB-C Battery Charger for Nikon EN-EL25"},
+        {"product_id": 494, "parameter_name": "Type", "specification": "Battery Charger"},
+        {"product_id": 494, "parameter_name": "Compatibility", "specification": "Nikon EN-EL25"},
+        {"product_id": 494, "parameter_name": "Charging Time", "specification": "Approx. 2 hours"},
+        {"product_id": 494, "parameter_name": "Input", "specification": "USB-C"},
+        {"product_id": 494, "parameter_name": "Output", "specification": "DC 5V"},
+        {"product_id": 494, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 494, "parameter_name": "Dimensions", "specification": "80 x 45 x 20 mm"},
+        {"product_id": 494, "parameter_name": "Weight", "specification": "120g"},
+        {"product_id": 494, "parameter_name": "Included Accessories", "specification": "USB-C Cable"},
+
+        {"product_id": 495, "parameter_name": "Model", "specification": "Marumi Prime Plasma Sputtering CPL 72mm"},
+        {"product_id": 495, "parameter_name": "Type", "specification": "Circular Polarizer Filter"},
+        {"product_id": 495, "parameter_name": "Size", "specification": "72mm"},
+        {"product_id": 495, "parameter_name": "Coating", "specification": "Plasma Sputtering"},
+        {"product_id": 495, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 495, "parameter_name": "Light Transmission", "specification": "High Transmission"},
+        {"product_id": 495, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 495, "parameter_name": "Weight", "specification": "85g"},
+        {"product_id": 495, "parameter_name": "Effect", "specification": "Reduces Reflections and Enhances Colors"},
+        {"product_id": 495, "parameter_name": "Application", "specification": "Outdoor Photography"},
+
+        {"product_id": 496, "parameter_name": "Model", "specification": "Marumi Prime Plasma Sputtering CPL 62mm"},
+        {"product_id": 496, "parameter_name": "Type", "specification": "Circular Polarizer Filter"},
+        {"product_id": 496, "parameter_name": "Size", "specification": "62mm"},
+        {"product_id": 496, "parameter_name": "Coating", "specification": "Plasma Sputtering"},
+        {"product_id": 496, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 496, "parameter_name": "Light Transmission", "specification": "High Transmission"},
+        {"product_id": 496, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 496, "parameter_name": "Weight", "specification": "70g"},
+        {"product_id": 496, "parameter_name": "Effect", "specification": "Reduces Reflections and Enhances Colors"},
+        {"product_id": 496, "parameter_name": "Application", "specification": "Outdoor Photography"},
+
+        {"product_id": 497, "parameter_name": "Model", "specification": "Zhiyun Smooth 5S AI"},
+        {"product_id": 497, "parameter_name": "Type", "specification": "Smartphone Gimbal"},
+        {"product_id": 497, "parameter_name": "Stabilization", "specification": "3-Axis"},
+        {"product_id": 497, "parameter_name": "Battery Life", "specification": "Up to 12 hours"},
+        {"product_id": 497, "parameter_name": "Compatibility", "specification": "Smartphones (Up to 300g)"},
+        {"product_id": 497, "parameter_name": "Color", "specification": "Black"},
+        {"product_id": 497, "parameter_name": "Dimensions", "specification": "270 x 130 x 110 mm"},
+        {"product_id": 497, "parameter_name": "Weight", "specification": "600g"},
+        {"product_id": 497, "parameter_name": "Material", "specification": "Plastic and Aluminum"},
+        {"product_id": 497, "parameter_name": "Included Accessories", "specification": "USB-C Cable, Tripod, Carrying Case"},
+
+        {"product_id": 498, "parameter_name": "Model", "specification": "Marumi FS Plus 72 mm"},
+        {"product_id": 498, "parameter_name": "Type", "specification": "UV Filter"},
+        {"product_id": 498, "parameter_name": "Size", "specification": "72mm"},
+        {"product_id": 498, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 498, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 498, "parameter_name": "Weight", "specification": "60g"},
+        {"product_id": 498, "parameter_name": "Protection", "specification": "Lens Protection from Dust and Scratches"},
+        {"product_id": 498, "parameter_name": "Application", "specification": "All Photography"},
+        {"product_id": 498, "parameter_name": "Coating", "specification": "Multi-Coating for Better Light Transmission"},
+        {"product_id": 498, "parameter_name": "Effect", "specification": "Prevents UV Light and Lens Damage"},
+
+        {"product_id": 499, "parameter_name": "Model", "specification": "Marumi FS Plus 52 mm"},
+        {"product_id": 499, "parameter_name": "Type", "specification": "UV Filter"},
+        {"product_id": 499, "parameter_name": "Size", "specification": "52mm"},
+        {"product_id": 499, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 499, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 499, "parameter_name": "Weight", "specification": "45g"},
+        {"product_id": 499, "parameter_name": "Protection", "specification": "Lens Protection from Dust and Scratches"},
+        {"product_id": 499, "parameter_name": "Application", "specification": "All Photography"},
+        {"product_id": 499, "parameter_name": "Coating", "specification": "Multi-Coating for Better Light Transmission"},
+        {"product_id": 499, "parameter_name": "Effect", "specification": "Prevents UV Light and Lens Damage"},
+
+        {"product_id": 500, "parameter_name": "Model", "specification": "Marumi FS Plus 46 mm"},
+        {"product_id": 500, "parameter_name": "Type", "specification": "UV Filter"},
+        {"product_id": 500, "parameter_name": "Size", "specification": "46mm"},
+        {"product_id": 500, "parameter_name": "Material", "specification": "Optical Glass"},
+        {"product_id": 500, "parameter_name": "Color", "specification": "Clear"},
+        {"product_id": 500, "parameter_name": "Weight", "specification": "40g"},
+        {"product_id": 500, "parameter_name": "Protection", "specification": "Lens Protection from Dust and Scratches"},
+        {"product_id": 500, "parameter_name": "Application", "specification": "All Photography"},
+        {"product_id": 500, "parameter_name": "Coating", "specification": "Multi-Coating for Better Light Transmission"},
+        {"product_id": 500, "parameter_name": "Effect", "specification": "Prevents UV Light and Lens Damage"}
     ]
 
     for spec in tqdm(specifications, desc="Seeding specifications", unit="spec"):
@@ -12454,6 +16553,7 @@ def seed_specifications():
             print(Fore.RED + f"Error adding specification {spec['parameter_name']} for product ID {spec['product_id']}: {e}")
 
     print(Fore.GREEN + "Specifications seeded successfully!")
+
 
 def seed_opinions():
     Opinion.objects.all().delete()
@@ -12496,6 +16596,24 @@ def seed_opinions():
         ("Very intuitive and user-friendly.", 5),
         ("Exceeded my expectations, worth every penny.", 5),
         ("The warranty service is exceptional.", 5),
+        ("Could have better features, but works well.", 3),
+        ("Poor customer service, very disappointing.", 1),
+        ("A bit too bulky, but works fine.", 3),
+        ("Amazing performance, highly recommended.", 5),
+        ("I like it, but it has some flaws.", 4),
+        ("Doesn't work as expected, poor quality.", 1),
+        ("Perfect for the price, highly satisfied.", 5),
+        ("Does the job but nothing spectacular.", 3),
+        ("The packaging could be improved.", 2),
+        ("Love the design, very sleek and modern.", 5),
+        ("Great value for money, totally worth it.", 5),
+        ("Very compact and efficient.", 4),
+        ("Just what I needed, no complaints.", 5),
+        ("It's decent but lacks certain features.", 3),
+        ("Easy to set up, but not the best quality.", 2),
+        ("Works great, happy with my purchase.", 5),
+        ("I was expecting more from this product.", 2),
+        ("Not the best, but good enough for the price.", 3),
     ]
 
     for product in tqdm(products, desc="Seeding Opinions", unit="product"):
@@ -12517,6 +16635,7 @@ def seed_opinions():
                 print(Fore.RED + f"Error adding opinion for Product ID {product.id}: {e}")
 
     print(Fore.GREEN + "Opinions successfully seeded.")
+
 
 def seed_orders():
     reset_sequences()

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import config from "../../config/config";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -7,7 +8,7 @@ const AdminOrders = () => {
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/orders/", {
+      .get(`${config.apiUrl}/api/orders/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

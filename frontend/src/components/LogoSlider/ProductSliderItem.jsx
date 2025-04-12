@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
+import config from "../../config/config";
 
 const ProductSliderItem = ({ id, photos, name, price }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
@@ -21,7 +22,7 @@ const ProductSliderItem = ({ id, photos, name, price }) => {
       addToFavorites({
         id,
         img: photos?.[0]?.path
-          ? `http://localhost:8000/media/${photos[0].path}`
+          ? `${config.apiUrl}/media/${photos[0].path}`
           : "https://via.placeholder.com/150",
         name,
         price,
@@ -30,7 +31,7 @@ const ProductSliderItem = ({ id, photos, name, price }) => {
   };
 
   const imageUrl = photos?.[0]?.path
-    ? `http://localhost:8000/media/${photos[0].path}`
+    ? `${config.apiUrl}/media/${photos[0].path}`
     : "https://via.placeholder.com/150";
 
   return (

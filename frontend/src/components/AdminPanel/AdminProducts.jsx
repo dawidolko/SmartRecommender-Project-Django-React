@@ -17,6 +17,7 @@ import StatCard from "./StatCard";
 import SalesTrendChart from "./SalesTrendChart";
 import CategoryDistributionChart from "./CategoryDistributionChart";
 import "./AdminPanel.scss";
+import config from "../../config/config";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -86,7 +87,7 @@ const AdminProducts = () => {
   const fetchProducts = () => {
     const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/products/", {
+      .get(`${config.apiUrl}/api/products/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setProducts(res.data))
@@ -104,7 +105,7 @@ const AdminProducts = () => {
   const fetchTags = async () => {
     const token = localStorage.getItem("access");
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/tags/", {
+      const response = await axios.get(`${config.apiUrl}/api/tags/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAvailableTags(response.data);
@@ -116,12 +117,9 @@ const AdminProducts = () => {
   const fetchCategories = async () => {
     const token = localStorage.getItem("access");
     try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/categories/",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get(`${config.apiUrl}/api/categories/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setAvailableCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -131,12 +129,9 @@ const AdminProducts = () => {
   const fetchProduct = async (id) => {
     const token = localStorage.getItem("access");
     try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000/api/products/${id}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get(`${config.apiUrl}/api/products/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setEditName(response.data.name);
       setEditPrice(response.data.price);
       setEditOldPrice(response.data.old_price || "");
@@ -156,7 +151,7 @@ const AdminProducts = () => {
   const fetchStats = () => {
     const token = localStorage.getItem("access");
     axios
-      .get("http://127.0.0.1:8000/api/admin-dashboard-stats/", {
+      .get(`${config.apiUrl}/api/admin-dashboard-stats/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -197,7 +192,7 @@ const AdminProducts = () => {
     };
     try {
       if (!editId) {
-        await axios.post("http://127.0.0.1:8000/api/products/", productData, {
+        await axios.post(`${config.apiUrl}/api/products/`, productData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -226,11 +221,9 @@ const AdminProducts = () => {
       photos: editPhotos || [],
     };
     try {
-      await axios.put(
-        `http://127.0.0.1:8000/api/products/${editId}/`,
-        productData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put(`${config.apiUrl}/api/products/${editId}/`, productData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setEditId(null);
       setEditName("");
       setEditPrice("");
@@ -266,7 +259,7 @@ const AdminProducts = () => {
     if (!window.confirm("Czy na pewno chcesz usunąć ten produkt?")) return;
     const token = localStorage.getItem("access");
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/products/${productId}/`, {
+      await axios.delete(`${config.apiUrl}/api/products/${productId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts((prev) => prev.filter((p) => p.id !== productId));

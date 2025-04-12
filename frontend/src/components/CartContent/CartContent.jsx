@@ -5,6 +5,7 @@ import CartProduct from "./CartProduct";
 import TotalAmount from "./TotalAmount";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import config from "../../config/config";
 
 const CartContent = () => {
   const { items, totalAmount } = useContext(CartContext);
@@ -14,7 +15,7 @@ const CartContent = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/products/");
+        const response = await axios.get(`${config.apiUrl}/api/products/`);
         setShopData(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./PanelLogin.scss";
+import config from "../../config/config";
 
 const LoginPanel = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ const LoginPanel = () => {
     }
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
+      const response = await axios.post(`${config.apiUrl}/api/token/`, {
         email,
         password,
       });

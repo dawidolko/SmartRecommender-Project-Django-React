@@ -5,9 +5,11 @@ import CartModal from "./CartModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import config from "../../config/config";
 
 const TotalAmount = () => {
-  const { totalAmount, totalCartItems, resetCart, items } = useContext(CartContext);
+  const { totalAmount, totalCartItems, resetCart, items } =
+    useContext(CartContext);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -36,7 +38,7 @@ const TotalAmount = () => {
     try {
       // Send POST request with Authorization header
       await axios.post(
-        "http://localhost:8000/api/orders/",
+        `${config.apiUrl}/api/orders/`,
         {
           items,
           total: totalAmount(),

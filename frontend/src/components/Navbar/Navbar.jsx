@@ -8,6 +8,7 @@ import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
 import CartPreview from "../CartContent/CartPreview";
 import axios from "axios";
+import config from "../../config/config";
 
 const Navbar = () => {
   useContext(CartContext);
@@ -41,7 +42,7 @@ const Navbar = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/categories/")
+      .get(`${config.apiUrl}/api/categories/`)
       .then((res) => setCategories(res.data))
       .catch((err) => console.error("Error fetching categories:", err));
   }, []);

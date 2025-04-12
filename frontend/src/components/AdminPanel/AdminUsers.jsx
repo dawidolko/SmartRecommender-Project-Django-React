@@ -10,7 +10,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import axios from "axios";
-
+import config from "../../config/config";
 import StatCard from "./StatCard";
 import UserGrowthChart from "./UserGrowthChart";
 import "./AdminPanel.scss";
@@ -64,7 +64,7 @@ const AdminUsers = () => {
   const fetchCustomers = async () => {
     const token = localStorage.getItem("access");
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/users/", {
+      const res = await axios.get(`${config.apiUrl}/api/users/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCustomers(res.data);
@@ -77,7 +77,7 @@ const AdminUsers = () => {
     const token = localStorage.getItem("access");
     try {
       const res = await axios.get(
-        "http://127.0.0.1:8000/api/admin-dashboard-stats/",
+        `${config.apiUrl}/api/admin-dashboard-stats/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -102,7 +102,7 @@ const AdminUsers = () => {
     const token = localStorage.getItem("access");
     try {
       await axios.post(
-        "http://127.0.0.1:8000/api/users/",
+        `${config.apiUrl}/api/users/`,
         {
           username: newUsername,
           email: newEmail,
@@ -152,7 +152,7 @@ const AdminUsers = () => {
     const token = localStorage.getItem("access");
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/users/${editId}/`,
+        `${config.apiUrl}/api/users/${editId}/`,
         {
           email: editEmail,
           username: editUsername,
@@ -175,7 +175,7 @@ const AdminUsers = () => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     const token = localStorage.getItem("access");
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/users/${userId}/`, {
+      await axios.delete(`${config.apiUrl}/api/users/${userId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchCustomers();

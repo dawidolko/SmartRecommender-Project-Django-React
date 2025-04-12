@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
+import config from "../../config/config";
 
 const ShopContent = () => {
   const { category } = useParams();
@@ -30,7 +31,7 @@ const ShopContent = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/categories/");
+        const response = await fetch(`${config.apiUrl}/api/categories/`);
         const data = await response.json();
         setCategories(data.map((cat) => cat.name));
         setIsLoadingCategories(false);
@@ -42,7 +43,7 @@ const ShopContent = () => {
 
     const fetchTags = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/tags/");
+        const response = await fetch(`${config.apiUrl}/api/tags/`);
         const data = await response.json();
         setTags(data);
         setIsLoadingTags(false);
@@ -54,7 +55,7 @@ const ShopContent = () => {
 
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/products/");
+        const response = await fetch(`${config.apiUrl}/api/products/`);
         const data = await response.json();
         setProducts(data);
         setIsLoadingProducts(false);
@@ -69,7 +70,9 @@ const ShopContent = () => {
     fetchProducts();
   }, []);
 
-  const mainCategories = Array.from(new Set(categories.map((cat) => cat.split(".")[0])));
+  const mainCategories = Array.from(
+    new Set(categories.map((cat) => cat.split(".")[0]))
+  );
   const subCategories =
     selectedMainCategory !== "all"
       ? categories
@@ -85,7 +88,8 @@ const ShopContent = () => {
         const [prodMain, prodSub = "all"] = prodCat.split(".");
         return selectedSubCategory === "all"
           ? prodMain === selectedMainCategory
-          : prodMain === selectedMainCategory && prodSub === selectedSubCategory;
+          : prodMain === selectedMainCategory &&
+              prodSub === selectedSubCategory;
       });
 
     const matchesTag = !selectedTag || product.tags.includes(selectedTag);
@@ -114,8 +118,9 @@ const ShopContent = () => {
                   setSelectedSubCategory("all");
                   navigate(`/category/all`);
                 }}
-                className={selectedMainCategory === "all" ? "shop__active" : ""}
-              >
+                className={
+                  selectedMainCategory === "all" ? "shop__active" : ""
+                }>
                 ALL PRODUCTS
               </button>
               {mainCategories.map((mainCat) => (
@@ -126,8 +131,9 @@ const ShopContent = () => {
                     setSelectedSubCategory("all");
                     navigate(`/category/${mainCat}`);
                   }}
-                  className={selectedMainCategory === mainCat ? "shop__active" : ""}
-                >
+                  className={
+                    selectedMainCategory === mainCat ? "shop__active" : ""
+                  }>
                   {mainCat.toUpperCase()}
                 </button>
               ))}
@@ -140,8 +146,9 @@ const ShopContent = () => {
                     setSelectedSubCategory("all");
                     navigate(`/category/${selectedMainCategory}`);
                   }}
-                  className={selectedSubCategory === "all" ? "shop__active" : ""}
-                >
+                  className={
+                    selectedSubCategory === "all" ? "shop__active" : ""
+                  }>
                   ALL PRODUCTS
                 </button>
                 {subCategories.map((subCat) => (
@@ -151,8 +158,9 @@ const ShopContent = () => {
                       setSelectedSubCategory(subCat);
                       navigate(`/category/${selectedMainCategory}.${subCat}`);
                     }}
-                    className={selectedSubCategory === subCat ? "shop__active" : ""}
-                  >
+                    className={
+                      selectedSubCategory === subCat ? "shop__active" : ""
+                    }>
                     {subCat.toUpperCase()}
                   </button>
                 ))}
@@ -164,16 +172,14 @@ const ShopContent = () => {
                 <p>Filter by tag:</p>
                 <button
                   onClick={() => setSelectedTag(null)}
-                  className={!selectedTag ? "shop__active" : ""}
-                >
+                  className={!selectedTag ? "shop__active" : ""}>
                   ALL TAGS
                 </button>
                 {tags.map((tag) => (
                   <button
                     key={tag.id}
                     onClick={() => setSelectedTag(tag.name)}
-                    className={selectedTag === tag.name ? "shop__active" : ""}
-                  >
+                    className={selectedTag === tag.name ? "shop__active" : ""}>
                     {tag.name.toUpperCase()}
                   </button>
                 ))}
@@ -195,7 +201,7 @@ const ShopContent = () => {
               price={product.price}
               old_price={product.old_price}
               imgs={product.photos.map(
-                (photo) => `http://localhost:8000/media/${photo.path}`
+                (photo) => `${config.apiUrl}/media/${photo.path}`
               )}
               category={product.categories[0] || "N/A"}
             />

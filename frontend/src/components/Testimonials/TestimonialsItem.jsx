@@ -1,5 +1,6 @@
 import "./Testimonials.scss";
 import { useNavigate } from "react-router-dom";
+import config from "../../config/config";
 
 const TestimonialsItem = ({
   id,
@@ -32,7 +33,7 @@ const TestimonialsItem = ({
       <img
         src={
           photos?.[0]?.path
-            ? `http://localhost:8000/media/${photos[0].path}`
+            ? `${config.apiUrl}/media/${photos[0].path}`
             : "/placeholder.jpg"
         }
         alt={name}

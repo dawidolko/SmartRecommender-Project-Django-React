@@ -1,13 +1,14 @@
 import React, { useContext } from "react";
 import { CartContext } from "../ShopContext/ShopContext";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
+import config from "../../config/config";
 
 const CartProduct = ({ id, name, price, photos }) => {
   const { items, addToCart, removeFromCart, singleProductAmount } =
     useContext(CartContext);
 
   const img = photos?.[0]?.path
-    ? `http://localhost:8000/media/${photos[0].path}`
+    ? `${config.apiUrl}/media/${photos[0].path}`
     : "https://via.placeholder.com/150";
 
   const itemQuantity = items[id];
