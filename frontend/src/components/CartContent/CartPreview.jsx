@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import "./CartPreview.scss";
 import { AiOutlineClose, AiOutlineShopping } from "react-icons/ai";
+import { Link } from "react-router-dom";
 import config from "../../config/config";
 import { CartContext } from "../ShopContext/ShopContext";
 
@@ -42,8 +43,12 @@ const CartPreview = () => {
   const changeQuantity = (itemId, action) => {
     if (action === "increase") {
       items[itemId] = (items[itemId] || 0) + 1;
-    } else if (action === "decrease" && items[itemId] > 1) {
-      items[itemId] -= 1;
+    } else if (action === "decrease") {
+      if (items[itemId] === 1) {
+        removeItem(itemId);
+      } else {
+        items[itemId] -= 1;
+      }
     }
   };
 
@@ -75,7 +80,11 @@ const CartPreview = () => {
                       className="cart-item__img"
                     />
                     <div className="cart-item__details">
-                      <p>{product.name}</p>
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="cart-item__name">
+                        <p>{product.name}</p>
+                      </Link>
                       <span>{product.price} $</span>
                       <div className="cart-item__actions">
                         <button
@@ -103,9 +112,9 @@ const CartPreview = () => {
           ) : (
             <p>Cart is empty</p>
           )}
-          <a href="/cart" className="cart-btn">
+          <Link to="/cart" className="cart-btn">
             Go To Cart
-          </a>
+          </Link>
         </div>
       )}
     </div>

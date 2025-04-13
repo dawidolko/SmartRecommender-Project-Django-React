@@ -10,6 +10,23 @@ const ClientOrders = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Pending":
+        return "status-pending";
+      case "Processing":
+        return "status-processing";
+      case "Shipped":
+        return "status-shipped";
+      case "Delivered":
+        return "status-delivered";
+      case "Cancelled":
+        return "status-cancelled";
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
@@ -57,31 +74,36 @@ const ClientOrders = () => {
         <table className="table table-hover">
           <thead>
             <tr>
-              <th>#</th>
+              <th class="text-align-client">#</th>
               <th
+                className="hide-complaints2 text-align-client"
                 style={{ cursor: "pointer" }}
                 onClick={() => handleSort("date")}>
-                Date{renderSortIndicator("date")}
+                Date {renderSortIndicator("date")}
               </th>
               <th
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", textAlign: "center" }}
                 onClick={() => handleSort("status")}>
-                Status{renderSortIndicator("status")}
+                Status {renderSortIndicator("status")}
               </th>
-              <th>Actions</th>
+              <th class="text-align-client">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedOrders.map((order) => (
               <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>
+                <td class="text-align-client">{order.id}</td>
+                <td className="hide-complaints2 text-align-client">
                   {format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}
                 </td>
-                <td>{order.status}</td>
-                <td>
+                <td
+                  style={{ textAlign: "center" }}
+                  className={getStatusClass(order.status)}>
+                  {order.status}
+                </td>
+                <td className="table-center">
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-main-client"
                     onClick={() => handleViewDetails(order.id)}>
                     View Details
                   </button>

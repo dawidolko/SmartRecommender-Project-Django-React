@@ -1,91 +1,90 @@
 .client-account {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-      font-size: 3rem;
-      color: #333;
-    }
-  
-    .account-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 3rem;
+    color: #333;
+  }
+
+  .account-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .form-group {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-  
-      .form-group {
-        display: flex;
-        flex-direction: column;
-  
-        label {
-          margin-bottom: 0.5rem;
-          font-weight: bold;
-          color: #555;
-          font-size: 1.8rem;
-        }
-  
-        input {
-          padding: 0.5rem;
-          font-size: 1.6rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          margin-bottom: 1rem;
-          transition: border-color 0.2s;
-  
-          &:focus {
-            outline: none;
-            border-color: #007bff;
-          }
-        }
+
+      label {
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #555;
+        font-size: 1.8rem;
       }
-  
-      .error-message {
-        color: red;
-        font-size: 0.9rem;
-        text-align: center;
-      }
-  
-      .btn-submit {
-        padding: 1rem 2rem;
-        font-size: 1.7rem;
-        border: none;
-        background-color: #28a745;
-        color: #fff;
+
+      input {
+        padding: 0.5rem;
+        font-size: 1.6rem;
+        border: 1px solid #ccc;
         border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        margin-top: 1rem;
-  
-        &:hover {
-          background-color: #218838;
+        margin-bottom: 1rem;
+        transition: border-color 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
         }
       }
     }
-  }
-  
-  @media (max-width: 576px) {
-    .client-account {
-      padding: 0.5rem;
-      h1 {
-        font-size: 1.5rem;
+
+    .error-message {
+      color: red;
+      font-size: 1.9rem;
+      text-align: left;
+    }
+
+    .btn-submit {
+      padding: 1rem 2rem;
+      font-size: 1.7rem;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 1rem;
+
+      &:hover {
+        background-color: #218838;
       }
-      .account-form {
-        .form-group {
-          input {
-            font-size: 0.9rem;
-            padding: 0.4rem;
-          }
-        }
-        .btn-submit {
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .client-account {
+    padding: 0.5rem;
+    h1 {
+      font-size: 1.5rem;
+    }
+    .account-form {
+      .form-group {
+        input {
           font-size: 0.9rem;
-          padding: 0.6rem;
+          padding: 0.4rem;
         }
+      }
+      .btn-submit {
+        font-size: 0.9rem;
+        padding: 0.6rem;
       }
     }
   }
-  
+}

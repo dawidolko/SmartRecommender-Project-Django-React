@@ -51,6 +51,7 @@ REM Installing psycopg2-binary
 pip uninstall psycopg2-binary
 pip install psycopg[c]
 pip install djangorestframework-simplejwt
+npm install react-toastify
 @REM pip install psycopg2-binary
 
 REM Creating and applying migrations

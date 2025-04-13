@@ -6,8 +6,13 @@
 
   &__title {
     margin-bottom: 1em;
-    font-size: 3rem;
+    font-size: 4rem;
     text-align: center;
+    width: 100%;
+    margin-top: 30px;
+    @media (max-width: 1024px) {
+      font-size: 2.5rem;
+    }
   }
 
   &__favorite-btn {
@@ -219,18 +224,6 @@
     }
   }
 
-  &__category {
-    font-size: 1.2rem;
-    color: #000000;
-    margin-bottom: 0.5em;
-    border: 1px solid black;
-    padding: 0.5em;
-    border-radius: 3px;
-    min-width: 100%;
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-
   &__prices {
     display: flex;
     justify-content: center;
@@ -243,6 +236,10 @@
       color: rgb(107 114 128 / var(--tw-text-opacity));
       text-decoration-line: line-through;
       font-weight: bold;
+      font-size: 2rem;
+      @media (max-width: 1024px) {
+        font-size: 1.5rem;
+      }
     }
   }
 
@@ -250,6 +247,10 @@
     font-weight: bolder;
     color: rgb(239 68 68);
     margin-bottom: 0.5em;
+    font-size: 3.5rem;
+    @media (max-width: 1024px) {
+      font-size: 2rem;
+    }
   }
 
   &__active {
@@ -290,11 +291,7 @@
 
 @media (min-width: 600px) {
   .shop {
-    &__title {
-      font-size: 4rem;
-    }
-
-    &__buttons > *,
+    &__title &__buttons > *,
     &__btn,
     &__navigate {
       padding: 0.8em 1.6em;
@@ -304,10 +301,6 @@
 
 @media (max-width: 768px) {
   .shop {
-    &__title {
-      font-size: 5rem;
-    }
-
     &__buttons {
       gap: 1em;
     }
@@ -374,4 +367,171 @@
 
 .Toastify__close-button {
   color: white;
+}
+
+.shop {
+  &__container__main {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  &__active {
+    background-color: #e3e3e3;
+  }
+
+  &__main-categories {
+    margin-top: 20px;
+    button {
+      background-color: #ffffff00;
+      color: #333;
+      font-size: 1.5rem;
+      font-weight: 500;
+      min-width: 170px;
+      text-align: left;
+      transition: all 0.3s ease;
+      &:hover {
+        background-color: #ff5733;
+        color: white;
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  &__category {
+    &__main {
+      border-radius: 5px;
+      font-size: 1.2rem;
+      color: #000000;
+      margin-bottom: 0.5em;
+      border: 1px solid black;
+      padding: 0.5em;
+      border-radius: 3px;
+      min-width: 100%;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    min-width: 220px;
+    button {
+      background-color: #ffffff00;
+      color: #333;
+      font-size: 1.5rem;
+      font-weight: 500;
+      min-width: 180px;
+      text-align: left;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1.2rem !important;
+    }
+  }
+
+  &__sub-categories {
+    background: #e3e3e3;
+    button {
+      width: 100%;
+      font-size: 1.3rem;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+
+      &.shop__active {
+        background-color: #ff5733;
+        color: white;
+        transform: scale(1.05);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  &__sidebar {
+    width: 180px;
+    padding: 1em;
+    border-right: 2px solid #ddd;
+    position: fixed;
+    top: 110px;
+    left: 0;
+    bottom: 0;
+    background-color: white;
+    transition: transform 0.3s ease;
+    z-index: 9999999;
+    &.open {
+      transform: translateX(0);
+    }
+    &.closed {
+      transform: translateX(-100%);
+    }
+
+    &-categories button {
+      width: 100%;
+      padding: 1em;
+      font-size: 1.2rem;
+      text-align: left;
+      background-color: #f2f2f2;
+      border: 2px solid #ddd;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      margin: 0.5em 0;
+      float: left;
+
+      &.shop__active {
+        background-color: #ff5733;
+        color: white;
+        transform: scale(1.05);
+        font-weight: 600;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .category__class {
+      margin-left: 10px;
+      margin-top: 10px;
+      float: right;
+    }
+
+    .category__icon {
+      font-size: 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .category__class.expanded {
+      background-color: #ff5733;
+      border-radius: 5px;
+      padding: 5px;
+    }
+
+    .category__icon.expanded {
+      transform: rotate(90deg);
+    }
+  }
+
+  .hamburger-icon {
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    background: #333;
+    cursor: pointer;
+    position: fixed;
+    top: 115px;
+    left: 198px;
+    z-index: 1000;
+  }
+
+  @media (max-width: 768px) {
+    .hamburger-icon {
+      display: block;
+    }
+  }
+
+  &__products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
 }

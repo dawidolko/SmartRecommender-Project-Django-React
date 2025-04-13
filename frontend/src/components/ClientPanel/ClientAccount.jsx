@@ -2,12 +2,12 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 import "./ClientAccount.scss";
 import config from "../../config/config";
 
 const ClientAccount = () => {
   const { user, setUser } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const [initialData, setInitialData] = useState({
     first_name: "",
@@ -118,12 +118,21 @@ const ClientAccount = () => {
       .then((res) => {
         setUser(res.data);
         localStorage.setItem("loggedUser", JSON.stringify(res.data));
-        alert("Account updated!");
-        navigate("/client");
+        toast.success("Account updated!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+        });
       })
       .catch((err) => {
         console.error("Error updating account:", err);
-        setErrorMessage("Error updating account");
+        toast.error("Error updating account", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+        });
       });
   };
 
@@ -185,7 +194,7 @@ const ClientAccount = () => {
           />
         </div>
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-        <button type="submit" className="btn-submit">
+        <button type="submit" className="btn-submit btn-main-client">
           Update
         </button>
       </form>

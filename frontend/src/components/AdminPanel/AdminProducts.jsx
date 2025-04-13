@@ -18,6 +18,8 @@ import SalesTrendChart from "./SalesTrendChart";
 import CategoryDistributionChart from "./CategoryDistributionChart";
 import "./AdminPanel.scss";
 import config from "../../config/config";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -264,8 +266,24 @@ const AdminProducts = () => {
       });
       setProducts((prev) => prev.filter((p) => p.id !== productId));
       fetchStats();
+      toast.success("Product deleted successfully!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (error) {
       console.error("Error deleting product:", error);
+      toast.error("Failed to delete product. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 

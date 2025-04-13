@@ -115,7 +115,7 @@ const ShopProduct = (props) => {
       </div>
 
       <div className="shop__content" onClick={(e) => e.stopPropagation()}>
-        <p className="shop__category">{`CATEGORY: ${category
+        <p className="shop__category__main">{`CATEGORY: ${category
           .replace(".", " > ")
           .toUpperCase()}`}</p>
 

@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
@@ -31,6 +30,7 @@ const AdminPanel = () => {
     return null;
   }
 
+  // Function to get the title based on the current path
   const getTitle = () => {
     switch (location.pathname) {
       case "/admin":
@@ -57,11 +57,14 @@ const AdminPanel = () => {
           <AdminHeader title={getTitle()} />
           <main className="admin-main">
             <Routes>
+              {/* AdminDashboard is the default route when visiting /admin */}
               <Route path="/" element={<AdminDashboard />} />
-              <Route path="/products" element={<AdminProducts />} />
-              <Route path="/orders" element={<AdminOrders />} />
-              <Route path="/users" element={<AdminUsers />} />
-              <Route path="/complaints" element={<AdminComplaints />} />
+              {/* These are the routes for other sections like Products, Orders, etc. */}
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="complaints" element={<AdminComplaints />} />
+              {/* Catch-all route for undefined paths */}
               <Route
                 path="*"
                 element={

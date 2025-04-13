@@ -699,3 +699,22 @@ class CurrentUserUpdateAPIView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+class RecommendedProductsAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        
+        recommended_products = Product.objects.all().order_by('?')[:4] 
+
+        serializer = ProductSerializer(recommended_products, many=True)
+        return Response(serializer.data)
+    
+class RecommendedProductsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        recommended_products = Product.objects.filter(id__in=[100, 200, 300, 400])
+
+        serializer = ProductSerializer(recommended_products, many=True)
+        return Response(serializer.data)

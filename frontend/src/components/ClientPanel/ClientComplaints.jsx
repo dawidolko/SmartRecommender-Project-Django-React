@@ -11,6 +11,19 @@ const ClientComplaints = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Pending":
+        return "status-pending";
+      case "Resolved":
+        return "status-resolved";
+      case "Rejected":
+        return "status-rejected";
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
@@ -58,38 +71,49 @@ const ClientComplaints = () => {
         <table className="table table-hover">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Order ID</th>
-              <th>Cause</th>
+              <th className="hide-complaints text-align-client">#</th>
+              <th className="hide-complaints text-align-client">Order ID</th>
+              <th className="hide-complaints2 text-align-client">Cause</th>
               <th
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", textAlign: "center" }}
                 onClick={() => handleSort("status")}>
-                Status{renderSortIndicator("status")}
+                Status {renderSortIndicator("status")}
               </th>
               <th
+                className="hide-complaints2 text-align-client"
                 style={{ cursor: "pointer" }}
                 onClick={() => handleSort("date")}>
-                Submission Date{renderSortIndicator("date")}
+                Submission Date {renderSortIndicator("date")}
               </th>
-              <th>Actions</th>
+              <th class="text-align-client">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedComplaints.map((complaint) => (
               <tr key={complaint.id}>
-                <td>{complaint.id}</td>
-                <td>{complaint.order}</td>
-                <td>{complaint.cause}</td>
-                <td>{complaint.status}</td>
-                <td>
+                <td className="hide-complaints text-align-client">
+                  {complaint.id}
+                </td>
+                <td className="hide-complaints text-align-client">
+                  {complaint.order}
+                </td>
+                <td className="hide-complaints2 text-align-client">
+                  {complaint.cause}
+                </td>
+                <td
+                  style={{ textAlign: "center" }}
+                  className={getStatusClass(complaint.status)}>
+                  {complaint.status}
+                </td>
+                <td className="hide-complaints2 text-align-client">
                   {format(
                     new Date(complaint.submission_date),
                     "dd MMM yyyy, HH:mm"
                   )}
                 </td>
-                <td>
+                <td className="table-center">
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-main-client"
                     onClick={() => handleViewDetails(complaint.id)}>
                     View Details
                   </button>

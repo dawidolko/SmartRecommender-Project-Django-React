@@ -49,6 +49,7 @@ pip install -r requirements.txt
 # Installing psycopg2-binary
 pip uninstall -y psycopg2-binary
 pip install psycopg[c]
+npm install react-toastify
 
 # Creating and applying migrations
 echo "Creating and applying migrations to the database..."

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { color, motion } from "framer-motion";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
 import FormComponent from "./FormComponent";
 import { AiOutlineClose } from "react-icons/ai";
@@ -33,7 +33,9 @@ const ModalComponent = ({
         exit="exit"
         onClick={(e) => e.stopPropagation()}
         className="modal">
-        <h2 className="modal__title">Request a Callback</h2>
+        <h2 style={{ color: "white" }} className="modal__title">
+          Request a Callback
+        </h2>
         <p className="modal__text">
           Enter your details below, and we will call you back within 30 seconds.
         </p>
@@ -45,7 +47,7 @@ const ModalComponent = ({
           message={message}
         />
         <button
-          className="modal__close"
+          className="modal__close modal__close--absolute"
           onClick={handleClose}
           aria-label="Close">
           <AiOutlineClose />

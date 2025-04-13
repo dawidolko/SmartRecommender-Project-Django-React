@@ -93,10 +93,11 @@ class OrderSerializer(serializers.ModelSerializer):
     status = serializers.CharField(required=False)
     order_products = OrderProductSerializer(many=True, read_only=True, source='orderproduct_set')
     total = serializers.SerializerMethodField()
+    user_email = serializers.EmailField(source="user.email", read_only=True)
 
     class Meta:
         model = Order
-        fields = ["id", "user", "date_order", "status", "order_products", "total"]
+        fields = ["id", "user", "user_email", "date_order", "status", "order_products", "total"]
         read_only_fields = ["date_order"]
 
     def get_total(self, obj):
@@ -104,7 +105,6 @@ class OrderSerializer(serializers.ModelSerializer):
         for op in obj.orderproduct_set.all():
             total_value += op.product.price * op.quantity
         return total_value
-
 
 # Item in cart
 class CartItemSerializer(serializers.ModelSerializer):

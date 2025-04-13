@@ -2,7 +2,21 @@
 
 .cart {
   padding: 6em 0;
-  margin-top: 200px !important;
+  margin-top: 350px !important;
+
+  &__remove-btn {
+    background-color: transparent;
+    border: none;
+    color: red;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: rgb(107, 14, 14) !important;
+      background-color: transparent !important;
+    }
+  }
 
   &__notification {
     position: fixed;
@@ -15,6 +29,13 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     font-size: 1rem;
     z-index: 1000;
+  }
+
+  &__name {
+    &:hover {
+      color: #007bff !important;
+      text-decoration: underline;
+    }
   }
 
   &__container {
@@ -49,14 +70,19 @@
 
   &__action-btn {
     padding: 0.15em;
-    background-color: #4caf50;
+    background-color: #00b60f;
+    border: 1px solid #00b60f;
     border-radius: 3px;
+    &:hover {
+      background: #08630f;
+      border: 1px solid #08630f;
+    }
   }
 
   &__action-icon {
     @include flexCenter(row);
     font-size: 1rem;
-    color: $white;
+    color: white;
   }
 
   &__action-quantity {
@@ -66,7 +92,7 @@
 
   &__total {
     font-weight: bold;
-    color: $main;
+    color: rgb(239, 68, 68);
   }
 
   &__info {
@@ -114,8 +140,16 @@
     padding: 0.9em 1.8em;
     background-color: $dark;
     color: $white;
+    border: 1px solid $dark;
     border-radius: 12px;
     font-size: inherit;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0) !important;
+      color: $dark;
+      border: 1px solid $dark;
+    }
   }
 
   &__modal-overlay {
@@ -191,12 +225,18 @@
 @media (min-width: 760px) {
   .cart {
     &__btn {
-      padding: 0.8em 1.6em;
-      transition: background-color 0.3s ease;
+      padding: 0.9em 1.8em;
+      background-color: $dark;
+      color: $white;
+      border: 1px solid $dark;
+      border-radius: 12px;
       font-size: inherit;
+      transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: $main;
+        background-color: rgba(255, 255, 255, 0) !important;
+        color: $dark;
+        border: 1px solid $dark;
       }
     }
 

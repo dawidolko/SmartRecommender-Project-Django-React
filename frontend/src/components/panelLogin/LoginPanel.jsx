@@ -43,6 +43,12 @@ const LoginPanel = () => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
+  };
+
   return (
     <div className="loginPanel">
       <div className="loginPanel__container">
@@ -60,6 +66,7 @@ const LoginPanel = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={handleKeyPress} // Nasłuchiwanie Entera
               required
             />
           </div>
@@ -72,6 +79,7 @@ const LoginPanel = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>

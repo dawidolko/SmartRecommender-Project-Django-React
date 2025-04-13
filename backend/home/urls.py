@@ -7,6 +7,7 @@ from .views import (
     ProductsAPIView,
     RandomProductsAPIView,
     ProductDetailAPIView,
+    RecommendedProductsAPIView,
     home_view,
     UserLoginView,
     UserRegisterView,
@@ -61,4 +62,5 @@ urlpatterns = [
     path('cart/update/<int:item_id>/', CartPreviewView.as_view(), name="cart_update"),
     path('cart/remove/<int:item_id>/', CartPreviewView.as_view(), name="cart_remove"),
     path("api/client-stats/", ClientStatsView.as_view(), name="client-stats"),
+    path('api/recommended-products/', RecommendedProductsAPIView.as_view(), name='recommended-products'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -19,12 +19,12 @@ const ClientDashboard = () => {
   const [categoryDistributionData, setCategoryDistributionData] =
     useState(null);
   const [chartOptions, setChartOptions] = useState(null);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const baseOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -42,9 +42,15 @@ const ClientDashboard = () => {
     const clientStatsRequest = axios.get(`${config.apiUrl}/api/client-stats/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    const recommendedProductsRequest = axios.get(
+      `${config.apiUrl}/api/recommended-products/`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-    Promise.all([ordersRequest, clientStatsRequest])
-      .then(([ordersRes, clientStatsRes]) => {
+    Promise.all([ordersRequest, clientStatsRequest, recommendedProductsRequest])
+      .then(([ordersRes, clientStatsRes, recommendedProductsRes]) => {
         const orders = ordersRes.data;
 
         const trendsMap = {};
@@ -127,12 +133,19 @@ const ClientDashboard = () => {
         };
         setCategoryDistributionData(catChart);
 
+        setRecommendedProducts(recommendedProductsRes.data);
+
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
         setError("Failed to fetch data. Please try again.");
         setLoading(false);
+
+        // Wylogowanie i przekierowanie na stronę główną
+        localStorage.removeItem("access");
+        navigate("/");
+        window.location.reload();
       });
   }, [baseOptions]);
 
@@ -142,6 +155,10 @@ const ClientDashboard = () => {
   if (error) {
     return <div style={{ padding: "2rem", color: "red" }}>{error}</div>;
   }
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
 
   return (
     <div className="container client-dashboard">
@@ -222,22 +239,21 @@ const ClientDashboard = () => {
       <div className="dashboard-recommendations my-4">
         <h2>Recommended For You</h2>
         <div className="recommendations-grid">
-          <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
-            <p>Product Name</p>
-          </div>
-          <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
-            <p>Product Name</p>
-          </div>
-          <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
-            <p>Product Name</p>
-          </div>
-          <div className="recommendation-card">
-            <img src="https://placehold.co/250" alt="Recommendation" />
-            <p>Product Name</p>
-          </div>
+          {recommendedProducts.map((product, index) => (
+            <div
+              className="recommendation-card"
+              key={index}
+              onClick={() => handleProductClick(product.id)}
+              style={{ cursor: "pointer" }}>
+              <img
+                src={`${config.apiUrl}/media/${
+                  product.photos[0]?.path || "https://placehold.co/250"
+                }`}
+                alt={product.name}
+              />
+              <p>{product.name}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

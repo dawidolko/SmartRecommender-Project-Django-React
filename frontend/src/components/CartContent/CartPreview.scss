@@ -29,12 +29,21 @@
     position: absolute;
     top: 40px;
     right: 0;
-    background: white;
+    background-color: #111;
+    color: #e6dbdb;
     width: 300px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 15px;
     z-index: 1000;
+
+    h4 {
+      color: #e6dbdb;
+    }
+
+    p {
+      color: #e6dbdb !important;
+    }
 
     .cart-item {
       display: flex;
@@ -51,24 +60,44 @@
       &__details {
         flex: 1;
         margin-left: 10px;
+        p {
+          &:hover {
+            color: #007bff !important;
+            text-decoration: underline;
+          }
+        }
+        span {
+          color: rgb(239, 68, 68);
+        }
       }
 
       &__actions {
         display: flex;
         align-items: center;
 
+        span {
+          color: white;
+        }
+
         button {
-          background: #ddd;
-          border: none;
+          background: #00b60f;
+          border: 1px solid #00b60f;
           padding: 0.4rem 0.9rem;
           margin: 0 10px;
           cursor: pointer;
+          &:hover {
+            background: #08630f;
+            border: 1px solid #08630f;
+          }
         }
       }
 
       &__remove {
         cursor: pointer;
         color: red;
+        &:hover {
+          color: #8f0202;
+        }
       }
     }
 
@@ -82,7 +111,7 @@
       border-radius: 5px;
       text-decoration: none;
       &:hover {
-        background: #ffffff;
+        background: #ffffff00;
         border: 1px solid #007bff;
         color: #007bff;
       }

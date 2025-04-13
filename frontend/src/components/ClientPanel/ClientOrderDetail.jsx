@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import "./ClientPanel.scss";
 import config from "../../config/config";
@@ -10,6 +10,24 @@ const ClientOrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Pending":
+        return "status-pending";
+      case "Processing":
+        return "status-processing";
+      case "Shipped":
+        return "status-shipped";
+      case "Delivered":
+        return "status-delivered";
+      case "Cancelled":
+        return "status-cancelled";
+      default:
+        return "";
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("access");
@@ -41,7 +59,7 @@ const ClientOrderDetail = () => {
       </p>
       <p>
         <strong>Status: </strong>
-        {order.status}
+        <span className={getStatusClass(order.status)}>{order.status}</span>
       </p>
       <p>
         <strong>Total:</strong>${order.total.toFixed(2)}
@@ -51,10 +69,10 @@ const ClientOrderDetail = () => {
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Price (each)</th>
+            <th style={{ textAlign: "center" }}>Image</th>
+            <th style={{ textAlign: "center" }}>Name</th>
+            <th style={{ textAlign: "center" }}>Quantity</th>
+            <th style={{ textAlign: "center" }}>Price (each)</th>
           </tr>
         </thead>
         <tbody>
@@ -66,21 +84,35 @@ const ClientOrderDetail = () => {
                 : "https://via.placeholder.com/150";
             return (
               <tr key={op.id}>
-                <td style={{ display: "flex", justifyContent: "center" }}>
+                <td
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: "none",
+                    borderBottom: "1px solid #ddd",
+                  }}>
                   <img
                     src={imgSrc}
                     alt={product.name}
                     style={{ width: "100px" }}
                   />
                 </td>
-                <td>{product.name}</td>
-                <td>{op.quantity}</td>
-                <td>${Number(product.price).toFixed(2)}</td>
+                <td style={{ textAlign: "center" }}>{product.name}</td>
+                <td style={{ textAlign: "center" }}>{op.quantity}</td>
+                <td style={{ textAlign: "center" }}>
+                  ${Number(product.price).toFixed(2)}
+                </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <button
+        className="btn btn-primary back_button btn-main-client"
+        onClick={() => navigate(-1)}>
+        Back to Complaints
+      </button>
     </div>
   );
 };

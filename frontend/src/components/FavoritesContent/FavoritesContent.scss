@@ -2,12 +2,27 @@
 
 .favorites {
   padding: 6em 0;
-  margin-top: 250px !important;
+  margin-top: 350px !important;
 
   &__table {
     width: 100%;
     margin-bottom: 3em;
     border-collapse: collapse;
+  }
+
+  &__remove-btn {
+    margin-left: 50px;
+    background-color: transparent;
+    border: none;
+    color: red;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: rgb(107, 14, 14) !important;
+      background-color: transparent !important;
+    }
   }
 
   &__thead {
@@ -25,27 +40,40 @@
     border-bottom: 1px solid #ddd;
   }
 
+  &__td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
   &__img {
-    width: 50px;
+    width: 70px;
     object-fit: cover;
   }
 
-  &__price {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #fd266e;
+  &__product-name {
+    display: block;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: #333;
+    &:hover {
+      color: #007bff !important;
+      text-decoration: underline;
+    }
   }
 
   &__action-btn {
     padding: 0.15em;
-    background-color: #4caf50;
+    background-color: #007bff;
+    border: 1px solid #007bff;
     border-radius: 3px;
-    color: $white;
+    color: white;
     font-size: 1rem;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: darken(#4caf50, 10%);
+      background-color: #ffffff00;
+      border: 1px solid #007bff;
+      color: #007bff;
     }
   }
 
@@ -58,17 +86,6 @@
     font-size: 1.6rem;
     font-weight: bold;
     color: $main;
-  }
-
-  &__total-title {
-    font-size: 1.8rem;
-    margin-right: 0.5em;
-  }
-
-  &__total-price {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #fd266e;
   }
 
   &__empty {
@@ -85,12 +102,15 @@
     padding: 0.9em 1.8em;
     background-color: $dark;
     color: $white;
+    border: 1px solid $dark;
     border-radius: 12px;
     font-size: inherit;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: $main;
+      background-color: rgba(255, 255, 255, 0) !important;
+      color: $dark;
+      border: 1px solid $dark;
     }
   }
 

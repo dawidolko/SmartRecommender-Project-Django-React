@@ -10,15 +10,12 @@ const ShopContent = () => {
 
   const [selectedMainCategory, setSelectedMainCategory] = useState("all");
   const [selectedSubCategory, setSelectedSubCategory] = useState("all");
-  const [selectedTag, setSelectedTag] = useState(null);
-
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [tags, setTags] = useState([]);
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Do kontrolowania stanu sidebaru (otwarty/zwiń)
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-  const [isLoadingTags, setIsLoadingTags] = useState(true);
+  const [expandedCategories, setExpandedCategories] = useState([]); // Nowy stan do zarządzania rozwinięciem kategorii
 
   useEffect(() => {
     if (category) {
@@ -41,18 +38,6 @@ const ShopContent = () => {
       }
     };
 
-    const fetchTags = async () => {
-      try {
-        const response = await fetch(`${config.apiUrl}/api/tags/`);
-        const data = await response.json();
-        setTags(data);
-        setIsLoadingTags(false);
-      } catch (error) {
-        console.error("Error fetching tags:", error);
-        setIsLoadingTags(false);
-      }
-    };
-
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${config.apiUrl}/api/products/`);
@@ -66,7 +51,6 @@ const ShopContent = () => {
     };
 
     fetchCategories();
-    fetchTags();
     fetchProducts();
   }, []);
 
@@ -80,7 +64,6 @@ const ShopContent = () => {
           .map((cat) => cat.split(".")[1])
       : [];
 
-  // Product filtering - we take into account the category and the selected tag
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
       selectedMainCategory === "all" ||
@@ -92,10 +75,20 @@ const ShopContent = () => {
               prodSub === selectedSubCategory;
       });
 
-    const matchesTag = !selectedTag || product.tags.includes(selectedTag);
-
-    return matchesCategory && matchesTag;
+    return matchesCategory;
   });
+
+  const toggleSubCategories = (category) => {
+    setExpandedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((cat) => cat !== category)
+        : [...prev, category]
+    );
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
 
   return (
     <div className="shop container">
@@ -105,13 +98,30 @@ const ShopContent = () => {
           : `Products in "${selectedMainCategory.toUpperCase()}" category`}
       </h2>
 
-      <div className="shop__buttons">
-        {isLoadingCategories ? (
-          <div className="loading-spinner"></div>
-        ) : (
-          <>
+      <div className="shop__container__main">
+        <button className="hamburger-icon" onClick={toggleSidebar}>
+          {isSidebarOpen ? "☰" : "X"}
+        </button>
+        <div
+          style={{
+            position: "fixed",
+            display: isSidebarOpen ? "none" : "flex",
+            top: 110,
+            left: 0,
+            bottom: 0,
+            color: "#d5d5d5",
+            border: "1px solid black",
+            backgroundColor: "white",
+            width: "250px",
+            zIndex: 100,
+            flexDirection: "column",
+            height: "100%",
+            paddingBottom: "50px",
+          }}>
+          {isLoadingCategories ? (
+            <div className="loading-spinner"></div>
+          ) : (
             <div className="shop__main-categories">
-              <p>Filter by category and subcategory:</p>
               <button
                 onClick={() => {
                   setSelectedMainCategory("all");
@@ -124,91 +134,71 @@ const ShopContent = () => {
                 ALL PRODUCTS
               </button>
               {mainCategories.map((mainCat) => (
-                <button
+                <div
                   key={mainCat}
-                  onClick={() => {
-                    setSelectedMainCategory(mainCat);
-                    setSelectedSubCategory("all");
-                    navigate(`/category/${mainCat}`);
-                  }}
-                  className={
-                    selectedMainCategory === mainCat ? "shop__active" : ""
-                  }>
-                  {mainCat.toUpperCase()}
-                </button>
-              ))}
-            </div>
-
-            {selectedMainCategory !== "all" && subCategories.length > 0 && (
-              <div className="shop__sub-categories">
-                <button
-                  onClick={() => {
-                    setSelectedSubCategory("all");
-                    navigate(`/category/${selectedMainCategory}`);
-                  }}
-                  className={
-                    selectedSubCategory === "all" ? "shop__active" : ""
-                  }>
-                  ALL PRODUCTS
-                </button>
-                {subCategories.map((subCat) => (
+                  className={`shop__category ${
+                    expandedCategories.includes(mainCat) ? "expanded" : ""
+                  }`}>
                   <button
-                    key={subCat}
                     onClick={() => {
-                      setSelectedSubCategory(subCat);
-                      navigate(`/category/${selectedMainCategory}.${subCat}`);
+                      setSelectedMainCategory(mainCat);
+                      setSelectedSubCategory("all");
+                      navigate(`/category/${mainCat}`);
                     }}
                     className={
-                      selectedSubCategory === subCat ? "shop__active" : ""
+                      selectedMainCategory === mainCat ? "shop__active" : ""
                     }>
-                    {subCat.toUpperCase()}
+                    {mainCat.toUpperCase()}
                   </button>
-                ))}
-              </div>
-            )}
+                  {selectedMainCategory === mainCat &&
+                    subCategories.length > 0 && (
+                      <div className="shop__sub-categories">
+                        {subCategories.map((subCat) => (
+                          <button
+                            key={subCat}
+                            onClick={() => {
+                              setSelectedSubCategory(subCat);
+                              navigate(`/category/${mainCat}.${subCat}`);
+                            }}
+                            className={
+                              selectedSubCategory === subCat
+                                ? "shop__active"
+                                : ""
+                            }>
+                            {subCat.toUpperCase()}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-            {!isLoadingTags && tags.length > 0 && (
-              <div className="shop__tags">
-                <p>Filter by tag:</p>
-                <button
-                  onClick={() => setSelectedTag(null)}
-                  className={!selectedTag ? "shop__active" : ""}>
-                  ALL TAGS
-                </button>
-                {tags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() => setSelectedTag(tag.name)}
-                    className={selectedTag === tag.name ? "shop__active" : ""}>
-                    {tag.name.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      <div className="shop__products">
-        {isLoadingProducts ? (
-          <div className="loading-spinner"></div>
-        ) : filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <ShopProduct
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              old_price={product.old_price}
-              imgs={product.photos.map(
-                (photo) => `${config.apiUrl}/media/${photo.path}`
-              )}
-              category={product.categories[0] || "N/A"}
-            />
-          ))
-        ) : (
-          <p>No products available in this category or tag.</p>
-        )}
+        {/* Products section */}
+        <div className="shop__products">
+          <h1 className="shop__title">Filter by category and subcategory:</h1>
+          {isLoadingProducts ? (
+            <div className="loading-spinner"></div>
+          ) : filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ShopProduct
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                old_price={product.old_price}
+                imgs={product.photos.map(
+                  (photo) => `${config.apiUrl}/media/${photo.path}`
+                )}
+                category={product.categories[0] || "N/A"}
+              />
+            ))
+          ) : (
+            <p>No products available in this category.</p>
+          )}
+        </div>
       </div>
     </div>
   );

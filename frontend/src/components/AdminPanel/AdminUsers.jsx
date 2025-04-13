@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 import config from "../../config/config";
 import StatCard from "./StatCard";
-import UserGrowthChart from "./UserGrowthChart";
 import "./AdminPanel.scss";
 
 const AdminUsers = () => {
@@ -50,6 +49,34 @@ const AdminUsers = () => {
     fetchStatsFromBackend();
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleFilteringAndSorting = () => {
+    let data = [...customers];
+
+    data = data.filter((c) => {
+      const term = searchTerm.toLowerCase();
+      const emailMatch = c.email?.toLowerCase().includes(term);
+      const userMatch = c.username?.toLowerCase().includes(term);
+      const fnameMatch = c.first_name?.toLowerCase().includes(term);
+      const lnameMatch = c.last_name?.toLowerCase().includes(term);
+      return emailMatch || userMatch || fnameMatch || lnameMatch;
+    });
+
+    data.sort((a, b) => {
+      let fieldA = a[sortField] || "";
+      let fieldB = b[sortField] || "";
+      if (typeof fieldA === "string") fieldA = fieldA.toLowerCase();
+      if (typeof fieldB === "string") fieldB = fieldB.toLowerCase();
+
+      if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
+      if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredCustomers(data);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     handleFilteringAndSorting();
   }, [
@@ -57,7 +84,6 @@ const AdminUsers = () => {
     searchTerm,
     sortField,
     sortDirection,
-    // eslint-disable-next-line no-use-before-define
     handleFilteringAndSorting,
   ]);
 
@@ -182,34 +208,6 @@ const AdminUsers = () => {
     } catch (error) {
       console.error("Error deleting user:", error);
     }
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleFilteringAndSorting = () => {
-    let data = [...customers];
-
-    data = data.filter((c) => {
-      const term = searchTerm.toLowerCase();
-      const emailMatch = c.email?.toLowerCase().includes(term);
-      const userMatch = c.username?.toLowerCase().includes(term);
-      const fnameMatch = c.first_name?.toLowerCase().includes(term);
-      const lnameMatch = c.last_name?.toLowerCase().includes(term);
-      return emailMatch || userMatch || fnameMatch || lnameMatch;
-    });
-
-    data.sort((a, b) => {
-      let fieldA = a[sortField] || "";
-      let fieldB = b[sortField] || "";
-      if (typeof fieldA === "string") fieldA = fieldA.toLowerCase();
-      if (typeof fieldB === "string") fieldB = fieldB.toLowerCase();
-
-      if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
-      if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setFilteredCustomers(data);
-    setCurrentPage(1);
   };
 
   const handleSort = (field) => {
@@ -555,13 +553,6 @@ const AdminUsers = () => {
             </div>
           </div>
         </motion.div>
-
-        <div className="chart-container-products">
-          <div className="chart-item">
-            <UserGrowthChart />
-          </div>
-          <div className="chart-item"></div>
-        </div>
       </main>
     </div>
   );

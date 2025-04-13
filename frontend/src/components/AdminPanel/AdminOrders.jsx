@@ -12,6 +12,7 @@ const AdminOrders = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
+        console.log("Orders data:", res.data);
         setOrders(res.data);
       })
       .catch((err) => {
@@ -19,25 +20,56 @@ const AdminOrders = () => {
       });
   }, []);
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Processing":
+        return "processing";
+      case "Shipped":
+        return "shipped";
+      case "Delivered":
+        return "delivered";
+      case "Cancelled":
+        return "cancelled";
+      case "Pending":
+      default:
+        return "pending";
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date
+      .toLocaleString("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "")
+      .replace(" ", "T")
+      .substring(0, 16);
+  };
+
   return (
-    <div className="container">
+    <div className="container container_orders">
       <h1>Orders</h1>
       <div className="table-responsive">
-        <table className="table table-hover">
+        <table className="table table-bordered table-hover table-collapse">
           <thead>
             <tr>
               <th>#</th>
-              <th>User Email</th>
               <th>Date</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((ord) => (
-              <tr key={ord.id}>
+              <tr key={ord.id} className={getStatusClass(ord.status)}>
                 <td>{ord.id}</td>
-                <td>{ord.user?.email}</td>
-                <td>{ord.date_order}</td>
+                <td>{formatDate(ord.date_order)}</td>
                 <td>{ord.status}</td>
               </tr>
             ))}

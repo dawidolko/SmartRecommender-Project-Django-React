@@ -34,6 +34,10 @@ const FavoritesContent = () => {
     }
   };
 
+  const handleRemoveFromFavorites = (productId) => {
+    removeFromFavorites(productId);
+  };
+
   return (
     <div className="favorites container">
       {favorites.length > 0 ? (
@@ -41,9 +45,9 @@ const FavoritesContent = () => {
           <table className="favorites__table">
             <thead className="favorites__thead">
               <tr className="favorites__row">
-                <th>Product</th>
-                <th>Name</th>
-                <th>Action</th>
+                <th style={{ textAlign: "center" }}>Product</th>
+                <th style={{ textAlign: "center" }}>Name</th>
+                <th style={{ textAlign: "center" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -55,6 +59,7 @@ const FavoritesContent = () => {
                       key={product.id}
                       product={product}
                       onMoveToCart={handleMoveToCart}
+                      onRemoveFromFavorites={handleRemoveFromFavorites}
                     />
                   );
                 }

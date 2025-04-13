@@ -86,6 +86,12 @@ const RegisterPanel = () => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
+  };
+
   return (
     <div className="registerPanel">
       <div className="registerPanel__container">
@@ -102,6 +108,7 @@ const RegisterPanel = () => {
               placeholder="Nickname"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -113,6 +120,7 @@ const RegisterPanel = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -124,6 +132,7 @@ const RegisterPanel = () => {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -135,6 +144,7 @@ const RegisterPanel = () => {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -146,6 +156,7 @@ const RegisterPanel = () => {
               placeholder="Password"
               value={password1}
               onChange={(e) => setPassword1(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -157,6 +168,7 @@ const RegisterPanel = () => {
               placeholder="Confirm Password"
               value={password2}
               onChange={(e) => setPassword2(e.target.value)}
+              onKeyDown={handleKeyPress}
               required
             />
           </div>

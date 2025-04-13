@@ -14,9 +14,20 @@ const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
-    if (window.innerWidth < 576) {
-      setIsOpen(false);
-    }
+    const handleResize = () => {
+      if (window.innerWidth < 900) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const handleLogout = () => {

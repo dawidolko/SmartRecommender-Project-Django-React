@@ -1,6 +1,6 @@
 import "./Navbar.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
   AiOutlineClose,
@@ -12,19 +12,19 @@ import { useFavorites } from "../FavoritesContent/FavoritesContext";
 import CartPreview from "../CartContent/CartPreview";
 import axios from "axios";
 import config from "../../config/config";
-import { useContext } from "react";
 import { CartContext } from "../ShopContext/ShopContext";
+import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
   const { favorites } = useFavorites();
   const { totalCartItems } = useContext(CartContext);
+  const { user, setUser } = useContext(AuthContext); // Get user from context
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
   const [navBgc, setNavBgc] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchActive, setSearchActive] = useState(false);
-  const [loggedUser, setLoggedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showModal, setShowModal] = useState(true);
@@ -32,9 +32,9 @@ const Navbar = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedUser");
     if (savedUser) {
-      setLoggedUser(JSON.parse(savedUser));
+      setUser(JSON.parse(savedUser)); // Update user in context
     }
-  }, []);
+  }, [setUser]);
 
   useEffect(() => {
     const changeBgc = () => {
@@ -52,7 +52,6 @@ const Navbar = () => {
         setShowModal(false);
       }
     };
-
     window.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -91,16 +90,15 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
-    setLoggedUser(null);
+    setUser(null); // Reset user context
     setShowUserDropdown(false);
-    window.location.href = "/login";
+    navigate("/login");
   };
 
-  const panelPrefix =
-    loggedUser && loggedUser.role === "admin" ? "/admin" : "/client";
+  const panelPrefix = user && user.role === "admin" ? "/admin" : "/client"; // Dynamically select panel
 
   const getUserRedirect = () => {
-    if (loggedUser) {
+    if (user) {
       return panelPrefix;
     }
     return "/login";
@@ -167,7 +165,7 @@ const Navbar = () => {
               />
               {showUserDropdown && (
                 <div className="navbar__user-dropdown">
-                  {loggedUser ? (
+                  {user ? (
                     <>
                       <Link
                         to={`${panelPrefix}/account`}

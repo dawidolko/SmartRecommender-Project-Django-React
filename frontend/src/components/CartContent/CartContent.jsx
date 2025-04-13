@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import config from "../../config/config";
 
 const CartContent = () => {
-  const { items, totalAmount } = useContext(CartContext);
+  const { items, totalAmount, removeFromCart } = useContext(CartContext);
   const [shopData, setShopData] = useState([]);
   const navigate = useNavigate();
 
@@ -35,16 +35,23 @@ const CartContent = () => {
           <table className="cart__table">
             <thead className="cart__thead">
               <tr className="cart__row">
-                <th>Product</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Total Price</th>
+                <th style={{ textAlign: "center" }}>Product</th>
+                <th style={{ textAlign: "center" }}>Name</th>
+                <th style={{ textAlign: "center" }}>Quantity</th>
+                <th style={{ textAlign: "center" }}>Total Price</th>
+                <th style={{ textAlign: "center" }}>Remove</th>
               </tr>
             </thead>
             <tbody>
               {shopData.map((product) => {
                 if (items[product.id] > 0) {
-                  return <CartProduct key={product.id} {...product} />;
+                  return (
+                    <CartProduct
+                      key={product.id}
+                      {...product}
+                      removeItemFromCart={removeFromCart}
+                    />
+                  );
                 }
                 return null;
               })}

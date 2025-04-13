@@ -12,6 +12,19 @@ const ClientComplaintDetail = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Pending":
+        return "status-pending";
+      case "Resolved":
+        return "status-resolved";
+      case "Rejected":
+        return "status-rejected";
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("access");
     axios
@@ -43,14 +56,17 @@ const ClientComplaintDetail = () => {
         <strong>Cause:</strong> {complaint.cause}
       </p>
       <p>
-        <strong>Status:</strong> {complaint.status}
+        <strong>Status:</strong>{" "}
+        <span className={getStatusClass(complaint.status)}>
+          {complaint.status}
+        </span>
       </p>
       <p>
         <strong>Submission Date:</strong>{" "}
         {format(new Date(complaint.submission_date), "dd MMM yyyy, HH:mm")}
       </p>
       <button
-        className="btn btn-primary back_button"
+        className="btn btn-primary back_button btn-main-client"
         onClick={() => navigate(-1)}>
         Back to Complaints
       </button>

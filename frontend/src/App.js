@@ -33,13 +33,18 @@ import ClientOrderDetail from "./components/ClientPanel/ClientOrderDetail";
 import ClientComplaints from "./components/ClientPanel/ClientComplaints";
 import ClientAccount from "./components/ClientPanel/ClientAccount";
 
+import ScrollToTop from "./utils/ScrollToTop";
+
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
-
-  if (!user) return <Navigate to="/login" replace />;
-
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
   if (!user.role || (roles && !roles.includes(user.role))) {
     console.warn("[PrivateRoute] Unauthorized access, redirecting...");
+    setTimeout(() => {
+      window.location.reload();
+    }, 0);
     return <Navigate to="/" replace />;
   }
 
@@ -51,10 +56,10 @@ function App() {
 
   return (
     <>
-      {/* <ScrollToTop /> */}
+      <ScrollToTop />
       <FavoritesProvider>
         <ShopContext>
-          <Navbar />
+          {location.pathname.startsWith("/admin") ? null : <Navbar />}
           <ToastContainer
             position="top-center"
             autoClose={3000}
@@ -124,7 +129,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
-          <Footer />
+          {location.pathname.startsWith("/admin") ? null : <Footer />}
         </ShopContext>
       </FavoritesProvider>
     </>

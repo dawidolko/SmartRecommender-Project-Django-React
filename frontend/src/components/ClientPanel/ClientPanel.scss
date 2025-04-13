@@ -18,7 +18,7 @@
     }
 
     &--closed {
-      width: 70px;
+      width: 90px;
       overflow: hidden;
 
       .client-aside__title,
@@ -74,6 +74,9 @@
       background-color: #d9e7f0;
       padding: 10px;
       border-radius: 5px;
+      @media (max-width: 1520px) {
+        display: none;
+      }
     }
 
     &__desc {
@@ -183,7 +186,9 @@
 
     .client-main {
       padding: 30px;
-
+      @media (max-width: 1520px) {
+        padding: 0px;
+      }
       .form-container {
         max-width: 600px;
         margin: 0 auto;
@@ -246,6 +251,73 @@
       }
     }
   }
+}
+@media (max-width: 750px) {
+  .client-complaints {
+    max-width: none;
+  }
+  .hide-complaints {
+    display: none;
+  }
+}
+
+@media (max-width: 475px) {
+  .hide-complaints2 {
+    display: none;
+  }
+}
+.status {
+  &-pending {
+    color: rgb(116, 116, 35);
+    font-weight: bold !important;
+  }
+  &-resolved {
+    color: green;
+    font-weight: bold !important;
+  }
+  &-rejected {
+    color: red;
+    font-weight: bold !important;
+  }
+  &-pending {
+    color: rgb(116, 116, 35);
+    font-weight: bold !important;
+  }
+  &-processing {
+    color: blue;
+    font-weight: bold !important;
+  }
+  &-shipped {
+    color: orange;
+    font-weight: bold !important;
+  }
+  &-delivered {
+    color: green;
+    font-weight: bold !important;
+  }
+  &-cancelled {
+    color: red;
+    font-weight: bold !important;
+  }
+}
+
+.btn-main-client {
+  border: 1px solid #007bff !important;
+  background-color: #007bff;
+  color: #fff;
+  &:hover {
+    color: #007bff !important;
+    background-color: #fff !important;
+  }
+}
+
+.text-align-client {
+  text-align: center !important;
+}
+
+.table-center {
+  display: flex;
+  justify-content: center;
 }
 
 form {
@@ -333,8 +405,8 @@ form button {
   }
 
   .client-aside {
-    width: 200px;
-    min-width: 200px;
+    width: 70px;
+    min-width: 70px;
   }
 
   .client-dashboard {
@@ -394,6 +466,8 @@ form button {
     justify-content: space-around;
     padding: 0;
     margin: 0;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   .client-aside__toggle {
