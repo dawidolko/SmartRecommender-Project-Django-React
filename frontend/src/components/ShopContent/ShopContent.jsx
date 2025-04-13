@@ -107,7 +107,7 @@ const ShopContent = () => {
 
       <div className="shop__buttons">
         {isLoadingCategories ? (
-          <p>Loading categories...</p>
+          <div className="loading-spinner"></div>
         ) : (
           <>
             <div className="shop__main-categories">
@@ -191,7 +191,7 @@ const ShopContent = () => {
 
       <div className="shop__products">
         {isLoadingProducts ? (
-          <p>Loading products...</p>
+          <div className="loading-spinner"></div>
         ) : filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <ShopProduct

@@ -28,7 +28,7 @@ const ClientOrderDetail = () => {
       });
   }, [id]);
 
-  if (loading) return <div>Loading order details...</div>;
+  if (loading) return <div className="loading-spinner"></div>;
   if (error) return <div>{error}</div>;
   if (!order) return <div>No order found.</div>;
 

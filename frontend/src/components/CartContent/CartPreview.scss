@@ -1,162 +1,172 @@
 .cart-preview {
+  position: relative;
+  display: inline-block;
+  color: black;
+
+  .cart-icon {
+    cursor: pointer;
     position: relative;
-    display: inline-block;
-    color: black;
-  
-    .cart-icon {
-      cursor: pointer;
-      position: relative;
-      font-size: 24px;
-  
-      .cart-count {
-        position: absolute;
-        top: -5px;
-        right: -10px;
-        background: red;
-        color: white;
-        border-radius: 50%;
-        padding: 5px;
-        font-size: 12px;
-      }
-    }
-  
-    .cart-dropdown {
+    font-size: 24px;
+    color: white;
+
+    .cart-count {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
       position: absolute;
-      top: 40px;
-      right: 0;
-      background: white;
-      width: 300px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 15px;
-      z-index: 1000;
-  
-      .cart-item {
+      width: 20px;
+      height: 20px;
+      top: 18px;
+      left: 10px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      background-color: #fd266e;
+    }
+  }
+
+  .cart-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: white;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    z-index: 1000;
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+
+      &__img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+      }
+
+      &__details {
+        flex: 1;
+        margin-left: 10px;
+      }
+
+      &__actions {
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
-        font-size: 1.3rem;
-  
-        &__img {
-          width: 50px;
-          height: 50px;
-          object-fit: cover;
-        }
-  
-        &__details {
-          flex: 1;
-          margin-left: 10px;
-        }
-  
-        &__actions {
-          display: flex;
-          align-items: center;
-  
-          button {
-            background: #ddd;
-            border: none;
-            padding: 0.4rem 0.9rem;
-            margin: 0 10px;
-            cursor: pointer;
-          }
-        }
-  
-        &__remove {
+
+        button {
+          background: #ddd;
+          border: none;
+          padding: 0.4rem 0.9rem;
+          margin: 0 10px;
           cursor: pointer;
-          color: red;
         }
       }
-  
-      .cart-btn {
-        display: block;
-        text-align: center;
-        background: green;
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        text-decoration: none;
+
+      &__remove {
+        cursor: pointer;
+        color: red;
       }
     }
-  
-    @media (max-width: 1366px) {
-        .cart-dropdown {
-          width: 270px;
-          padding: 10px;
-        }
-  
-        .cart-item {
-          font-size: 1.1rem;
-  
-          &__img {
-            width: 45px;
-            height: 45px;
-          }
-  
-          &__actions {
-            button {
-              font-size: 0.9rem;
-              padding: 0.3rem 0.8rem;
-            }
-          }
-        }
+
+    .cart-btn {
+      display: block;
+      text-align: center;
+      background: #007bff;
+      border: 1px solid #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      &:hover {
+        background: #ffffff;
+        border: 1px solid #007bff;
+        color: #007bff;
       }
-    
-      @media (max-width: 1024px) {
-        .cart-dropdown {
-          width: 250px;
-          padding: 8px;
-        }
-  
-        .cart-item {
-          font-size: 1rem;
-  
-          &__img {
-            width: 40px;
-            height: 40px;
-          }
-  
-          &__actions {
-            button {
-              font-size: 0.85rem;
-              padding: 0.3rem 0.7rem;
-            }
-          }
-        }
-  
-        .cart-btn {
-          font-size: 1rem;
-          padding: 8px;
-        }
-      }
-    
-      @media (max-width: 768px) {
-        .cart-dropdown {
-          max-height: 300px;
-          overflow-y: auto;
-        }
-  
-        .cart-item {
-          font-size: 0.95rem;
-          flex-direction: column;
-          align-items: flex-start;
-  
-          &__img {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 5px;
-          }
-  
-          &__actions {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-          }
-        }
-  
-        .cart-btn {
-          font-size: 1rem;
-          padding: 10px;
-        }
-      }
+    }
   }
-  
+
+  @media (max-width: 1366px) {
+    .cart-dropdown {
+      width: 270px;
+      padding: 10px;
+    }
+
+    .cart-item {
+      font-size: 1.1rem;
+
+      &__img {
+        width: 45px;
+        height: 45px;
+      }
+
+      &__actions {
+        button {
+          font-size: 0.9rem;
+          padding: 0.3rem 0.8rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .cart-dropdown {
+      width: 250px;
+      padding: 8px;
+    }
+
+    .cart-item {
+      font-size: 1rem;
+
+      &__img {
+        width: 40px;
+        height: 40px;
+      }
+
+      &__actions {
+        button {
+          font-size: 0.85rem;
+          padding: 0.3rem 0.7rem;
+        }
+      }
+    }
+
+    .cart-btn {
+      font-size: 1rem;
+      padding: 8px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cart-dropdown {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      font-size: 0.95rem;
+      flex-direction: column;
+      align-items: flex-start;
+
+      &__img {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 5px;
+      }
+
+      &__actions {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+    }
+
+    .cart-btn {
+      font-size: 1rem;
+      padding: 10px;
+    }
+  }
+}

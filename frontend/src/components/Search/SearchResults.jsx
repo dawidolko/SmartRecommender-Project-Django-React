@@ -33,7 +33,7 @@ const SearchResults = () => {
 
       <div className="shop__products">
         {isLoading ? (
-          <p>Loading products...</p>
+          <div className="loading-spinner"></div>
         ) : products.length > 0 ? (
           products.map((product) => (
             <ShopProduct

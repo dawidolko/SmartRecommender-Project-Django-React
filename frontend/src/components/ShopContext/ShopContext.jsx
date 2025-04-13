@@ -41,6 +41,10 @@ const ShopContext = (props) => {
     }));
   };
 
+  const resetCart = () => {
+    setItems({});
+  };
+
   const totalAmount = () => {
     return Object.entries(items).reduce((total, [itemId, quantity]) => {
       const product = products.find((product) => product.id === Number(itemId));
@@ -52,22 +56,12 @@ const ShopContext = (props) => {
     return Object.values(items).reduce((sum, quantity) => sum + quantity, 0);
   };
 
-  const singleProductAmount = (itemId) => {
-    const product = products.find((product) => product.id === Number(itemId));
-    return product ? items[itemId] * product.price : 0;
-  };
-
-  const resetCart = () => {
-    setItems({});
-  };
-
   const contextValue = {
     items,
     addToCart,
     removeFromCart,
     totalAmount,
     totalCartItems,
-    singleProductAmount,
     resetCart,
   };
 

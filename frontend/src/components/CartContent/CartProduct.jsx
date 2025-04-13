@@ -4,15 +4,14 @@ import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import config from "../../config/config";
 
 const CartProduct = ({ id, name, price, photos }) => {
-  const { items, addToCart, removeFromCart, singleProductAmount } =
-    useContext(CartContext);
+  const { items, addToCart, removeFromCart } = useContext(CartContext);
 
   const img = photos?.[0]?.path
     ? `${config.apiUrl}/media/${photos[0].path}`
     : "https://via.placeholder.com/150";
 
   const itemQuantity = items[id];
-  const totalProductAmount = singleProductAmount(id);
+  const totalProductAmount = price * itemQuantity;
 
   return (
     <tr className="cart__tr" key={id}>

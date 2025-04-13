@@ -3,6 +3,8 @@ $white: #e6dbdb;
 $dark: #1b1717;
 $darker: #181414;
 
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans&display=swap");
+
 @mixin flexCenter($direction) {
   display: flex;
   flex-direction: $direction;
@@ -21,8 +23,34 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Instrument Sans", sans-serif !important;
 }
 
 .Toastify__toast-container {
   z-index: 3000;
+}
+
+.Toastify__close-button {
+  &:hover {
+    background-color: rgb(255, 255, 255, 0.1);
+    color: red;
+  }
+}
+
+.loading-spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #007bff;
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  animation: spin 1.5s linear infinite;
+  margin-bottom: 70px;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

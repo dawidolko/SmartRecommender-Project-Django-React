@@ -49,7 +49,7 @@ const ProductPage = () => {
   }, [id, isFavorite]);
 
   if (loading) {
-    return <h2>Loading...</h2>;
+    return <div className="loading-spinner"></div>;
   }
 
   if (!product) {
@@ -112,109 +112,115 @@ const ProductPage = () => {
           </button>
         </div>
 
-        <div className="productPage__images">
-          <div className="productPage__slider">
-            <button
-              onClick={handlePrevImage}
-              aria-label="Previous Image"
-              className="productPage__arrow">
-              <AiOutlineLeft />
-            </button>
-            <img
-              src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
-              alt={product.name}
-              className="productPage__main-img"
-              onClick={handleImageEnlarge}
-            />
-            <button
-              onClick={handleNextImage}
-              aria-label="Next Image"
-              className="productPage__arrow">
-              <AiOutlineRight />
-            </button>
-          </div>
-          <div className="productPage__thumbnails">
-            {product.photos.map((photo, idx) => (
-              <img
-                key={photo.id || photo.path || idx}
-                src={`${config.apiUrl}/media/${photo.path}`}
-                alt={`Thumbnail ${idx + 1}`}
-                className={`productPage__thumbnail ${
-                  idx === currentIndex ? "active" : ""
-                }`}
-                onClick={() => setCurrentIndex(idx)}
-              />
-            ))}
-          </div>
-        </div>
+        <div class="productPage__main__section">
+          <div class="productPage__main__subsection">
+            <div className="productPage__images">
+              <div className="productPage__slider">
+                <button
+                  onClick={handlePrevImage}
+                  aria-label="Previous Image"
+                  className="productPage__arrow">
+                  <AiOutlineLeft />
+                </button>
+                <img
+                  src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                  alt={product.name}
+                  className="productPage__main-img"
+                  onClick={handleImageEnlarge}
+                />
+                <button
+                  onClick={handleNextImage}
+                  aria-label="Next Image"
+                  className="productPage__arrow">
+                  <AiOutlineRight />
+                </button>
+              </div>
+              <div className="productPage__thumbnails">
+                {product.photos.map((photo, idx) => (
+                  <img
+                    key={photo.id || photo.path || idx}
+                    src={`${config.apiUrl}/media/${photo.path}`}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className={`productPage__thumbnail ${
+                      idx === currentIndex ? "active" : ""
+                    }`}
+                    onClick={() => setCurrentIndex(idx)}
+                  />
+                ))}
+              </div>
+            </div>
 
-        {isImageEnlarged && (
-          <div className="productPage__overlay" onClick={closeImageOverlay}>
-            <button
-              className="productPage__overlay-close"
-              onClick={() => setIsImageEnlarged(false)}>
-              X
-            </button>
-            <img
-              className="productPage__overlay-image"
-              src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
-              alt={product.name}
-            />
-          </div>
-        )}
+            {isImageEnlarged && (
+              <div className="productPage__overlay" onClick={closeImageOverlay}>
+                <button
+                  className="productPage__overlay-close"
+                  onClick={() => setIsImageEnlarged(false)}>
+                  X
+                </button>
+                <img
+                  className="productPage__overlay-image"
+                  src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                  alt={product.name}
+                />
+              </div>
+            )}
 
-        <div className="productPage__info">
-          <div className="productPage__info__main">
-            <h2 className="productPage__title">{product.name}</h2>
-            <p className="productPage__category">
-              Category:{" "}
-              {product.categories
-                .map((category) => category.replace(/\./g, " > "))
-                .join(", ")
-                .toUpperCase()}
-            </p>
-            <div className="productPage__tags">
-              <p className="tags">
-                <span className="tagsHeader">Tags: </span>
-                {product.tags.length > 0 ? (
-                  product.tags.map((tag) => (
-                    <span key={tag} className="tag">
-                      {tag}
-                    </span>
-                  ))
-                ) : (
-                  <p>No tags available for this product.</p>
-                )}
+            <div className="productPage__info__main">
+              <p className="productPage__category">
+                Category:{" "}
+                {product.categories
+                  .map((category) => category.replace(/\./g, " > "))
+                  .join(", ")
+                  .toUpperCase()}
               </p>
-            </div>
-            <div className="productPage__prices">
-              {product.old_price && !isNaN(product.old_price) ? (
-                <span className="productPage__old-price">
-                  ${parseFloat(product.old_price).toFixed(2)}
+              <h2 className="productPage__title">{product.name}</h2>
+              <div className="productPage__tags">
+                <p className="tags">
+                  <span className="tagsHeader">Tags: </span>
+                  {product.tags.length > 0 ? (
+                    product.tags.map((tag) => (
+                      <span key={tag} className="tag">
+                        {tag}
+                      </span>
+                    ))
+                  ) : (
+                    <p>No tags available for this product.</p>
+                  )}
+                </p>
+              </div>
+              <div className="productPage__prices">
+                {product.old_price && !isNaN(product.old_price) ? (
+                  <span className="productPage__old-price">
+                    ${parseFloat(product.old_price).toFixed(2)}
+                  </span>
+                ) : null}
+                <span className="productPage__current-price">
+                  ${parseFloat(product.price).toFixed(2)}
                 </span>
-              ) : null}
-              <span className="productPage__current-price">
-                ${parseFloat(product.price).toFixed(2)}
-              </span>
-              <button
-                className="productPage__cart-btn"
-                onClick={handleAddToCart}>
-                Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
-              </button>
+              </div>
+              <div className="productPage__btn_price">
+                <button
+                  className="productPage__cart-btn"
+                  onClick={handleAddToCart}>
+                  Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="productPage__desc">
-            <h4>Description:</h4>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: product.description,
-              }}
-            />
+          <div className="productPage__description">
+            <div className="productPage__desc">
+              <h1>Description:</h1>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: product.description,
+                }}
+              />
+            </div>
           </div>
 
           <div className="productPage__specs">
-            <h4>Specifications:</h4>
+            <h1>Specifications:</h1>
             <table>
               <tbody>
                 {product.specifications.map((spec) => (
@@ -228,7 +234,7 @@ const ProductPage = () => {
           </div>
 
           <div className="productPage__reviews">
-            <h4>Customer Reviews</h4>
+            <h1>Customer Reviews</h1>
             {product.opinions.length > 0 ? (
               product.opinions.map((review) => (
                 <div key={review.id} className="productPage__review">

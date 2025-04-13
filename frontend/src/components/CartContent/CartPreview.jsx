@@ -1,35 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import "./CartPreview.scss";
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineShopping } from "react-icons/ai";
 import config from "../../config/config";
+import { CartContext } from "../ShopContext/ShopContext";
 
 const BASE_URL = `${config.apiUrl}`;
 
 const CartPreview = () => {
-  const [cart, setCart] = useState([]);
+  const { items, totalCartItems } = useContext(CartContext);
   const [showCart, setShowCart] = useState(false);
   const [products, setProducts] = useState({});
 
   useEffect(() => {
-    let storedCart = JSON.parse(localStorage.getItem("cart"));
-    if (!storedCart) {
-      storedCart = [];
-    } else if (!Array.isArray(storedCart)) {
-      storedCart = Object.entries(storedCart).map(([productId, quantity]) => ({
-        id: productId,
-        quantity: quantity,
-      }));
-    }
-    setCart(storedCart);
-  }, []);
-
-  useEffect(() => {
-    if (cart.length === 0) return;
+    if (totalCartItems() === 0) return;
 
     const fetchProducts = async () => {
       try {
-        const productIds = cart.map((item) => item.id).join(",");
+        const productIds = Object.keys(items).join(",");
         const response = await axios.get(
           `${BASE_URL}/api/products/?ids=${productIds}`
         );
@@ -49,30 +37,18 @@ const CartPreview = () => {
     };
 
     fetchProducts();
-  }, [cart]);
+  }, [items]);
 
   const changeQuantity = (itemId, action) => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              quantity:
-                action === "increase"
-                  ? item.quantity + 1
-                  : Math.max(item.quantity - 1, 1),
-            }
-          : item
-      );
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    if (action === "increase") {
+      items[itemId] = (items[itemId] || 0) + 1;
+    } else if (action === "decrease" && items[itemId] > 1) {
+      items[itemId] -= 1;
+    }
   };
 
   const removeItem = (itemId) => {
-    const updatedCart = cart.filter((item) => item.id !== itemId);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    setCart(updatedCart);
+    delete items[itemId];
   };
 
   return (
@@ -81,47 +57,48 @@ const CartPreview = () => {
       onMouseEnter={() => setShowCart(true)}
       onMouseLeave={() => setShowCart(false)}>
       <div className="cart-icon">
-        🛒{" "}
-        <span className="cart-count">
-          {cart.reduce((acc, item) => acc + item.quantity, 0)}
-        </span>
+        <AiOutlineShopping />
+        <span className="cart-count">{totalCartItems()}</span>
       </div>
       {showCart && (
         <div className="cart-dropdown">
-          <h4>Cart ({cart.length})</h4>
-          {cart.length > 0 ? (
-            cart.map((item) => {
-              const product = products[item.id];
-              return product ? (
-                <div key={item.id} className="cart-item">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="cart-item__img"
-                  />
-                  <div className="cart-item__details">
-                    <p>{product.name}</p>
-                    <span>{product.price} $</span>
-                    <div className="cart-item__actions">
-                      <button
-                        onClick={() => changeQuantity(item.id, "decrease")}>
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        onClick={() => changeQuantity(item.id, "increase")}>
-                        +
-                      </button>
+          <h4>Cart ({totalCartItems()})</h4>
+          {totalCartItems() > 0 ? (
+            Object.entries(items).map(([itemId, quantity]) => {
+              if (quantity > 0) {
+                const product = products[itemId];
+                return product ? (
+                  <div key={itemId} className="cart-item">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="cart-item__img"
+                    />
+                    <div className="cart-item__details">
+                      <p>{product.name}</p>
+                      <span>{product.price} $</span>
+                      <div className="cart-item__actions">
+                        <button
+                          onClick={() => changeQuantity(itemId, "decrease")}>
+                          -
+                        </button>
+                        <span>{quantity}</span>
+                        <button
+                          onClick={() => changeQuantity(itemId, "increase")}>
+                          +
+                        </button>
+                      </div>
                     </div>
+                    <AiOutlineClose
+                      className="cart-item__remove"
+                      onClick={() => removeItem(itemId)}
+                    />
                   </div>
-                  <AiOutlineClose
-                    className="cart-item__remove"
-                    onClick={() => removeItem(item.id)}
-                  />
-                </div>
-              ) : (
-                <p key={item.id}>Loading...</p>
-              );
+                ) : (
+                  <div key={itemId} className="loading-spinner"></div>
+                );
+              }
+              return null;
             })
           ) : (
             <p>Cart is empty</p>

@@ -29,7 +29,7 @@ const ClientComplaintDetail = () => {
       });
   }, [id]);
 
-  if (loading) return <div>Loading complaint details...</div>;
+  if (loading) return <div className="loading-spinner"></div>;
   if (error) return <div>{error}</div>;
   if (!complaint) return <div>No complaint found.</div>;
 

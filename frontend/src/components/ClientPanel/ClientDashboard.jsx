@@ -137,7 +137,7 @@ const ClientDashboard = () => {
   }, [baseOptions]);
 
   if (loading) {
-    return <div style={{ padding: "2rem" }}>Loading stats...</div>;
+    return <div className="loading-spinner"></div>;
   }
   if (error) {
     return <div style={{ padding: "2rem", color: "red" }}>{error}</div>;

@@ -16,7 +16,7 @@
 
   &__image {
     width: 40%;
-    background: url("https://images.pexels.com/photos/114979/pexels-photo-114979.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940");
+    background: url("https://e-commerce-mansy.vercel.app/assets/SignImg-Br-hVEyo.png");
     background-size: cover;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
@@ -72,18 +72,20 @@
   }
 
   button {
-    background-color: #B69DE6;
-    border: none;
-    padding: 1.2rem 3.5rem;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    padding: 0.6rem 0.8rem;
     font-size: 2rem;
     color: white;
     cursor: pointer;
-    border-radius: 20px;
+    border-radius: 5px;
     transition: 0.3s;
   }
 
   button:hover {
-    background-color: darken(#B69DE6, 30%);
+    background-color: #ffffff;
+    color: #007bff;
+    border: 1px solid #007bff;
   }
 
   &__or {
@@ -94,11 +96,11 @@
   }
 
   &__signupBtn {
-    background-color: #6D8AFF;
+    background-color: #6d8aff;
   }
 
   &__signupBtn:hover {
-    background-color: darken(#6D8AFF, 30%);
+    background-color: darken(#6d8aff, 30%);
   }
 
   @media (max-width: 1366px) {

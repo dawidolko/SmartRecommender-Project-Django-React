@@ -73,10 +73,12 @@
     font-size: 1.2rem;
     color: #000000;
     margin-bottom: 0.5em;
-    background-color: $main;
+    border: 1px solid black;
     padding: 0.5em;
-    border-radius: 8px;
+    border-radius: 3px;
+    min-width: 100%;
     text-transform: uppercase;
+    font-weight: bold;
   }
 
   &__name {
@@ -98,13 +100,25 @@
   }
 
   &__old-price {
+    font-size: 1.9rem;
     text-decoration: line-through;
-    color: #999;
+    color: rgb(107 114 128 / var(--tw-text-opacity));
+    text-decoration-line: line-through;
+    font-weight: bold;
+    margin-right: 10px;
+    @media (max-width: 768px) {
+      font-size: 1em;
+    }
   }
 
   &__current-price {
-    font-weight: bold;
-    color: #333;
+    font-size: 2.5rem;
+    font-weight: bolder;
+    color: rgb(239 68 68);
+    margin-bottom: 0.5em;
+    @media (max-width: 768px) {
+      font-size: 1em;
+    }
   }
 }
 

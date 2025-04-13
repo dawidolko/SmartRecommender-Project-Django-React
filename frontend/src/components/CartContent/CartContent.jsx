@@ -24,6 +24,10 @@ const CartContent = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(items));
+  }, [items]);
+
   return (
     <div className="cart container">
       {totalAmount() > 0 ? (

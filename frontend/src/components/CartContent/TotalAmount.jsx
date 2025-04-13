@@ -17,7 +17,6 @@ const TotalAmount = () => {
     typeof totalAmount() === "number" ? totalAmount().toFixed(2) : "0.00";
 
   const handleCheckout = async () => {
-    // Retrieve logged-in user and token from localStorage
     const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
     const token = localStorage.getItem("access");
 
@@ -35,12 +34,28 @@ const TotalAmount = () => {
       return;
     }
 
+    const validItems = Object.entries(items).filter(
+      ([itemId, quantity]) => quantity > 0
+    );
+    if (validItems.length === 0) {
+      toast.error("Your cart is empty or contains items with zero quantity.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return;
+    }
+
     try {
-      // Send POST request with Authorization header
       await axios.post(
         `${config.apiUrl}/api/orders/`,
         {
-          items,
+          items: Object.fromEntries(validItems),
           total: totalAmount(),
         },
         {

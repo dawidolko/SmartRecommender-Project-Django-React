@@ -59,15 +59,21 @@
   }
 
   &__price {
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: #333;
+    font-size: 1.5rem;
+    font-weight: bolder;
+    color: rgb(239 68 68);
+    margin-bottom: 0.5em;
+    @media (max-width: 768px) {
+      font-size: 1em;
+    }
   }
 
   &__btn-fav {
-    background: none;
+    background-color: #ddd;
+    padding: 5px 8px 5px 8px;
     border: none;
     cursor: pointer;
+    color: red;
   }
 
   @media (max-width: 596px) {

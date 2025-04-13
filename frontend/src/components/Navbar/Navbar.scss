@@ -1,28 +1,46 @@
-/* src/components/Navbar/Navbar.scss */
-
 @import "../../global.scss";
-
-//TODO: Clear the code of old search bar
 
 .navbar {
   position: fixed;
   top: 0;
   width: 100%;
-  height: 8vh;
   z-index: 1000;
   color: $white;
   background-color: #0a0a0a;
   transition: background-color 0.3s ease;
 
+  &__section {
+    display: flex;
+    align-items: center;
+  }
+
+  &__logo {
+    &-wrapper {
+      display: flex;
+      justify-content: center;
+      @media (max-width: 660px) {
+        display: none;
+      }
+    }
+  }
+
+  &__links {
+    padding-left: 1em;
+    @media (max-width: 660px) {
+      padding-left: 0em;
+    }
+  }
+
   &__categories {
     position: relative;
+    padding-bottom: 5px;
 
     .navbar__dropdown {
       display: none;
       position: absolute;
       top: 100%;
       left: 0;
-      background-color: #ffffff;
+      background-color: #111;
       color: #333;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       border-radius: 4px;
@@ -30,6 +48,11 @@
       z-index: 1000;
       flex-direction: column;
       gap: 0.5rem;
+      font-size: 1.4rem;
+      @media (max-width: 660px) {
+        top: 0px;
+        left: 100px;
+      }
 
       .navbar__main-category {
         position: relative;
@@ -39,16 +62,15 @@
         }
 
         .navbar__main-category-name {
-          font-weight: bold;
           font-size: 1.4rem;
-          color: $main;
+          color: #e6dbdb;
           cursor: pointer;
           text-transform: uppercase;
           padding: 2px;
         }
 
         .navbar__main-category-name:hover {
-          color: black;
+          color: #007bff;
         }
 
         .navbar__subcategories {
@@ -56,8 +78,8 @@
           position: absolute;
           top: 0;
           left: 100%;
-          background-color: #f9f9f9;
-          color: #333;
+          background-color: #111;
+          color: white;
           box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
           border-radius: 4px;
           padding: 0.5rem 1rem;
@@ -67,12 +89,12 @@
 
           .navbar__dropdown-item {
             text-decoration: none;
-            color: #333;
+            color: white;
             padding: 0.2rem 0;
             text-transform: uppercase;
 
             &:hover {
-              color: $main;
+              color: #007bff;
             }
           }
         }
@@ -99,30 +121,14 @@
     }
   }
 
-  &__logo-text {
-    display: block;
-    width: 140px;
-    height: 60px;
-    background: url("../../assets/logo_of_name.png") no-repeat center center;
-    background-size: contain;
-    transition: box-shadow 0.3s ease;
-    &:hover {
-      box-shadow: 0 0 10px 2px #007bff;
-    }
-  }
-
   &__container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center;
     height: 100%;
     padding: 0 0.5em;
-  }
-
-  &__logo {
-    font-size: 3.5rem;
-    color: $white;
-    font-family: "Wallpoet", sans-serif;
+    @media (max-width: 660px) {
+      justify-content: flex-end;
+    }
   }
 
   &__links {
@@ -130,13 +136,13 @@
     gap: 1em;
     position: absolute;
     top: 8vh;
-    left: 0;
     height: 45vh;
-    width: 100%;
+    width: 50%;
     left: -100%;
     background-color: #111;
     transition: 0.3s ease;
-    z-index: 10;
+    z-index: 2;
+    max-height: 300px;
   }
 
   &__icons {
@@ -175,8 +181,8 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    top: -10px;
-    left: 6px;
+    top: 15px;
+    left: 10px;
     border-radius: 50%;
     font-size: 1.2rem;
     background-color: $main;
@@ -208,7 +214,8 @@
       display: none;
       position: absolute;
       top: 100%;
-      right: 0;
+      left: 0;
+      min-width: 150px;
       background-color: #ffffff;
       color: #333;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -237,6 +244,8 @@
         padding: 0.2rem 0;
         cursor: pointer;
         transition: color 0.3s;
+        font-size: 16px;
+        text-align: left;
 
         &:hover {
           color: $main;
@@ -286,6 +295,7 @@
 
   &__hamburger {
     padding: 0.3em;
+    margin-left: 15px;
   }
 
   @media (max-width: 800px) {
@@ -297,7 +307,7 @@
     }
   }
 
-  @media (min-width: 888px) {
+  @media (min-width: 640px) {
     .navbar {
       background-color: unset;
 
@@ -346,18 +356,128 @@
     }
   }
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  max-width: 300px;
-  background: #525252;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  gap: 0;
+  .cart-icon:hover {
+    color: #007bff;
+  }
 
-  input {
+  .header {
+    &__logo-text {
+      display: block;
+      width: 140px;
+      height: 60px;
+      background: url("../../assets/logo_of_name.png") no-repeat center center;
+      background-size: contain;
+      transition: box-shadow 0.3s ease;
+      &:hover {
+        box-shadow: 0 0 10px 2px #fd266e;
+      }
+    }
+
+    &__logo {
+      font-size: 3.5rem;
+      color: $white;
+      font-family: "Instrument Sans", sans-serif !important;
+      &__display {
+        @media (max-width: 640px) {
+          display: flex;
+          margin-right: auto;
+        }
+        @media (min-width: 640px) {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .nav_con {
+    padding-top: 0 !important;
+    @media (max-width: 660px) {
+      padding-top: 1rem !important;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    background-color: #064283;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    padding: 0 20px;
+    z-index: 2000;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+
+    &__content {
+      display: flex;
+      margin-top: 15px;
+    }
+
+    &__text {
+      font-size: 1.4rem;
+      margin-top: 2px;
+      margin-right: 10px;
+    }
+
+    &__button {
+      padding: 10px 20px;
+      border: 1px solid #fff;
+      background-color: rgb(255 255 255 / 0%);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 8px 5px;
+      margin-right: 10px;
+      &:hover {
+        background-color: #fff;
+        color: #0061cc;
+      }
+    }
+
+    &__close {
+      font-size: 2rem;
+      cursor: pointer;
+      &:hover {
+        color: red;
+      }
+    }
+
+    @media (max-width: 660px) {
+      display: none;
+    }
+  }
+
+  .modal.fade-out {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  .search-icon {
+    background-color: #00000000 !important;
+    font-size: 22px;
+    &:hover {
+      color: #007bff;
+    }
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    max-width: 300px;
+    background: #525252;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    gap: 0;
+    position: absolute;
+
+    input {
       padding: 10px 15px;
       border: none;
       font-size: 1.4rem;
@@ -366,11 +486,11 @@
       background: transparent;
 
       &::placeholder {
-          color: #ffffff;
+        color: #ffffff;
       }
-  }
+    }
 
-  .search-btn {
+    .search-btn {
       background: #2762f3;
       color: white;
       border: none;
@@ -380,52 +500,58 @@
       transition: background 0.3s ease;
 
       &:hover {
-          background: #0c48db;
+        background: #0c48db;
       }
+    }
   }
-}
 
-@mixin responsive($max-width, $search-width, $input-width, $font-size, $btn-padding, $links_gap) {
-  @media (max-width: $max-width) {
+  @mixin responsive(
+    $max-width,
+    $search-width,
+    $input-width,
+    $font-size,
+    $btn-padding,
+    $links_gap
+  ) {
+    @media (max-width: $max-width) {
       .search-bar {
-          max-width: $search-width;
+        max-width: $search-width;
 
-          input {
-              font-size: $font-size;
-              max-width: $input-width;
-          }
+        input {
+          font-size: $font-size;
+          max-width: $input-width;
+        }
 
-          .search-btn {
-              font-size: $font-size;
-              padding: $btn-padding;
-          }
+        .search-btn {
+          font-size: $font-size;
+          padding: $btn-padding;
+        }
       }
       .navbar__links {
         gap: $links_gap;
       }
+    }
   }
-}
 
-@include responsive(1366px, 300px, 250px, 1.3rem, 8px 12px, 1em);
+  @include responsive(1366px, 300px, 250px, 1.3rem, 8px 12px, 1em);
 
-@include responsive(1024px, 220px, 140px, 1rem, 8px 10px, 0.3em);
+  @include responsive(1024px, 220px, 140px, 1rem, 8px 10px, 0.3em);
 
-@media (max-width: 768px) {
-  .search-bar {
+  @media (max-width: 768px) {
+    .search-bar {
       max-width: 200px;
       margin: 10px auto;
 
       input {
-          font-size: 1.1rem;
-          padding: 12px;
-          max-width: 120px;
+        font-size: 1.1rem;
+        padding: 12px;
+        max-width: 120px;
       }
 
       .search-btn {
-          font-size: 1.1rem;
-          padding: 12px 15px;
+        font-size: 1.1rem;
+        padding: 12px 15px;
       }
+    }
   }
-}
-
 }

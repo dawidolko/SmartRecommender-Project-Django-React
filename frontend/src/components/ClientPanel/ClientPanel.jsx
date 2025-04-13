@@ -16,7 +16,7 @@ const ClientPanel = () => {
   }
 
   if (token && !user) {
-    return <div>Loading...</div>;
+    return <div className="loading-spinner"></div>;
   }
 
   if (user.role !== "client") {

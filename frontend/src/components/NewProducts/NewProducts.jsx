@@ -51,7 +51,7 @@ const NewProducts = () => {
             <ShopProduct key={product.id} {...product} />
           ))
         ) : (
-          <p>Loading products...</p>
+          <div className="loading-spinner"></div>
         )}
       </div>
       <button onClick={() => navigate("/shop")} className="shop__navigate">
