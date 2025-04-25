@@ -1,177 +1,168 @@
-# Product Recommendation Platform Using Machine Learning and Uncertainty Modeling
+# 🛍️ Product Recommendation Platform Using Machine Learning and Uncertainty Modeling
 
-## Project Description
+> **Case:** Build a full-stack platform that delivers personalized product recommendations by combining machine learning, uncertainty modeling, and user behavior analysis. The system enhances user experience through dynamic, intelligent suggestions based on real-world data.
 
-This project is a product recommendation platform that leverages advanced machine learning algorithms, uncertainty modeling, and user data analysis. The system aims to personalize recommendations based on purchase history, product attributes, and user reviews. The project integrates techniques such as:
-
-- **Collaborative Filtering**
-  - Identifying similarities between users (User-Based) and products (Item-Based).
-- **Content-Based Filtering**
-  - Analyzing product attributes and matching them to user preferences.
-- **Fuzzy Logic**
-  - Handling imprecise data, such as "low price" or "high quality."
-- **Sentiment Analysis**
-  - Evaluating product reviews using NLP techniques.
-
-The platform consists of a Django-based backend and a React-based frontend application.
-
-![Full Screen Screenshot](images/mobile_home.png)
+> **Tech Stack:** `Python`, `Django`, `PostgreSQL`, `React`, `Redux`, `Material-UI`, `D3.js`, `scikit-learn`, `fuzzywuzzy`, `spaCy`, `NLTK`.
 
 ---
 
-## Features
+## 🚀 Usage
 
-- **Product Recommendations:**
+### Running the Application Locally
 
-  - Based on user purchase history.
-  - Considering product attributes and sentiment analysis.
-  - Dynamically adjusted recommendations in real-time.
-
-- **Data Management:**
-  - User login and registration.
-  - Product and transaction management.
-  - Data visualization using frontend libraries.
-
----
-
-## Technologies
-
-**Backend:**
-
-- Python, Django, Django REST Framework
-- PostgreSQL (database)
-- scikit-learn (machine learning)
-- fuzzywuzzy, scikit-fuzzy (fuzzy logic)
-- spaCy, NLTK (natural language processing)
-
-**Frontend:**
-
-- React
-- Redux (state management)
-- Material-UI (UI framework)
-- D3.js, Chart.js (data visualization)
-
----
-
-## How to Run the Project
-
-### Prerequisites
-
-- Python 3.8+
-- Node.js (version 16 or newer)
-- PostgreSQL
-- npm or yarn (for managing frontend packages)
-
-### Step 1: Clone the Repository
+- Clone the repository:
 
 ```bash
-# Clone the repository to your local machine
 git clone https://github.com/dawidolko/Django-React-Project-SmartRecommender.git
 cd Django-React-Project-SmartRecommender
 ```
 
----
-
-### Running the Backend (Django)
-
-1. **Set up a virtual environment and install dependencies:**
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-2. **Configure the database:**
-
-   - Create a PostgreSQL database and update the access details in the `settings.py` file (DATABASES section).
-
-3. **Apply migrations:**
-
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-
-4. **Create an admin account:**
-
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-5. **Run the backend server:**
-   ```bash
-   python manage.py runserver
-   ```
-
-The backend will be available at [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+- Ensure you have installed:
+  - Python 3.8+
+  - Node.js (v16+)
+  - PostgreSQL
+  - npm or yarn
 
 ---
 
-### Running the Frontend (React)
+### Backend (Django)
 
-1. **Navigate to the `frontend` directory:**
+1. Create and activate a virtual environment:
 
-   ```bash
-   cd frontend
-   ```
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-2. **Install dependencies:**
+2. Install backend dependencies:
 
-   ```bash
-   npm install  # or yarn install
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-3. **Start the frontend application:**
-   ```bash
-   npm start  # or yarn start
-   ```
+3. Configure your PostgreSQL database in `settings.py`.
 
-The frontend will be available at [http://localhost:3000/](http://localhost:3000/).
+4. Apply database migrations:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+5. Create a Django admin user:
+
+```bash
+python manage.py createsuperuser
+```
+
+6. Start the backend server:
+
+```bash
+python manage.py runserver
+```
+
+Backend will be available at [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
 ---
 
-### Optional: Running Only the Frontend (React)
+### Frontend (React)
 
-1. **Install dependencies and start the app:**
-   ```bash
-   cd frontend
-   npm install
-   npm start
-   ```
+1. Navigate to the frontend directory:
 
-You can configure a mock API or use local test data.
+```bash
+cd frontend
+```
+
+2. Install frontend dependencies:
+
+```bash
+npm install  # or yarn install
+```
+
+3. Start the frontend server:
+
+```bash
+npm start  # or yarn start
+```
+
+Frontend will be available at [http://localhost:3000/](http://localhost:3000/).
 
 ---
 
-## Directory Structure
+## 📈 Features
+
+- **Advanced Product Recommendations:**
+  - Collaborative Filtering (User-Based & Item-Based)
+  - Content-Based Filtering
+  - Real-time dynamic adjustment
+  - Sentiment analysis based on user reviews
+
+- **Uncertainty Modeling:**
+  - Fuzzy Logic applied to product attributes ("low price", "high quality", etc.)
+
+- **Full Data Management:**
+  - User authentication (login/register)
+  - Product and transaction database management
+  - Visual dashboards for data representation
+
+- **Intuitive UI/UX:**
+  - Responsive and user-friendly interface built with Material-UI and D3.js.
+
+---
+
+## 🧠 Technologies
+
+**Backend:**
+- Django & Django REST Framework
+- PostgreSQL
+- scikit-learn
+- fuzzywuzzy, scikit-fuzzy
+- spaCy, NLTK
+
+**Frontend:**
+- React
+- Redux
+- Material-UI
+- D3.js, Chart.js
+
+---
+
+## 📂 Project Structure
 
 ```plaintext
 product-recommendation-platform/
-├── backend/        # Backend code (Django)
-├── frontend/       # Frontend code (React)
-├── requirements.txt  # Python dependencies
-├── README.md      # README file (this document)
-└── .gitignore     # Git ignore file
+├── backend/           # Django backend
+├── frontend/          # React frontend
+├── requirements.txt   # Backend dependencies
+├── README.md          # Documentation
+└── .gitignore         # Git ignored files
 ```
 
 ---
 
-## Authors
+## 🖼️ Screenshots
+
+[<img src="images/mobile_home.png" width="80%"/>](images/mobile_home.png)
+
+---
+
+## 🧑‍💻 Authors
 
 - Dawid Olko
 - Piotr Smoła
 
-This project was created as part of an engineering thesis under the supervision of Dr. Grochowalski.
+> This project was developed as part of an engineering thesis under the supervision of Dr. Grochowalski.
 
 ---
 
-## License
+## 📜 License
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+The **Product Recommendation Platform** project is licensed under the [Apache License 2.0](LICENSE).
 
 ---
 
-## Contact
+## 📬 Contact
 
-For questions regarding this project, please contact us via GitHub or email.
+For any questions or suggestions, feel free to open an issue or contact us directly via GitHub.
+
+---
