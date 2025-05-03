@@ -18,7 +18,7 @@ import { AuthContext } from "../../context/AuthContext";
 const Navbar = () => {
   const { favorites } = useFavorites();
   const { totalCartItems } = useContext(CartContext);
-  const { user, setUser } = useContext(AuthContext); // Get user from context
+  const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +32,7 @@ const Navbar = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedUser");
     if (savedUser) {
-      setUser(JSON.parse(savedUser)); // Update user in context
+      setUser(JSON.parse(savedUser));
     }
   }, [setUser]);
 
@@ -90,12 +90,12 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
-    setUser(null); // Reset user context
+    setUser(null);
     setShowUserDropdown(false);
     navigate("/login");
   };
 
-  const panelPrefix = user && user.role === "admin" ? "/admin" : "/client"; // Dynamically select panel
+  const panelPrefix = user && user.role === "admin" ? "/admin" : "/client";
 
   const getUserRedirect = () => {
     if (user) {
@@ -137,23 +137,6 @@ const Navbar = () => {
             <p className="header__logo-text"></p>
           </Link>
           <div className="navbar__section">
-            <div className="navbar__search-wrapper">
-              <button className="search-icon" onClick={toggleSearchBar}>
-                <AiOutlineSearch />
-              </button>
-              {searchActive && (
-                <form className="search-bar" onSubmit={handleSearchSubmit}>
-                  <input
-                    type="search"
-                    name="search"
-                    placeholder="Search products..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    required
-                  />
-                </form>
-              )}
-            </div>
             <div
               className="navbar__user"
               onMouseEnter={handleUserIconHover}
@@ -197,6 +180,23 @@ const Navbar = () => {
                     </>
                   )}
                 </div>
+              )}
+            </div>
+            <div className="navbar__search-wrapper">
+              <button className="search-icon" onClick={toggleSearchBar}>
+                <AiOutlineSearch />
+              </button>
+              {searchActive && (
+                <form className="search-bar" onSubmit={handleSearchSubmit}>
+                  <input
+                    type="search"
+                    name="search"
+                    placeholder="Search products..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    required
+                  />
+                </form>
               )}
             </div>
           </div>

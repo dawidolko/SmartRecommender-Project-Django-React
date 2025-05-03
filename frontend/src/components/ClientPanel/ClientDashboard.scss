@@ -1,4 +1,3 @@
-// Use Bootstrap container and grid system as base
 .container {
   padding: 1rem;
   margin: 0 auto;
@@ -14,11 +13,54 @@ h1 {
   height: 100%;
 }
 
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.col-md-6 {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@media (min-width: 768px) {
+  .col-md-6 {
+    flex: 0 0 25%;
+    max-width: 50%;
+  }
+}
+
 .small-box {
   border-radius: 0.5rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
   margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  height: 100%;
+
+  &.bg-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  &.bg-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  &.bg-success {
+    background-color: #3bdc35;
+    color: white;
+  }
+
+  &.bg-info {
+    background-color: #dca235;
+    color: white;
+  }
 
   &:hover {
     transform: translateY(-3px);
@@ -44,9 +86,32 @@ h1 {
   margin-bottom: 30px;
 }
 
+.center-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .chart-container {
   width: 60%;
   height: 400px;
+}
+
+@media (max-width: 1100px) {
+  .margin-bottom-4 {
+    margin-bottom: 1rem;
+    max-width: 250px;
+  }
+}
+
+.font-size-4 {
+  font-size: 2.5rem !important;
+}
+
+.summary-title {
+  font-size: 1.2rem !important;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
 }
 
 .order-summary {
@@ -63,12 +128,7 @@ h1 {
     padding: 1rem;
     text-align: center;
     margin-bottom: 1rem;
-
-    .summary-title {
-      font-size: 2rem;
-      color: #555;
-      margin-bottom: 0.5rem;
-    }
+    height: 100%;
 
     h3 {
       font-size: 2rem;
@@ -103,9 +163,17 @@ h1 {
 
   .recommendations-grid {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5em;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    overflow-x: auto;
+
+    @media (max-width: 992px) {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
     .recommendation-card {
       background: #fff;
@@ -114,16 +182,30 @@ h1 {
       padding: 0.5rem;
       text-align: center;
       width: 250px;
+      flex: 1;
+      min-width: 200px;
+      max-width: 250px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
       img {
-        max-width: 100%;
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
         border-radius: 0.5rem;
       }
 
       p {
         margin-top: 0.5rem;
-        font-size: 1.9rem;
+        font-size: 1.2rem;
         color: #333;
+      }
+
+      @media (max-width: 768px) {
+        min-width: 45%;
+      }
+
+      @media (max-width: 576px) {
+        min-width: 100%;
       }
     }
   }
@@ -149,41 +231,31 @@ h1 {
     padding: 0.8rem;
   }
 
-  .dashboard-recommendations .recommendations-grid {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  // .order-trends-chart, .chart-container, .category-distribution-chart {
-  //   width: 100%;
-  // }
-
   .chart-container {
     width: 100%;
-    // height: 1050px;
-
-    // .order-trends-chart, .category-distribution-chart {
-    //   height: 100% ;
-    // }
   }
 }
 
-.recommendations-grid {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  padding: 1.5em;
-  background-color: #f1f1f1;
-  border-radius: 10px;
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #6366f1;
+  animation: spin 1s ease-in-out infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.recommendation-card {
-  text-align: center;
-  background-color: #fff;
-  border-radius: 5px;
-  width: 200px;
-  padding: 1em;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .productPage__main-img {
@@ -204,4 +276,17 @@ h1 {
 
 .productPage__arrow:hover {
   color: #ff5733;
+}
+
+.my-4 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important;
+  @media screen and (max-width: 1100px) {
+    display: flex;
+    justify-content: center;
+  }
 }

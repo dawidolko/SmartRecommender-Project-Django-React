@@ -17,7 +17,9 @@ const MainBackground = () => {
 
   return (
     <header className="mainBackground">
-      <span className="mainBackground__arrow" onClick={prevSlide}>
+      <span
+        className="mainBackground__arrow mainBackground__arrow-left"
+        onClick={prevSlide}>
         <AiOutlineArrowLeft className="mainBackground__arrows" />
       </span>
       <div className="mainBackground__container">

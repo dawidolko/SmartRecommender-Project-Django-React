@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
+import { AuthContext } from "../../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -16,8 +17,10 @@ import config from "../../config/config";
 
 const ProductPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { addToCart, items } = useContext(CartContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { logout } = useContext(AuthContext);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,13 +43,22 @@ const ProductPage = () => {
         toast.error("Error loading product details.", {
           position: "top-center",
         });
+
+        // Handle session expiration
+        if (
+          error.message.includes("401") ||
+          error.message.includes("unauthorized")
+        ) {
+          logout();
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchProduct();
-  }, [id, isFavorite]);
+  }, [id, isFavorite, logout, navigate]);
 
   if (loading) {
     return <div className="loading-spinner"></div>;
@@ -112,8 +124,8 @@ const ProductPage = () => {
           </button>
         </div>
 
-        <div class="productPage__main__section">
-          <div class="productPage__main__subsection">
+        <div className="productPage__main__section">
+          <div className="productPage__main__subsection">
             <div className="productPage__images">
               <div className="productPage__slider">
                 <button
@@ -178,8 +190,8 @@ const ProductPage = () => {
                 <p className="tags">
                   <span className="tagsHeader">Tags: </span>
                   {product.tags.length > 0 ? (
-                    product.tags.map((tag) => (
-                      <span key={tag} className="tag">
+                    product.tags.map((tag, index) => (
+                      <span key={tag || `tag-${index}`} className="tag">
                         {tag}
                       </span>
                     ))
@@ -223,8 +235,8 @@ const ProductPage = () => {
             <h1>Specifications:</h1>
             <table>
               <tbody>
-                {product.specifications.map((spec) => (
-                  <tr key={spec.parameter_name}>
+                {product.specifications.map((spec, index) => (
+                  <tr key={spec.parameter_name || index}>
                     <td>{spec.parameter_name}</td>
                     <td>{spec.specification}</td>
                   </tr>
@@ -241,11 +253,11 @@ const ProductPage = () => {
                   <div className="productPage__review-header">
                     <span>{review.user_email}</span>
                     <div className="productPage__review-stars">
-                      {Array.from({ length: 5 }, (_, index) => (
+                      {Array.from({ length: 5 }, (_, starIndex) => (
                         <FaStar
-                          key={index}
+                          key={`${review.id}-star-${starIndex}`}
                           className={
-                            index < review.rating
+                            starIndex < review.rating
                               ? "productPage__review-stars__star--active"
                               : "productPage__review-stars__star"
                           }

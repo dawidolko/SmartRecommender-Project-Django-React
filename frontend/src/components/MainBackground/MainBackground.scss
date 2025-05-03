@@ -17,7 +17,6 @@
   &__content {
     @include flexCenter(column);
     gap: 1em;
-    // margin-top: 50px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -63,11 +62,11 @@
   }
 
   &__arrow-right {
-    right: 10px;
+    right: 50px;
   }
 
-  &__arrow {
-    left: 10px;
+  &__arrow-left {
+    left: 50px;
   }
 
   &__container {

@@ -1,19 +1,34 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import {
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+} from "lucide-react";
 import config from "../../config/config";
+import "./ClientPanel.scss";
+import Modal from "./Modal";
 
 const ClientOrders = () => {
   const [orders, setOrders] = useState([]);
   const [sortKey, setSortKey] = useState("date");
   const [sortOrder, setSortOrder] = useState("asc");
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(10);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderError, setOrderError] = useState(null);
 
   const getStatusClass = (status) => {
     switch (status) {
-      case "Pending":
-        return "status-pending";
       case "Processing":
         return "status-processing";
       case "Shipped":
@@ -22,23 +37,95 @@ const ClientOrders = () => {
         return "status-delivered";
       case "Cancelled":
         return "status-cancelled";
+      case "Pending":
       default:
-        return "";
+        return "status-pending";
     }
   };
 
   useEffect(() => {
     const token = localStorage.getItem("access");
+    setLoading(true);
     axios
       .get(`${config.apiUrl}/api/orders/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setOrders(res.data))
-      .catch((err) => console.error("Error fetching orders:", err));
+      .then((res) => {
+        setOrders(res.data);
+        setFilteredOrders(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching orders:", err);
+        setLoading(false);
+      });
   }, []);
 
+  useEffect(() => {
+    handleFilteringAndSorting();
+  }, [searchTerm, sortKey, sortOrder, orders]);
+
+  const handleFilteringAndSorting = () => {
+    if (!orders.length) return;
+
+    let data = [...orders];
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter((order) => {
+        const idMatch = order.id.toString().includes(term);
+        const statusMatch = order.status?.toLowerCase().includes(term);
+
+        const orderDate = format(
+          new Date(order.date_order),
+          "dd MMM yyyy, HH:mm"
+        ).toLowerCase();
+        const dateMatch = orderDate.includes(term);
+
+        return idMatch || statusMatch || dateMatch;
+      });
+    }
+
+    data.sort((a, b) => {
+      let comp = 0;
+      if (sortKey === "date") {
+        comp = new Date(a.date_order) - new Date(b.date_order);
+      } else if (sortKey === "status") {
+        comp = a.status.localeCompare(b.status);
+      } else if (sortKey === "id") {
+        comp = a.id - b.id;
+      }
+      return sortOrder === "asc" ? comp : -comp;
+    });
+
+    setFilteredOrders(data);
+    setCurrentPage(1);
+  };
+
   const handleViewDetails = (orderId) => {
-    navigate(`/client/orders/${orderId}`);
+    const token = localStorage.getItem("access");
+    setOrderLoading(true);
+    setOrderError(null);
+
+    axios
+      .get(`${config.apiUrl}/api/client/orders/${orderId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setSelectedOrder(res.data);
+        setOrderLoading(false);
+        setIsModalOpen(true);
+      })
+      .catch((err) => {
+        console.error("Error fetching order details:", err);
+        setOrderError("Failed to fetch order details");
+        setOrderLoading(false);
+      });
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
   };
 
   const handleSort = (column) => {
@@ -50,69 +137,269 @@ const ClientOrders = () => {
     }
   };
 
-  const renderSortIndicator = (column) => {
-    if (sortKey === column) {
-      return sortOrder === "asc" ? " ▲" : " ▼";
-    }
-    return "";
+  const handleSearch = (value) => {
+    setSearchTerm(value);
   };
 
-  const sortedOrders = [...orders].sort((a, b) => {
-    let comp = 0;
-    if (sortKey === "date") {
-      comp = new Date(a.date_order) - new Date(b.date_order);
-    } else if (sortKey === "status") {
-      comp = a.status.localeCompare(b.status);
+  const renderSortIcon = (column) => {
+    if (sortKey !== column) return null;
+    return sortOrder === "asc" ? (
+      <ChevronUp size={14} />
+    ) : (
+      <ChevronDown size={14} />
+    );
+  };
+
+  const indexOfLast = currentPage * ordersPerPage;
+  const indexOfFirst = indexOfLast - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirst, indexOfLast);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const nextPage = () => {
+    if (currentPage < Math.ceil(filteredOrders.length / ordersPerPage)) {
+      setCurrentPage(currentPage + 1);
     }
-    return sortOrder === "asc" ? comp : -comp;
-  });
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading-spinner"></div>;
+  }
+
+  const tableCellStyle = {
+    textAlign: "center",
+    verticalAlign: "middle",
+  };
+
+  const renderOrderDetails = () => {
+    if (orderLoading) return <div className="loading-spinner"></div>;
+    if (orderError) return <div>{orderError}</div>;
+    if (!selectedOrder) return <div>No order found.</div>;
+
+    return (
+      <div className="order-detail-modal">
+        <p>
+          <strong>Date: </strong>
+          {format(new Date(selectedOrder.date_order), "dd MMM yyyy, HH:mm")}
+        </p>
+        <p>
+          <strong>Status: </strong>
+          <span className={getStatusClass(selectedOrder.status)}>
+            {selectedOrder.status}
+          </span>
+        </p>
+        <p>
+          <strong>Total:</strong> ${selectedOrder.total.toFixed(2)}
+        </p>
+
+        <h3 style={{ marginTop: "1rem" }}>Ordered Products:</h3>
+        <div className="table-responsive">
+          <table className="modal-table">
+            <thead>
+              <tr>
+                <th style={{ textAlign: "center" }}>Image</th>
+                <th style={{ textAlign: "center" }}>Name</th>
+                <th style={{ textAlign: "center" }}>Quantity</th>
+                <th style={{ textAlign: "center" }}>Price (each)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedOrder.order_products.map((op) => {
+                const product = op.product;
+                const imgSrc =
+                  product.photos && product.photos.length > 0
+                    ? `${config.apiUrl}/media/${product.photos[0].path}`
+                    : "https://via.placeholder.com/150";
+                return (
+                  <tr key={op.id || `${selectedOrder.id}-${product.id}`}>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        border: "none",
+                        borderBottom: "1px solid #ddd",
+                      }}>
+                      <img
+                        src={imgSrc}
+                        alt={product.name}
+                        style={{ width: "100px" }}
+                      />
+                    </td>
+                    <td style={{ textAlign: "center" }}>{product.name}</td>
+                    <td style={{ textAlign: "center" }}>{op.quantity}</td>
+                    <td style={{ textAlign: "center" }}>
+                      ${Number(product.price).toFixed(2)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="container client-orders">
-      <h2>Your Orders</h2>
-      <div className="table-responsive">
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th class="text-align-client">#</th>
-              <th
-                className="hide-complaints2 text-align-client"
-                style={{ cursor: "pointer" }}
-                onClick={() => handleSort("date")}>
-                Date {renderSortIndicator("date")}
-              </th>
-              <th
-                style={{ cursor: "pointer", textAlign: "center" }}
-                onClick={() => handleSort("status")}>
-                Status {renderSortIndicator("status")}
-              </th>
-              <th class="text-align-client">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedOrders.map((order) => (
-              <tr key={order.id}>
-                <td class="text-align-client">{order.id}</td>
-                <td className="hide-complaints2 text-align-client">
-                  {format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}
-                </td>
-                <td
-                  style={{ textAlign: "center" }}
-                  className={getStatusClass(order.status)}>
-                  {order.status}
-                </td>
-                <td className="table-center">
-                  <button
-                    className="btn btn-primary btn-main-client"
-                    onClick={() => handleViewDetails(order.id)}>
-                    View Details
-                  </button>
-                </td>
+    <div className="client-main">
+      <div className="product-table-container2">
+        <div className="product-table-header2">
+          <h2>Your Orders</h2>
+          <div className="search-container2">
+            <input
+              type="text"
+              placeholder="Search orders... (ID, Status, Date)"
+              onChange={(e) => handleSearch(e.target.value)}
+              value={searchTerm}
+            />
+            <Search className="search-icon" size={18} />
+          </div>
+        </div>
+
+        <div className="table-wrapper">
+          <table className="product-table2">
+            <thead>
+              <tr>
+                <th
+                  style={tableCellStyle}
+                  onClick={() => handleSort("id")}
+                  className="sortable-header">
+                  <div className="header-content">
+                    <span>Order ID</span>
+                    {renderSortIcon("id")}
+                  </div>
+                </th>
+                <th
+                  style={tableCellStyle}
+                  onClick={() => handleSort("date")}
+                  className="sortable-header">
+                  <div className="header-content">
+                    <span>Date</span>
+                    {renderSortIcon("date")}
+                  </div>
+                </th>
+                <th
+                  style={tableCellStyle}
+                  onClick={() => handleSort("status")}
+                  className="sortable-header">
+                  <div className="header-content">
+                    <span>Status</span>
+                    {renderSortIcon("status")}
+                  </div>
+                </th>
+                <th style={tableCellStyle}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentOrders.length > 0 ? (
+                currentOrders.map((order) => (
+                  <tr key={order.id}>
+                    <td style={tableCellStyle}>{order.id}</td>
+                    <td style={tableCellStyle}>
+                      {format(new Date(order.date_order), "dd MMM yyyy, HH:mm")}
+                    </td>
+                    <td style={tableCellStyle}>
+                      <span
+                        className={`status-badge ${getStatusClass(
+                          order.status
+                        )}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td style={tableCellStyle}>
+                      <button
+                        className="btn-primary"
+                        onClick={() => handleViewDetails(order.id)}>
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="no-results">
+                    No orders found matching your search criteria
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredOrders.length > 0 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <p className="pagination-text">
+                Displaying {indexOfFirst + 1} to{" "}
+                {Math.min(indexOfLast, filteredOrders.length)} of{" "}
+                {filteredOrders.length} orders
+              </p>
+            </div>
+            <div className="pagination-controls">
+              <button
+                onClick={prevPage}
+                disabled={currentPage === 1}
+                className={`pagination-button ${
+                  currentPage === 1 ? "disabled" : ""
+                }`}>
+                <ChevronLeft size={16} />
+                <span>&lt;</span>
+              </button>
+              {Array.from({
+                length: Math.ceil(filteredOrders.length / ordersPerPage),
+              })
+                .map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => paginate(index + 1)}
+                    className={`pagination-number ${
+                      currentPage === index + 1 ? "active" : ""
+                    }`}>
+                    {index + 1}
+                  </button>
+                ))
+                .slice(
+                  Math.max(0, currentPage - 3),
+                  Math.min(
+                    Math.ceil(filteredOrders.length / ordersPerPage),
+                    currentPage + 2
+                  )
+                )}
+              <button
+                onClick={nextPage}
+                disabled={
+                  currentPage >=
+                  Math.ceil(filteredOrders.length / ordersPerPage)
+                }
+                className={`pagination-button ${
+                  currentPage >=
+                  Math.ceil(filteredOrders.length / ordersPerPage)
+                    ? "disabled"
+                    : ""
+                }`}>
+                <ChevronRight size={16} />
+                <span>&gt;</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={
+          selectedOrder ? `Order #${selectedOrder.id} Details` : "Order Details"
+        }>
+        {renderOrderDetails()}
+      </Modal>
     </div>
   );
 };

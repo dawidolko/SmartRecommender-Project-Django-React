@@ -76,11 +76,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'price', 'old_price', 'description', 'categories', 'photos', 'tags']
-
-# ---------------------------
-#   NEW SERIALIZERS
-# ---------------------------
-
+        read_only_fields = ['id']
 
 class OrderProductSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
@@ -106,7 +102,6 @@ class OrderSerializer(serializers.ModelSerializer):
             total_value += op.product.price * op.quantity
         return total_value
 
-# Item in cart
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 
@@ -186,7 +181,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     def validate_password(self, value):
         if value == "":
-            return value  # If field is empty, we don't update
+            return value
         if len(value) < 8:
             raise serializers.ValidationError("Password must have at least 8 characters.")
         if not re.search(r'\d', value):

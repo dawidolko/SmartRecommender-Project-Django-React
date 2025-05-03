@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,10 +11,9 @@ const LoginPanel = () => {
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [submitForm, setSubmitForm] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleLogin = async () => {
     if (!email || !password) {
       toast.error("Please enter email and password.");
       return;
@@ -43,11 +42,32 @@ const LoginPanel = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSubmit(e);
+  useEffect(() => {
+    if (submitForm) {
+      handleLogin();
+      setSubmitForm(false);
     }
+  }, [submitForm]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitForm(true);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        setSubmitForm(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div className="loginPanel">
@@ -66,7 +86,6 @@ const LoginPanel = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={handleKeyPress} // Nasłuchiwanie Entera
               required
             />
           </div>
@@ -79,13 +98,14 @@ const LoginPanel = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
 
           <div className="loginPanel__buttons">
-            <button type="submit">Log in</button>
+            <button type="button" onClick={() => setSubmitForm(true)}>
+              Log in
+            </button>
             <span className="loginPanel__or">OR</span>
             <button
               type="button"

@@ -3,9 +3,23 @@ from django.db.models.functions import TruncMonth
 from django.forms import ValidationError
 from django.utils import timezone
 from datetime import timedelta
+import os
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
+import os
+import time
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import Product, PhotoProduct
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdminUser
+from django.db import connection
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import (
     CartItem,
     PhotoProduct,
@@ -44,19 +58,16 @@ from rest_framework.generics import (
 from rest_framework import status
 from .permissions import (
     IsAdminUser,
-)  # Custom permission checking for administrator rights
+) 
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.db import IntegrityError
+from django.db.models import Avg
 
 User = get_user_model()
-
-# ----------------------------------
-# TOKEN HANDLING
-# ----------------------------------
-
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = "email"
@@ -73,19 +84,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
-
-# ----------------------------------
-# CATEGORIES - Public Access
-# ----------------------------------
-
 
 class CategoriesAPIView(APIView):
     permission_classes = [AllowAny]
@@ -93,13 +96,6 @@ class CategoriesAPIView(APIView):
     def get(self, request):
         categories = Category.objects.values("name")
         return Response(categories)
-
-
-# ----------------------------------
-# PRODUCTS
-# Public product list view; creation/modification is allowed only for admin users.
-# ----------------------------------
-
 
 class ProductsAPIView(APIView):
     permission_classes = [AllowAny]
@@ -131,11 +127,58 @@ class ProductDetailAPIView(RetrieveAPIView):
     )
     serializer_class = ProductDetailSerializer
 
+class ProductImageUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
-# ----------------------------------
-# HOME PAGE - Public Access
-# ----------------------------------
-
+    def post(self, request, pk):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        images = request.FILES.getlist('images')
+        result = []
+        
+        if not os.path.exists('media'):
+            os.makedirs('media')
+        
+        for image in images:
+            original_filename = image.name
+            base_name, extension = os.path.splitext(original_filename)
+            timestamp = int(time.time() * 1000)
+            filename = f"{base_name}_{timestamp}{extension}"
+            
+            filepath = os.path.join('media', filename)
+            with open(filepath, 'wb+') as destination:
+                for chunk in image.chunks():
+                    destination.write(chunk)
+            
+            max_attempts = 3
+            attempt = 0
+            success = False
+            
+            while attempt < max_attempts and not success:
+                try:
+                    photo = PhotoProduct.objects.create(product=product, path=filename)
+                    result.append({"id": photo.id, "path": filename})
+                    success = True
+                except IntegrityError:
+                    with connection.cursor() as cursor:
+                        cursor.execute("SELECT MAX(id) FROM photo_product")
+                        max_id = cursor.fetchone()[0] or 0
+                        cursor.execute(f"ALTER SEQUENCE photo_product_id_seq RESTART WITH {max_id + 1}")
+                    attempt += 1
+            
+            if not success:
+                return Response({
+                    "error": "Failed to add image due to database constraints after multiple attempts"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response({
+            "message": f"{len(images)} images uploaded successfully",
+            "uploaded_images": result
+        }, status=status.HTTP_201_CREATED)
 
 def home_view(request):
     html_content = """
@@ -208,12 +251,6 @@ def home_view(request):
     """
     return HttpResponse(html_content)
 
-
-# ----------------------------------
-# LOGIN - Public Access
-# ----------------------------------
-
-
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -243,12 +280,6 @@ class UserLoginView(APIView):
             {"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-
-# ----------------------------------
-# REGISTRATION - Public Access
-# ----------------------------------
-
-
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -275,13 +306,6 @@ class UserRegisterView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
-# ----------------------------------
-# CRUD ENDPOINTS - Authentication Required
-# ----------------------------------
-
-
-# Products - creation, modification, and deletion allowed only for admin users
 class ProductListCreateAPIView(ListCreateAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
@@ -291,38 +315,33 @@ class ProductListCreateAPIView(ListCreateAPIView):
             return [AllowAny()]
         return [IsAuthenticated(), IsAdminUser()]
 
-    def perform_create(self, serializer):
-        tags = self.request.data.get("tags", [])
-        categories = self.request.data.get("categories", [])
-        photos = self.request.data.get("photos", [])
+def perform_create(self, serializer):
+    tags = self.request.data.get("tags", [])
+    categories = self.request.data.get("categories", [])
+    photos = self.request.data.get("photos", [])
 
-        if not tags:
-            raise ValidationError("Tags are required.")
-        if not categories:
-            raise ValidationError("Categories are required.")
+    if not tags:
+        raise ValidationError("Tags are required.")
+    if not categories:
+        raise ValidationError("Categories are required.")
 
-        try:
-            product = serializer.save()
+    try:
+        product = serializer.save()
 
-            if tags:
-                tags_objects = Tag.objects.filter(id__in=tags)
-                product.tags.set(tags_objects)
+        if tags:
+            tags_objects = Tag.objects.filter(id__in=tags)
+            product.tags.set(tags_objects)
 
-            if categories:
-                categories_objects = Category.objects.filter(name__in=categories)
-                product.categories.set(categories_objects)
+        if categories:
+            categories_objects = Category.objects.filter(name__in=categories)
+            product.categories.set(categories_objects)
 
-            if photos:
-                for photo_path in photos:
-                    photo_product = PhotoProduct.objects.create(path=photo_path)
-                    product.photoproduct_set.add(photo_product)
-
-            return Response(serializer.data, status=201)
-
-        except Exception as e:
-            raise ValidationError(f"Error occurred during product creation: {str(e)}")
+        if photos:
+            for photo_path in photos:
+                photo_product = PhotoProduct.objects.create(product=product, path=photo_path)
+    except Exception as e:
+        raise ValidationError(f"Error occurred during product creation: {str(e)}")
         
-
 class ProductRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -344,7 +363,6 @@ class OrderListCreateAPIView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         items = self.request.data.get("items", {})
-        # Save order with status "Pending"
         order = serializer.save(user=self.request.user, status="Pending")
         for product_id, quantity in items.items():
             try:
@@ -374,8 +392,6 @@ class OrderUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
             return Order.objects.all()
         return Order.objects.filter(user=user)
 
-
-# Users - Only admin can manage users.
 class UserListCreateAPIView(ListCreateAPIView):
     queryset = MyUser.objects.all()
     serializer_class = AdminUserSerializer
@@ -386,8 +402,6 @@ class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = AdminUserSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
 
-
-# Complaints - A user can see only their own complaints; admin can see all.
 class ComplaintListCreateAPIView(ListCreateAPIView):
     serializer_class = ComplaintSerializer
     permission_classes = [IsAuthenticated]
@@ -412,8 +426,6 @@ class ComplaintRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
             return Complaint.objects.all()
         return Complaint.objects.filter(order__user=user)
 
-
-# Admin statistics - accessible only by administrators.
 class AdminStatsView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
@@ -444,7 +456,6 @@ class AdminDashboardStatsView(APIView):
 
         conversion_rate = round((Order.objects.count() / clients * 100), 1) if clients else 0
 
-        # Trend (Sales by Month)
         orders_by_month = OrderProduct.objects.annotate(
             month=TruncMonth("order__date_order")
         ).values("month").annotate(
@@ -471,7 +482,6 @@ class AdminDashboardStatsView(APIView):
         cat_labels = list(cat_summary.keys())
         cat_data = list(cat_summary.values())
 
-        # TOP SELLING
         top_selling_data = OrderProduct.objects.values('product').annotate(
             total_sold=Sum('quantity')
         ).order_by('-total_sold').first()
@@ -484,12 +494,9 @@ class AdminDashboardStatsView(APIView):
 
         total_opinions = Opinion.objects.count()
 
-        # averageRating
-        from django.db.models import Avg
         avg_rating_dict = Opinion.objects.aggregate(avg_rating=Avg('rating'))
         average_rating = avg_rating_dict['avg_rating'] or 0
 
-        # topCategoryName
         top_category_name = None
         if cat_summary:
             sorted_cats = sorted(cat_summary.items(), key=lambda x: x[1], reverse=True)
@@ -538,8 +545,6 @@ class AdminDashboardStatsView(APIView):
             "topTagName": top_tag_name or "",
         })
 
-
-# Current user - accessible only for authenticated users.
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -558,8 +563,6 @@ class CurrentUserView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
-# Product search - public access.
 class ProductSearchAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -575,8 +578,6 @@ class ProductSearchAPIView(APIView):
             return Response(serializer.data)
         return Response({"error": "No query provided"}, status=400)
 
-
-# Client statistics - accessible only for authenticated users (pertaining to their own data).
 class ClientStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -591,8 +592,6 @@ class ClientStatsView(APIView):
         )
 
         complaints_count = Complaint.objects.filter(order__user=request.user).count()
-
-        from django.db.models.functions import TruncMonth
 
         orders_by_month = (
             orders.annotate(month=TruncMonth("date_order"))
@@ -682,8 +681,6 @@ class CartPreviewView(APIView):
         cart_item.delete()
         return Response({"message": "Item removed"})
 
-
-# Tags - public access.
 class TagsAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -718,3 +715,18 @@ class RecommendedProductsAPIView(APIView):
 
         serializer = ProductSerializer(recommended_products, many=True)
         return Response(serializer.data)
+
+class ResetPhotoSequenceView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    
+    def post(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT MAX(id) FROM photo_product")
+            max_id = cursor.fetchone()[0] or 0
+            
+            cursor.execute(f"ALTER SEQUENCE photo_product_id_seq RESTART WITH {max_id + 1}")
+            
+            return Response({
+                "message": f"Sequence reset to {max_id + 1}",
+                "max_id": max_id
+            })

@@ -29,7 +29,6 @@ import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
 import ClientDashboard from "./components/ClientPanel/ClientDashboard";
 import ClientOrders from "./components/ClientPanel/ClientOrders";
-import ClientOrderDetail from "./components/ClientPanel/ClientOrderDetail";
 import ClientComplaints from "./components/ClientPanel/ClientComplaints";
 import ClientAccount from "./components/ClientPanel/ClientAccount";
 
@@ -37,15 +36,9 @@ import ScrollToTop from "./utils/ScrollToTop";
 
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
+
   if (!user) {
     return <Navigate to="/login" replace />;
-  }
-  if (!user.role || (roles && !roles.includes(user.role))) {
-    console.warn("[PrivateRoute] Unauthorized access, redirecting...");
-    setTimeout(() => {
-      window.location.reload();
-    }, 0);
-    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -122,7 +115,6 @@ function App() {
                 }>
                 <Route index element={<ClientDashboard />} />
                 <Route path="orders" element={<ClientOrders />} />
-                <Route path="orders/:id" element={<ClientOrderDetail />} />
                 <Route path="complaints" element={<ClientComplaints />} />
                 <Route path="account" element={<ClientAccount />} />
               </Route>

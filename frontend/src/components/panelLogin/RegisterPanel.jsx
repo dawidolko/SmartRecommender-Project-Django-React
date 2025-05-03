@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ const RegisterPanel = () => {
   const [lastName, setLastName] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
+  const [submitForm, setSubmitForm] = useState(false);
 
   const validateForm = () => {
     if (!nickname.trim()) {
@@ -52,8 +53,7 @@ const RegisterPanel = () => {
     return "";
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleRegister = async () => {
     const error = validateForm();
     if (error) {
       toast.error(error);
@@ -86,11 +86,36 @@ const RegisterPanel = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSubmit(e);
+  // Submit form when submitForm state changes
+  useEffect(() => {
+    if (submitForm) {
+      handleRegister();
+      setSubmitForm(false);
     }
+  }, [submitForm]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitForm(true);
   };
+
+  // Global key handler
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        setSubmitForm(true);
+      }
+    };
+
+    // Add event listener
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div className="registerPanel">
@@ -108,7 +133,6 @@ const RegisterPanel = () => {
               placeholder="Nickname"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -120,7 +144,6 @@ const RegisterPanel = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -132,7 +155,6 @@ const RegisterPanel = () => {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -144,7 +166,6 @@ const RegisterPanel = () => {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -156,7 +177,6 @@ const RegisterPanel = () => {
               placeholder="Password"
               value={password1}
               onChange={(e) => setPassword1(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
@@ -168,13 +188,14 @@ const RegisterPanel = () => {
               placeholder="Confirm Password"
               value={password2}
               onChange={(e) => setPassword2(e.target.value)}
-              onKeyDown={handleKeyPress}
               required
             />
           </div>
 
           <div className="registerPanel__buttons">
-            <button type="submit">Create Account</button>
+            <button type="button" onClick={() => setSubmitForm(true)}>
+              Create Account
+            </button>
           </div>
 
           <div className="registerPanel__footer">

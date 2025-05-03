@@ -63,7 +63,7 @@ const ClientSidebar = () => {
                 (isActive ? "client-aside__link--active" : "")
               }
               end>
-              <FiHome className="client-aside__link-icon" />
+              <FiHome className="client-aside__link-icon icon-dashboard" />
               {isOpen && <span>Dashboard</span>}
             </NavLink>
           </li>
@@ -74,7 +74,7 @@ const ClientSidebar = () => {
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")
               }>
-              <FiShoppingCart className="client-aside__link-icon" />
+              <FiShoppingCart className="client-aside__link-icon icon-orders" />
               {isOpen && <span>My Orders</span>}
             </NavLink>
           </li>
@@ -85,7 +85,7 @@ const ClientSidebar = () => {
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")
               }>
-              <FiList className="client-aside__link-icon" />
+              <FiList className="client-aside__link-icon icon-complaints" />
               {isOpen && <span>Complaints</span>}
             </NavLink>
           </li>
@@ -96,7 +96,7 @@ const ClientSidebar = () => {
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")
               }>
-              <FiUser className="client-aside__link-icon" />
+              <FiUser className="client-aside__link-icon icon-account" />
               {isOpen && <span>Account</span>}
             </NavLink>
           </li>

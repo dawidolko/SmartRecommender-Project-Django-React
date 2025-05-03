@@ -1,0 +1,183 @@
+/* Style dla zawartości modalu */
+.order-detail-modal,
+.complaint-detail-modal {
+  p {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+
+    strong {
+      color: black;
+    }
+  }
+
+  h3 {
+    font-size: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    margin-top: 1.5rem;
+  }
+
+  .modal-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #f9f9f9;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.6rem;
+    }
+
+    td {
+      font-size: 1.5rem;
+      text-align: center;
+      vertical-align: middle;
+
+      img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .status-pending {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: #f9e4b7;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-rejected {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: #ff0000;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-resolved {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: #00ff40;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-processing {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: blue;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-shipped {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: orange;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-delivered {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: green;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-cancelled {
+    background-color: rgba(119, 0, 255, 0.2);
+    color: red;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Dodatkowe media queries dla modalu */
+@media (max-width: 768px) {
+  .modal-content2 {
+    width: 95%;
+  }
+
+  .order-detail-modal,
+  .complaint-detail-modal {
+    p {
+      font-size: 1.6rem;
+    }
+
+    h3 {
+      font-size: 1.8rem;
+    }
+
+    .modal-table {
+      th {
+        font-size: 1.4rem;
+      }
+
+      td {
+        font-size: 1.3rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .order-detail-modal,
+  .complaint-detail-modal {
+    p {
+      font-size: 1.4rem;
+    }
+
+    h3 {
+      font-size: 1.6rem;
+    }
+  }
+}

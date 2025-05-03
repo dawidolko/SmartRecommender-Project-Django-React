@@ -17,24 +17,24 @@ else
     echo "Database 'product_recommendation' created successfully."
 fi
 
-# Checking if Python is installed
-echo "Checking Python installation..."
-if ! command -v python &> /dev/null; then
-    echo "Python is not installed or not available in PATH."
+# Checking if Python3 is installed
+echo "Checking Python3 installation..."
+if ! command -v python3 &> /dev/null; then
+    echo "Python3 is not installed or not available in PATH."
     exit 1
 fi
 
-# Checking if pip is installed
-echo "Checking pip installation..."
-if ! command -v pip &> /dev/null; then
-    echo "pip is not installed or not available in PATH."
+# Checking if pip3 is installed
+echo "Checking pip3 installation..."
+if ! command -v pip3 &> /dev/null; then
+    echo "pip3 is not installed or not available in PATH."
     exit 1
 fi
 
 # Creating virtual environment if it does not exist
 if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    python -m venv .venv
+    python3 -m venv .venv
 fi
 
 # Activating virtual environment
@@ -43,23 +43,31 @@ source .venv/bin/activate
 
 # Installing required packages
 echo "Installing dependencies from requirements.txt..."
-pip install --upgrade pip
-pip install -r requirements.txt
+pip3 install --upgrade pip
+pip3 install -r requirements.txt
+pip3 install Pillow
 
-# Installing psycopg2-binary
-pip uninstall -y psycopg2-binary
-pip install psycopg[c]
-npm install react-toastify
+# Installing psycopg
+echo "Installing psycopg..."
+pip3 uninstall -y psycopg2-binary
+pip3 install psycopg[c]
+pip3 install djangorestframework-simplejwt
+
+# Create media directory if it doesn't exist
+if [ ! -d "media" ]; then
+    echo "Creating media directory..."
+    mkdir -p media
+fi
 
 # Creating and applying migrations
 echo "Creating and applying migrations to the database..."
-python manage.py makemigrations
+python3 manage.py makemigrations
 if [ $? -ne 0 ]; then
     echo "Error during migrations creation."
     exit 1
 fi
 
-python manage.py migrate
+python3 manage.py migrate
 if [ $? -ne 0 ]; then
     echo "Error during migrations application."
     exit 1
@@ -67,13 +75,28 @@ fi
 
 # Seeding the database
 echo "Seeding the database..."
-python manage.py seed
+python3 manage.py seed
 if [ $? -ne 0 ]; then
     echo "Error during database seeding."
     exit 1
 fi
 
+# Running check_media.py if it exists
+if [ -f "check_media.py" ]; then
+    echo "Running media check..."
+    python3 check_media.py
+fi
+
 # Running Django server
 echo "Starting Django server..."
-xdg-open http://127.0.0.1:8000 &  # Opens the browser
-python manage.py runserver
+# Use different browser open command depending on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    open http://127.0.0.1:8000 &
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux
+    xdg-open http://127.0.0.1:8000 &
+fi
+
+# Start the Django server
+python3 manage.py runserver

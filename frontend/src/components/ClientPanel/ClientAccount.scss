@@ -2,7 +2,7 @@
   max-width: 600px;
   margin: 2rem auto;
   padding: 1rem;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #eaeef1, #dfe1e3);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
@@ -32,10 +32,11 @@
       input {
         padding: 0.5rem;
         font-size: 1.6rem;
-        border: 1px solid #ccc;
+        border: 1px solid #737272;
         border-radius: 4px;
         margin-bottom: 1rem;
         transition: border-color 0.2s;
+        background: linear-gradient(135deg, #ebe7e7, #e2e9ef);
 
         &:focus {
           outline: none;

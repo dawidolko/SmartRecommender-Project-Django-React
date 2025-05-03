@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
 import config from "../../config/config";
+import { IoHomeOutline } from "react-icons/io5";
+import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 
 const ShopContent = () => {
   const { category } = useParams();
@@ -12,10 +14,10 @@ const ShopContent = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState("all");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Do kontrolowania stanu sidebaru (otwarty/zwiń)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-  const [expandedCategories, setExpandedCategories] = useState([]); // Nowy stan do zarządzania rozwinięciem kategorii
+  const [expandedCategories, setExpandedCategories] = useState([]);
 
   useEffect(() => {
     if (category) {
@@ -52,11 +54,25 @@ const ShopContent = () => {
 
     fetchCategories();
     fetchProducts();
+
+    const handleResize = () => {
+      if (window.innerWidth < 868) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const mainCategories = Array.from(
     new Set(categories.map((cat) => cat.split(".")[0]))
   );
+
   const subCategories =
     selectedMainCategory !== "all"
       ? categories
@@ -94,65 +110,82 @@ const ShopContent = () => {
     <div className="shop container">
       <h2 className="shop__title">
         {selectedMainCategory === "all"
-          ? "Our Products"
-          : `Products in "${selectedMainCategory.toUpperCase()}" category`}
+          ? "Nasze Produkty"
+          : `Produkty w kategorii "${selectedMainCategory.toUpperCase()}"`}
       </h2>
 
       <div className="shop__container__main">
-        <button className="hamburger-icon" onClick={toggleSidebar}>
-          {isSidebarOpen ? "☰" : "X"}
+        <button
+          className={`hamburger-icon ${isSidebarOpen ? "active" : ""}`}
+          onClick={toggleSidebar}
+          aria-label="Toggle sidebar">
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
-        <div
-          style={{
-            position: "fixed",
-            display: isSidebarOpen ? "none" : "flex",
-            top: 110,
-            left: 0,
-            bottom: 0,
-            color: "#d5d5d5",
-            border: "1px solid black",
-            backgroundColor: "white",
-            width: "250px",
-            zIndex: 100,
-            flexDirection: "column",
-            height: "100%",
-            paddingBottom: "50px",
-          }}>
+
+        <aside className={`shop__sidebar ${isSidebarOpen ? "open" : "closed"}`}>
           {isLoadingCategories ? (
-            <div className="loading-spinner"></div>
+            <div className="shop__loading-spinner"></div>
           ) : (
-            <div className="shop__main-categories">
-              <button
-                onClick={() => {
-                  setSelectedMainCategory("all");
-                  setSelectedSubCategory("all");
-                  navigate(`/category/all`);
-                }}
-                className={
-                  selectedMainCategory === "all" ? "shop__active" : ""
-                }>
-                ALL PRODUCTS
-              </button>
-              {mainCategories.map((mainCat) => (
-                <div
-                  key={mainCat}
-                  className={`shop__category ${
-                    expandedCategories.includes(mainCat) ? "expanded" : ""
+            <div className="shop__sidebar-content">
+              <div className="shop__sidebar-item">
+                <button
+                  onClick={() => {
+                    setSelectedMainCategory("all");
+                    setSelectedSubCategory("all");
+                    navigate(`/category/all`);
+                  }}
+                  className={`shop__sidebar-button ${
+                    selectedMainCategory === "all" ? "active" : ""
                   }`}>
-                  <button
-                    onClick={() => {
-                      setSelectedMainCategory(mainCat);
-                      setSelectedSubCategory("all");
-                      navigate(`/category/${mainCat}`);
-                    }}
-                    className={
-                      selectedMainCategory === mainCat ? "shop__active" : ""
-                    }>
-                    {mainCat.toUpperCase()}
-                  </button>
-                  {selectedMainCategory === mainCat &&
-                    subCategories.length > 0 && (
-                      <div className="shop__sub-categories">
+                  <IoHomeOutline className="shop__sidebar-icon" />
+                  <span className="shop__sidebar-name">ALL PRODUCTS</span>
+                </button>
+              </div>
+
+              {mainCategories.map((mainCat) => {
+                const isExpanded =
+                  selectedMainCategory === mainCat ||
+                  expandedCategories.includes(mainCat);
+                const hasSubCategories =
+                  subCategories.length > 0 && selectedMainCategory === mainCat;
+
+                return (
+                  <div className="shop__sidebar-item" key={mainCat}>
+                    <div className="shop__sidebar-main-category">
+                      <button
+                        onClick={() => {
+                          setSelectedMainCategory(mainCat);
+                          setSelectedSubCategory("all");
+                          navigate(`/category/${mainCat}`);
+                        }}
+                        className={`shop__sidebar-button ${
+                          selectedMainCategory === mainCat ? "active" : ""
+                        }`}>
+                        <span className="shop__sidebar-dot"></span>
+                        <span className="shop__sidebar-name">
+                          {mainCat.toUpperCase()}
+                        </span>
+                      </button>
+
+                      {categories.some((cat) =>
+                        cat.startsWith(mainCat + ".")
+                      ) && (
+                        <button
+                          className="shop__sidebar-toggle"
+                          onClick={() => toggleSubCategories(mainCat)}>
+                          {isExpanded ? (
+                            <RiArrowUpSLine />
+                          ) : (
+                            <RiArrowDownSLine />
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {hasSubCategories && isExpanded && (
+                      <div className="shop__sidebar-subcategories">
                         {subCategories.map((subCat) => (
                           <button
                             key={subCat}
@@ -160,44 +193,77 @@ const ShopContent = () => {
                               setSelectedSubCategory(subCat);
                               navigate(`/category/${mainCat}.${subCat}`);
                             }}
-                            className={
-                              selectedSubCategory === subCat
-                                ? "shop__active"
-                                : ""
-                            }>
-                            {subCat.toUpperCase()}
+                            className={`shop__sidebar-subbutton ${
+                              selectedSubCategory === subCat ? "active" : ""
+                            }`}>
+                            <span className="shop__sidebar-subdot"></span>
+                            <span>{subCat.toUpperCase()}</span>
                           </button>
                         ))}
                       </div>
                     )}
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           )}
-        </div>
+        </aside>
 
-        {/* Products section */}
-        <div className="shop__products">
-          <h1 className="shop__title">Filter by category and subcategory:</h1>
-          {isLoadingProducts ? (
-            <div className="loading-spinner"></div>
-          ) : filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <ShopProduct
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                price={product.price}
-                old_price={product.old_price}
-                imgs={product.photos.map(
-                  (photo) => `${config.apiUrl}/media/${photo.path}`
-                )}
-                category={product.categories[0] || "N/A"}
-              />
-            ))
-          ) : (
-            <p>No products available in this category.</p>
-          )}
+        <div className="shop__products-container">
+          <div className="shop__products-header">
+            <h3 className="shop__products-title">Filtry:</h3>
+            <div className="shop__filter-tags">
+              {selectedMainCategory !== "all" && (
+                <div className="shop__filter-tag">
+                  <span>{selectedMainCategory.toUpperCase()}</span>
+                  <button
+                    onClick={() => {
+                      setSelectedMainCategory("all");
+                      setSelectedSubCategory("all");
+                      navigate(`/category/all`);
+                    }}>
+                    ×
+                  </button>
+                </div>
+              )}
+              {selectedSubCategory !== "all" && (
+                <div className="shop__filter-tag">
+                  <span>{selectedSubCategory.toUpperCase()}</span>
+                  <button
+                    onClick={() => {
+                      setSelectedSubCategory("all");
+                      navigate(`/category/${selectedMainCategory}`);
+                    }}>
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="shop__products">
+            {isLoadingProducts ? (
+              <div className="shop__loading-spinner"></div>
+            ) : filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <ShopProduct
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  old_price={product.old_price}
+                  imgs={product.photos.map(
+                    (photo) => `${config.apiUrl}/media/${photo.path}`
+                  )}
+                  category={product.categories[0] || "N/A"}
+                />
+              ))
+            ) : (
+              <p className="shop__no-products">
+                Brak produktów w tej kategorii.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

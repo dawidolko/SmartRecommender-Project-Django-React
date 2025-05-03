@@ -4,10 +4,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import (
     CategoriesAPIView,
+    ProductImageUploadView,
     ProductsAPIView,
     RandomProductsAPIView,
     ProductDetailAPIView,
     RecommendedProductsAPIView,
+    ResetPhotoSequenceView,
     home_view,
     UserLoginView,
     UserRegisterView,
@@ -63,4 +65,6 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', CartPreviewView.as_view(), name="cart_remove"),
     path("api/client-stats/", ClientStatsView.as_view(), name="client-stats"),
     path('api/recommended-products/', RecommendedProductsAPIView.as_view(), name='recommended-products'),
+    path('api/products/<int:pk>/upload-images/', ProductImageUploadView.as_view(), name='upload-product-images'),
+    path('api/reset-photo-sequence/', ResetPhotoSequenceView.as_view(), name='reset-photo-sequence'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

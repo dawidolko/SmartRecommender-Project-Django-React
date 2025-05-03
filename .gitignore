@@ -1,25 +1,30 @@
 # === PYTHON / DJANGO ===
+# Cache and compiled files
 __pycache__/
 *.py[cod]
-*.sqlite3
-*.log
-*.pot
 *.pyc
 *.pyo
 *.pyd
+
+# Databases and Logs
+*.sqlite3
+*.log
+*.pot
 *.db
-*.DS_Store
+
+# Virtual environment
+backend/.venv/
 
 # Django specific
 /staticfiles/
 /media/
-/local_settings.py
-/secrets.json
+local_settings.py
+secrets.json
 
 # VSCode
 .vscode/
 
-# Migrations (jeśli chcesz kontrolować – możesz wyjąć z ignore)
+# Migrations
 **/migrations/*.py
 !**/migrations/__init__.py
 

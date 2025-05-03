@@ -1,7 +1,14 @@
+import blog1 from "../../../assets/blog1.webp";
+import blog2 from "../../../assets/blog2.webp";
+import blog3 from "../../../assets/blog3.webp";
+import blog4 from "../../../assets/blog4.webp";
+import blog5 from "../../../assets/blog5.webp";
+import blog6 from "../../../assets/blog6.webp";
+
 const articleData = [
   {
     id: 1,
-    img: "https://placehold.co/800x400?text=Laptop+Recommendations",
+    img: blog5,
     alt: "A sleek laptop on a modern desk",
     title: "HOW TO CHOOSE THE PERFECT LAPTOP FOR YOUR NEEDS",
     text: "Choosing the perfect laptop can be a daunting task with so many options available. This guide will help you navigate through specifications, performance, and design to find the ideal laptop for your needs, whether for work, gaming, or everyday use.",
@@ -12,7 +19,7 @@ const articleData = [
   },
   {
     id: 2,
-    img: "https://placehold.co/800x400?text=Build+Your+Own+PC",
+    img: blog4,
     alt: "Custom-built PC setup with RGB lighting",
     title: "BUILDING YOUR OWN PC: A BEGINNER'S GUIDE",
     text: "Building your own PC can be a fulfilling experience and a cost-effective way to get the exact specifications you need. This article breaks down the process, from selecting components to assembling and troubleshooting your custom rig.",
@@ -22,7 +29,7 @@ const articleData = [
   },
   {
     id: 3,
-    img: "https://placehold.co/800x400?text=Top+Gaming+Accessories",
+    img: blog6,
     alt: "Gaming setup with high-end accessories",
     title: "TOP GAMING ACCESSORIES FOR THE ULTIMATE EXPERIENCE",
     text: "Elevate your gaming experience with the best accessories. From ergonomic keyboards to immersive headsets, discover the gear that can enhance your performance and comfort during long gaming sessions.",
@@ -32,7 +39,7 @@ const articleData = [
   },
   {
     id: 4,
-    img: "https://placehold.co/800x400?text=Desktop+vs+Laptop",
+    img: blog2,
     alt: "A desktop and laptop side by side",
     title: "DESKTOP VS LAPTOP: WHICH IS RIGHT FOR YOU?",
     text: "Deciding between a desktop and a laptop depends on your lifestyle and requirements. This article compares the advantages and disadvantages of each to help you make the right choice for gaming, work, or portability.",
@@ -42,7 +49,7 @@ const articleData = [
   },
   {
     id: 5,
-    img: "https://placehold.co/800x400?text=Upgrade+to+SSD",
+    img: blog1,
     alt: "SSD drives on a table",
     title: "WHY YOU SHOULD UPGRADE TO AN SSD",
     text: "Upgrading to a solid-state drive (SSD) can dramatically improve your computer's performance. This article explains the benefits of SSDs, including faster boot times, quicker file transfers, and enhanced system responsiveness.",
@@ -52,7 +59,7 @@ const articleData = [
   },
   {
     id: 6,
-    img: "https://placehold.co/800x400?text=Smart+Home+Tech",
+    img: blog3,
     alt: "Smart home devices on display",
     title: "SMART HOME TECH: WHERE TO START",
     text: "Transform your living space with smart home technology. From smart speakers to security systems, this guide introduces the essential devices to begin your journey into home automation.",

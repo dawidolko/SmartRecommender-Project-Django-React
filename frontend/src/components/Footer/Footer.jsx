@@ -88,6 +88,74 @@ const Footer = () => {
 
         <hr className="footer__line" />
 
+        <div className="footer__attribution">
+          <h4 className="footer__attribution-title">Attributions</h4>
+          <div className="footer__attribution-content">
+            <p>
+              <strong>Fonts:</strong> "Instrument Sans" designed by Luzi Type,
+              available through{" "}
+              <a
+                href="https://fonts.google.com/specimen/Instrument+Sans"
+                target="_blank"
+                rel="noreferrer">
+                Google Fonts
+              </a>{" "}
+              under the Open Font License.
+            </p>
+            <p>
+              <strong>Icons:</strong> This site uses icons from the following
+              libraries:
+            </p>
+            <ul className="footer__attribution-list">
+              <li>
+                React Icons (
+                <a
+                  href="https://react-icons.github.io/react-icons/"
+                  target="_blank"
+                  rel="noreferrer">
+                  react-icons.github.io
+                </a>
+                ) - Licensed under MIT License
+              </li>
+              <li>
+                Font Awesome Icons via React Icons (
+                <a
+                  href="https://fontawesome.com/license"
+                  target="_blank"
+                  rel="noreferrer">
+                  fontawesome.com
+                </a>
+                ) - Licensed under CC BY 4.0 License
+              </li>
+              <li>
+                Ant Design Icons via React Icons - Licensed under MIT License
+              </li>
+              <li>
+                Lucide React (
+                <a href="https://lucide.dev/" target="_blank" rel="noreferrer">
+                  lucide.dev
+                </a>
+                ) - Licensed under ISC License
+              </li>
+              <li>
+                Recharts (
+                <a
+                  href="https://recharts.org/"
+                  target="_blank"
+                  rel="noreferrer">
+                  recharts.org
+                </a>
+                ) - Licensed under MIT License
+              </li>
+            </ul>
+            <p>
+              All trademarks, logos, and brand names are the property of their
+              respective owners. All company, product, and service names used in
+              this website are for identification purposes only.
+            </p>
+          </div>
+        </div>
+
         <div className="footer__date">
           <p>
             &copy; Copyright {new Date().getFullYear()}{" "}

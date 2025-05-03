@@ -1,37 +1,43 @@
 import team1 from "../../assets/team1.jpg";
 import team2 from "../../assets/team2.jpg";
-import team3 from "../../assets/team3.jpg";
+import team3 from "../../assets/team3.png";
 
 const teamData = [
   {
     id: 1,
     img: team2,
-    alt: "Photo of the technology expert - Piotr Smoła.",
+    alt: "Photo of Piotr Smoła - Co-creator of SmartRecommender.",
     name: "Piotr Smoła",
-    role: "Backend Developer",
+    role: "Co-creator & Backend Developer",
+    description:
+      "One of the main creators of SmartRecommender, specializing in backend development, database design, and system architecture.",
     facebook: "https://www.facebook.com/profile.php?id=100008145638313",
     twitter: "https://x.com/",
     instagram: "https://instagram.com/",
   },
   {
     id: 2,
-    img: team1,
-    alt: "Photo of the technology expert - Dawid Olko.",
-    name: "Dawid Olko",
-    role: "Data Scientist",
-    facebook: "https://www.facebook.com/olkodawid/",
-    twitter: "https://x.com/nullfresh",
-    instagram: "https://instagram.com/dawid_olko",
-  },
-  {
-    id: 3,
     img: team3,
-    alt: "Photo of the technology expert - Anna Kowalska.",
-    name: "Anna Kowalska",
-    role: "UI/UX Designer",
+    alt: "Photo of Dr. Eng. Piotr Grochowalski - Project Supervisor.",
+    name: "Dr. Eng. Piotr Grochowalski",
+    role: "Thesis Supervisor",
+    description:
+      "Our project supervisor and mentor who provided valuable guidance, technical expertise, and academic support throughout the development process.",
     facebook: "https://www.facebook.com/",
     twitter: "https://x.com/",
     instagram: "https://instagram.com/",
+  },
+  {
+    id: 3,
+    img: team1,
+    alt: "Photo of Dawid Olko - Co-creator of SmartRecommender.",
+    name: "Dawid Olko",
+    role: "Co-creator & Data Scientist",
+    description:
+      "One of the main creators of SmartRecommender, focusing on machine learning algorithms, recommendation systems, and frontend development.",
+    facebook: "https://www.facebook.com/olkodawid/",
+    twitter: "https://x.com/nullfresh",
+    instagram: "https://instagram.com/dawid_olko",
   },
 ];
 

@@ -54,11 +54,7 @@ const AdminDashboard = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex-1 overflow-auto relative z-10 p-8">
-        Loading dashboard...
-      </div>
-    );
+    return <div className="loading-spinner"></div>;
   }
 
   return (

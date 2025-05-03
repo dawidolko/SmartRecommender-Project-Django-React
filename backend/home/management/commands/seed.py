@@ -32,15 +32,35 @@ class Command(BaseCommand):
         seed_complaints()
         self.stdout.write(Fore.BLUE + 'Database seeding completed.')
 
-# def reset_sequences():
-#     with connection.cursor() as cursor:
-#         tables = ["auth_user", "home_order", "home_complaint", "home_opinion", "home_orderproduct"]
-#         for table in tables:
-#             try:
-#                 cursor.execute(f"ALTER SEQUENCE {table}_id_seq RESTART WITH 1;")
-#                 print(Fore.GREEN + f"Reset sequence for table {table}.")
-#             except Exception as e:
-#                 print(Fore.RED + f"Failed to reset sequence for table {table}: {e}")
+def reset_sequences():
+    """Resetuje sekwencje ID dla wszystkich modeli."""
+    from django.db import connection
+    from colorama import Fore
+
+    tables = [
+        'product', 
+        'photo_product',
+        'order',
+        'order_product',
+        'opinion',
+        'complaint',
+        'category',
+        'sale',
+        'tag',
+        'specification',
+        'user'
+    ]
+    
+    for table in tables:
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT MAX(id) FROM {table}")
+                max_id = cursor.fetchone()[0] or 0
+                next_id = max_id + 1
+                cursor.execute(f"ALTER SEQUENCE {table}_id_seq RESTART WITH {next_id}")
+                print(Fore.GREEN + f"Reset {table} ID sequence to {next_id}")
+        except Exception as e:
+            print(Fore.RED + f"Error resetting sequence for {table}: {e}")
 
 def seed_categories():
     Category.objects.all().delete()
@@ -10384,20 +10404,16 @@ def seed_product_photos():
 
     PhotoProduct.objects.bulk_create(photo_instances)
 
+    # Reset sekwencji ID dla PhotoProduct
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT MAX(id) FROM photo_product")
+        max_id = cursor.fetchone()[0] or 0
+        next_id = max_id + 1
+        cursor.execute(f"ALTER SEQUENCE photo_product_id_seq RESTART WITH {next_id}")
+        print(Fore.GREEN + f"Reset PhotoProduct ID sequence to {next_id}")
+
     print(Fore.GREEN + "Product photos successfully seeded.")
-
-# Seed product tags
-
-# CATEGORY_TAGS = {
-#     "gaming": ["Gaming", "High Performance", "RGB", "Overclocking"],
-#     "learning": ["Office", "Budget", "Energy Efficient"],
-#     "office": ["Office", "Silent", "Energy Efficient"],
-#     "cooling": ["Water Cooling", "Silent", "Overclocking"],
-#     "graphics": ["High Performance", "Gaming", "Premium"],
-#     "laptops": ["Compact", "Energy Efficient", "Office"],
-#     "processors": ["Overclocking", "High Performance"],
-#     "accessories": ["Budget", "RGB", "Premium"],
-# }
 
 def seed_product_tags():
     products = Product.objects.all()

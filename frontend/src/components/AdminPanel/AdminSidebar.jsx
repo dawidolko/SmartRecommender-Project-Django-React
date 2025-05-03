@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   BarChart2,
   ShoppingBag,
@@ -8,6 +8,8 @@ import {
   List,
   ArrowLeft,
   LogOut,
+  User,
+  BarChart,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./AdminPanel.scss";
@@ -33,11 +35,24 @@ const SIDEBAR_ITEMS = [
     color: "#10B981",
     href: "/admin/complaints",
   },
+  {
+    name: "Statistics",
+    icon: BarChart,
+    color: "#3B82F6",
+    href: "/admin/statistics",
+  },
+  {
+    name: "Account",
+    icon: User,
+    color: "#EF4444",
+    href: "/admin/account",
+  },
 ];
 
 const AdminSidebar = () => {
   const [isOpen] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => {
@@ -56,6 +71,13 @@ const AdminSidebar = () => {
 
   const isMobile = windowWidth <= 800;
 
+  const isLinkActive = (path) => {
+    if (path === "/admin") {
+      return location.pathname === "/admin";
+    }
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <motion.div
       className={`admin-aside ${
@@ -69,13 +91,6 @@ const AdminSidebar = () => {
       animate={{ width: isOpen && !isMobile ? 300 : isMobile ? 80 : 300 }}
       transition={{ duration: 0.3 }}>
       <div className="admin-aside__header">
-        {/* <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen(!isOpen)}
-          className="admin-aside__toggle">
-          <Menu size={24} />
-        </motion.button> */}
         <AnimatePresence>
           {isOpen && !isMobile && (
             <motion.div
@@ -94,11 +109,12 @@ const AdminSidebar = () => {
             <li key={item.href}>
               <NavLink
                 to={item.href}
-                className={({ isActive }) =>
-                  `admin-aside__link ${
-                    isActive ? "admin-aside__link--active" : ""
-                  }`
-                }>
+                className={
+                  isLinkActive(item.href)
+                    ? "admin-aside__link admin-aside__link--active"
+                    : "admin-aside__link"
+                }
+                end>
                 <item.icon
                   size={20}
                   style={{ color: item.color, minWidth: "20px" }}

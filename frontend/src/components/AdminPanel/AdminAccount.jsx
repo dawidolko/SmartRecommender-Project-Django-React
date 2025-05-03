@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import "./ClientAccount.scss";
 import config from "../../config/config";
+import "./AdminPanel.scss";
 
-const ClientAccount = () => {
+const AdminAccount = () => {
   const { user, setUser } = useContext(AuthContext);
 
   const [initialData, setInitialData] = useState({
@@ -35,19 +36,6 @@ const ClientAccount = () => {
         last_name,
         email,
       }));
-    }
-
-    const shouldShowToast = localStorage.getItem("accountUpdateSuccess");
-    if (shouldShowToast === "true") {
-      setTimeout(() => {
-        toast.success("Account updated!", {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-        });
-        localStorage.removeItem("accountUpdateSuccess");
-      }, 500);
     }
   }, [user]);
 
@@ -135,13 +123,8 @@ const ClientAccount = () => {
       const updatedUser = { ...user, ...response.data };
       setUser(updatedUser);
       localStorage.setItem("loggedUser", JSON.stringify(updatedUser));
-      toast.success("Account updated successfully!", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-      });
 
+      toast.success("Account updated successfully!");
       setLoading(false);
       setFormData((prev) => ({
         ...prev,
@@ -155,83 +138,96 @@ const ClientAccount = () => {
       });
     } catch (err) {
       console.error("Error updating account:", err);
-      toast.error("Error updating account", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-      });
+      toast.error("Error updating account. Please try again.");
       setLoading(false);
     }
   };
 
   return (
-    <div className="container client-account">
-      <h1>Account Settings</h1>
-      <form onSubmit={handleSubmit} className="account-form">
-        <div className="form-group">
-          <label htmlFor="first_name">First Name:</label>
-          <input
-            type="text"
-            name="first_name"
-            id="first_name"
-            value={formData.first_name}
-            onChange={handleChange}
-            required
-          />
+    <div className="admin-content">
+      <motion.div
+        className="admin-account-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}>
+        <div className="admin-account-card">
+          <h2 className="admin-account-title">Account Settings</h2>
+          <form onSubmit={handleSubmit} className="admin-account-form">
+            <div className="form-group">
+              <label htmlFor="first_name">First Name</label>
+              <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                required
+                className="admin-account-input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="last_name">Last Name</label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                required
+                className="admin-account-input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="admin-account-input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">New Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="admin-account-input"
+              />
+              <small className="admin-account-hint">
+                Leave blank to keep current password
+              </small>
+            </div>
+            <div className="form-group">
+              <label htmlFor="confirm_password">Confirm New Password</label>
+              <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                value={formData.confirm_password}
+                onChange={handleChange}
+                className="admin-account-input"
+              />
+            </div>
+            {errorMessage && (
+              <div className="admin-account-error">{errorMessage}</div>
+            )}
+            <button
+              type="submit"
+              className="admin-account-btn-submit"
+              disabled={loading}>
+              {loading ? "Updating..." : "Update Account"}
+            </button>
+          </form>
         </div>
-        <div className="form-group">
-          <label htmlFor="last_name">Last Name:</label>
-          <input
-            type="text"
-            name="last_name"
-            id="last_name"
-            value={formData.last_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email Address:</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">New Password:</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="confirm_password">Confirm Password:</label>
-          <input
-            type="password"
-            name="confirm_password"
-            id="confirm_password"
-            value={formData.confirm_password}
-            onChange={handleChange}
-          />
-        </div>
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-        <button
-          type="submit"
-          className="btn-submit btn-main-client"
-          disabled={loading}>
-          {loading ? "Updating..." : "Update"}
-        </button>
-      </form>
+      </motion.div>
     </div>
   );
 };
 
-export default ClientAccount;
+export default AdminAccount;

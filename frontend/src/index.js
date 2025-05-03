@@ -22,7 +22,8 @@ if (window.location.hostname === "localhost") {
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <CartProvider>
           <App />
         </CartProvider>

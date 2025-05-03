@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import CountUp from "react-countup";
 import { Line, Pie } from "react-chartjs-2";
@@ -22,6 +22,7 @@ const ClientDashboard = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const dataFetchedRef = useRef(false);
 
   const navigate = useNavigate();
 
@@ -34,6 +35,9 @@ const ClientDashboard = () => {
   };
 
   useEffect(() => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
     const token = localStorage.getItem("access");
 
     const ordersRequest = axios.get(`${config.apiUrl}/api/orders/`, {
@@ -133,7 +137,7 @@ const ClientDashboard = () => {
         };
         setCategoryDistributionData(catChart);
 
-        setRecommendedProducts(recommendedProductsRes.data);
+        setRecommendedProducts(recommendedProductsRes.data.slice(0, 4));
 
         setLoading(false);
       })
@@ -142,12 +146,11 @@ const ClientDashboard = () => {
         setError("Failed to fetch data. Please try again.");
         setLoading(false);
 
-        // Wylogowanie i przekierowanie na stronę główną
         localStorage.removeItem("access");
         navigate("/");
         window.location.reload();
       });
-  }, [baseOptions]);
+  }, []);
 
   if (loading) {
     return <div className="loading-spinner"></div>;
@@ -165,50 +168,46 @@ const ClientDashboard = () => {
       <h1>Client Dashboard</h1>
 
       <div className="row mt-4">
-        <div className="col-md-6">
+        <div className="col-md-6 margin-bottom-4">
           <div
             className="small-box bg-primary"
             style={{ cursor: "pointer" }}
             onClick={() => navigate("/client/orders")}>
             <div className="inner">
-              <h3>
+              <h3 className="font-size-4">
                 <CountUp end={purchasedItems} duration={1.5} />
               </h3>
-              <p>Purchased Items</p>
+              <p className="summary-title">Purchased Items</p>
             </div>
           </div>
         </div>
-        <div className="col-md-6">
+        <div className="col-md-6 margin-bottom-4">
           <div
             className="small-box bg-danger"
             style={{ cursor: "pointer" }}
             onClick={() => navigate("/client/complaints")}>
             <div className="inner">
-              <h3>
+              <h3 className="font-size-4">
                 <CountUp end={complaints} duration={1.5} />
               </h3>
-              <p>Complaints</p>
+              <p className="summary-title">Complaints</p>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="order-summary my-4">
-        <h2>Order Summary</h2>
-        <div className="row">
-          <div className="col-md-6">
-            <div className="summary-box">
-              <p className="summary-title">Orders This Month</p>
-              <h3>
-                <CountUp end={orderSummary.ordersThisMonth} duration={1.5} />
-              </h3>
-            </div>
+        <div className="col-md-6 margin-bottom-4">
+          <div className="small-box bg-success">
+            <h3 className="font-size-4">
+              <CountUp end={orderSummary.ordersThisMonth} duration={1.5} />
+            </h3>
+            <p className="summary-title">Orders This Month</p>
           </div>
-          <div className="col-md-6">
-            <div className="summary-box">
-              <p className="summary-title">Average Order Value</p>
-              <h3>${orderSummary.avgOrderValue.toFixed(2)}</h3>
-            </div>
+        </div>
+        <div className="col-md-6 margin-bottom-4">
+          <div className="small-box bg-info">
+            <h3 className="font-size-4">
+              ${orderSummary.avgOrderValue.toFixed(2)}
+            </h3>
+            <p className="summary-title">Average Order Value</p>
           </div>
         </div>
       </div>
@@ -239,7 +238,7 @@ const ClientDashboard = () => {
       <div className="dashboard-recommendations my-4">
         <h2>Recommended For You</h2>
         <div className="recommendations-grid">
-          {recommendedProducts.map((product, index) => (
+          {recommendedProducts.slice(0, 4).map((product, index) => (
             <div
               className="recommendation-card"
               key={index}

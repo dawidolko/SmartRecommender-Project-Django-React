@@ -16,6 +16,7 @@ import {
 import StatCard from "./StatCard";
 import SalesTrendChart from "./SalesTrendChart";
 import CategoryDistributionChart from "./CategoryDistributionChart";
+import ConfirmationModal from "./ConfirmationModal";
 import "./AdminPanel.scss";
 import config from "../../config/config";
 import { toast } from "react-toastify";
@@ -38,7 +39,7 @@ const AdminProducts = () => {
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState([]);
   const [category, setCategory] = useState("");
-  const [photos, setPhotos] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
 
   const [availableTags, setAvailableTags] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -50,7 +51,7 @@ const AdminProducts = () => {
   const [editDescription, setEditDescription] = useState("");
   const [editTags, setEditTags] = useState([]);
   const [editCategory, setEditCategory] = useState("");
-  const [editPhotos, setEditPhotos] = useState([]);
+  const [editUploadedImages, setEditUploadedImages] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -58,6 +59,12 @@ const AdminProducts = () => {
   const [productsPerPage] = useState(10);
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [loading, setLoading] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddConfirmModalOpen, setIsAddConfirmModalOpen] = useState(false);
+  const [isEditConfirmModalOpen, setIsEditConfirmModalOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -87,13 +94,21 @@ const AdminProducts = () => {
   }, [searchTerm, products, sortField, sortDirection]);
 
   const fetchProducts = () => {
+    setLoading(true);
     const token = localStorage.getItem("access");
     axios
       .get(`${config.apiUrl}/api/products/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.error("Error fetching products:", err));
+      .then((res) => {
+        setProducts(res.data);
+        setFilteredProducts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching products:", err);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -144,7 +159,7 @@ const AdminProducts = () => {
           ? response.data.categories[0]
           : ""
       );
-      setEditPhotos(response.data.photos || []);
+      setEditUploadedImages([]);
     } catch (error) {
       console.error("Error fetching product:", error);
     }
@@ -180,52 +195,142 @@ const AdminProducts = () => {
       });
   };
 
-  const handleSubmit = async (e) => {
+  const handleImageUpload = (e) => {
+    setUploadedImages(Array.from(e.target.files));
+  };
+
+  const handleEditImageUpload = (e) => {
+    setEditUploadedImages(Array.from(e.target.files));
+  };
+
+  const handleSubmitClick = (e) => {
     e.preventDefault();
+
+    if (!name || !price || isNaN(price)) {
+      toast.error("Please fill in all required fields correctly.");
+      return;
+    }
+
+    setIsAddConfirmModalOpen(true);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
     const token = localStorage.getItem("access");
+
     const productData = {
       name,
       price,
-      old_price: oldPrice,
-      description,
-      tags,
+      old_price: oldPrice || null,
+      description: description || null,
+      tags: tags,
       categories: category ? [category] : [],
-      photos,
     };
+
     try {
-      if (!editId) {
-        await axios.post(`${config.apiUrl}/api/products/`, productData, {
-          headers: { Authorization: `Bearer ${token}` },
+      const productData = {
+        name,
+        price,
+        old_price: oldPrice || null,
+        description: description || null,
+        tags: tags,
+        categories: category ? [category] : [],
+      };
+
+      const response = await axios.post(
+        `${config.apiUrl}/api/products/`,
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const productId = response.data.id;
+
+      if (uploadedImages.length > 0) {
+        const formData = new FormData();
+        uploadedImages.forEach((image) => {
+          formData.append("images", image);
         });
+
+        await axios.post(
+          `${config.apiUrl}/api/products/${productId}/upload-images/`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
       }
+
+      toast.success("Product added successfully!");
       clearForm();
       fetchProducts();
       fetchStats();
     } catch (error) {
       console.error("Error submitting product:", error);
+      toast.error(
+        "Error adding product. Please check your data and try again."
+      );
+    } finally {
+      setIsAddConfirmModalOpen(false);
+      setLoading(false);
     }
   };
 
-  const handleEditSubmit = async (e) => {
+  const handleEditClick = (e) => {
     e.preventDefault();
     if (!editName || !editPrice || isNaN(editPrice)) {
-      alert("Please fill in all required fields correctly.");
+      toast.error("Please fill in all required fields correctly.");
       return;
     }
+    setIsEditConfirmModalOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    setLoading(true);
     const token = localStorage.getItem("access");
+
     const productData = {
       name: editName,
       price: editPrice,
       old_price: editOldPrice || null,
       description: editDescription || null,
-      tags: editTags || [],
+      tags: editTags,
       categories: editCategory ? [editCategory] : [],
-      photos: editPhotos || [],
     };
+
     try {
       await axios.put(`${config.apiUrl}/api/products/${editId}/`, productData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
+
+      if (editUploadedImages.length > 0) {
+        const formData = new FormData();
+        editUploadedImages.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        await axios.post(
+          `${config.apiUrl}/api/products/${editId}/upload-images/`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+
       setEditId(null);
       setEditName("");
       setEditPrice("");
@@ -233,17 +338,18 @@ const AdminProducts = () => {
       setEditDescription("");
       setEditTags([]);
       setEditCategory("");
-      setEditPhotos([]);
+      setEditUploadedImages([]);
       fetchProducts();
       fetchStats();
+      toast.success("Product updated successfully!");
     } catch (error) {
       console.error("Error editing product:", error);
-      if (error.response) {
-        console.error("Response error data:", error.response.data);
-        alert("Error: " + error.response.data.detail || "Unknown error");
-      } else {
-        alert("Unknown error occurred.");
-      }
+      toast.error(
+        "Error updating product. Please check your data and try again."
+      );
+    } finally {
+      setIsEditConfirmModalOpen(false);
+      setLoading(false);
     }
   };
 
@@ -254,36 +360,33 @@ const AdminProducts = () => {
     setDescription("");
     setTags([]);
     setCategory("");
-    setPhotos([]);
+    setUploadedImages([]);
   };
 
-  const handleDelete = async (productId) => {
-    if (!window.confirm("Czy na pewno chcesz usunąć ten produkt?")) return;
+  const handleDeleteClick = (productId) => {
+    setPendingDeleteId(productId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!pendingDeleteId) return;
+    setLoading(true);
+
     const token = localStorage.getItem("access");
     try {
-      await axios.delete(`${config.apiUrl}/api/products/${productId}/`, {
+      await axios.delete(`${config.apiUrl}/api/products/${pendingDeleteId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
+      setProducts((prev) => prev.filter((p) => p.id !== pendingDeleteId));
       fetchStats();
-      toast.success("Product deleted successfully!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.success("Product deleted successfully!");
     } catch (error) {
       console.error("Error deleting product:", error);
-      toast.error("Failed to delete product. Please try again.", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error("Error deleting product. Please try again.");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setPendingDeleteId(null);
+      setLoading(false);
     }
   };
 
@@ -300,7 +403,7 @@ const AdminProducts = () => {
     setEditDescription("");
     setEditTags([]);
     setEditCategory("");
-    setEditPhotos([]);
+    setEditUploadedImages([]);
   };
 
   const handleSort = (field) => {
@@ -340,6 +443,10 @@ const AdminProducts = () => {
     );
   };
 
+  if (loading) {
+    return <div className="loading-spinner"></div>;
+  }
+
   return (
     <div className="admin-content">
       <main className="admin-products">
@@ -363,7 +470,7 @@ const AdminProducts = () => {
           <StatCard
             name="Total Sales"
             icon={DollarSign}
-            value={`$${stats.totalSales.toLocaleString("pl-PL", {
+            value={`$${stats.totalSales.toLocaleString("en-US", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}`}
@@ -371,14 +478,13 @@ const AdminProducts = () => {
           />
         </motion.div>
 
-        {/* FORMULARZ DODAWANIA PRODUKTU */}
         <motion.div
           className="product-form"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}>
           <h4 className="product-form__title">Add new product</h4>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={(e) => e.preventDefault()}>
             <div className="form-group">
               <label>Name</label>
               <input
@@ -454,25 +560,35 @@ const AdminProducts = () => {
             </div>
 
             <div className="form-group">
-              <label>Photos</label>
+              <label>Upload Images</label>
               <input
-                type="text"
-                value={photos.join(", ")}
-                onChange={(e) =>
-                  setPhotos(
-                    e.target.value.split(",").map((photo) => photo.trim())
-                  )
-                }
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="file-input"
               />
+              {uploadedImages.length > 0 && (
+                <div className="uploaded-images-preview">
+                  <p>Uploaded files: {uploadedImages.length}</p>
+                  <ul>
+                    {Array.from(uploadedImages).map((file, index) => (
+                      <li key={index}>{file.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
-            <button type="submit" className="btn-primary">
+            <button
+              type="button"
+              onClick={handleSubmitClick}
+              className="btn-primary">
               Add Product
             </button>
           </form>
         </motion.div>
 
-        {/* TABELA PRODUKTÓW */}
         <motion.div
           className="product-table-container"
           initial={{ opacity: 0, y: 20 }}
@@ -517,143 +633,155 @@ const AdminProducts = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentProducts.map((prod) =>
-                  editId === prod.id ? (
-                    <motion.tr
-                      key={prod.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="edit-row">
-                      <td>
-                        <input
-                          type="text"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          value={editPrice}
-                          onChange={(e) => setEditPrice(e.target.value)}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          value={editOldPrice}
-                          onChange={(e) => setEditOldPrice(e.target.value)}
-                        />
-                      </td>
-                      <td className="description-cell">
-                        <textarea
-                          value={editDescription}
-                          onChange={(e) => setEditDescription(e.target.value)}
-                          className="edit-description"
-                        />
-                      </td>
-                      <td className="action-cell">
-                        <button onClick={handleEditSubmit} className="btn-save">
-                          Save
-                        </button>
-                        <button onClick={cancelEdit} className="btn-cancel">
-                          Cancel
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ) : (
-                    <motion.tr
-                      key={prod.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}>
-                      <td>{prod.name}</td>
-                      <td>${parseFloat(prod.price).toFixed(2)}</td>
-                      <td>
-                        {prod.old_price
-                          ? `$${parseFloat(prod.old_price).toFixed(2)}`
-                          : "-"}
-                      </td>
-                      <td className="description-cell">
-                        <div className="description-content">
-                          {prod.description}
-                        </div>
-                      </td>
-                      <td className="action-cell">
-                        <button
-                          onClick={() => startEdit(prod)}
-                          className="btn-edit">
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(prod.id)}
-                          className="btn-delete">
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </motion.tr>
+                {currentProducts.length > 0 ? (
+                  currentProducts.map((prod) =>
+                    editId === prod.id ? (
+                      <motion.tr
+                        key={prod.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="edit-row">
+                        <td>
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={editPrice}
+                            onChange={(e) => setEditPrice(e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={editOldPrice}
+                            onChange={(e) => setEditOldPrice(e.target.value)}
+                          />
+                        </td>
+                        <td className="description-cell">
+                          <textarea
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            className="edit-description"
+                          />
+                        </td>
+                        <td className="action-cell">
+                          <button
+                            onClick={handleEditClick}
+                            className="btn-save">
+                            Save
+                          </button>
+                          <button onClick={cancelEdit} className="btn-cancel">
+                            Cancel
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ) : (
+                      <motion.tr
+                        key={prod.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}>
+                        <td>{prod.name}</td>
+                        <td>${parseFloat(prod.price).toFixed(2)}</td>
+                        <td>
+                          {prod.old_price
+                            ? `$${parseFloat(prod.old_price).toFixed(2)}`
+                            : "-"}
+                        </td>
+                        <td className="description-cell">
+                          <div className="description-content">
+                            {prod.description}
+                          </div>
+                        </td>
+                        <td className="action-cell">
+                          <button
+                            onClick={() => startEdit(prod)}
+                            className="btn-edit">
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(prod.id)}
+                            className="btn-delete">
+                            <Trash2 size={18} />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    )
                   )
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="no-results">
+                      No products found matching your search criteria
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
 
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <p className="pagination-text">
-                Displaying {indexOfFirstProduct + 1} to{" "}
-                {Math.min(indexOfLastProduct, filteredProducts.length)} from{" "}
-                {filteredProducts.length} products
-              </p>
+          {filteredProducts.length > 0 && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                <p className="pagination-text">
+                  Displaying {indexOfFirstProduct + 1} to{" "}
+                  {Math.min(indexOfLastProduct, filteredProducts.length)} from{" "}
+                  {filteredProducts.length} products
+                </p>
+              </div>
+              <div className="pagination-controls">
+                <button
+                  onClick={prevPage}
+                  disabled={currentPage === 1}
+                  className={`pagination-button ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}>
+                  <ChevronLeft size={16} />
+                  <span>&lt;</span>
+                </button>
+                {Array.from({
+                  length: Math.ceil(filteredProducts.length / productsPerPage),
+                })
+                  .map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => paginate(index + 1)}
+                      className={`pagination-number ${
+                        currentPage === index + 1 ? "active" : ""
+                      }`}>
+                      {index + 1}
+                    </button>
+                  ))
+                  .slice(
+                    Math.max(0, currentPage - 3),
+                    Math.min(
+                      Math.ceil(filteredProducts.length / productsPerPage),
+                      currentPage + 2
+                    )
+                  )}
+                <button
+                  onClick={nextPage}
+                  disabled={
+                    currentPage >=
+                    Math.ceil(filteredProducts.length / productsPerPage)
+                  }
+                  className={`pagination-button ${
+                    currentPage >=
+                    Math.ceil(filteredProducts.length / productsPerPage)
+                      ? "disabled"
+                      : ""
+                  }`}>
+                  <ChevronRight size={16} />
+                  <span>&gt;</span>
+                </button>
+              </div>
             </div>
-            <div className="pagination-controls">
-              <button
-                onClick={prevPage}
-                disabled={currentPage === 1}
-                className={`pagination-button ${
-                  currentPage === 1 ? "disabled" : ""
-                }`}>
-                <ChevronLeft size={16} />
-                <span>&lt;</span>
-              </button>
-              {Array.from({
-                length: Math.ceil(filteredProducts.length / productsPerPage),
-              })
-                .map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => paginate(index + 1)}
-                    className={`pagination-number ${
-                      currentPage === index + 1 ? "active" : ""
-                    }`}>
-                    {index + 1}
-                  </button>
-                ))
-                .slice(
-                  Math.max(0, currentPage - 3),
-                  Math.min(
-                    Math.ceil(filteredProducts.length / productsPerPage),
-                    currentPage + 2
-                  )
-                )}
-              <button
-                onClick={nextPage}
-                disabled={
-                  currentPage >=
-                  Math.ceil(filteredProducts.length / productsPerPage)
-                }
-                className={`pagination-button ${
-                  currentPage >=
-                  Math.ceil(filteredProducts.length / productsPerPage)
-                    ? "disabled"
-                    : ""
-                }`}>
-                <ChevronRight size={16} />
-                <span>&gt;</span>
-              </button>
-            </div>
-          </div>
+          )}
         </motion.div>
 
         <div className="chart-container-products">
@@ -671,6 +799,30 @@ const AdminProducts = () => {
           </div>
         </div>
       </main>
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this product? This action cannot be undone."
+      />
+
+      <ConfirmationModal
+        isOpen={isEditConfirmModalOpen}
+        onClose={() => setIsEditConfirmModalOpen(false)}
+        onConfirm={handleEditSubmit}
+        title="Confirm Update"
+        message="Do you want to save changes to this product?"
+      />
+
+      <ConfirmationModal
+        isOpen={isAddConfirmModalOpen}
+        onClose={() => setIsAddConfirmModalOpen(false)}
+        onConfirm={handleSubmit}
+        title="Confirm Addition"
+        message="Do you want to add this new product?"
+      />
     </div>
   );
 };

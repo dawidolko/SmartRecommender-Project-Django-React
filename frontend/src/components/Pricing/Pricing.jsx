@@ -12,20 +12,19 @@ const Pricing = () => {
     {
       id: 1,
       title:
-        "TOP 5 SŁUCHAWEK GAMINGOWYCH DO 150/200/300ZŁ | Najlepsze słuchawki [2021]",
+        "TOP 5 GAMING HEADPHONES FOR 150/200/300 PLN | The best headphones [2021]",
       url: "https://www.youtube.com/watch?v=EZagYbsGJeU",
       thumbnail: "https://img.youtube.com/vi/EZagYbsGJeU/maxresdefault.jpg",
     },
     {
       id: 2,
-      title:
-        "TOP 5 KLAWIATUR GAMINGOWYCH DO 200ZŁ | Najlepsze klawiatury [2021]",
+      title: "TOP 5 GAMING KEYBOARDS UP TO 200 PLN | The best keyboards [2021]",
       url: "https://www.youtube.com/watch?v=uuKotb4_GxI",
       thumbnail: "https://img.youtube.com/vi/uuKotb4_GxI/maxresdefault.jpg",
     },
     {
       id: 3,
-      title: "TOP 5 MYSZEK GAMINGOWYCH DO 100ZŁ | Najlepsze myszki [2021]",
+      title: "TOP 5 GAMING MICE UP TO 100 PLN | The best mice [2021]",
       url: "https://www.youtube.com/watch?v=4pzPTtDGz3c",
       thumbnail: "https://img.youtube.com/vi/4pzPTtDGz3c/maxresdefault.jpg",
     },

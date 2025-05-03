@@ -38,19 +38,23 @@ body {
 }
 
 .loading-spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #007bff;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  width: 90px;
-  height: 90px;
-  animation: spin 1.5s linear infinite;
-  margin-bottom: 70px;
+  border-top-color: #6366f1;
+  animation: spin 1s ease-in-out infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
+
 @keyframes spin {
   0% {
-    transform: rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }

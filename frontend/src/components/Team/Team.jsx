@@ -16,10 +16,11 @@ const Team = () => {
       initial="initial"
       animate={isInView ? "animate" : "initial"}
       ref={ref}>
-      <h2 className="team__title">Meet Our Technology Experts</h2>
+      <h2 className="team__title">Meet Our Project Team</h2>
       <p className="team__subtitle">
-        Get to know the minds driving innovation in technology. Our experts are
-        committed to creating solutions that empower your digital journey.
+        Get to know the talented individuals behind SmartRecommender. Our team
+        combines technical expertise and academic guidance to create this
+        innovative product recommendation system.
       </p>
       <motion.div
         variants={AnimationVariants.slideIn}

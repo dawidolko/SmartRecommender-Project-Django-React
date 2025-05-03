@@ -1,4 +1,5 @@
 @echo off
+SETLOCAL EnableDelayedExpansion
 
 REM Environment variables for PostgreSQL
 set PGPASSWORD=admin
@@ -40,7 +41,7 @@ if not exist ".venv" (
 
 REM Activating virtual environment
 echo Activating virtual environment...
-call .venv\Scripts\activate
+call .venv\Scripts\activate.bat
 
 REM Installing required packages
 echo Installing dependencies from requirements.txt...
@@ -48,11 +49,17 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 REM Installing psycopg2-binary
-pip uninstall psycopg2-binary
+echo Installing psycopg...
+pip uninstall -y psycopg2-binary
 pip install psycopg[c]
 pip install djangorestframework-simplejwt
-npm install react-toastify
-@REM pip install psycopg2-binary
+pip install Pillow
+
+REM Create media directory if it doesn't exist
+if not exist "media" (
+    echo Creating media directory...
+    mkdir media
+)
 
 REM Creating and applying migrations
 echo Creating and applying migrations to the database...
@@ -78,8 +85,16 @@ if %errorlevel% neq 0 (
 
 REM Running Django server
 echo Starting Django server...
-start http://127.0.0.1:8000
-python check_media.py
+start "" http://127.0.0.1:8000
+
+REM Run check_media.py if it exists
+if exist "check_media.py" (
+    echo Running media check...
+    python check_media.py
+)
+
+REM Start Django server
 python manage.py runserver
 
 pause
+ENDLOCAL

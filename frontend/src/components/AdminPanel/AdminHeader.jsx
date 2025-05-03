@@ -5,7 +5,7 @@ const AdminHeader = ({ title }) => {
   const { user } = useContext(AuthContext);
 
   const displayName = user
-    ? (user.first_name || user.last_name)
+    ? user.first_name || user.last_name
       ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
       : user.username || user.email
     : null;
@@ -18,8 +18,9 @@ const AdminHeader = ({ title }) => {
         {/* User Data */}
         {user && (
           <div className="welcome-text">
-            
-            <span className="text-gray-100">Witaj, {displayName}</span>
+            <span className="text-gray-100 name-span">
+              Witaj, {displayName}
+            </span>
           </div>
         )}
       </div>

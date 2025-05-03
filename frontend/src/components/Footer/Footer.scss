@@ -138,3 +138,44 @@
     }
   }
 }
+
+.footer__attribution {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+
+  &-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #e6dbdb;
+  }
+
+  &-content {
+    font-size: 0.9rem;
+    color: #e6dbdb;
+    line-height: 1.5;
+
+    a {
+      color: #fd266e;
+      text-decoration: underline;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #1a1a1a;
+      }
+    }
+  }
+
+  &-list {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

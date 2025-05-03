@@ -5,21 +5,30 @@ import config from "../config/config";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("loggedUser");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [token, setToken] = useState(localStorage.getItem("access") || null);
 
   useEffect(() => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setUser(decoded);
-        fetchUserData(token);
+        const currentTime = Date.now() / 1000;
+
+        if (decoded.exp < currentTime) {
+          logout();
+        } else if (!user) {
+          setUser(decoded);
+          fetchUserData(token);
+        }
       } catch (error) {
         console.error("Błąd dekodowania tokena:", error);
         logout();
       }
     }
-  }, [token]);
+  }, [token, user]);
 
   const fetchUserData = async (authToken) => {
     try {
