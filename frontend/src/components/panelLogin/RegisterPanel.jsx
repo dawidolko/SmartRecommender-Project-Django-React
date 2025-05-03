@@ -86,7 +86,6 @@ const RegisterPanel = () => {
     }
   };
 
-  // Submit form when submitForm state changes
   useEffect(() => {
     if (submitForm) {
       handleRegister();
@@ -99,7 +98,6 @@ const RegisterPanel = () => {
     setSubmitForm(true);
   };
 
-  // Global key handler
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Enter") {
@@ -108,10 +106,8 @@ const RegisterPanel = () => {
       }
     };
 
-    // Add event listener
     document.addEventListener("keydown", handleKeyDown);
 
-    // Cleanup
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
