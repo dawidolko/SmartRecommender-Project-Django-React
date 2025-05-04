@@ -7,7 +7,6 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -200,5 +199,261 @@ class Migration(migrations.Migration):
                 'db_table': 'opinion',
                 'constraints': [models.CheckConstraint(condition=models.Q(('rating__gte', 1), ('rating__lte', 5)), name='rating_range')],
             },
+        ),
+         migrations.CreateModel(
+            name='Tag',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=50, unique=True)),
+            ],
+            options={
+                'verbose_name': 'Tag',
+                'verbose_name_plural': 'Tags',
+                'db_table': 'tag',
+            },
+        ),
+        migrations.AlterField(
+            model_name='product',
+            name='id',
+            field=models.AutoField(primary_key=True, serialize=False),
+        ),
+        migrations.CreateModel(
+            name='CartItem',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('quantity', models.PositiveIntegerField(default=1)),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.AddField(
+            model_name='product',
+            name='tags',
+            field=models.ManyToManyField(blank=True, to='home.tag'),
+        ),
+         migrations.CreateModel(
+            name='SentimentAnalysis',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('sentiment_score', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('sentiment_category', models.CharField(choices=[('positive', 'Positive'), ('neutral', 'Neutral'), ('negative', 'Negative')], max_length=20)),
+                ('analyzed_at', models.DateTimeField(auto_now_add=True)),
+                ('opinion', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='home.opinion')),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+            ],
+            options={
+                'verbose_name': 'Sentiment Analysis',
+                'verbose_name_plural': 'Sentiment Analyses',
+                'db_table': 'sentiment_analysis',
+                'indexes': [
+                    models.Index(fields=['product'], name='home_senti_product_idx'),
+                    models.Index(fields=['sentiment_category'], name='home_senti_category_idx'),
+                ],
+            },
+        ),
+        migrations.CreateModel(
+            name='ProductSentimentSummary',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('average_sentiment_score', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('positive_count', models.PositiveIntegerField(default=0)),
+                ('neutral_count', models.PositiveIntegerField(default=0)),
+                ('negative_count', models.PositiveIntegerField(default=0)),
+                ('total_opinions', models.PositiveIntegerField(default=0)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('product', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='sentiment_summary', to='home.product')),
+            ],
+            options={
+                'verbose_name': 'Product Sentiment Summary',
+                'verbose_name_plural': 'Product Sentiment Summaries',
+                'db_table': 'product_sentiment_summary',
+            },
+        ),
+        migrations.CreateModel(
+            name='UserInteraction',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('interaction_type', models.CharField(choices=[('view', 'View'), ('click', 'Click'), ('add_to_cart', 'Add to Cart'), ('purchase', 'Purchase'), ('favorite', 'Favorite')], max_length=20)),
+                ('timestamp', models.DateTimeField(auto_now_add=True)),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'user_interactions',
+                'indexes': [
+                    models.Index(fields=['user', 'product'], name='home_useri_user_id_product_id_idx'),
+                    models.Index(fields=['interaction_type'], name='home_useri_interaction_idx'),
+                ],
+            },
+        ),
+        migrations.CreateModel(
+            name='ProductSimilarity',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('similarity_type', models.CharField(choices=[('collaborative', 'Collaborative Filtering'), ('content_based', 'Content Based')], max_length=20)),
+                ('similarity_score', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('product1', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='similarity_from', to='home.product')),
+                ('product2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='similarity_to', to='home.product')),
+            ],
+            options={
+                'db_table': 'product_similarity',
+                'unique_together': {('product1', 'product2', 'similarity_type')},
+            },
+        ),
+        migrations.CreateModel(
+            name='UserProductRecommendation',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('recommendation_type', models.CharField(choices=[('collaborative', 'Collaborative Filtering'), ('content_based', 'Content Based')], max_length=20)),
+                ('score', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'user_product_recommendation',
+                'ordering': ['-score'],
+                'unique_together': {('user', 'product', 'recommendation_type')},
+            },
+        ),
+        migrations.CreateModel(
+            name='RecommendationSettings',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('active_algorithm', models.CharField(choices=[('collaborative', 'Collaborative Filtering'), ('content_based', 'Content Based')], default='collaborative', max_length=20)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'recommendation_settings',
+                'unique_together': {('user', 'active_algorithm')},
+            },
+        ),
+        migrations.CreateModel(
+            name='ProductAssociation',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('support', models.FloatField()),
+                ('confidence', models.FloatField()),
+                ('lift', models.FloatField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('product_1', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='associations_from', to='home.product')),
+                ('product_2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='associations_to', to='home.product')),
+            ],
+            options={
+                'unique_together': {('product_1', 'product_2')},
+            },
+        ),
+        migrations.CreateModel(
+            name='PurchaseProbability',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('probability', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('confidence_level', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('last_updated', models.DateTimeField(auto_now=True)),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'purchase_probability',
+                'unique_together': {('user', 'product')},
+            },
+        ),
+        migrations.CreateModel(
+            name='SalesForecast',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('forecast_date', models.DateField()),
+                ('predicted_quantity', models.PositiveIntegerField()),
+                ('confidence_interval_lower', models.PositiveIntegerField()),
+                ('confidence_interval_upper', models.PositiveIntegerField()),
+                ('historical_accuracy', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+            ],
+            options={
+                'db_table': 'sales_forecast',
+                'ordering': ['-forecast_date'],
+                'unique_together': {('product', 'forecast_date')},
+            },
+        ),
+        migrations.CreateModel(
+            name='UserPurchasePattern',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('purchase_frequency', models.DecimalField(decimal_places=2, max_digits=5)),
+                ('average_order_value', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('preferred_time_of_day', models.CharField(max_length=20, choices=[
+                    ('morning', 'Morning (6-12)'),
+                    ('afternoon', 'Afternoon (12-18)'),
+                    ('evening', 'Evening (18-24)'),
+                    ('night', 'Night (0-6)')
+                ])),
+                ('seasonality_factor', models.JSONField(blank=True, null=True)),
+                ('last_computed', models.DateTimeField(auto_now=True)),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.category')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'user_purchase_pattern',
+                'unique_together': {('user', 'category')},
+            },
+        ),
+        migrations.CreateModel(
+            name='ProductDemandForecast',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('forecast_period', models.CharField(max_length=10, choices=[
+                    ('week', 'Weekly'),
+                    ('month', 'Monthly'),
+                    ('quarter', 'Quarterly')
+                ])),
+                ('period_start', models.DateField()),
+                ('expected_demand', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('demand_variance', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('reorder_point', models.PositiveIntegerField()),
+                ('suggested_stock_level', models.PositiveIntegerField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
+            ],
+            options={
+                'db_table': 'product_demand_forecast',
+                'ordering': ['-period_start'],
+                'unique_together': {('product', 'forecast_period', 'period_start')},
+            },
+        ),
+        migrations.CreateModel(
+            name='RiskAssessment',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('risk_type', models.CharField(max_length=50, choices=[
+                    ('customer_churn', 'Customer Churn Risk'),
+                    ('inventory_excess', 'Inventory Excess Risk'),
+                    ('price_sensitivity', 'Price Sensitivity Risk'),
+                    ('demand_fluctuation', 'Demand Fluctuation Risk')
+                ])),
+                ('entity_type', models.CharField(max_length=20, choices=[
+                    ('user', 'User'),
+                    ('product', 'Product')
+                ])),
+                ('entity_id', models.PositiveIntegerField()),
+                ('risk_score', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('confidence', models.DecimalField(decimal_places=3, max_digits=5)),
+                ('mitigation_suggestion', models.TextField(blank=True, null=True)),
+                ('assessment_date', models.DateTimeField(auto_now=True)),
+            ],
+            options={
+                'db_table': 'risk_assessment',
+            },
+        ),
+        migrations.AddIndex(
+            model_name='riskassessment',
+            index=models.Index(fields=['entity_type', 'entity_id'], name='home_riska_entity_type_entity_id_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='riskassessment',
+            index=models.Index(fields=['risk_type'], name='home_riska_risk_type_idx'),
         ),
     ]

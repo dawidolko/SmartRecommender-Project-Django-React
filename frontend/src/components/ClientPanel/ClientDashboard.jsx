@@ -22,6 +22,10 @@ const ClientDashboard = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
+  const [recommendationTitle, setRecommendationTitle] = useState(
+    "Recommended For You"
+  );
   const dataFetchedRef = useRef(false);
 
   const navigate = useNavigate();
@@ -46,14 +50,44 @@ const ClientDashboard = () => {
     const clientStatsRequest = axios.get(`${config.apiUrl}/api/client-stats/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const recommendedProductsRequest = axios.get(
-      `${config.apiUrl}/api/recommended-products/`,
+
+    const algorithmRequest = axios.get(
+      `${config.apiUrl}/api/recommendation-settings/`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
 
-    Promise.all([ordersRequest, clientStatsRequest, recommendedProductsRequest])
+    const fetchingAlgorithm = algorithmRequest
+      .then((response) => {
+        const algorithm = response.data.active_algorithm || "collaborative";
+        setCurrentAlgorithm(algorithm);
+
+        if (algorithm === "collaborative") {
+          setRecommendationTitle(
+            "Recommended For You (Collaborative Filtering)"
+          );
+        } else {
+          setRecommendationTitle("Recommended For You (Content-Based)");
+        }
+
+        return axios.get(
+          `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching algorithm:", error);
+        setCurrentAlgorithm("collaborative");
+        setRecommendationTitle("Recommended For You");
+        return axios.get(`${config.apiUrl}/api/recommended-products/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      });
+
+    Promise.all([ordersRequest, clientStatsRequest, fetchingAlgorithm])
       .then(([ordersRes, clientStatsRes, recommendedProductsRes]) => {
         const orders = ordersRes.data;
 
@@ -137,7 +171,14 @@ const ClientDashboard = () => {
         };
         setCategoryDistributionData(catChart);
 
-        setRecommendedProducts(recommendedProductsRes.data.slice(0, 4));
+        if (
+          recommendedProductsRes.data &&
+          recommendedProductsRes.data.length > 0
+        ) {
+          setRecommendedProducts(recommendedProductsRes.data.slice(0, 4));
+        } else {
+          setRecommendedProducts([]);
+        }
 
         setLoading(false);
       })
@@ -151,6 +192,66 @@ const ClientDashboard = () => {
         window.location.reload();
       });
   }, []);
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "recommendationAlgorithm") {
+        setCurrentAlgorithm(e.newValue || "collaborative");
+        fetchRecommendedProducts(e.newValue || "collaborative");
+      }
+    };
+
+    const handleCustomEvent = (e) => {
+      if (e.detail && e.detail.algorithm) {
+        setCurrentAlgorithm(e.detail.algorithm);
+        fetchRecommendedProducts(e.detail.algorithm);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("algorithmChanged", handleCustomEvent);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("algorithmChanged", handleCustomEvent);
+    };
+  }, []);
+
+  const fetchRecommendedProducts = async (algorithm) => {
+    const token = localStorage.getItem("access");
+    if (!token) return;
+
+    try {
+      const response = await axios.get(
+        `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data && response.data.length > 0) {
+        setRecommendedProducts(response.data.slice(0, 4));
+      } else {
+        setRecommendedProducts([]);
+      }
+
+      if (algorithm === "collaborative") {
+        setRecommendationTitle("Recommended For You (Collaborative Filtering)");
+      } else {
+        setRecommendationTitle("Recommended For You (Content-Based)");
+      }
+    } catch (err) {
+      console.error("Error fetching recommended products:", err);
+      const fallbackResponse = await axios.get(
+        `${config.apiUrl}/api/recommended-products/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setRecommendedProducts(fallbackResponse.data.slice(0, 4));
+      setRecommendationTitle("Recommended For You");
+    }
+  };
 
   if (loading) {
     return <div className="loading-spinner"></div>;
@@ -236,23 +337,27 @@ const ClientDashboard = () => {
       </div>
 
       <div className="dashboard-recommendations my-4">
-        <h2>Recommended For You</h2>
+        <h2>{recommendationTitle}</h2>
         <div className="recommendations-grid">
-          {recommendedProducts.slice(0, 4).map((product, index) => (
-            <div
-              className="recommendation-card"
-              key={index}
-              onClick={() => handleProductClick(product.id)}
-              style={{ cursor: "pointer" }}>
-              <img
-                src={`${config.apiUrl}/media/${
-                  product.photos[0]?.path || "https://placehold.co/250"
-                }`}
-                alt={product.name}
-              />
-              <p>{product.name}</p>
-            </div>
-          ))}
+          {recommendedProducts.length > 0 ? (
+            recommendedProducts.map((product, index) => (
+              <div
+                className="recommendation-card"
+                key={index}
+                onClick={() => handleProductClick(product.id)}
+                style={{ cursor: "pointer" }}>
+                <img
+                  src={`${config.apiUrl}/media/${
+                    product.photos[0]?.path || "https://placehold.co/250"
+                  }`}
+                  alt={product.name}
+                />
+                <p>{product.name}</p>
+              </div>
+            ))
+          ) : (
+            <p>No recommendations available</p>
+          )}
         </div>
       </div>
     </div>

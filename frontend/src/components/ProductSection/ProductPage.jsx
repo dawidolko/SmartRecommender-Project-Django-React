@@ -12,8 +12,12 @@ import {
   AiOutlineRight,
 } from "react-icons/ai";
 import { FaStar } from "react-icons/fa";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "./ProductPage.scss";
 import config from "../../config/config";
+import axios from "axios";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -27,24 +31,21 @@ const ProductPage = () => {
   const [favorite, setFavorite] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
+  const [similarProducts, setSimilarProducts] = useState([]);
+  const [similarProductsLoading, setSimilarProductsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/api/product/${id}/`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch product details.");
-        }
-        const data = await response.json();
-        setProduct(data);
-        setFavorite(isFavorite(data.id));
+        const response = await axios.get(`${config.apiUrl}/api/product/${id}/`);
+        setProduct(response.data);
+        setFavorite(isFavorite(response.data.id));
       } catch (error) {
         console.error(error);
         toast.error("Error loading product details.", {
           position: "top-center",
         });
 
-        // Handle session expiration
         if (
           error.message.includes("401") ||
           error.message.includes("unauthorized")
@@ -59,6 +60,45 @@ const ProductPage = () => {
 
     fetchProduct();
   }, [id, isFavorite, logout, navigate]);
+
+  useEffect(() => {
+    const fetchSimilarProducts = async () => {
+      if (!product || !product.categories || product.categories.length === 0)
+        return;
+
+      setSimilarProductsLoading(true);
+      try {
+        const category = product.categories[0];
+        const token = localStorage.getItem("access");
+
+        const headers = {};
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const response = await axios.get(`${config.apiUrl}/api/products/`, {
+          params: { category: category },
+          headers: headers,
+        });
+
+        const filteredProducts = response.data.filter(
+          (p) => p.id !== product.id
+        );
+
+        const sortedProducts = filteredProducts.sort(() => 0.5 - Math.random());
+        setSimilarProducts(sortedProducts.slice(0, 10));
+      } catch (error) {
+        console.error("Error fetching similar products:", error);
+        setSimilarProducts([]);
+      } finally {
+        setSimilarProductsLoading(false);
+      }
+    };
+
+    if (product && product.categories) {
+      fetchSimilarProducts();
+    }
+  }, [product]);
 
   if (loading) {
     return <div className="loading-spinner"></div>;
@@ -112,6 +152,49 @@ const ProductPage = () => {
   };
 
   const quantityInCart = items[product.id] || 0;
+
+  const sliderSettings = {
+    dots: true,
+    infinite: similarProducts.length > 4,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    responsive: [
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+  const getSimpleCategory = (category) => {
+    return category.split(".")[0];
+  };
+
+  const getCurrentCategory = () => {
+    return product?.categories?.[0]
+      ? getSimpleCategory(product.categories[0])
+      : "";
+  };
 
   return (
     <section className="productPage">
@@ -272,6 +355,49 @@ const ProductPage = () => {
               <p>No reviews yet for this product.</p>
             )}
           </div>
+        </div>
+
+        <div className="productPage__similar-products">
+          <h2 className="productPage__similar-products-title">
+            Similar Products{" "}
+            {getCurrentCategory() && `in ${getCurrentCategory().toUpperCase()}`}
+          </h2>
+          {similarProductsLoading ? (
+            <div style={{ textAlign: "center" }}>Loading products...</div>
+          ) : similarProducts.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {similarProducts.map((similarProduct) => (
+                <div
+                  key={similarProduct.id}
+                  className="productPage__similar-product"
+                  onClick={() => navigate(`/product/${similarProduct.id}`)}>
+                  <div className="productPage__similar-product-inner">
+                    <img
+                      src={`${config.apiUrl}/media/${similarProduct.photos[0]?.path}`}
+                      alt={similarProduct.name}
+                      className="productPage__similar-product-img"
+                    />
+                    <h3 className="productPage__similar-product-name">
+                      {similarProduct.name}
+                    </h3>
+                    <div className="productPage__similar-product-prices">
+                      {similarProduct.old_price &&
+                      !isNaN(similarProduct.old_price) ? (
+                        <span className="productPage__similar-product-old-price">
+                          ${parseFloat(similarProduct.old_price).toFixed(2)}
+                        </span>
+                      ) : null}
+                      <span className="productPage__similar-product-current-price">
+                        ${parseFloat(similarProduct.price).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p>No similar products found in this category.</p>
+          )}
         </div>
       </div>
       <ToastContainer />

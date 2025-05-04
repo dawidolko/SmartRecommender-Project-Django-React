@@ -54,6 +54,8 @@ pip uninstall -y psycopg2-binary
 pip install psycopg[c]
 pip install djangorestframework-simplejwt
 pip install Pillow
+pip install textblob
+python -m textblob.download_corpora
 
 REM Create media directory if it doesn't exist
 if not exist "media" (

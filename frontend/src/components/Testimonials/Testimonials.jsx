@@ -8,22 +8,103 @@ import TestimonialsItem from "./TestimonialsItem";
 import config from "../../config/config";
 
 const Testimonials = () => {
-  const [randomProducts, setRandomProducts] = useState([]);
+  const [productsState, setProductsState] = useState({
+    currentAlgorithm: null,
+    products: [],
+    isLoading: true,
+  });
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
+      setProductsState((prev) => ({ ...prev, isLoading: true }));
       try {
-        const response = await axios.get(
-          `${config.apiUrl}/api/random-products/`
-        );
-        setRandomProducts(response.data);
+        const token = localStorage.getItem("access");
+        if (token) {
+          const settingsResponse = await axios.get(
+            `${config.apiUrl}/api/recommendation-settings/`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const algorithm =
+            settingsResponse.data.active_algorithm || "collaborative";
+          setProductsState((prev) => ({
+            ...prev,
+            currentAlgorithm: algorithm,
+          }));
+
+          await fetchProducts(algorithm, token);
+        } else {
+          await fetchProducts(null, null);
+        }
       } catch (error) {
-        console.error("Error fetching random products:", error);
+        console.error("Error in initial fetch:", error);
+      } finally {
+        setProductsState((prev) => ({ ...prev, isLoading: false }));
       }
     };
 
-    fetchProducts();
+    fetchData();
+
+    const handleStorageChange = (e) => {
+      if (e.key === "recommendationAlgorithm") {
+        setProductsState((prev) => ({
+          ...prev,
+          currentAlgorithm: e.newValue || "collaborative",
+        }));
+      }
+    };
+
+    const handleCustomEvent = (e) => {
+      if (e.detail && e.detail.algorithm) {
+        setProductsState((prev) => ({
+          ...prev,
+          currentAlgorithm: e.detail.algorithm,
+        }));
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("algorithmChanged", handleCustomEvent);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("algorithmChanged", handleCustomEvent);
+    };
   }, []);
+
+  useEffect(() => {
+    if (productsState.currentAlgorithm !== null) {
+      const token = localStorage.getItem("access");
+      fetchProducts(productsState.currentAlgorithm, token);
+    }
+  }, [productsState.currentAlgorithm]);
+
+  const fetchProducts = async (algorithm, token) => {
+    try {
+      if (token && algorithm) {
+        try {
+          const previewResponse = await axios.get(
+            `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (previewResponse.data && previewResponse.data.length > 0) {
+            setProductsState((prev) => ({
+              ...prev,
+              products: previewResponse.data,
+            }));
+            return;
+          }
+        } catch (error) {
+          console.error("Error fetching recommendations:", error);
+        }
+      }
+
+      const response = await axios.get(`${config.apiUrl}/api/random-products/`);
+      setProductsState((prev) => ({ ...prev, products: response.data }));
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
 
   const sliderSettings = {
     infinite: true,
@@ -49,16 +130,36 @@ const Testimonials = () => {
     ],
   };
 
+  const getTitle = () => {
+    if (localStorage.getItem("access") && productsState.currentAlgorithm) {
+      return productsState.currentAlgorithm === "collaborative"
+        ? "Personalized Recommendations (Collaborative Filtering)"
+        : "Personalized Recommendations (Content-Based)";
+    }
+    return "Explore Our Latest Products";
+  };
+
+  const getSubtitle = () => {
+    if (localStorage.getItem("access") && productsState.currentAlgorithm) {
+      return productsState.currentAlgorithm === "collaborative"
+        ? "Based on what users like you are buying"
+        : "Based on products similar to your preferences";
+    }
+    return "Check out a few random picks from our store – swipe to see more!";
+  };
+
+  if (productsState.isLoading) {
+    return <div className="testimonials">Loading...</div>;
+  }
+
   return (
     <section className="testimonials">
       <div className="testimonials__wrapper">
-        <h2 className="testimonials__title">Explore Our Latest Products</h2>
-        <p className="testimonials__subtitle">
-          Check out a few random picks from our store – swipe to see more!
-        </p>
+        <h2 className="testimonials__title">{getTitle()}</h2>
+        <p className="testimonials__subtitle">{getSubtitle()}</p>
 
         <Slider {...sliderSettings}>
-          {randomProducts.map((product) => (
+          {productsState.products.map((product) => (
             <TestimonialsItem key={product.id} {...product} />
           ))}
         </Slider>

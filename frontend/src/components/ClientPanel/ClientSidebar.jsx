@@ -57,7 +57,7 @@ const ClientSidebar = () => {
         <ul className="client-aside__list">
           <li>
             <NavLink
-              to=""
+              to="/client"
               className={({ isActive }) =>
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")
@@ -69,7 +69,7 @@ const ClientSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="orders"
+              to="/client/orders"
               className={({ isActive }) =>
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")
@@ -80,7 +80,7 @@ const ClientSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="complaints"
+              to="/client/complaints"
               className={({ isActive }) =>
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")
@@ -91,7 +91,7 @@ const ClientSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="account"
+              to="/client/account"
               className={({ isActive }) =>
                 "client-aside__link " +
                 (isActive ? "client-aside__link--active" : "")

@@ -8,9 +8,13 @@ import { useNavigate } from "react-router-dom";
 import config from "../../config/config";
 
 const CartContent = () => {
-  const { items, totalAmount, removeFromCart } = useContext(CartContext);
+  const { items, totalAmount, removeFromCart, addToCart } =
+    useContext(CartContext);
   const [shopData, setShopData] = useState([]);
   const navigate = useNavigate();
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [enlargedImage, setEnlargedImage] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -27,6 +31,50 @@ const CartContent = () => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    if (Object.keys(items).length > 0) {
+      fetchRecommendations();
+    } else {
+      setRecommendations([]);
+    }
+  }, [items]);
+
+  const fetchRecommendations = async () => {
+    setRecommendationsLoading(true);
+    try {
+      const productIds = Object.keys(items).filter((id) => items[id] > 0);
+      if (productIds.length === 0) return;
+
+      const params = new URLSearchParams();
+      productIds.forEach((id) => params.append("product_ids[]", id));
+
+      const response = await axios.get(
+        `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`
+      );
+      setRecommendations(response.data);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    } finally {
+      setRecommendationsLoading(false);
+    }
+  };
+
+  const handleAddToCart = (productId) => {
+    addToCart(productId);
+  };
+
+  const handleImageClick = (imageUrl, productName) => {
+    setEnlargedImage({ url: imageUrl, name: productName });
+  };
+
+  const closeImageOverlay = () => {
+    setEnlargedImage(null);
+  };
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
 
   return (
     <div className="cart container">
@@ -57,6 +105,73 @@ const CartContent = () => {
               })}
             </tbody>
           </table>
+
+          {totalAmount() > 0 && recommendations.length > 0 && (
+            <div className="cart__recommendations">
+              <h3 className="cart__recommendations-title">
+                Frequently Bought Together
+              </h3>
+              {recommendationsLoading ? (
+                <div className="cart__recommendations-loading">Loading...</div>
+              ) : (
+                <div className="cart__recommendations-grid">
+                  {recommendations.map((rec, index) => {
+                    const imageUrl = `${config.apiUrl}/media/${rec.product.photos[0]?.path}`;
+                    return (
+                      <div key={index} className="cart__recommendation-item">
+                        <img
+                          src={imageUrl}
+                          alt={rec.product.name}
+                          className="cart__recommendation-image"
+                          onClick={() =>
+                            handleImageClick(imageUrl, rec.product.name)
+                          }
+                        />
+                        <div className="cart__recommendation-info">
+                          <h4
+                            className="cart__recommendation-name"
+                            onClick={() => handleProductClick(rec.product.id)}>
+                            {rec.product.name}
+                          </h4>
+                          <p className="cart__recommendation-price">
+                            ${rec.product.price}
+                          </p>
+                          <div className="cart__recommendation-stats">
+                            <span>
+                              Confidence: {(rec.confidence * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <button
+                            className="cart__recommendation-button"
+                            onClick={() => handleAddToCart(rec.product.id)}>
+                            Add to Cart
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {enlargedImage && (
+            <div className="cart__image-overlay" onClick={closeImageOverlay}>
+              <div className="cart__image-overlay-content">
+                <button
+                  className="cart__image-overlay-close"
+                  onClick={closeImageOverlay}>
+                  ×
+                </button>
+                <img
+                  className="cart__image-overlay-image"
+                  src={enlargedImage.url}
+                  alt={enlargedImage.name}
+                />
+              </div>
+            </div>
+          )}
+
           <TotalAmount />
         </div>
       ) : (

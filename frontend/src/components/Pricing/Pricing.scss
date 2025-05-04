@@ -53,6 +53,11 @@
     font-size: 1.6rem;
     color: whitesmoke;
     text-align: center;
+
+    &:hover {
+      color: #007bff;
+      text-decoration: underline;
+    }
   }
 
   &__link {

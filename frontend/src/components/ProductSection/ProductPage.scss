@@ -463,7 +463,8 @@
       position: absolute;
       top: 120px;
       right: 20px;
-      background-color: #ff1100;
+      background-color: red;
+      border: 1px solid red;
       color: #fff;
       border: none;
       padding: 0.5em 1em;
@@ -475,7 +476,9 @@
       transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: #d32f2f;
+        background-color: rgba(255, 255, 255, 0);
+        border: 1px solid red;
+        color: red;
       }
     }
   }
@@ -579,6 +582,109 @@
     .tag {
       padding: 0.2em 0.6em;
       margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.productPage__similar-products {
+  margin-top: 4rem;
+  padding: 2rem 0;
+  background-color: #f8f9fa;
+
+  .productPage__similar-products-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+
+  .productPage__similar-product {
+    padding: 0 10px;
+    cursor: pointer;
+
+    .productPage__similar-product-inner {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+    }
+
+    .productPage__similar-product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .productPage__similar-product-name {
+      padding: 1rem;
+      font-size: 1.1rem;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .productPage__similar-product-prices {
+      padding: 0 1rem 1rem;
+
+      .productPage__similar-product-old-price {
+        text-decoration: line-through;
+        color: #999;
+        margin-right: 0.5rem;
+      }
+
+      .productPage__similar-product-current-price {
+        font-weight: bold;
+        color: #fd266e;
+      }
+    }
+  }
+  .slick-dots {
+    bottom: -30px;
+
+    li button:before {
+      color: #999;
+      font-size: 10px;
+    }
+
+    li.slick-active button:before {
+      color: #fd266e;
+    }
+  }
+
+  .slick-arrow {
+    width: 40px;
+    height: 40px;
+    z-index: 1;
+
+    &:before {
+      font-size: 40px;
+      color: #333;
+    }
+  }
+
+  .slick-prev {
+    left: -50px;
+  }
+
+  .slick-next {
+    right: -50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .productPage__similar-products {
+    .slick-prev {
+      left: 10px;
+    }
+
+    .slick-next {
+      right: 10px;
     }
   }
 }

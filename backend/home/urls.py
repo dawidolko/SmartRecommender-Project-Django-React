@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
+
 from .views import (
     CategoriesAPIView,
     ProductImageUploadView,
@@ -33,6 +34,34 @@ from .views import (
     ClientOrderDetailAPIView,
     CurrentUserUpdateAPIView,
     AdminDashboardStatsView,
+)
+
+from .recommendation_views import (
+    GenerateUserRecommendationsView, 
+    ProcessRecommendationsView, 
+    RecommendationPreviewView, 
+    RecommendationSettingsView,
+)
+
+from .sentiment_views import (
+    SentimentSearchAPIView,
+    FuzzySearchAPIView,
+)
+
+from .association_views import (
+    AssociationRulesListAPI,
+    FrequentlyBoughtTogetherAPI, 
+    UpdateAssociationRulesAPI,
+)
+
+from .probabilistic_views import (
+    UserPurchasePredictionView,
+    PersonalizedRecommendationsView,
+    SalesForecastView,
+    ProductDemandView,
+    RiskDashboardView,
+    UserInsightsView,
+    ClientProbabilisticInsightsView,
 )
 
 urlpatterns = [
@@ -67,4 +96,20 @@ urlpatterns = [
     path('api/recommended-products/', RecommendedProductsAPIView.as_view(), name='recommended-products'),
     path('api/products/<int:pk>/upload-images/', ProductImageUploadView.as_view(), name='upload-product-images'),
     path('api/reset-photo-sequence/', ResetPhotoSequenceView.as_view(), name='reset-photo-sequence'),
+    path("api/sentiment-search/", SentimentSearchAPIView.as_view(), name="sentiment-search"),
+    path("api/fuzzy-search/", FuzzySearchAPIView.as_view(), name="fuzzy-search"),
+    path("api/recommendation-settings/", RecommendationSettingsView.as_view(), name="recommendation-settings"),
+    path("api/process-recommendations/", ProcessRecommendationsView.as_view(), name="process-recommendations"),
+    path("api/recommendation-preview/", RecommendationPreviewView.as_view(), name="recommendation-preview"),
+    path("api/generate-user-recommendations/", GenerateUserRecommendationsView.as_view(), name="generate-user-recommendations"),
+    path('api/frequently-bought-together/', FrequentlyBoughtTogetherAPI.as_view(), name='frequently-bought-together'),
+    path('api/update-association-rules/', UpdateAssociationRulesAPI.as_view(), name='update-association-rules'),
+    path('api/association-rules/', AssociationRulesListAPI.as_view(), name='association-rules'),
+    path('api/purchase-prediction/', UserPurchasePredictionView.as_view(), name='purchase-prediction'),
+    path('api/personalized-recommendations/', PersonalizedRecommendationsView.as_view(), name='personalized-recommendations'),
+    path('api/sales-forecast/', SalesForecastView.as_view(), name='sales-forecast'),
+    path('api/product-demand/', ProductDemandView.as_view(), name='product-demand'),
+    path('api/risk-dashboard/', RiskDashboardView.as_view(), name='risk-dashboard'),
+    path('api/user-insights/<int:user_id>/', UserInsightsView.as_view(), name='user-insights'),
+    path('api/my-shopping-insights/', ClientProbabilisticInsightsView.as_view(), name='client-insights'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

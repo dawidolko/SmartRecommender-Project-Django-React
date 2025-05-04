@@ -10,6 +10,7 @@ import {
   LogOut,
   User,
   BarChart,
+  TrendingUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./AdminPanel.scss";
@@ -40,6 +41,12 @@ const SIDEBAR_ITEMS = [
     icon: BarChart,
     color: "#3B82F6",
     href: "/admin/statistics",
+  },
+  {
+    name: "Probabilistic",
+    icon: TrendingUp,
+    color: "#8B5CF6",
+    href: "/admin/probabilistic",
   },
   {
     name: "Account",

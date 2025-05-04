@@ -13,6 +13,7 @@ import AdminUsers from "../components/AdminPanel/AdminUsers";
 import AdminComplaints from "../components/AdminPanel/AdminComplaints";
 import AdminAccount from "../components/AdminPanel/AdminAccount";
 import AdminStatistics from "../components/AdminPanel/AdminStatistics";
+import AdminProbabilistic from "../components/AdminPanel/AdminProbabilistic";
 
 import "../components/AdminPanel/AdminPanel.scss";
 
@@ -47,6 +48,8 @@ const AdminPanel = () => {
         return "Account Settings";
       case "/admin/statistics":
         return "Statistics";
+      case "/admin/probabilistic":
+        return "Probabilistic Analytics";
       default:
         return "Admin Panel";
     }
@@ -68,6 +71,7 @@ const AdminPanel = () => {
               <Route path="complaints" element={<AdminComplaints />} />
               <Route path="account" element={<AdminAccount />} />
               <Route path="statistics" element={<AdminStatistics />} />
+              <Route path="probabilistic" element={<AdminProbabilistic />} />
               <Route
                 path="*"
                 element={

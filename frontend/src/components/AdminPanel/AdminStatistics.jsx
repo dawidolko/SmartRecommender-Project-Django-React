@@ -10,6 +10,8 @@ import {
   ShoppingCart,
   TrendingUp,
   List,
+  Link2,
+  RefreshCw,
 } from "lucide-react";
 import StatCard from "./StatCard";
 import config from "../../config/config";
@@ -30,10 +32,25 @@ const AdminStatistics = () => {
     conversionRate: "0%",
   });
   const [loading, setLoading] = useState(false);
+  const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
+  const [recommendationPreview, setRecommendationPreview] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [associationRules, setAssociationRules] = useState([]);
+  const [associationLoading, setAssociationLoading] = useState(false);
+  const [isUpdatingRules, setIsUpdatingRules] = useState(false);
 
   useEffect(() => {
     fetchStats();
+    fetchRecommendationSettings();
+    fetchAssociationRules();
   }, []);
+
+  useEffect(() => {
+    if (currentAlgorithm) {
+      fetchRecommendationPreview(currentAlgorithm);
+    }
+  }, [currentAlgorithm]);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -65,7 +82,128 @@ const AdminStatistics = () => {
     }
   };
 
-  if (loading) {
+  const fetchRecommendationSettings = async () => {
+    const token = localStorage.getItem("access");
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/api/recommendation-settings/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const algorithm = res.data.active_algorithm || "collaborative";
+      setCurrentAlgorithm(algorithm);
+      setSelectedAlgorithm(algorithm);
+    } catch (err) {
+      console.error("Error fetching recommendation settings:", err);
+      setCurrentAlgorithm("collaborative");
+      setSelectedAlgorithm("collaborative");
+    }
+  };
+
+  const fetchRecommendationPreview = async (algorithm) => {
+    const token = localStorage.getItem("access");
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setRecommendationPreview(res.data);
+    } catch (err) {
+      console.error("Error fetching recommendation preview:", err);
+    }
+  };
+
+  const fetchAssociationRules = async () => {
+    setAssociationLoading(true);
+    const token = localStorage.getItem("access");
+    try {
+      const res = await axios.get(`${config.apiUrl}/api/association-rules/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAssociationRules(res.data.slice(0, 10));
+    } catch (err) {
+      console.error("Error fetching association rules:", err);
+      toast.error("Failed to fetch association rules.");
+    } finally {
+      setAssociationLoading(false);
+    }
+  };
+
+  const updateAssociationRules = async () => {
+    setIsUpdatingRules(true);
+    const token = localStorage.getItem("access");
+    try {
+      const res = await axios.post(
+        `${config.apiUrl}/api/update-association-rules/`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success(
+        `Successfully updated association rules! Created ${res.data.rules_created} rules.`
+      );
+      fetchAssociationRules();
+    } catch (err) {
+      console.error("Error updating association rules:", err);
+      toast.error("Failed to update association rules.");
+    } finally {
+      setIsUpdatingRules(false);
+    }
+  };
+
+  const handleAlgorithmChange = (algorithm) => {
+    setSelectedAlgorithm(algorithm);
+  };
+
+  const handleApplyAlgorithm = async () => {
+    if (isProcessing) return;
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+
+    const token = localStorage.getItem("access");
+    setIsProcessing(true);
+    try {
+      const res = await axios.post(
+        `${config.apiUrl}/api/recommendation-settings/`,
+        { algorithm: selectedAlgorithm },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (res.data.success) {
+        toast.success(
+          `${selectedAlgorithm} algorithm applied successfully! This will be used across the website.`
+        );
+        setCurrentAlgorithm(selectedAlgorithm);
+
+        const processRes = await axios.post(
+          `${config.apiUrl}/api/process-recommendations/`,
+          { algorithm: selectedAlgorithm },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (processRes.data.success) {
+          toast.success("Recommendations processed successfully!");
+        }
+      }
+    } catch (err) {
+      console.error("Error updating recommendation settings:", err);
+      toast.error("Failed to update recommendation settings.");
+      setIsProcessing(false);
+    }
+  };
+
+  const hasChanges = currentAlgorithm !== selectedAlgorithm;
+
+  if (loading && currentAlgorithm === null) {
     return <div className="loading-spinner"></div>;
   }
 
@@ -147,6 +285,160 @@ const AdminStatistics = () => {
           </div>
         </div>
       </motion.div>
+
+      <motion.div
+        className="association-rules-section"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}>
+        <div className="association-rules-card">
+          <div className="association-rules-header">
+            <h2 className="association-rules-title">
+              <Link2 className="association-rules-icon" />
+              Association Rules Management
+            </h2>
+            <button
+              className="update-rules-btn"
+              onClick={updateAssociationRules}
+              disabled={isUpdatingRules}>
+              <RefreshCw
+                className={`icon ${isUpdatingRules ? "rotating" : ""}`}
+              />
+              {isUpdatingRules ? "Updating..." : "Update Rules"}
+            </button>
+          </div>
+
+          <div className="association-rules-content">
+            <p className="association-rules-description">
+              Association rules help identify products frequently bought
+              together. These rules power the "Frequently Bought Together"
+              recommendations in the shopping cart.
+            </p>
+
+            {associationLoading ? (
+              <div className="association-rules-loading">
+                Loading association rules...
+              </div>
+            ) : associationRules.length > 0 ? (
+              <div className="association-rules-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Product 1</th>
+                      <th>Product 2</th>
+                      <th>Support</th>
+                      <th>Confidence</th>
+                      <th>Lift</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {associationRules.map((rule, index) => (
+                      <tr key={index}>
+                        <td>{rule.product_1.name}</td>
+                        <td>{rule.product_2.name}</td>
+                        <td>{(rule.support * 100).toFixed(1)}%</td>
+                        <td>{(rule.confidence * 100).toFixed(1)}%</td>
+                        <td>{rule.lift.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="association-rules-empty">
+                No association rules found. Click "Update Rules" to generate
+                them.
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      {currentAlgorithm !== null && (
+        <motion.div
+          className="recommendation-control-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}>
+          <div className="recommendation-card">
+            <h2 className="recommendation-title">Recommendation System</h2>
+            <div className="recommendation-controls">
+              <div className="algorithm-selection">
+                <label className="algorithm-label">Select Algorithm:</label>
+                <div className="algorithm-options">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      value="collaborative"
+                      checked={selectedAlgorithm === "collaborative"}
+                      onChange={() => handleAlgorithmChange("collaborative")}
+                      disabled={isProcessing}
+                    />
+                    Collaborative Filtering (CF)
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      value="content_based"
+                      checked={selectedAlgorithm === "content_based"}
+                      onChange={() => handleAlgorithmChange("content_based")}
+                      disabled={isProcessing}
+                    />
+                    Content-Based Filtering (CBF)
+                  </label>
+                </div>
+              </div>
+              <div className="algorithm-actions">
+                <button
+                  className="btn-primary"
+                  onClick={handleApplyAlgorithm}
+                  disabled={isProcessing || !hasChanges}
+                  style={{
+                    opacity: !hasChanges && !isProcessing ? 0.5 : 1,
+                    cursor:
+                      !hasChanges && !isProcessing ? "not-allowed" : "pointer",
+                  }}>
+                  {isProcessing ? "Processing..." : "Apply Algorithm"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="recommendation-preview">
+            <h3 className="preview-title">
+              {currentAlgorithm === "collaborative"
+                ? "Collaborative Filtering Preview"
+                : "Content-Based Filtering Preview"}
+            </h3>
+            <div className="preview-content">
+              {recommendationPreview.length > 0 ? (
+                <div className="preview-products">
+                  {recommendationPreview.map((product) => (
+                    <div key={product.id} className="preview-product">
+                      {product.photos?.[0]?.path && (
+                        <img
+                          src={`${config.apiUrl}/media/${product.photos[0].path}`}
+                          alt={product.name}
+                          className="preview-product-image"
+                        />
+                      )}
+                      <div className="preview-product-info">
+                        <h4>{product.name}</h4>
+                        <p>${product.price}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="preview-empty">
+                  No recommendations available. Click "Apply Algorithm" to
+                  generate.
+                </p>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

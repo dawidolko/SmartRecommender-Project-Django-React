@@ -9,17 +9,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import os
 import time
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Product, PhotoProduct
-from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminUser
 from django.db import connection
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny
+from .models import Product, Opinion, Category
+from .serializers import ProductSerializer
+from django.db.models import Q, Avg, F
+from .models import Product, ProductSentimentSummary
+from .serializers import ProductSerializer
+import re
+from textblob import TextBlob
+from .models import SentimentAnalysis, ProductSentimentSummary
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import status
 from .models import (
     CartItem,
     PhotoProduct,
@@ -563,21 +570,6 @@ class CurrentUserView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class ProductSearchAPIView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        query = request.GET.get("q", "")
-        if query:
-            products = Product.objects.filter(
-                Q(name__icontains=query)
-                | Q(description__icontains=query)
-                | Q(categories__name__icontains=query)
-            ).distinct()
-            serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data)
-        return Response({"error": "No query provided"}, status=400)
-
 class ClientStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -696,16 +688,6 @@ class CurrentUserUpdateAPIView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
-class RecommendedProductsAPIView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        
-        recommended_products = Product.objects.all().order_by('?')[:4] 
-
-        serializer = ProductSerializer(recommended_products, many=True)
-        return Response(serializer.data)
     
 class RecommendedProductsAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -730,3 +712,18 @@ class ResetPhotoSequenceView(APIView):
                 "message": f"Sequence reset to {max_id + 1}",
                 "max_id": max_id
             })
+    
+class ProductSearchAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.GET.get("q", "")
+        if query:
+            products = Product.objects.filter(
+                Q(name__icontains=query)
+                | Q(description__icontains=query)
+                | Q(categories__name__icontains=query)
+            ).distinct()
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data)
+        return Response({"error": "No query provided"}, status=400)
