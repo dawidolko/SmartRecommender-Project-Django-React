@@ -460,12 +460,14 @@ const AdminProducts = () => {
             icon={Package}
             value={stats.totalProducts}
             color="#6366F1"
+            variant="first"
           />
           <StatCard
             name="Best Selling"
             icon={TrendingUp}
             value={stats.topSelling}
             color="#10B981"
+            variant="third"
           />
           <StatCard
             name="Total Sales"
@@ -475,6 +477,7 @@ const AdminProducts = () => {
               maximumFractionDigits: 2,
             })}`}
             color="#EF4444"
+            variant="second"
           />
         </motion.div>
 
@@ -602,6 +605,7 @@ const AdminProducts = () => {
                 placeholder="Search products..."
                 onChange={(e) => setSearchTerm(e.target.value)}
                 value={searchTerm}
+                style={{ color: "#000000" }}
               />
               <Search className="search-icon" size={18} />
             </div>

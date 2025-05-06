@@ -53,7 +53,6 @@ const Navbar = () => {
       }
     };
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -82,17 +81,10 @@ const Navbar = () => {
     localStorage.removeItem("loggedUser");
     setUser(null);
     setShowUserDropdown(false);
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
   const panelPrefix = user && user.role === "admin" ? "/admin" : "/client";
-
-  const getUserRedirect = () => {
-    if (user) {
-      return panelPrefix;
-    }
-    return "/login";
-  };
 
   const closeModal = () => setShowModal(false);
 
@@ -135,7 +127,7 @@ const Navbar = () => {
                 style={{ cursor: "pointer" }}>
                 <FaUserCircle
                   className="navbar__user-icon"
-                  onClick={() => (window.location.href = getUserRedirect())}
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
                 />
                 {showUserDropdown && (
                   <div className="navbar__user-dropdown">

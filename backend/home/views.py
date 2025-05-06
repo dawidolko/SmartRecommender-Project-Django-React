@@ -1,9 +1,11 @@
 from django.db.models import Count, Q, Sum, F, FloatField
 from django.db.models.functions import TruncMonth
 from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 import os
+from home.signals import run_all_analytics_after_order
 from random import sample
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,7 +19,7 @@ from django.db import connection
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.permissions import AllowAny
 from .models import Product, Opinion, Category
-from .serializers import ProductSerializer
+from .serializers import OpinionSerializer, ProductSerializer
 from django.db.models import Q, Avg, F
 from .models import Product, ProductSentimentSummary
 from .serializers import ProductSerializer
@@ -380,6 +382,8 @@ class OrderListCreateAPIView(ListCreateAPIView):
             except Product.DoesNotExist:
                 continue
 
+        run_all_analytics_after_order(order)
+
 
 class ClientOrderDetailAPIView(RetrieveAPIView):
     serializer_class = OrderSerializer
@@ -727,3 +731,30 @@ class ProductSearchAPIView(APIView):
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return Response({"error": "No query provided"}, status=400)
+    
+class ProductReviewAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, product_id):
+        product = get_object_or_404(Product, pk=product_id)
+        user = request.user
+
+        purchased = OrderProduct.objects.filter(
+            order__user=user, product=product
+        ).exists()
+        if not purchased:
+            return Response(
+                {"detail": "You can only review products you have purchased."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = OpinionSerializer(
+            data=request.data,
+            context={"request": request, "product": product},
+        )
+        serializer.is_valid(raise_exception=True)
+
+        opinion = serializer.save(user=user, product=product)
+
+        return Response(OpinionSerializer(opinion).data,
+                        status=status.HTTP_201_CREATED)

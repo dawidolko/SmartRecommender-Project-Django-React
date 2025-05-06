@@ -191,3 +191,20 @@ class GenerateUserRecommendationsView(APIView):
             'success': True,
             'message': f'User recommendations generated for {algorithm} algorithm'
         })
+    
+class CreateUserInteractionAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        product_id = request.data.get("product_id")
+        interaction_type = request.data.get("interaction_type")
+
+        if not product_id or not interaction_type:
+            return Response({"error": "Invalid data."}, status=400)
+
+        UserInteraction.objects.create(
+            user=request.user,
+            product_id=product_id,
+            interaction_type=interaction_type
+        )
+        return Response({"success": True})

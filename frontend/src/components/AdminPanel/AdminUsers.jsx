@@ -380,24 +380,28 @@ const AdminUsers = () => {
             icon={Edit}
             value={stats.totalOpinions.toLocaleString()}
             color="#6366F1"
+            variant="first"
           />
           <StatCard
             name="Average Rating"
             icon={Edit}
             value={stats.averageRating}
             color="#10B981"
+            variant="third"
           />
           <StatCard
             name="Top Category"
             icon={Edit}
             value={stats.topCategoryName || "—"}
             color="#F59E0B"
+            variant="fourth"
           />
           <StatCard
             name="Top Tag"
             icon={Edit}
             value={stats.topTagName || "—"}
             color="#EF4444"
+            variant="second"
           />
         </motion.div>
 

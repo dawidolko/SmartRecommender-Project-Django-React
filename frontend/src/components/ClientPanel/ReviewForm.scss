@@ -1,0 +1,132 @@
+.review-form-container {
+  padding: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+
+  h3 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #333;
+  }
+
+  .review-form-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff0f0;
+    color: #d32f2f;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border-left: 3px solid #d32f2f;
+
+    svg {
+      min-width: 18px;
+    }
+  }
+
+  .rating-container {
+    margin-bottom: 1.5rem;
+
+    p {
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .stars-container {
+      display: flex;
+      gap: 8px;
+
+      .star-icon {
+        cursor: pointer;
+        transition: transform 0.2s;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .review-text-container {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.95rem;
+
+      &:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+      }
+    }
+  }
+
+  .review-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-secondary {
+      background-color: #808080;
+      border: 1px solid #808080;
+      color: #ffffff;
+
+      &:hover:not(:disabled) {
+        background-color: #ffffff00;
+        border: 1px solid #808080;
+        color: #808080;
+      }
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border: 1px solid #007bff;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: #ffffff00;
+        border: 1px solid #007bff;
+        color: #007bff;
+      }
+    }
+  }
+}
+
+.review-form-success {
+  text-align: center;
+  padding: 2rem;
+
+  h3 {
+    color: #2e7d32;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #333;
+  }
+}

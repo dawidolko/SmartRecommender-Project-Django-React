@@ -214,24 +214,28 @@ const AdminOrders = () => {
             icon={Package}
             value={stats.totalOrders.toLocaleString()}
             color="#6366F1"
+            variant="first"
           />
           <StatCard
             name="Pending Orders"
             icon={Package}
             value={stats.pendingOrders.toLocaleString()}
             color="#F59E0B"
+            variant="fourth"
           />
           <StatCard
             name="Shipped Orders"
             icon={Package}
             value={stats.shippedOrders.toLocaleString()}
             color="#10B981"
+            variant="third"
           />
           <StatCard
             name="Delivered Orders"
             icon={Package}
             value={stats.deliveredOrders.toLocaleString()}
             color="#EF4444"
+            variant="second"
           />
         </motion.div>
 

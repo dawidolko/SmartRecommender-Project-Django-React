@@ -64,10 +64,10 @@
     color: red;
     cursor: pointer;
     &--absolute {
-      background-color: #ffffff00;
+      background-color: $darkblack;
     }
     &:hover {
-      background-color: #ffffff00;
+      background-color: $darkblack;
       color: rgb(107, 14, 14) !important;
     }
   }

@@ -1,9 +1,8 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useMemo } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
 import Hero from "../components/Hero/Hero";
-
 import AdminSidebar from "../components/AdminPanel/AdminSidebar";
 import AdminHeader from "../components/AdminPanel/AdminHeader";
 import AdminDashboard from "../components/AdminPanel/AdminDashboard";
@@ -28,11 +27,7 @@ const AdminPanel = () => {
     }
   }, [user, navigate]);
 
-  if (!user || user.role !== "admin") {
-    return null;
-  }
-
-  const getTitle = () => {
+  const getTitle = useMemo(() => {
     switch (location.pathname) {
       case "/admin":
         return "Overview";
@@ -53,15 +48,32 @@ const AdminPanel = () => {
       default:
         return "Admin Panel";
     }
-  };
+  }, [location.pathname]);
+
+  const displayName = useMemo(() => {
+    if (!user) return null;
+    if (user.first_name || user.last_name) {
+      return `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim();
+    }
+    return user.username || user.email || "Admin";
+  }, [user]);
+
+  if (!user || user.role !== "admin") {
+    return null;
+  }
 
   return (
     <div className="admin-container">
       <Hero title="Panel Admin" cName="hero__img" />
+      <AdminHeader title={getTitle} />
       <div className="admin-panel">
         <AdminSidebar />
         <div className="admin-wrapper">
-          <AdminHeader title={getTitle()} />
+          <div className="welcome-text">
+            <span className="text-gray-100 name-span">
+              Welcome, {displayName}
+            </span>
+          </div>
           <main className="admin-main">
             <Routes>
               <Route path="/" element={<AdminDashboard />} />

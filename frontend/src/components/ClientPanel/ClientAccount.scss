@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .client-account {
   max-width: 600px;
   margin: 2rem auto;
@@ -56,7 +58,7 @@
       font-size: 1.7rem;
       border: none;
       background-color: #007bff;
-      color: #fff;
+      color: $realwhite;
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;

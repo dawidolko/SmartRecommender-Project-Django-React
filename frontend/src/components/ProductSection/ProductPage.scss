@@ -54,7 +54,7 @@
     h1 {
       margin-bottom: 0.5em;
       font-size: 2.1rem;
-      color: #000000;
+      color: black;
       text-align: left;
       text-decoration: underline;
     }
@@ -71,7 +71,7 @@
     h1 {
       margin-bottom: 0.5em;
       font-size: 2.1rem;
-      color: #000000;
+      color: black;
       text-align: left;
       text-decoration: underline;
     }
@@ -165,6 +165,7 @@
 
     &:hover {
       transform: scale(1.02);
+      transition: transform 0.5s ease;
     }
 
     @media (max-width: 850px) {
@@ -195,6 +196,7 @@
       &:hover {
         border-color: #ff5733;
         transform: scale(1.05);
+        transition: transform 0.5s ease;
       }
 
       &.active {
@@ -242,7 +244,7 @@
 
   &__category {
     font-size: 1.8rem;
-    color: #000000;
+    color: black;
     margin-bottom: 0.5em;
     border: 1px solid black;
     padding: 0.5em;
@@ -305,7 +307,7 @@
     h1 {
       margin-bottom: 0.5em;
       font-size: 2.1rem;
-      color: #000000;
+      color: black;
       text-align: left;
       text-decoration: underline;
     }
@@ -313,14 +315,14 @@
     h2 {
       margin-bottom: 0.5em;
       font-size: 1.6rem;
-      color: #000000;
+      color: black;
       text-align: left;
     }
 
     h3 {
       margin-bottom: 0.5em;
       font-size: 2.2rem;
-      color: #000000;
+      color: black;
     }
 
     p {
@@ -374,6 +376,7 @@
       &:hover {
         background-color: #007bff;
         transform: scale(1.1);
+        transition: transform 0.5s ease;
       }
 
       &:focus {
@@ -404,12 +407,13 @@
       border: 1px solid #007bff;
       &:hover {
         border: 1px solid #007bff;
-        background-color: #fff;
+        background-color: $realwhite;
         color: #007bff;
       }
 
       &:active {
         transform: scale(0.95);
+        transition: transform 0.5s ease;
       }
 
       @media (max-width: 768px) {
@@ -435,15 +439,18 @@
     0% {
       opacity: 0;
       transform: scale(0.8);
+      transition: transform 0.5s ease;
     }
 
     60% {
       opacity: 1;
       transform: scale(1.1);
+      transition: transform 0.5s ease;
     }
 
     100% {
       transform: scale(1);
+      transition: transform 0.5s ease;
     }
   }
 
@@ -465,7 +472,7 @@
       right: 20px;
       background-color: red;
       border: 1px solid red;
-      color: #fff;
+      color: $realwhite;
       border: none;
       padding: 0.5em 1em;
       font-size: 1rem;
@@ -543,6 +550,7 @@
 
     &:hover {
       transform: scale(1.05);
+      transition: transform 0.5s ease;
       background: linear-gradient(to right, #ff8a00, #da1b60);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -611,6 +619,7 @@
 
       &:hover {
         transform: translateY(-5px);
+        transition: transform 0.5s ease;
       }
     }
 
@@ -627,6 +636,10 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      &:hover {
+        text-decoration: underline;
+        color: #007bff;
+      }
     }
 
     .productPage__similar-product-prices {
@@ -664,16 +677,40 @@
 
     &:before {
       font-size: 40px;
-      color: #333;
+      color: #fd266e;
+
+      &:hover {
+        color: #fd266e;
+      }
+
+      &:active {
+        color: #fd266e;
+      }
     }
   }
 
   .slick-prev {
     left: -50px;
+
+    &:hover {
+      color: #fd266e;
+    }
+
+    &:active {
+      color: #fd266e;
+    }
   }
 
   .slick-next {
     right: -50px;
+
+    &:hover {
+      color: #fd266e;
+    }
+
+    &:active {
+      color: #fd266e;
+    }
   }
 }
 

@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .cart-preview {
   position: relative;
   display: inline-block;
@@ -60,12 +62,14 @@
       &__details {
         flex: 1;
         margin-left: 10px;
+
         p {
           &:hover {
             color: #007bff !important;
             text-decoration: underline;
           }
         }
+
         span {
           color: rgb(239, 68, 68);
         }
@@ -85,6 +89,7 @@
           padding: 0.4rem 0.9rem;
           margin: 0 10px;
           cursor: pointer;
+
           &:hover {
             background: #08630f;
             border: 1px solid #08630f;
@@ -95,6 +100,7 @@
       &__remove {
         cursor: pointer;
         color: red;
+
         &:hover {
           color: #8f0202;
         }
@@ -110,8 +116,9 @@
       padding: 10px;
       border-radius: 5px;
       text-decoration: none;
+
       &:hover {
-        background: #ffffff00;
+        background: $darkblack;
         border: 1px solid #007bff;
         color: #007bff;
       }

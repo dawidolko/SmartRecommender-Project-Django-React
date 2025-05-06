@@ -15,6 +15,24 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "./AdminPanel.scss";
 
+// Komponent ikony hamburger menu (trzy poziome linie)
+const HamburgerMenuIcon = () => (
+  <svg
+    stroke="currentColor"
+    fill="none"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    height="1em"
+    width="1em"
+    xmlns="http://www.w3.org/2000/svg">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+);
+
 const SIDEBAR_ITEMS = [
   { name: "Dashboard", icon: BarChart2, color: "#6366f1", href: "/admin" },
   {
@@ -57,16 +75,25 @@ const SIDEBAR_ITEMS = [
 ];
 
 const AdminSidebar = () => {
-  const [isOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
+
+      if (window.innerWidth <= 800) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
     };
 
     window.addEventListener("resize", handleResize);
+
+    handleResize();
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -74,6 +101,10 @@ const AdminSidebar = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
     window.location.href = "/login";
+  };
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
   };
 
   const isMobile = windowWidth <= 800;
@@ -88,16 +119,19 @@ const AdminSidebar = () => {
   return (
     <motion.div
       className={`admin-aside ${
-        isMobile
-          ? "admin-aside--closed"
-          : isOpen
-          ? "admin-aside--open"
-          : "admin-aside--closed"
+        isOpen ? "admin-aside--open" : "admin-aside--closed"
       }`}
-      style={{ width: isMobile ? "80px" : isOpen ? "300px" : "80px" }}
-      animate={{ width: isOpen && !isMobile ? 300 : isMobile ? 80 : 300 }}
+      animate={{ width: isOpen && !isMobile ? 300 : 80 }}
       transition={{ duration: 0.3 }}>
       <div className="admin-aside__header">
+        {isOpen && (
+          <button
+            className="admin-aside__toggle"
+            onClick={toggleSidebar}
+            aria-label="Toggle sidebar">
+            <HamburgerMenuIcon />
+          </button>
+        )}
         <AnimatePresence>
           {isOpen && !isMobile && (
             <motion.div
@@ -105,10 +139,19 @@ const AdminSidebar = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}>
-              SmartRecommender
+              <div className="admin-aside__title-content">SmartRecommender</div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {!isOpen && (
+          <button
+            className="admin-aside__toggle-collapsed"
+            onClick={toggleSidebar}
+            aria-label="Expand sidebar">
+            <HamburgerMenuIcon />
+          </button>
+        )}
       </div>
       <nav className="admin-aside__nav">
         <ul className="admin-aside__list">

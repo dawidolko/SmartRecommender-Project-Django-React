@@ -16,11 +16,16 @@
     display: flex !important;
     justify-content: center;
     align-items: center;
-    background-color: #fff;
+    background-color: $realwhite;
     border-radius: 8px;
     margin: 0 10px;
     max-height: 200px;
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      transform: translateY(-5px);
+      transition: transform 0.5s ease;
+    }
   }
 }
 
@@ -43,6 +48,10 @@
     height: 80px;
     object-fit: cover;
     border-radius: 4px;
+    &:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s ease;
+    }
   }
 
   &__name {

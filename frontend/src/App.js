@@ -31,6 +31,7 @@ import ClientDashboard from "./components/ClientPanel/ClientDashboard";
 import ClientOrders from "./components/ClientPanel/ClientOrders";
 import ClientComplaints from "./components/ClientPanel/ClientComplaints";
 import ClientAccount from "./components/ClientPanel/ClientAccount";
+import ClientProbabilistic from "./components/ClientPanel/ClientProbabilistic";
 
 import ScrollToTop from "./utils/ScrollToTop";
 
@@ -117,6 +118,7 @@ function App() {
                 <Route path="orders" element={<ClientOrders />} />
                 <Route path="complaints" element={<ClientComplaints />} />
                 <Route path="account" element={<ClientAccount />} />
+                <Route path="probabilistic" element={<ClientProbabilistic />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

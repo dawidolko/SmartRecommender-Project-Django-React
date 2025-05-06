@@ -269,24 +269,28 @@ const AdminComplaints = () => {
             icon={AlertCircle}
             value={stats.totalComplaints.toLocaleString()}
             color="#6366F1"
+            variant="first"
           />
           <StatCard
             name="Pending Complaints"
             icon={AlertCircle}
             value={stats.pendingComplaints.toLocaleString()}
             color="#F59E0B"
+            variant="fourth"
           />
           <StatCard
             name="Resolved Complaints"
             icon={AlertCircle}
             value={stats.resolvedComplaints.toLocaleString()}
             color="#10B981"
+            variant="third"
           />
           <StatCard
             name="Rejected Complaints"
             icon={AlertCircle}
             value={stats.rejectedComplaints.toLocaleString()}
             color="#EF4444"
+            variant="second"
           />
         </motion.div>
 

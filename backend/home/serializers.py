@@ -19,11 +19,16 @@ class PhotoProductSerializer(serializers.ModelSerializer):
         return f"{obj.path}"
 
 class OpinionSerializer(serializers.ModelSerializer):
-    user_email = serializers.EmailField(source="user.email")
+    user_email = serializers.EmailField(source="user.email", read_only=True)
 
     class Meta:
         model = Opinion
-        fields = ['user_email', 'content', 'rating']
+        fields = ["user_email", "content", "rating"]
+
+    def create(self, validated_data):
+        validated_data["user"] = self.context["request"].user
+        validated_data["product"] = self.context["product"]
+        return super().create(validated_data)
 
 class SpecificationSerializer(serializers.ModelSerializer):
     class Meta:

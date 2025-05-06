@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .notFound {
   height: 100vh;
   display: flex;
@@ -19,6 +21,6 @@
   &__text,
   &__error,
   &__icon {
-    color: #fff;
+    color: $realwhite;
   }
 }

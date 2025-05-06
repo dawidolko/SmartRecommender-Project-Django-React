@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from .views import (
     CategoriesAPIView,
     ProductImageUploadView,
+    ProductReviewAPIView,
     ProductsAPIView,
     RandomProductsAPIView,
     ProductDetailAPIView,
@@ -37,6 +38,7 @@ from .views import (
 )
 
 from .recommendation_views import (
+    CreateUserInteractionAPI,
     GenerateUserRecommendationsView, 
     ProcessRecommendationsView, 
     RecommendationPreviewView, 
@@ -55,6 +57,9 @@ from .association_views import (
 )
 
 from .probabilistic_views import (
+    AdminChurnPredictionView,
+    AdminProductRecommendationsView,
+    AdminPurchasePatternsView,
     UserPurchasePredictionView,
     PersonalizedRecommendationsView,
     SalesForecastView,
@@ -84,6 +89,7 @@ urlpatterns = [
     path("api/users/", UserListCreateAPIView.as_view(), name="users-list"),
     path("api/users/<int:pk>/", UserRetrieveUpdateDestroyAPIView.as_view(), name="users-destroy"),
     path("api/complaints/", ComplaintListCreateAPIView.as_view(), name="complaint-list-create"),
+    path("api/products/<int:product_id>/reviews/", ProductReviewAPIView.as_view(), name="product-reviews"),
     path("api/complaints/<int:pk>/", ComplaintRetrieveUpdateDestroyAPIView.as_view(), name="complaint-rud"),
     path("api/admin-stats/", AdminStatsView.as_view(), name="admin-stats"),
     path("api/admin-dashboard-stats/", AdminDashboardStatsView.as_view(), name="admin-dashboard-stats"),
@@ -100,6 +106,7 @@ urlpatterns = [
     path("api/fuzzy-search/", FuzzySearchAPIView.as_view(), name="fuzzy-search"),
     path("api/recommendation-settings/", RecommendationSettingsView.as_view(), name="recommendation-settings"),
     path("api/process-recommendations/", ProcessRecommendationsView.as_view(), name="process-recommendations"),
+    path("api/interaction/", CreateUserInteractionAPI.as_view(), name="create-interaction"),
     path("api/recommendation-preview/", RecommendationPreviewView.as_view(), name="recommendation-preview"),
     path("api/generate-user-recommendations/", GenerateUserRecommendationsView.as_view(), name="generate-user-recommendations"),
     path('api/frequently-bought-together/', FrequentlyBoughtTogetherAPI.as_view(), name='frequently-bought-together'),
@@ -112,4 +119,7 @@ urlpatterns = [
     path('api/risk-dashboard/', RiskDashboardView.as_view(), name='risk-dashboard'),
     path('api/user-insights/<int:user_id>/', UserInsightsView.as_view(), name='user-insights'),
     path('api/my-shopping-insights/', ClientProbabilisticInsightsView.as_view(), name='client-insights'),
+    path('api/admin-purchase-patterns/', AdminPurchasePatternsView.as_view(), name='admin-purchase-patterns'),
+    path('api/admin-product-recommendations/', AdminProductRecommendationsView.as_view(), name='admin-product-recommendations'),
+    path('api/admin-churn-prediction/', AdminChurnPredictionView.as_view(), name='admin-churn-prediction'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

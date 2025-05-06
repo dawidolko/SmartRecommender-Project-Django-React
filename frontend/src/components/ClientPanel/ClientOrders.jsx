@@ -11,6 +11,7 @@ import {
 import config from "../../config/config";
 import "./ClientPanel.scss";
 import Modal from "./Modal";
+import ReviewForm from "./ReviewForm";
 
 const ClientOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -23,7 +24,9 @@ const ClientOrders = () => {
   const [ordersPerPage] = useState(10);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderError, setOrderError] = useState(null);
 
@@ -123,9 +126,29 @@ const ClientOrders = () => {
       });
   };
 
+  const handleAddReview = (product) => {
+    // Make sure we're setting a valid product object with an ID
+    if (product && product.id) {
+      setSelectedProduct(product);
+      setIsReviewModalOpen(true);
+    } else {
+      console.error("Invalid product object:", product);
+    }
+  };
+
+  const handleReviewSubmitted = (reviewData) => {
+    console.log("Review submitted successfully:", reviewData);
+    setIsReviewModalOpen(false);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
+  };
+
+  const handleCloseReviewModal = () => {
+    setIsReviewModalOpen(false);
+    setSelectedProduct(null);
   };
 
   const handleSort = (column) => {
@@ -195,7 +218,7 @@ const ClientOrders = () => {
           </span>
         </p>
         <p>
-          <strong>Total:</strong> ${selectedOrder.total.toFixed(2)}
+          <strong>Total:</strong> ${parseFloat(selectedOrder.total).toFixed(2)}
         </p>
 
         <h3 style={{ marginTop: "1rem" }}>Ordered Products:</h3>
@@ -207,15 +230,27 @@ const ClientOrders = () => {
                 <th style={{ textAlign: "center" }}>Name</th>
                 <th style={{ textAlign: "center" }}>Quantity</th>
                 <th style={{ textAlign: "center" }}>Price (each)</th>
+                <th style={{ textAlign: "center" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {selectedOrder.order_products.map((op) => {
                 const product = op.product;
+
+                // Check if photos exists and has items before accessing [0]
                 const imgSrc =
                   product.photos && product.photos.length > 0
                     ? `${config.apiUrl}/media/${product.photos[0].path}`
-                    : "https://via.placeholder.com/150";
+                    : `${config.apiUrl}/media/placeholder-product.png`;
+
+                // Ensure price is a valid number greater than 0
+                const price =
+                  product.price &&
+                  !isNaN(parseFloat(product.price)) &&
+                  parseFloat(product.price) > 0
+                    ? parseFloat(product.price)
+                    : 0;
+
                 return (
                   <tr key={op.id || `${selectedOrder.id}-${product.id}`}>
                     <td
@@ -230,12 +265,22 @@ const ClientOrders = () => {
                         src={imgSrc}
                         alt={product.name}
                         style={{ width: "100px" }}
+                        onError={(e) => {
+                          console.log("Image error, using fallback");
+                          e.target.onerror = null; // Prevent infinite loop
+                          e.target.src = `${config.apiUrl}/media/placeholder-product.png`;
+                        }}
                       />
                     </td>
                     <td style={{ textAlign: "center" }}>{product.name}</td>
                     <td style={{ textAlign: "center" }}>{op.quantity}</td>
+                    <td style={{ textAlign: "center" }}>${price.toFixed(2)}</td>
                     <td style={{ textAlign: "center" }}>
-                      ${Number(product.price).toFixed(2)}
+                      <button
+                        className="btn-primary review-btn"
+                        onClick={() => handleAddReview(product)}>
+                        Add Review
+                      </button>
                     </td>
                   </tr>
                 );
@@ -399,6 +444,19 @@ const ClientOrders = () => {
           selectedOrder ? `Order #${selectedOrder.id} Details` : "Order Details"
         }>
         {renderOrderDetails()}
+      </Modal>
+
+      <Modal
+        isOpen={isReviewModalOpen}
+        onClose={handleCloseReviewModal}
+        title="Add Product Review">
+        {selectedProduct && (
+          <ReviewForm
+            product={selectedProduct}
+            onReviewSubmitted={handleReviewSubmitted}
+            onClose={handleCloseReviewModal}
+          />
+        )}
       </Modal>
     </div>
   );

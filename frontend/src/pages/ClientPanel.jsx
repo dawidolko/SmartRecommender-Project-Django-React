@@ -6,6 +6,7 @@ import ClientDashboard from "../components/ClientPanel/ClientDashboard";
 import ClientOrders from "../components/ClientPanel/ClientOrders";
 import ClientComplaints from "../components/ClientPanel/ClientComplaints";
 import ClientAccount from "../components/ClientPanel/ClientAccount";
+import ClientProbabilistic from "../components/ClientPanel/ClientProbabilistic";
 import "../components/ClientPanel/ClientPanel.scss";
 
 const ClientPanel = () => {
@@ -35,6 +36,7 @@ const ClientPanel = () => {
             <Route path="orders" element={<ClientOrders />} />
             <Route path="complaints" element={<ClientComplaints />} />
             <Route path="account" element={<ClientAccount />} />
+            <Route path="probabilistic" element={<ClientProbabilistic />} />
             <Route
               path="*"
               element={<div style={{ padding: "2rem" }}>Page Not Found</div>}

@@ -16745,7 +16745,7 @@ def seed_complaints():
         if not products_in_order:
             continue
 
-        num_complaints = random.randint(1, len(products_in_order))  # Przynajmniej 1 skarga na zamówienie
+        num_complaints = random.randint(1, len(products_in_order))
         products_for_complaints = random.sample(list(products_in_order), num_complaints)
 
         for product_entry in products_for_complaints:
@@ -16925,7 +16925,7 @@ def generate_sales_forecasts():
         total_sold = historical_sales['total_sold'] or 0
         avg_per_order = historical_sales['avg_per_order'] or 1
         
-        for days_ahead in range(1, 31):  # Zmieniono z 91 na 31 dla szybszego działania
+        for days_ahead in range(1, 31): 
             forecast_date = current_date + timedelta(days=days_ahead)
             
             seasonal_factor = get_seasonal_factor(forecast_date.month)
@@ -17064,11 +17064,11 @@ def generate_risk_assessments():
         if not recent_orders.exists():
             risk_score = Decimal('0.7') + Decimal(random.uniform(0, 0.2))
             confidence = Decimal('0.8') + Decimal(random.uniform(0, 0.2))
-            mitigation_suggestion = "Wysłać spersonalizowaną ofertę lub zniżkę, aby zachęcić do powrotu."
+            mitigation_suggestion = "Send a personalized offer or discount to encourage return."
         else:
             risk_score = Decimal('0.2') + Decimal(random.uniform(0, 0.2))
             confidence = Decimal('0.7') + Decimal(random.uniform(0, 0.1))
-            mitigation_suggestion = "Kontynuować regularną komunikację z klientem."
+            mitigation_suggestion = "Maintain current inventory levels."
         
         RiskAssessment.objects.create(
             risk_type='customer_churn',
@@ -17089,11 +17089,11 @@ def generate_risk_assessments():
         if recent_sales['total_sold'] is None or recent_sales['total_sold'] < 5:
             risk_score = Decimal('0.6') + Decimal(random.uniform(0, 0.3))
             confidence = Decimal('0.7') + Decimal(random.uniform(0, 0.2))
-            mitigation_suggestion = "Rozważyć promocję produktu lub dostosowanie ilości zamówień."
+            mitigation_suggestion = "Consider promoting your product or adjusting your order quantities."
         else:
             risk_score = Decimal('0.2') + Decimal(random.uniform(0, 0.2))
             confidence = Decimal('0.6') + Decimal(random.uniform(0, 0.1))
-            mitigation_suggestion = "Utrzymać obecny poziom zapasów."
+            mitigation_suggestion = "Maintain current inventory levels."
         
         RiskAssessment.objects.create(
             risk_type='inventory_excess',

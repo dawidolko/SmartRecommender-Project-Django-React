@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
+  FiArrowLeft,
   FiHome,
   FiShoppingCart,
   FiList,
   FiUser,
   FiLogOut,
   FiMenu,
+  FiBarChart2,
 } from "react-icons/fi";
 import "./ClientPanel.scss";
 
 const ClientSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,6 +83,17 @@ const ClientSidebar = () => {
           </li>
           <li>
             <NavLink
+              to="/client/probabilistic"
+              className={({ isActive }) =>
+                "client-aside__link " +
+                (isActive ? "client-aside__link--active" : "")
+              }>
+              <FiBarChart2 className="client-aside__link-icon icon-probabilistic" />
+              {isOpen && <span>Smart Recommendations</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
               to="/client/complaints"
               className={({ isActive }) =>
                 "client-aside__link " +
@@ -99,6 +113,14 @@ const ClientSidebar = () => {
               <FiUser className="client-aside__link-icon icon-account" />
               {isOpen && <span>Account</span>}
             </NavLink>
+          </li>
+          <li>
+            <button
+              className="client-aside__link client-aside__link--back"
+              onClick={() => navigate("/")}>
+              <FiArrowLeft className="client-aside__link-icon" />
+              {isOpen && <span>Back to page</span>}
+            </button>
           </li>
           <li>
             <button

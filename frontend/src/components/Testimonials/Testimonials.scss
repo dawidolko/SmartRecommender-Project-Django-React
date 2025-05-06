@@ -36,14 +36,18 @@
     background-color: rgb(235, 233, 233);
     text-align: center;
     padding: 1.5em;
-
     height: 420px;
     box-sizing: border-box;
-
     transition: box-shadow 0.3s ease, background-color 0.3s ease;
+
     &:hover {
       background-color: #e1dfdf;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      transition: transform 0.5s ease;
     }
   }
 
@@ -67,11 +71,16 @@
     border-radius: 4px;
     transition: transform 0.3s ease;
     max-height: 180px;
+
+    &:hover {
+      transform: scale(1.02);
+      transition: transform 0.5s ease;
+    }
   }
 
   &__category {
     font-size: 1.2rem;
-    color: #000000;
+    color: black;
     margin-bottom: 0.5em;
     border: 1px solid black;
     padding: 0.5em;
@@ -86,6 +95,7 @@
     font-weight: 500;
     margin-bottom: 0.3em;
     transition: color 0.3s ease;
+
     &:hover {
       text-decoration: underline;
       color: #007bff;
@@ -103,9 +113,9 @@
     font-size: 1.9rem;
     text-decoration: line-through;
     color: rgb(107 114 128 / var(--tw-text-opacity));
-    text-decoration-line: line-through;
     font-weight: bold;
     margin-right: 10px;
+
     @media (max-width: 768px) {
       font-size: 1em;
     }
@@ -116,40 +126,49 @@
     font-weight: bolder;
     color: rgb(239 68 68);
     margin-bottom: 0.5em;
+
     @media (max-width: 768px) {
       font-size: 1em;
     }
   }
+
+  @media (min-width: 500px) {
+    &__wrapper {
+      width: 70%;
+    }
+  }
+
+  @media (min-width: 796px) {
+    background-attachment: fixed;
+  }
 }
 
-.slick-slide > div {
-  margin: 0 10px;
+.slick-slide {
+  > div {
+    margin: 0 10px;
+  }
 }
 
 .slick-list {
   margin: 0 -10px;
 }
 
-.slick-dots li button:before {
-  font-size: 12px;
-  background-color: #fff;
-  border-radius: 50%;
-}
-
-.slick-dots li.slick-active button:before {
-  background-color: rgb(255, 255, 255);
-}
-
-@media (min-width: 500px) {
-  .testimonials {
-    &__wrapper {
-      width: 70%;
+.slick-dots {
+  li {
+    button {
+      &:before {
+        font-size: 12px;
+        background-color: $realwhite;
+        border-radius: 50%;
+      }
     }
-  }
-}
 
-@media (min-width: 796px) {
-  .testimonials {
-    background-attachment: fixed;
+    &.slick-active {
+      button {
+        &:before {
+          background-color: rgb(255, 255, 255);
+        }
+      }
+    }
   }
 }

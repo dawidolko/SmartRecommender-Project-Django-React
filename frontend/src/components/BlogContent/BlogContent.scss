@@ -32,7 +32,7 @@
     overflow: hidden;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
-    background-color: #fff;
+    background-color: $realwhite;
   }
 
   &__overflow {
@@ -111,7 +111,7 @@
     border: 1px solid $main;
     &:hover {
       border: 1px solid $main;
-      color: #007bff;
+      color: $main;
       background-color: rgba(255, 255, 255, 0) !important;
     }
   }
@@ -133,6 +133,7 @@
     &__box {
       &:hover .blog__img {
         transform: scale(1.02);
+        transition: transform 0.5s ease;
       }
     }
 

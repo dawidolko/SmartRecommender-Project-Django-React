@@ -1,5 +1,3 @@
-# home/probabilistic_views.py
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,13 +15,11 @@ from home.serializers import ProductSerializer
 
 
 class UserPurchasePredictionView(APIView):
-    """Przewidywanie następnego zakupu użytkownika"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
         
-        # Pobierz top 10 produktów z największym prawdopodobieństwem zakupu
         predicted_products = PurchaseProbability.objects.filter(
             user=user
         ).select_related('product').order_by('-probability')[:10]
@@ -42,30 +38,26 @@ class UserPurchasePredictionView(APIView):
 
 
 class PersonalizedRecommendationsView(APIView):
-    """Personalizowane rekomendacje oparte o modele probabilistyczne"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
         
-        # Analizuj wzorce zakupowe użytkownika
         purchase_patterns = UserPurchasePattern.objects.filter(user=user)
         
         recommendations = []
         for pattern in purchase_patterns:
-            # Znajdź produkty w tej kategorii
             category_products = Product.objects.filter(
                 categories=pattern.category
             ).prefetch_related('photoproduct_set')
             
-            # Filtruj produkty, które użytkownik już kupił
             already_purchased = OrderProduct.objects.filter(
                 order__user=user
             ).values_list('product_id', flat=True)
             
             new_products = category_products.exclude(id__in=already_purchased)
             
-            for product in new_products[:3]:  # Pobierz top 3 z każdej kategorii
+            for product in new_products[:3]: 
                 recommendations.append({
                     'product': ProductSerializer(product).data,
                     'category': pattern.category.name,
@@ -83,14 +75,12 @@ class PersonalizedRecommendationsView(APIView):
         })
     
     def calculate_next_purchase_time(self, pattern):
-        """Oblicza przewidywany czas następnego zakupu"""
         if pattern.purchase_frequency > 0:
             days_until_next = 30 / pattern.purchase_frequency
             return f"in {int(days_until_next)} days"
         return "unknown"
     
     def get_most_active_category(self, user):
-        """Zwraca najbardziej aktywną kategorię użytkownika"""
         most_active = UserPurchasePattern.objects.filter(
             user=user
         ).order_by('-purchase_frequency').first()
@@ -100,19 +90,16 @@ class PersonalizedRecommendationsView(APIView):
         return "No data"
     
     def get_preferred_time(self, user):
-        """Zwraca preferowaną porę zakupów"""
         times = UserPurchasePattern.objects.filter(
             user=user
         ).values_list('preferred_time_of_day', flat=True)
         
         if times:
-            # Zwróć najczęściej występującą porę
             return max(set(times), key=lambda x: list(times).count(x))
         return "No preference"
 
 
 class SalesForecastView(APIView):
-    """Widok prognoz sprzedaży dla admina"""
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
@@ -202,7 +189,6 @@ class ProductDemandView(APIView):
 
 
 class RiskDashboardView(APIView):
-    """Dashboard oceny ryzyka"""
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
@@ -260,7 +246,6 @@ class RiskDashboardView(APIView):
 
 
 class UserInsightsView(APIView):
-    """Szczegółowe analizy użytkownika dla admina"""
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request, user_id):
@@ -269,7 +254,6 @@ class UserInsightsView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        # Wzorce zakupowe
         purchase_patterns = UserPurchasePattern.objects.filter(user=user)
         
         patterns_data = []
@@ -281,8 +265,7 @@ class UserInsightsView(APIView):
                 'preferred_time': pattern.preferred_time_of_day,
                 'seasonality': pattern.seasonality_factor
             })
-        
-        # Prawdopodobieństwa zakupu
+
         top_probabilities = PurchaseProbability.objects.filter(
             user=user
         ).select_related('product').order_by('-probability')[:10]
@@ -294,8 +277,7 @@ class UserInsightsView(APIView):
                 'probability': float(prob.probability),
                 'confidence': float(prob.confidence_level)
             })
-        
-        # Ocena ryzyka dla użytkownika
+
         user_risks = RiskAssessment.objects.filter(
             entity_type='user',
             entity_id=user_id
@@ -329,7 +311,6 @@ class UserInsightsView(APIView):
         })
     
     def calculate_lifetime_value(self, user):
-        """Oblicza całkowitą wartość klienta"""
         lifetime_value = OrderProduct.objects.filter(
             order__user=user
         ).aggregate(
@@ -338,7 +319,6 @@ class UserInsightsView(APIView):
         return float(lifetime_value)
     
     def get_churn_risk(self, user):
-        """Pobiera ryzyko odpływu klienta"""
         churn_risk = RiskAssessment.objects.filter(
             entity_type='user',
             entity_id=user.id,
@@ -353,12 +333,10 @@ class UserInsightsView(APIView):
         return None
     
     def predict_next_purchase(self, user):
-        """Przewiduje następny zakup"""
         last_order = Order.objects.filter(user=user).order_by('-date_order').first()
         if not last_order:
             return None
         
-        # Analiza średniego czasu między zakupami
         orders = Order.objects.filter(user=user).order_by('date_order')
         if orders.count() < 2:
             return None
@@ -382,13 +360,11 @@ class UserInsightsView(APIView):
 
 
 class ClientProbabilisticInsightsView(APIView):
-    """Widok dla klienta z personalizowanymi insightami"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
         
-        # Najbardziej prawdopodobne produkty
         top_products = PurchaseProbability.objects.filter(
             user=user
         ).select_related('product').order_by('-probability')[:5]
@@ -399,13 +375,10 @@ class ClientProbabilisticInsightsView(APIView):
             product_data['match_score'] = int(float(prob.probability) * 100)
             product_suggestions.append(product_data)
         
-        # Analiza wzorców
         patterns = UserPurchasePattern.objects.filter(user=user)
         
-        # Najlepsza kategoria
         best_category = patterns.order_by('-purchase_frequency').first()
         
-        # Rekomendowane portorę zakupów
         preferred_time = None
         if patterns:
             times = [p.preferred_time_of_day for p in patterns]
@@ -426,8 +399,6 @@ class ClientProbabilisticInsightsView(APIView):
         })
     
     def calculate_savings_potential(self, user):
-        """Oblicza potencjalne oszczędności na podstawie wzorców zakupowych"""
-        # To jest uproszczona wersja - w rzeczywistości użyłbyś bardziej zaawansowanej analizy
         recent_orders = Order.objects.filter(
             user=user,
             date_order__gte=datetime.now() - timedelta(days=30)
@@ -442,7 +413,6 @@ class ClientProbabilisticInsightsView(APIView):
         patterns = UserPurchasePattern.objects.filter(user=user)
         
         if patterns:
-            # Znajdź najczęstszą porę dnia
             times = [p.preferred_time_of_day for p in patterns]
             if times:
                 most_common_time = max(set(times), key=times.count)
@@ -459,7 +429,6 @@ class ClientProbabilisticInsightsView(APIView):
         return "No specific recommendation based on your history"
     
     def get_seasonal_recommendations(self, user):
-        """Daje sezonowe rekomendacje"""
         current_month = datetime.now().month
         
         patterns = UserPurchasePattern.objects.filter(user=user)
@@ -476,3 +445,111 @@ class ClientProbabilisticInsightsView(APIView):
             seasonal_tips.append("No specific seasonal patterns found")
         
         return seasonal_tips
+    
+class AdminPurchasePatternsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        all_patterns = UserPurchasePattern.objects.all().select_related('user', 'category')
+        
+        patterns_by_user = {}
+        for pattern in all_patterns:
+            if pattern.user.id not in patterns_by_user:
+                patterns_by_user[pattern.user.id] = {
+                    'user': {
+                        'id': pattern.user.id,
+                        'email': pattern.user.email
+                    },
+                    'patterns': []
+                }
+            
+            patterns_by_user[pattern.user.id]['patterns'].append({
+                'category': pattern.category.name,
+                'purchase_frequency': float(pattern.purchase_frequency),
+                'average_order_value': float(pattern.average_order_value),
+                'preferred_time': pattern.preferred_time_of_day,
+                'seasonality': pattern.seasonality_factor
+            })
+        
+        return Response({
+            'purchase_patterns': list(patterns_by_user.values()),
+            'summary': {
+                'total_users': len(patterns_by_user),
+                'total_patterns': all_patterns.count()
+            }
+        })
+    
+class AdminProductRecommendationsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        users = User.objects.filter(role='client')
+        
+        recommendations_by_user = []
+        for user in users:
+            top_probabilities = PurchaseProbability.objects.filter(
+                user=user
+            ).select_related('product').order_by('-probability')[:5]
+            
+            user_recommendations = {
+                'user': {
+                    'id': user.id,
+                    'email': user.email
+                },
+                'recommendations': []
+            }
+            
+            for prob in top_probabilities:
+                user_recommendations['recommendations'].append({
+                    'product': prob.product.name,
+                    'product_id': prob.product.id,
+                    'probability': float(prob.probability),
+                    'confidence': float(prob.confidence_level),
+                    'price': float(prob.product.price) if hasattr(prob.product, 'price') else None
+                })
+            
+            recommendations_by_user.append(user_recommendations)
+        
+        return Response({
+            'user_recommendations': recommendations_by_user,
+            'summary': {
+                'total_users': len(recommendations_by_user),
+                'recommendation_threshold': 0.5,
+            }
+        })
+    
+class AdminChurnPredictionView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        churn_risks = RiskAssessment.objects.filter(
+            risk_type='customer_churn',
+            entity_type='user'
+        ).order_by('-risk_score')
+        
+        churn_data = []
+        for risk in churn_risks:
+            try:
+                user = User.objects.get(id=risk.entity_id)
+                user_name = f"{user.first_name} {user.last_name}" if user.first_name else user.email
+            except User.DoesNotExist:
+                user_name = f"User #{risk.entity_id}"
+            
+            churn_data.append({
+                'user_id': risk.entity_id,
+                'user_name': user_name,
+                'risk_score': float(risk.risk_score),
+                'confidence': float(risk.confidence),
+                'mitigation': risk.mitigation_suggestion,
+                'assessment_date': risk.assessment_date
+            })
+        
+        return Response({
+            'churn_predictions': churn_data,
+            'summary': {
+                'total_users_analyzed': len(churn_data),
+                'high_risk_users': len([data for data in churn_data if data['risk_score'] > 0.7]),
+                'medium_risk_users': len([data for data in churn_data if 0.4 <= data['risk_score'] <= 0.7]),
+                'low_risk_users': len([data for data in churn_data if data['risk_score'] < 0.4])
+            }
+        })

@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .search-modal-overlay {
   position: fixed;
   top: 0;
@@ -33,7 +35,6 @@
   position: relative;
   animation: slideIn 0.3s ease-out;
 
-  /* Custom scrollbar */
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -72,10 +73,22 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #000000;
+  color: $darkblack;
   background-color: red;
   border: 1px solid red;
   transition: color 0.3s ease;
+
+  svg {
+    color: black;
+
+    &:hover {
+      color: red;
+    }
+
+    &:active {
+      color: red;
+    }
+  }
 
   &:hover {
     color: #ff0000;
@@ -108,7 +121,7 @@
   transition: background-color 0.3s ease;
 
   &:hover {
-    background: #ffffff00;
+    background: $darkblack;
     border: 1px solid #007bff;
     color: #007bff;
   }
@@ -195,7 +208,7 @@
   transition: background-color 0.3s ease;
 
   &:hover {
-    background: #ffffff00;
+    background: $darkblack;
     border: 1px solid #007bff;
     color: #007bff;
   }
@@ -227,7 +240,6 @@
   max-height: 400px;
   overflow-y: auto;
 
-  /* Custom scrollbar for results list */
   &::-webkit-scrollbar {
     width: 8px;
   }

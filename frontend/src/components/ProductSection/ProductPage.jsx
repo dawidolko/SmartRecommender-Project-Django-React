@@ -34,18 +34,31 @@ const ProductPage = () => {
   const [similarProducts, setSimilarProducts] = useState([]);
   const [similarProductsLoading, setSimilarProductsLoading] = useState(true);
 
+  const sendInteraction = async (type) => {
+    try {
+      const token = localStorage.getItem("access");
+      await axios.post(
+        `${config.apiUrl}/api/interaction/`,
+        { product_id: id, interaction_type: type },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error) {
+      console.error("Error sending interaction:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(`${config.apiUrl}/api/product/${id}/`);
         setProduct(response.data);
         setFavorite(isFavorite(response.data.id));
+        sendInteraction("view");
       } catch (error) {
         console.error(error);
         toast.error("Error loading product details.", {
           position: "top-center",
         });
-
         if (
           error.message.includes("401") ||
           error.message.includes("unauthorized")
@@ -70,11 +83,8 @@ const ProductPage = () => {
       try {
         const category = product.categories[0];
         const token = localStorage.getItem("access");
-
         const headers = {};
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
+        if (token) headers.Authorization = `Bearer ${token}`;
 
         const response = await axios.get(`${config.apiUrl}/api/products/`, {
           params: { category: category },
@@ -84,7 +94,6 @@ const ProductPage = () => {
         const filteredProducts = response.data.filter(
           (p) => p.id !== product.id
         );
-
         const sortedProducts = filteredProducts.sort(() => 0.5 - Math.random());
         setSimilarProducts(sortedProducts.slice(0, 10));
       } catch (error) {
@@ -95,18 +104,11 @@ const ProductPage = () => {
       }
     };
 
-    if (product && product.categories) {
-      fetchSimilarProducts();
-    }
+    if (product && product.categories) fetchSimilarProducts();
   }, [product]);
 
-  if (loading) {
-    return <div className="loading-spinner"></div>;
-  }
-
-  if (!product) {
-    return <h2>Product not found.</h2>;
-  }
+  if (loading) return <div className="loading-spinner"></div>;
+  if (!product) return <h2>Product not found.</h2>;
 
   const handleToggleFavorite = () => {
     if (favorite) {
@@ -119,6 +121,7 @@ const ProductPage = () => {
         name: product.name,
         price: product.price,
       });
+      sendInteraction("favorite");
       toast.success("Added to Favorites", { position: "top-center" });
     }
     setFavorite(!favorite);
@@ -126,6 +129,7 @@ const ProductPage = () => {
 
   const handleAddToCart = () => {
     addToCart(product.id);
+    sendInteraction("add_to_cart");
     toast.success("Added to Cart", { position: "top-center" });
   };
 
@@ -141,14 +145,10 @@ const ProductPage = () => {
     );
   };
 
-  const handleImageEnlarge = () => {
-    setIsImageEnlarged(true);
-  };
-
+  const handleImageEnlarge = () => setIsImageEnlarged(true);
   const closeImageOverlay = (e) => {
-    if (e.target.className.includes("productPage__overlay")) {
+    if (e.target.className.includes("productPage__overlay"))
       setIsImageEnlarged(false);
-    }
   };
 
   const quantityInCart = items[product.id] || 0;
@@ -162,39 +162,15 @@ const ProductPage = () => {
     autoplay: true,
     autoplaySpeed: 3000,
     responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
+      { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 1 } },
+      { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 1 } },
+      { breakpoint: 480, settings: { slidesToShow: 1, slidesToScroll: 1 } },
     ],
   };
 
-  const getSimpleCategory = (category) => {
-    return category.split(".")[0];
-  };
-
-  const getCurrentCategory = () => {
-    return product?.categories?.[0]
-      ? getSimpleCategory(product.categories[0])
-      : "";
-  };
+  const getSimpleCategory = (category) => category.split(".")[0];
+  const getCurrentCategory = () =>
+    product?.categories?.[0] ? getSimpleCategory(product.categories[0]) : "";
 
   return (
     <section className="productPage">
@@ -206,7 +182,6 @@ const ProductPage = () => {
             {favorite ? <AiFillHeart /> : <AiOutlineHeart />}
           </button>
         </div>
-
         <div className="productPage__main__section">
           <div className="productPage__main__subsection">
             <div className="productPage__images">
@@ -244,7 +219,6 @@ const ProductPage = () => {
                 ))}
               </div>
             </div>
-
             {isImageEnlarged && (
               <div className="productPage__overlay" onClick={closeImageOverlay}>
                 <button
@@ -259,7 +233,6 @@ const ProductPage = () => {
                 />
               </div>
             )}
-
             <div className="productPage__info__main">
               <p className="productPage__category">
                 Category:{" "}
@@ -284,11 +257,11 @@ const ProductPage = () => {
                 </p>
               </div>
               <div className="productPage__prices">
-                {product.old_price && !isNaN(product.old_price) ? (
+                {product.old_price && !isNaN(product.old_price) && (
                   <span className="productPage__old-price">
                     ${parseFloat(product.old_price).toFixed(2)}
                   </span>
-                ) : null}
+                )}
                 <span className="productPage__current-price">
                   ${parseFloat(product.price).toFixed(2)}
                 </span>
@@ -302,18 +275,12 @@ const ProductPage = () => {
               </div>
             </div>
           </div>
-
           <div className="productPage__description">
             <div className="productPage__desc">
               <h1>Description:</h1>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: product.description,
-                }}
-              />
+              <div dangerouslySetInnerHTML={{ __html: product.description }} />
             </div>
           </div>
-
           <div className="productPage__specs">
             <h1>Specifications:</h1>
             <table>
@@ -327,7 +294,6 @@ const ProductPage = () => {
               </tbody>
             </table>
           </div>
-
           <div className="productPage__reviews">
             <h1>Customer Reviews</h1>
             {product.opinions.length > 0 ? (
@@ -356,7 +322,6 @@ const ProductPage = () => {
             )}
           </div>
         </div>
-
         <div className="productPage__similar-products">
           <h2 className="productPage__similar-products-title">
             Similar Products{" "}
@@ -382,11 +347,11 @@ const ProductPage = () => {
                     </h3>
                     <div className="productPage__similar-product-prices">
                       {similarProduct.old_price &&
-                      !isNaN(similarProduct.old_price) ? (
-                        <span className="productPage__similar-product-old-price">
-                          ${parseFloat(similarProduct.old_price).toFixed(2)}
-                        </span>
-                      ) : null}
+                        !isNaN(similarProduct.old_price) && (
+                          <span className="productPage__similar-product-old-price">
+                            ${parseFloat(similarProduct.old_price).toFixed(2)}
+                          </span>
+                        )}
                       <span className="productPage__similar-product-current-price">
                         ${parseFloat(similarProduct.price).toFixed(2)}
                       </span>

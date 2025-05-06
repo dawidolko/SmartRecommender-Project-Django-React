@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
   BarChart2,
   ShoppingBag,
@@ -215,12 +216,14 @@ const AdminStatistics = () => {
           icon={ShoppingBag}
           value={stats.totalProducts}
           color="#8B5CF6"
+          variant="first"
         />
         <StatCard
           name="Best Selling"
           icon={TrendingUp}
           value={stats.topSelling}
           color="#10B981"
+          variant="third"
         />
         <StatCard
           name="Total Sales"
@@ -230,12 +233,14 @@ const AdminStatistics = () => {
             maximumFractionDigits: 2,
           })}`}
           color="#EF4444"
+          variant="second"
         />
         <StatCard
           name="All Users"
           icon={Users}
           value={stats.totalUsers}
           color="#F59E0B"
+          variant="fourth"
         />
       </div>
 
@@ -245,24 +250,28 @@ const AdminStatistics = () => {
           icon={Star}
           value={stats.totalOpinions}
           color="#6366F1"
+          variant="fifth"
         />
         <StatCard
           name="Average Rating"
           icon={BarChart2}
           value={stats.averageRating.toFixed(1)}
           color="#10B981"
+          variant="sixth"
         />
         <StatCard
           name="Top Category"
           icon={ShoppingCart}
           value={stats.topCategoryName || "—"}
           color="#F59E0B"
+          variant="seventh"
         />
         <StatCard
           name="Top Tag"
           icon={List}
           value={stats.topTagName || "—"}
           color="#EF4444"
+          variant="eighth"
         />
       </div>
 
@@ -414,19 +423,24 @@ const AdminStatistics = () => {
               {recommendationPreview.length > 0 ? (
                 <div className="preview-products">
                   {recommendationPreview.map((product) => (
-                    <div key={product.id} className="preview-product">
-                      {product.photos?.[0]?.path && (
-                        <img
-                          src={`${config.apiUrl}/media/${product.photos[0].path}`}
-                          alt={product.name}
-                          className="preview-product-image"
-                        />
-                      )}
-                      <div className="preview-product-info">
-                        <h4>{product.name}</h4>
-                        <p>${product.price}</p>
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="preview-product-link"
+                      key={product.id}>
+                      <div className="preview-product">
+                        {product.photos?.[0]?.path && (
+                          <img
+                            src={`${config.apiUrl}/media/${product.photos[0].path}`}
+                            alt={product.name}
+                            className="preview-product-image"
+                          />
+                        )}
+                        <div className="preview-product-info">
+                          <h4>{product.name}</h4>
+                          <p>${product.price}</p>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (

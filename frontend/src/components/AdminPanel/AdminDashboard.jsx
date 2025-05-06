@@ -59,7 +59,6 @@ const AdminDashboard = () => {
 
   return (
     <main>
-      {/* STATS */}
       <motion.div
         className="stat_Cards"
         initial={{ opacity: 0, y: 20 }}
@@ -73,28 +72,31 @@ const AdminDashboard = () => {
             maximumFractionDigits: 2,
           })}`}
           color="#6366F1"
+          variant="first"
         />
         <StatCard
           name="New Users"
           icon={Users}
           value={stats.newUsers.toLocaleString()}
           color="#8B5CF6"
+          variant="second"
         />
         <StatCard
           name="Total Products"
           icon={ShoppingBag}
           value={stats.totalProducts.toLocaleString()}
           color="#EC4899"
+          variant="third"
         />
         <StatCard
           name="Conversion Rate"
           icon={BarChart2}
           value={stats.conversionRate}
           color="#10B981"
+          variant="fourth"
         />
       </motion.div>
 
-      {/* CHARTS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <SalesOverviewChart data={dashboardData.trend} />
         <CategoryDistributionChart

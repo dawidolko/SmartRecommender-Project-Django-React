@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .registerPanel {
   display: flex;
   align-items: center;
@@ -8,7 +10,7 @@
 
   &__container {
     display: flex;
-    background: #fff;
+    background: $realwhite;
     border-radius: 4px;
     box-shadow: 0px 2px 6px -1px rgba(0, 0, 0, 0.12);
     max-width: 1000px;
@@ -90,7 +92,7 @@
   }
 
   button:hover {
-    background-color: #ffffff;
+    background-color: $realwhite;
     color: #007bff;
     border: 1px solid #007bff;
   }

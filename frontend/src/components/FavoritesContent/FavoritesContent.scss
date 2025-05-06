@@ -48,6 +48,11 @@
   &__img {
     width: 70px;
     object-fit: cover;
+
+    &:hover {
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
   }
 
   &__product-name {
@@ -71,7 +76,7 @@
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #ffffff00;
+      background-color: $darkblack;
       border: 1px solid #007bff;
       color: #007bff;
     }

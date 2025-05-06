@@ -13,16 +13,7 @@ const AdminHeader = ({ title }) => {
   return (
     <header className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border-b border-gray-700">
       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        {/* Project Title */}
         <h1 className="admin-top-header">{title}</h1>
-        {/* User Data */}
-        {user && (
-          <div className="welcome-text">
-            <span className="text-gray-100 name-span">
-              Witaj, {displayName}
-            </span>
-          </div>
-        )}
       </div>
     </header>
   );
