@@ -47,6 +47,7 @@ REM Installing required packages
 echo Installing dependencies from requirements.txt...
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install colorama
 
 REM Installing psycopg2-binary
 echo Installing psycopg...

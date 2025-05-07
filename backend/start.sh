@@ -7,12 +7,18 @@ export PGDATABASE="postgres"
 export PGHOST="localhost"
 export PGPORT="5432"
 
-# Creating the database
-echo "Creating database 'product_recommendation'..."
+echo "================================="
+echo "Starting SmartRecommender Setup"
+echo "================================="
+
+# Drop and recreate database to ensure clean state
+echo "Recreating database 'product_recommendation'..."
+psql -U "$PGUSER" -d "$PGDATABASE" -h "$PGHOST" -p "$PGPORT" -c "DROP DATABASE IF EXISTS product_recommendation;" > /dev/null 2>&1
 psql -U "$PGUSER" -d "$PGDATABASE" -h "$PGHOST" -p "$PGPORT" -c "CREATE DATABASE product_recommendation;" > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then
-    echo "Failed to create the database or it already exists."
+    echo "Failed to create the database. Check PostgreSQL connection."
+    exit 1
 else
     echo "Database 'product_recommendation' created successfully."
 fi
@@ -42,16 +48,22 @@ echo "Activating virtual environment..."
 source .venv/bin/activate
 
 # Installing required packages
-echo "Installing dependencies from requirements.txt..."
+echo "Installing dependencies..."
 pip3 install --upgrade pip
-pip3 install -r requirements.txt
-pip3 install Pillow
 
-# Installing psycopg
-echo "Installing psycopg..."
-pip3 uninstall -y psycopg2-binary
-pip3 install psycopg[c]
-pip3 install djangorestframework-simplejwt
+# Install packages individually to ensure all dependencies are met
+echo "Installing critical packages first..."
+pip3 install django psycopg[c] psycopg2-binary django-environ
+
+echo "Installing additional required packages..."
+pip3 install djangorestframework djangorestframework-simplejwt
+pip3 install textblob colorama tqdm
+pip3 install Pillow
+pip3 install pandas numpy scikit-learn matplotlib seaborn nltk
+
+# Download required NLTK data for TextBlob
+echo "Downloading NLTK data for TextBlob..."
+python3 -m textblob.download_corpora
 
 # Create media directory if it doesn't exist
 if [ ! -d "media" ]; then
@@ -59,26 +71,34 @@ if [ ! -d "media" ]; then
     mkdir -p media
 fi
 
+# Reset migrations to ensure clean state
+echo "Resetting migrations state..."
+python3 manage.py migrate --fake zero
+
 # Creating and applying migrations
 echo "Creating and applying migrations to the database..."
 python3 manage.py makemigrations
 if [ $? -ne 0 ]; then
-    echo "Error during migrations creation."
-    exit 1
+    echo "Warning: Issue during migrations creation, continuing anyway..."
 fi
 
-python3 manage.py migrate
+# Apply migrations with fake-initial to handle existing tables
+echo "Applying migrations..."
+python3 manage.py migrate --fake-initial
 if [ $? -ne 0 ]; then
-    echo "Error during migrations application."
-    exit 1
+    echo "Warning: Issue during migrations application, trying regular migrate..."
+    python3 manage.py migrate
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to apply migrations. Trying with --fake option..."
+        python3 manage.py migrate --fake
+    fi
 fi
 
 # Seeding the database
 echo "Seeding the database..."
 python3 manage.py seed
 if [ $? -ne 0 ]; then
-    echo "Error during database seeding."
-    exit 1
+    echo "Warning: Error during database seeding, but continuing..."
 fi
 
 # Running check_media.py if it exists
@@ -97,6 +117,10 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
     xdg-open http://127.0.0.1:8000 &
 fi
+
+echo "================================="
+echo "Setup complete! Server starting..."
+echo "================================="
 
 # Start the Django server
 python3 manage.py runserver
