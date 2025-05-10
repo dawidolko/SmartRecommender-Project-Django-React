@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 const VideoItem = ({ title, url, thumbnail }) => {
   return (
     <div className="pricing__box">

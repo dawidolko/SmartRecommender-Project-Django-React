@@ -1,4 +1,4 @@
-import { color, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
 import FormComponent from "./FormComponent";
 import { AiOutlineClose } from "react-icons/ai";

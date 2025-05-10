@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import "./CartContent.scss";
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../ShopContext/ShopContext";

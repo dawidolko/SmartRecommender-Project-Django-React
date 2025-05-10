@@ -18,7 +18,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
   const { favorites } = useFavorites();
-  const { totalCartItems } = useContext(CartContext);
+  useContext(CartContext);
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 

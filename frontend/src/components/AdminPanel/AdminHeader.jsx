@@ -2,13 +2,7 @@ import React, { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 const AdminHeader = ({ title }) => {
-  const { user } = useContext(AuthContext);
-
-  const displayName = user
-    ? user.first_name || user.last_name
-      ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
-      : user.username || user.email
-    : null;
+  useContext(AuthContext);
 
   return (
     <header className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border-b border-gray-700">

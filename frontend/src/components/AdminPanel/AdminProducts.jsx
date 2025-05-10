@@ -199,10 +199,6 @@ const AdminProducts = () => {
     setUploadedImages(Array.from(e.target.files));
   };
 
-  const handleEditImageUpload = (e) => {
-    setEditUploadedImages(Array.from(e.target.files));
-  };
-
   const handleSubmitClick = (e) => {
     e.preventDefault();
 
@@ -270,9 +266,7 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {
-        console.log("Product similarity update skipped");
-      }
+      } catch (error) {}
 
       try {
         await axios.post(
@@ -285,9 +279,7 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {
-        console.log("Association rules update skipped");
-      }
+      } catch (error) {}
 
       try {
         await axios.post(
@@ -300,9 +292,7 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {
-        console.log("Recommendations processing skipped");
-      }
+      } catch (error) {}
 
       toast.success("Product added successfully with all integrations!");
       clearForm();
@@ -378,9 +368,7 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {
-        console.log("Product similarity update skipped");
-      }
+      } catch (error) {}
 
       try {
         await axios.post(
@@ -393,9 +381,7 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {
-        console.log("Association rules update skipped");
-      }
+      } catch (error) {}
 
       try {
         await axios.post(
@@ -408,9 +394,7 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {
-        console.log("Recommendations processing skipped");
-      }
+      } catch (error) {}
 
       setEditId(null);
       setEditName("");

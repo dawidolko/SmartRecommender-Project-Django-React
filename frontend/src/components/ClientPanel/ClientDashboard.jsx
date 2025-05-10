@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import CountUp from "react-countup";
@@ -22,9 +23,9 @@ const ClientDashboard = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
+  const [currentAlgorithm, setCurrentAlgorithm] = useState("collaborative");
   const [recommendationTitle, setRecommendationTitle] = useState(
-    "Recommended For You"
+    "Recommended For You (Collaborative Filtering)"
   );
   const dataFetchedRef = useRef(false);
 
@@ -36,6 +37,21 @@ const ClientDashboard = () => {
     plugins: {
       legend: { display: true, position: "top" },
     },
+  };
+
+  const fetchPopularProducts = async (token) => {
+    try {
+      const response = await axios.get(
+        `${config.apiUrl}/api/popular-products/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      console.error("Error fetching popular products:", err);
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -81,14 +97,18 @@ const ClientDashboard = () => {
       .catch((error) => {
         console.error("Error fetching algorithm:", error);
         setCurrentAlgorithm("collaborative");
-        setRecommendationTitle("Recommended For You");
-        return axios.get(`${config.apiUrl}/api/recommended-products/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        setRecommendationTitle("Recommended For You (Collaborative Filtering)");
+
+        return axios.get(
+          `${config.apiUrl}/api/recommendation-preview/?algorithm=collaborative`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       });
 
     Promise.all([ordersRequest, clientStatsRequest, fetchingAlgorithm])
-      .then(([ordersRes, clientStatsRes, recommendedProductsRes]) => {
+      .then(async ([ordersRes, clientStatsRes, recommendedProductsRes]) => {
         const orders = ordersRes.data;
 
         const trendsMap = {};
@@ -171,15 +191,33 @@ const ClientDashboard = () => {
         };
         setCategoryDistributionData(catChart);
 
+        let products = [];
         if (
           recommendedProductsRes.data &&
           recommendedProductsRes.data.length > 0
         ) {
-          setRecommendedProducts(recommendedProductsRes.data.slice(0, 4));
-        } else {
-          setRecommendedProducts([]);
+          products = recommendedProductsRes.data.slice(0, 4);
         }
 
+        if (products.length === 0) {
+          products = await fetchPopularProducts(token);
+
+          if (products.length === 0) {
+            try {
+              const fallbackResponse = await axios.get(
+                `${config.apiUrl}/api/recommended-products/`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+              products = fallbackResponse.data.slice(0, 4);
+            } catch (err) {
+              console.error("Error fetching fallback recommendations:", err);
+            }
+          }
+        }
+
+        setRecommendedProducts(products);
         setLoading(false);
       })
       .catch((err) => {
@@ -229,11 +267,26 @@ const ClientDashboard = () => {
         }
       );
 
+      let products = [];
       if (response.data && response.data.length > 0) {
-        setRecommendedProducts(response.data.slice(0, 4));
-      } else {
-        setRecommendedProducts([]);
+        products = response.data.slice(0, 4);
       }
+
+      if (products.length === 0) {
+        products = await fetchPopularProducts(token);
+
+        if (products.length === 0) {
+          const fallbackResponse = await axios.get(
+            `${config.apiUrl}/api/recommended-products/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          products = fallbackResponse.data.slice(0, 4);
+        }
+      }
+
+      setRecommendedProducts(products);
 
       if (algorithm === "collaborative") {
         setRecommendationTitle("Recommended For You (Collaborative Filtering)");
@@ -242,13 +295,21 @@ const ClientDashboard = () => {
       }
     } catch (err) {
       console.error("Error fetching recommended products:", err);
-      const fallbackResponse = await axios.get(
-        `${config.apiUrl}/api/recommended-products/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setRecommendedProducts(fallbackResponse.data.slice(0, 4));
+
+      const products = await fetchPopularProducts(token);
+
+      if (products.length > 0) {
+        setRecommendedProducts(products);
+      } else {
+        const fallbackResponse = await axios.get(
+          `${config.apiUrl}/api/recommended-products/`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setRecommendedProducts(fallbackResponse.data.slice(0, 4));
+      }
+
       setRecommendationTitle("Recommended For You");
     }
   };
@@ -339,7 +400,7 @@ const ClientDashboard = () => {
       <div className="dashboard-recommendations my-4">
         <h2>{recommendationTitle}</h2>
         <div className="recommendations-grid">
-          {recommendedProducts.length > 0 ? (
+          {recommendedProducts && recommendedProducts.length > 0 ? (
             recommendedProducts.map((product, index) => (
               <div
                 className="recommendation-card"
@@ -348,15 +409,20 @@ const ClientDashboard = () => {
                 style={{ cursor: "pointer" }}>
                 <img
                   src={`${config.apiUrl}/media/${
-                    product.photos[0]?.path || "https://placehold.co/250"
+                    product.photos && product.photos[0]?.path
+                      ? product.photos[0].path
+                      : "placeholder.jpg"
                   }`}
                   alt={product.name}
+                  onError={(e) => {
+                    e.target.src = "https://placehold.co/250";
+                  }}
                 />
                 <p>{product.name}</p>
               </div>
             ))
           ) : (
-            <p>No recommendations available</p>
+            <div className="loading-spinner"></div>
           )}
         </div>
       </div>

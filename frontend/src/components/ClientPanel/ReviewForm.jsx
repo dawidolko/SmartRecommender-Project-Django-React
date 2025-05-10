@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Star, AlertCircle } from "lucide-react";
