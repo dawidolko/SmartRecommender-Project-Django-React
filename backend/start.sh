@@ -50,6 +50,7 @@ source .venv/bin/activate
 # Installing required packages
 echo "Installing dependencies..."
 pip3 install --upgrade pip
+pip3 install django-cors-headers
 
 # Install packages individually to ensure all dependencies are met
 echo "Installing critical packages first..."
@@ -60,6 +61,7 @@ pip3 install djangorestframework djangorestframework-simplejwt
 pip3 install textblob colorama tqdm
 pip3 install Pillow
 pip3 install pandas numpy scikit-learn matplotlib seaborn nltk
+python3 -m nltk.downloader brown punkt wordnet averaged_perceptron_tagger conll2000 movie_reviews
 
 # Download required NLTK data for TextBlob
 echo "Downloading NLTK data for TextBlob..."
