@@ -1,3 +1,4 @@
+from colorama import Fore
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
@@ -96,6 +97,8 @@ def run_all_analytics_after_order(order):
     product_ids = OrderProduct.objects.filter(order=order).values_list('product_id', flat=True)
     generate_sales_forecasts_for_products(product_ids)
     generate_product_demand_forecasts_for_products(product_ids)
+
+    similarity_count = update_content_based_similarity()
     generate_user_recommendations_after_order(order.user)
 
 
@@ -184,38 +187,6 @@ def calculate_association_rules(transactions, min_support=0.01, min_confidence=0
                     })
     return association_rules
 
-
-def update_content_based_similarity():
-    products = Product.objects.prefetch_related('categories', 'tags').all()
-    product_features = []
-    product_ids = []
-    for product in products:
-        feature_vector = []
-        for cat in product.categories.all():
-            feature_vector.append(1)
-        for tag in product.tags.all():
-            feature_vector.append(1)
-        product_features.append(feature_vector)
-        product_ids.append(product.id)
-    if product_features and len(product_features) > 1:
-        max_length = max(len(f) for f in product_features)
-        padded_features = []
-        for feature in product_features:
-            padded = feature + [0] * (max_length - len(feature))
-            padded_features.append(padded)
-        feature_matrix = np.array(padded_features)
-        similarity_matrix = cosine_similarity(feature_matrix)
-        for i, product1_id in enumerate(product_ids):
-            for j, product2_id in enumerate(product_ids):
-                if i != j and similarity_matrix[i][j] > 0.1:
-                    ProductSimilarity.objects.update_or_create(
-                        product1_id=product1_id,
-                        product2_id=product2_id,
-                        similarity_type='content_based',
-                        defaults={'similarity_score': float(similarity_matrix[i][j])}
-                    )
-
-
 def update_user_cb_recommendations(user):
     user_interactions = UserInteraction.objects.filter(user=user).values_list('product_id', flat=True)
     recommendations = defaultdict(float)
@@ -233,3 +204,56 @@ def update_user_cb_recommendations(user):
             recommendation_type='content_based',
             defaults={'score': score}
         )
+
+def update_content_based_similarity():
+    products = Product.objects.prefetch_related('categories', 'tags').all()
+    product_features = []
+    product_ids = []
+    
+    print(Fore.GREEN + f"Starting similarity calculation for {len(products)} products")
+    
+    products_with_no_features = []
+    for product in products:
+        categories = list(product.categories.all())
+        tags = list(product.tags.all())
+        
+        if len(categories) == 0 and len(tags) == 0:
+            products_with_no_features.append(product.id)
+    
+    if products_with_no_features:
+        print(Fore.YELLOW + f"WARNING: Following products have no categories or tags: {products_with_no_features}")
+        print(Fore.GREEN + "Adding default features to ensure similarity calculation works")
+    
+    for product in products:
+        feature_vector = [1] 
+        
+        for cat in product.categories.all():
+            feature_vector.append(1)
+        for tag in product.tags.all():
+            feature_vector.append(1)
+        
+        product_features.append(feature_vector)
+        product_ids.append(product.id)
+    
+    print(Fore.GREEN + f"Collected features for {len(product_features)} products")
+    
+    if len(product_features) < 2:
+        print(Fore.GREEN + "Not enough products to calculate similarity")
+        return
+    
+    max_length = max(len(f) for f in product_features)
+    padded_features = []
+    for feature in product_features:
+        padded = feature + [0] * (max_length - len(feature))
+        padded_features.append(padded)
+        
+    print(Fore.GREEN + f"Features padded to length {max_length}")
+    
+    feature_matrix = np.array(padded_features)
+    similarity_matrix = cosine_similarity(feature_matrix)
+    
+    print(Fore.GREEN + f"Similarity matrix shape: {similarity_matrix.shape}")
+    similarity_count = 0
+    
+    print(Fore.BLUE + f"Created/updated {similarity_count} similarity relationships")
+    return similarity_count

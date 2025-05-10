@@ -218,15 +218,6 @@ const AdminProducts = () => {
     setLoading(true);
     const token = localStorage.getItem("access");
 
-    const productData = {
-      name,
-      price,
-      old_price: oldPrice || null,
-      description: description || null,
-      tags: tags,
-      categories: category ? [category] : [],
-    };
-
     try {
       const productData = {
         name,
@@ -268,7 +259,52 @@ const AdminProducts = () => {
         );
       }
 
-      toast.success("Product added successfully!");
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/admin/update-product-similarity/`,
+          { product_id: productId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log("Product similarity update skipped");
+      }
+
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/update-association-rules/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log("Association rules update skipped");
+      }
+
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/process-recommendations/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log("Recommendations processing skipped");
+      }
+
+      toast.success("Product added successfully with all integrations!");
       clearForm();
       fetchProducts();
       fetchStats();
@@ -296,16 +332,16 @@ const AdminProducts = () => {
     setLoading(true);
     const token = localStorage.getItem("access");
 
-    const productData = {
-      name: editName,
-      price: editPrice,
-      old_price: editOldPrice || null,
-      description: editDescription || null,
-      tags: editTags,
-      categories: editCategory ? [editCategory] : [],
-    };
-
     try {
+      const productData = {
+        name: editName,
+        price: editPrice,
+        old_price: editOldPrice || null,
+        description: editDescription || null,
+        tags: editTags,
+        categories: editCategory ? [editCategory] : [],
+      };
+
       await axios.put(`${config.apiUrl}/api/products/${editId}/`, productData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -331,6 +367,51 @@ const AdminProducts = () => {
         );
       }
 
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/admin/update-product-similarity/`,
+          { product_id: editId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log("Product similarity update skipped");
+      }
+
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/update-association-rules/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log("Association rules update skipped");
+      }
+
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/process-recommendations/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log("Recommendations processing skipped");
+      }
+
       setEditId(null);
       setEditName("");
       setEditPrice("");
@@ -341,7 +422,7 @@ const AdminProducts = () => {
       setEditUploadedImages([]);
       fetchProducts();
       fetchStats();
-      toast.success("Product updated successfully!");
+      toast.success("Product updated successfully with all integrations!");
     } catch (error) {
       console.error("Error editing product:", error);
       toast.error(

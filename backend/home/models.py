@@ -13,7 +13,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     class Meta:
-        db_table = 'user'
+        db_table = 'db_user'
         verbose_name = "User"
         verbose_name_plural = "Users"
 
@@ -25,7 +25,6 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.user} - {self.product} ({self.quantity})"
 
-# Product category
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
@@ -35,12 +34,11 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'category'
+        db_table = 'db_category'
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         ordering = ['name']
 
-# Promotions
 class Sale(models.Model):
     discount_amount = models.DecimalField(max_digits=5, decimal_places=2)
     start_date = models.DateField()
@@ -50,12 +48,11 @@ class Sale(models.Model):
         return f"Sale {self.discount_amount}%"
 
     class Meta:
-        db_table = 'sale'
+        db_table = 'db_sale'
         verbose_name = "Sale"
         verbose_name_plural = "Sales"
         ordering = ['start_date']
 
-# Tags
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -63,11 +60,10 @@ class Tag(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'tag'
+        db_table = 'db_tag'
         verbose_name = "Tag"
         verbose_name_plural = "Tags"
 
-# Products
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
@@ -82,12 +78,11 @@ class Product(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'product'
+        db_table = 'db_product'
         verbose_name = "Product"
         verbose_name_plural = "Products"
         ordering = ['name']
 
-# Relationship between products and categories
 class ProductCategory(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -97,11 +92,10 @@ class ProductCategory(models.Model):
 
     class Meta:
         unique_together = (('product', 'category'),)
-        db_table = 'product_category'
+        db_table = 'db_product_category'
         verbose_name = "Product Category"
         verbose_name_plural = "Product Categories"
 
-# Product photos
 class PhotoProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     path = models.CharField(max_length=255)
@@ -110,11 +104,10 @@ class PhotoProduct(models.Model):
         return f"Photo for {self.product.name}"
 
     class Meta:
-        db_table = 'photo_product'
+        db_table = 'db_photo_product'
         verbose_name = "Photo"
         verbose_name_plural = "Photos"
 
-# Product reviews
 class Opinion(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -125,14 +118,14 @@ class Opinion(models.Model):
         return f"Opinion by {self.user.username} on {self.product.name}"
 
     class Meta:
-        db_table = 'opinion'
+        db_table = 'db_opinion'
         verbose_name = "Opinion"
         verbose_name_plural = "Opinions"
         constraints = [
-            models.CheckConstraint(check=models.Q(rating__gte=1, rating__lte=5), name="rating_range")
+            models.CheckConstraint(check=models.Q(rating__gte=1, rating__lte=5), name="rating_range"),
+            models.UniqueConstraint(fields=['user', 'product'], name="unique_user_product_opinion")
         ]
 
-# Orders
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_order = models.DateTimeField(auto_now_add=True)
@@ -142,12 +135,11 @@ class Order(models.Model):
         return f"Order {self.id} by {self.user.username}"
 
     class Meta:
-        db_table = 'order'
+        db_table = 'db_order'
         verbose_name = "Order"
         verbose_name_plural = "Orders"
         ordering = ['-date_order']
 
-# Relationship between orders and products
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -157,11 +149,10 @@ class OrderProduct(models.Model):
         return f"Order {self.order.id} -> {self.product.name}"
 
     class Meta:
-        db_table = 'order_product'
+        db_table = 'db_order_product'
         verbose_name = "Order Product"
         verbose_name_plural = "Order Products"
 
-# Complaints regarding orders
 class Complaint(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     cause = models.CharField(max_length=100)
@@ -172,12 +163,11 @@ class Complaint(models.Model):
         return f"Complaint for Order {self.order.id}"
 
     class Meta:
-        db_table = 'complaint'
+        db_table = 'db_complaint'
         verbose_name = "Complaint"
         verbose_name_plural = "Complaints"
         ordering = ['-submission_date']
 
-# Product technical specifications
 class Specification(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     parameter_name = models.CharField(max_length=50)
@@ -187,11 +177,9 @@ class Specification(models.Model):
         return f"{self.parameter_name} for {self.product.name}"
 
     class Meta:
-        db_table = 'specification'
+        db_table = 'db_specification'
         verbose_name = "Specification"
         verbose_name_plural = "Specifications"
-
-# Search bar functionality
 
 class SentimentAnalysis(models.Model):
     SENTIMENT_CHOICES = [
@@ -207,7 +195,7 @@ class SentimentAnalysis(models.Model):
     analyzed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'sentiment_analysis'
+        db_table = 'method_sentiment_analysis'
         verbose_name = "Sentiment Analysis"
         verbose_name_plural = "Sentiment Analyses"
         indexes = [
@@ -226,11 +214,10 @@ class ProductSentimentSummary(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'product_sentiment_summary'
+        db_table = 'method_product_sentiment_summary'
         verbose_name = "Product Sentiment Summary"
         verbose_name_plural = "Product Sentiment Summaries"
 
-# Recommendation system models
 class UserInteraction(models.Model):
     INTERACTION_TYPES = [
         ('view', 'View'),
@@ -246,7 +233,7 @@ class UserInteraction(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        db_table = 'user_interactions'
+        db_table = 'method_user_interactions'
         indexes = [
             models.Index(fields=['user', 'product']),
             models.Index(fields=['interaction_type']),
@@ -266,7 +253,7 @@ class ProductSimilarity(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'product_similarity'
+        db_table = 'method_product_similarity'
         unique_together = ('product1', 'product2', 'similarity_type')
 
 
@@ -278,7 +265,7 @@ class UserProductRecommendation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        db_table = 'user_product_recommendation'
+        db_table = 'method_user_product_recommendation'
         unique_together = ('user', 'product', 'recommendation_type')
         ordering = ['-score']
 
@@ -294,7 +281,7 @@ class RecommendationSettings(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'recommendation_settings'
+        db_table = 'method_recommendation_settings'
         unique_together = ('user', 'active_algorithm')
 
 class ProductAssociation(models.Model):
@@ -307,6 +294,7 @@ class ProductAssociation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
+        db_table = 'method_productassociation'
         unique_together = ('product_1', 'product_2')
 
 class PurchaseProbability(models.Model):
@@ -317,7 +305,7 @@ class PurchaseProbability(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'purchase_probability'
+        db_table = 'method_purchase_probability'
         unique_together = ['user', 'product']
         
     def __str__(self):
@@ -334,7 +322,7 @@ class SalesForecast(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        db_table = 'sales_forecast'
+        db_table = 'method_sales_forecast'
         unique_together = ['product', 'forecast_date']
         ordering = ['-forecast_date']
         
@@ -357,7 +345,7 @@ class UserPurchasePattern(models.Model):
     last_computed = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'user_purchase_pattern'
+        db_table = 'method_user_purchase_pattern'
         unique_together = ['user', 'category']
         
     def __str__(self):
@@ -379,7 +367,7 @@ class ProductDemandForecast(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        db_table = 'product_demand_forecast'
+        db_table = 'method_product_demand_forecast'
         unique_together = ['product', 'forecast_period', 'period_start']
         ordering = ['-period_start']
         
@@ -407,7 +395,7 @@ class RiskAssessment(models.Model):
     assessment_date = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'risk_assessment'
+        db_table = 'method_risk_assessment'
         indexes = [
             models.Index(fields=['entity_type', 'entity_id']),
             models.Index(fields=['risk_type']),

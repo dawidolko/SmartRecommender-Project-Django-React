@@ -1,160 +1,96 @@
-# Product Recommendation Platform
+# .docs: Product Recommendation Platform Documentation
 
-## Project Overview
+## Directory Structure
 
-This project, developed by Dawid Olko and Piotr Smoła under the supervision of Dr. Grochowalski, aims to create a product recommendation platform based on user data analysis using machine learning and uncertainty modeling. Below is a detailed description of the key aspects and stages of the project.
+```
+.docs/
+├── .methods/
+│   ├── collaborative_filtering.md
+│   ├── content_based_filtering.md
+│   ├── association_rules.md
+│   ├── fuzzy_search.md
+│   ├── sentiment_analysis.md
+└── └── probabilistic_methods.md
 
----
+```
 
-## I. Recommendation Algorithms Based on User History
+## Documentation Contents
 
-### 1. Collaborative Filtering
+### .methods/database_schema.md
 
-- **Methodology:**
-  - **User-Based Collaborative Filtering:**
-    - Establishing similarities between users based on product ratings or purchase history.
-    - Using similarity measures such as Pearson correlation or cosine similarity to calculate user similarities.
-  - **Item-Based Collaborative Filtering:**
-    - Analyzing similarities between products based on the purchase history of different users.
-    - Recommending products with similar purchasing patterns to other users.
-- **Implementation in the Project:**
-  - Collecting user purchase data.
-  - Calculating similarities using measures such as cosine similarity or Pearson correlation.
-  - Generating recommendations based on historical purchase similarities.
+Comprehensive documentation of the 24-table database schema, organized into:
 
-### 2. Content-Based Filtering
+- Core Entities (`db_user`, `db_product`, `db_category`, `db_tag`)
+- E-Commerce Functionality (`db_order`, `db_order_product`, etc.)
+- Product Details (`db_photo_product`, `db_specification`, `db_opinion`)
+- Recommendation Systems (`method_user_interactions`, `method_product_similarity`, etc.)
+- Sentiment Analysis (`method_sentiment_analysis`, `method_product_sentiment_summary`)
+- Probabilistic Models (`method_purchase_probability`, `method_sales_forecast`, etc.)
 
-- **Methodology:**
-  - Recommending products similar to those already rated by the user, based on their attributes (e.g., categories, tags, descriptions).
-  - Analyzing product attributes using algorithms such as TF-IDF to process product descriptions.
-- **Implementation in the Project:**
-  - Profiling users based on their purchase history.
-  - Profiling products (e.g., "category," "description").
-  - Calculating similarities between products and users based on textual attributes.
+### .database/entity-relationship-diagram/erd.png
 
----
+Detailed explanation of database relationships:
 
-## II. Uncertainty Modeling in Data Using Machine Learning
+- User relationships (Orders, Opinions, etc.)
+- Product relationships (Categories, Tags, Photos, etc.)
+- Recommendation relationships (Similarities, Associations)
+- Specialized relationships for ML functionality
 
-### 1. Probabilistic Models (e.g., Naive Bayes Classifier)
+### .methods/collaborative_filtering.md
 
-- **Methodology:**
-  - Using Naive Bayes Classifier to predict the probability of users being interested in products based on past actions and ratings.
-- **Implementation in the Project:**
-  - Feature extraction: Collecting data on user preferences and product attributes.
-  - Training the model: Training the Naive Bayes classifier in Python using scikit-learn.
-  - Prediction: Estimating the probability of user interest in a given product.
+Detailed explanation of Collaborative Filtering implementation:
 
-### 2. Fuzzy Decision Systems
+- Methodology for both user-based and item-based approaches
+- Implementation details using cosine similarity
+- Related models and components
+- Process flows and API integration
 
-- **Methodology:**
-  - Using fuzzy decision rules to handle data imprecision, such as "low price" or "high quality."
-- **Implementation in the Project:**
-  - Defining membership functions for product attributes.
-  - Creating fuzzy rules based on "expert" input and applying inference engines in Python (e.g., using fuzzywuzzy).
+### .methods/content_based_filtering.md
 
----
+Documentation of Content-Based Filtering:
 
-## III. Dynamic Recommendations and Offer Customization
+- Feature extraction from product attributes
+- User profile creation
+- Similarity calculation for recommendations
 
-### 1. Sentiment-Based Recommendations
+### .methods/association_rules.md
 
-- **Methodology:**
-  - Using Natural Language Processing (NLP) and classification algorithms (e.g., SVM or Random Forest) to analyze sentiment in product reviews.
-- **Implementation in the Project:**
-  - Collecting data: Analyzing user reviews and opinions.
-  - Processing natural language (NLP): Analyzing texts using libraries such as scikit-learn or spaCy.
-  - Sentiment classification: Categorizing reviews as positive or negative.
+Comprehensive guide to Association Rules implementation:
 
----
+- Apriori algorithm for frequent itemset mining
+- Support, confidence, and lift metrics
+- ProductAssociation model structure
+- Automatic rule generation via signals
+- Frontend implementation for "Frequently Bought Together"
 
-## Recommended Tools and Technologies
+### .methods/fuzzy_search.md
 
-### Backend:
+Detailed documentation of the Fuzzy Search system:
 
-- Django (backend and API)
-- Python, scikit-learn (machine learning)
-- PostgreSQL (database)
-- fuzzywuzzy, scikit-fuzzy (fuzzy logic)
+- FuzzySearchAPIView implementation
+- Similarity calculation methodology
+- Price range filtering
+- Weighted scoring across product attributes
+- User controls for threshold adjustment
 
-### Frontend:
+### .methods/sentiment_analysis.md
 
-- React (user interface)
-- Redux (state management)
-- Material-UI (UI framework)
-- D3.js, Chart.js (data visualization)
+Explanation of sentiment-based recommendations:
 
-### Data Analysis:
+- Opinion processing using TextBlob
+- Sentiment categorization thresholds
+- Product summary aggregation
+- Integration with search functionality
+- Frontend implementation of sentiment indicators
 
-- NLP: Using spaCy, NLTK for text analysis and sentiment detection.
+### .methods/probabilistic_methods.md
 
----
+Detailed guide to probabilistic analytics:
 
-## Work Distribution
-
-### Stage 1: Project Setup and Structure
-
-- **Person 1:**
-  - Backend: Initializing Django project, connecting to PostgreSQL, configuring Django REST Framework.
-  - Frontend: Preparing a basic API integration template (e.g., setting up endpoints for the frontend to use once the API is functional).
-  - Creating basic models (Users, Products, Transactions) – structure without recommendation logic.
-  - Creating initial, simple backend endpoints (e.g., product list, user registration/login).
-- **Person 2:**
-  - Frontend: Initializing React project, preparing component structure (homepage, product list, product details).
-  - Integration with a mocked backend (using fake API or static data) based on preliminary endpoint documentation from Person 1.
-  - Backend: Assisting in refining the database schema and initial test migrations, consulting models with Person 1.
-
-### Stage 2: Extending Backend and Frontend Integration
-
-- **Person 1:**
-  - Backend: Implementing migrations and seeders, populating with test data.
-  - Adding endpoints for fetching/updating user and product data.
-  - Frontend: Preparing a basic login form and connecting it to the backend authentication mechanism (e.g., JWT tokens).
-- **Person 2:**
-  - Frontend: Integrating the frontend authentication (login, displaying product lists) with real endpoints.
-  - Adding filters, search functionality, basic component tests, and Material-UI styling.
-  - Backend: Verifying and refining endpoints to meet frontend needs.
-
-### Stage 3: Implementing Recommendation Algorithms – Part I (CF and CBF)
-
-- **Person 1:**
-  - Backend (ML): Implementing Collaborative Filtering (CF). Fetching transactional data, calculating similarities, and creating an endpoint for CF recommendations.
-  - Frontend: Adding a placeholder "Recommended" component and basic logic to display recommendations from the CF endpoint.
-- **Person 2:**
-  - Backend (ML): Implementing Content-Based Filtering (CBF). Analyzing product attributes (e.g., TF-IDF), and creating an endpoint for recommendations based on attributes.
-  - Frontend: Integrating the CBF recommendations view with existing components and adding integration tests.
-
-### Stage 4: Implementing Recommendation Algorithms – Part II (Naive Bayes, Fuzzy Logic)
-
-- **Person 1:**
-  - Backend (ML): Implementing Naive Bayes. Training the model in Python and adding an endpoint for probabilistic recommendations.
-  - Frontend: Integrating Naive Bayes results on the frontend (e.g., a section for probabilistic recommendations).
-- **Person 2:**
-  - Backend (ML): Implementing fuzzy logic. Defining fuzzy rules (e.g., low price, high quality) and integrating with the API to return fuzzy-based recommendations.
-  - Frontend: Adding components (e.g., sliders or checkboxes) to allow users to adjust fuzzy rule parameters.
-
-### Stage 5: Sentiment Analysis and Dynamic Recommendations (NLP)
-
-- **Person 1:**
-  - Backend (NLP): Implementing sentiment analysis (spaCy, NLTK), creating an endpoint that includes sentiment-based recommendations.
-  - Frontend: Adding sentiment information to the interface (e.g., percentage of positive reviews).
-- **Person 2:**
-  - Backend (NLP): Configuring NLP pipelines, refining sentiment model parameters (e.g., tokenization, stopword removal).
-  - Frontend: Adding a filter to display products with positive sentiment and performing basic A/B tests.
-
-### Stage 6: Sentiment Analysis and Dynamic Recommendations (NLP)
-
-- **Person 1 and 2 together:**
-
-  - **Frequent Itemset Detection**:  
-    I will use algorithms like **Apriori** or **FP-Growth** to identify groups of products that frequently appear together in user transactions.
-
-  - **Rule Generation**:  
-    Based on the frequent itemsets, rules are generated in the form: "If a user buys product A, then they are likely to buy product B." Metrics such as **support**, **confidence**, and **lift** help evaluate the strength of these rules.
-
-  - **Personalized Recommendations**:  
-    These rules can be applied to a user's shopping history to suggest complementary products, enhancing the overall recommendation quality.
+- Purchase probability prediction
+- Sales forecasting methodology
+- User purchase pattern analysis
+- Risk assessment techniques
+- Admin dashboard integration
 
 ---
-
-This README provides a comprehensive guide to the platform's development, methodology, and technical stack. The work distribution ensures efficient collaboration and modular implementation of key features. Further refinements and iterations will continue as the project progresses.

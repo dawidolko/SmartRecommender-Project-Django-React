@@ -89,8 +89,21 @@ const ReviewForm = ({ product = null, onReviewSubmitted, onClose }) => {
     } catch (err) {
       const apiData = err.response?.data;
       let msg = "Failed to submit your review. Please try again later.";
-      if (apiData?.detail) msg = apiData.detail;
-      else if (apiData) msg = Object.values(apiData).flat().join(" ");
+
+      if (apiData?.detail) {
+        if (
+          apiData.detail === "A review has already been added for this product."
+        ) {
+          toast.error(apiData.detail);
+          setLoading(false);
+          setTimeout(() => onClose?.(), 1000);
+          return;
+        }
+        msg = apiData.detail;
+      } else if (apiData) {
+        msg = Object.values(apiData).flat().join(" ");
+      }
+
       setError(msg);
       setLoading(false);
       toast.error(msg);

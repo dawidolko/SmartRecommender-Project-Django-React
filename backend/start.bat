@@ -12,6 +12,11 @@ REM Creating the database
 echo Creating database 'product_recommendation'...
 psql -U %PGUSER% -d %PGDATABASE% -h %PGHOST% -p %PGPORT% -c "CREATE DATABASE product_recommendation;" >nul 2>&1
 
+REM Drop and recreate database to ensure clean state
+echo Recreating database 'product_recommendation'...
+psql -U %$PGUSER% -d %$PGDATABASE% -h %$PGHOST% -p %$PGPORT% -c "DROP DATABASE IF EXISTS product_recommendation;" >nul 2>&1
+psql -U %$PGUSER% -d %$PGDATABASE% -h %$PGHOST% -p %$PGPORT% -c "CREATE DATABASE product_recommendation;" >nul 2>&1
+
 if %errorlevel% neq 0 (
     echo Failed to create the database or it already exists.
 ) else (
@@ -55,8 +60,9 @@ pip uninstall -y psycopg2-binary
 pip install psycopg[c]
 pip install djangorestframework-simplejwt
 pip install Pillow
-pip install textblob
 python -m textblob.download_corpora
+pip3 install textblob colorama tqdm
+pip3 install pandas numpy scikit-learn matplotlib seaborn nltk
 
 REM Create media directory if it doesn't exist
 if not exist "media" (

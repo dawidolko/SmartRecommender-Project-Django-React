@@ -68,7 +68,6 @@ const AdminProbabilistic = () => {
   const [modalTitle, setModalTitle] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Pagination for high risk alerts
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
@@ -471,7 +470,6 @@ const AdminProbabilistic = () => {
     }
   };
 
-  // Pagination logic for high risk alerts
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentAlerts = riskData.high_risk_alerts?.slice(

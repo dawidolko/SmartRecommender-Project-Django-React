@@ -89,11 +89,9 @@ const ClientProbabilistic = () => {
 
       const insightsData = await insightsRes.json();
 
-      // Modyfikacja danych rekomendacji z dopasowaniem zdjęć na wzór ProductSliderItem
       const enhancedRecommendations = (
         insightsData.personalized_suggestions || []
       ).map((product) => {
-        // Używamy takiej samej logiki jak w działającym przykładzie
         const imageUrl =
           product.photos && product.photos[0] && product.photos[0].path
             ? `${config.apiUrl}/media/${product.photos[0].path}`
@@ -101,7 +99,6 @@ const ClientProbabilistic = () => {
 
         return {
           ...product,
-          // Jeśli produkt nie ma image_url, próbujemy użyć photos, a w ostateczności używamy null
           image_url: product.image_url || imageUrl || null,
         };
       });

@@ -15,7 +15,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "./AdminPanel.scss";
 
-// Komponent ikony hamburger menu (trzy poziome linie)
 const HamburgerMenuIcon = () => (
   <svg
     stroke="currentColor"

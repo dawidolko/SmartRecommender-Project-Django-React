@@ -12,6 +12,7 @@ const TotalAmount = () => {
     useContext(CartContext);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const formattedTotalAmount =
     typeof totalAmount() === "number" ? totalAmount().toFixed(2) : "0.00";
@@ -51,6 +52,8 @@ const TotalAmount = () => {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       await axios.post(
         `${config.apiUrl}/api/orders/`,
@@ -76,6 +79,8 @@ const TotalAmount = () => {
         progress: undefined,
         theme: "colored",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,21 +95,40 @@ const TotalAmount = () => {
   };
 
   return (
-    <div className="cart__info">
-      <ToastContainer />
-      <h3 className="cart__info-title">Cart Total</h3>
-      <p className="cart__total-amount">Total Price: ${formattedTotalAmount}</p>
-      <p className="cart__total-amount">Total Items: {totalCartItems()}</p>
-      <div className="cart__buttons">
-        <button className="cart__btn" onClick={() => navigate("/shop")}>
-          Continue Shopping
-        </button>
-        <button className="cart__btn" onClick={handleCheckout}>
-          Checkout
-        </button>
+    <>
+      <div className="cart__info">
+        <ToastContainer />
+        <h3 className="cart__info-title">Cart Total</h3>
+        <p className="cart__total-amount">
+          Total Price: ${formattedTotalAmount}
+        </p>
+        <p className="cart__total-amount">Total Items: {totalCartItems()}</p>
+        <div className="cart__buttons">
+          <button
+            className="cart__btn"
+            onClick={() => navigate("/shop")}
+            disabled={isLoading}>
+            Continue Shopping
+          </button>
+          <button
+            className="cart__btn"
+            onClick={handleCheckout}
+            disabled={isLoading}>
+            {isLoading ? "Processing..." : "Checkout"}
+          </button>
+        </div>
+        <CartModal isOpen={isModalOpen} closeModal={closeModal} />
       </div>
-      <CartModal isOpen={isModalOpen} closeModal={closeModal} />
-    </div>
+
+      {isLoading && (
+        <div className="cart__loading-overlay">
+          <div className="cart__loading-spinner">
+            <div className="cart__spinner"></div>
+            <p>Processing your order...</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

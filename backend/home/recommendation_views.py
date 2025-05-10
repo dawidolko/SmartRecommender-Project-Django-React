@@ -8,7 +8,10 @@ from .serializers import ProductSerializer
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import defaultdict
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .signals import update_content_based_similarity
 
 class RecommendationSettingsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -208,3 +211,25 @@ class CreateUserInteractionAPI(APIView):
             interaction_type=interaction_type
         )
         return Response({"success": True})
+
+class UpdateProductSimilarityView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    
+    def post(self, request):
+        try:
+            product_count = Product.objects.count()
+            update_content_based_similarity()
+            similarity_count = ProductSimilarity.objects.count()
+            
+            return Response({
+                'status': 'success',
+                'message': f'Similarity updated for {product_count} products',
+                'similarity_records_created': similarity_count
+            })
+        except Exception as e:
+            import traceback
+            return Response({
+                'status': 'error',
+                'message': str(e),
+                'traceback': traceback.format_exc()
+            }, status=500)

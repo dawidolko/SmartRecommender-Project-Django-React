@@ -9,7 +9,7 @@
     color: #333;
   }
 
-  .review-form-error {
+  &-form-error {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -128,5 +128,19 @@
 
   p {
     color: #333;
+  }
+}
+
+.review {
+  &-btn2 {
+    background-color: #007bff !important;
+    border: 1px solid #007bff !important;
+    color: white !important;
+
+    &:hover {
+      background-color: #ffffff00 !important;
+      border: 1px solid #007bff !important;
+      color: #007bff !important;
+    }
   }
 }

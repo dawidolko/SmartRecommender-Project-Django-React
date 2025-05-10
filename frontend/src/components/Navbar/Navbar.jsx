@@ -79,9 +79,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("loggedUser");
-    setUser(null);
-    setShowUserDropdown(false);
-    navigate("/login", { replace: true });
+    window.location.href = "/login";
   };
 
   const panelPrefix = user && user.role === "admin" ? "/admin" : "/client";

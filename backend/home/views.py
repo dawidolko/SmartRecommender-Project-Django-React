@@ -174,9 +174,9 @@ class ProductImageUploadView(APIView):
                     success = True
                 except IntegrityError:
                     with connection.cursor() as cursor:
-                        cursor.execute("SELECT MAX(id) FROM photo_product")
+                        cursor.execute("SELECT MAX(id) FROM db_photo_product")
                         max_id = cursor.fetchone()[0] or 0
-                        cursor.execute(f"ALTER SEQUENCE photo_product_id_seq RESTART WITH {max_id + 1}")
+                        cursor.execute(f"ALTER SEQUENCE db_photo_product_id_seq RESTART WITH {max_id + 1}")
                     attempt += 1
             
             if not success:
@@ -531,7 +531,6 @@ class AdminDashboardStatsView(APIView):
         if tag_summary:
             sorted_tags = sorted(tag_summary.items(), key=lambda x: x[1], reverse=True)
             top_tag_name = sorted_tags[0][0]
-        # -----------------------------------
 
         return Response({
             "totalSales": float(total_sales),
@@ -707,10 +706,10 @@ class ResetPhotoSequenceView(APIView):
     
     def post(self, request):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT MAX(id) FROM photo_product")
+            cursor.execute("SELECT MAX(id) FROM db_photo_product")
             max_id = cursor.fetchone()[0] or 0
             
-            cursor.execute(f"ALTER SEQUENCE photo_product_id_seq RESTART WITH {max_id + 1}")
+            cursor.execute(f"ALTER SEQUENCE db_photo_product_id_seq RESTART WITH {max_id + 1}")
             
             return Response({
                 "message": f"Sequence reset to {max_id + 1}",
@@ -747,6 +746,13 @@ class ProductReviewAPIView(APIView):
                 {"detail": "You can only review products you have purchased."},
                 status=status.HTTP_403_FORBIDDEN,
             )
+            
+        existing_review = Opinion.objects.filter(user=user, product=product).exists()
+        if existing_review:
+            return Response(
+                {"detail": "A review has already been added for this product."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = OpinionSerializer(
             data=request.data,
@@ -758,3 +764,4 @@ class ProductReviewAPIView(APIView):
 
         return Response(OpinionSerializer(opinion).data,
                         status=status.HTTP_201_CREATED)
+    

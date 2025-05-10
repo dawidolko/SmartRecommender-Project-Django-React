@@ -5,10 +5,9 @@ from collections import defaultdict
 from .models import Order, OrderProduct, ProductAssociation, Product
 from .serializers import ProductSerializer
 from django.db.models import Prefetch
+from rest_framework.permissions import IsAuthenticated
 
 class FrequentlyBoughtTogetherAPI(APIView):
-    """API for getting frequently bought together products"""
-    
     def get(self, request):
         cart_product_ids = request.GET.getlist('product_ids[]')
         if not cart_product_ids:
@@ -42,32 +41,66 @@ class FrequentlyBoughtTogetherAPI(APIView):
         return Response(unique_recommendations[:5])
 
 class UpdateAssociationRulesAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
-        orders = Order.objects.prefetch_related(
-            Prefetch('orderproduct_set', queryset=OrderProduct.objects.select_related('product'))
-        ).all()
-        
-        transactions = []
-        for order in orders:
-            product_ids = []
-            for item in order.orderproduct_set.all():
-                product_ids.append(str(item.product_id))
-            if product_ids:
-                transactions.append(product_ids)
-        
-        rules = self.calculate_association_rules(transactions)
-        
-        ProductAssociation.objects.all().delete()
-        for rule in rules:
-            ProductAssociation.objects.create(
-                product_1_id=int(rule['product_1']),
-                product_2_id=int(rule['product_2']),
-                support=rule['support'],
-                confidence=rule['confidence'],
-                lift=rule['lift']
-            )
-        
-        return Response({'status': 'success', 'rules_created': len(rules)})
+        try:
+            ProductAssociation.objects.all().delete()
+            
+            orders = Order.objects.prefetch_related(
+                Prefetch('orderproduct_set', queryset=OrderProduct.objects.select_related('product'))
+            ).all()
+            
+            transactions = []
+            for order in orders:
+                product_ids = [str(item.product_id) for item in order.orderproduct_set.all()]
+                if product_ids:
+                    transactions.append(product_ids)
+            
+            if len(transactions) < 2:
+                return Response({
+                    "message": "Not enough transactions to generate association rules.",
+                    "rules_created": 0
+                })
+            
+            rules = self.calculate_association_rules(transactions)
+            rules_created = 0
+            
+            created_pairs = set()
+            
+            for rule in rules:
+                try:
+                    product_1_id = int(rule['product_1'])
+                    product_2_id = int(rule['product_2'])
+                    
+                    pair_key = (product_1_id, product_2_id)
+                    if pair_key in created_pairs:
+                        continue
+                    
+                    ProductAssociation.objects.create(
+                        product_1_id=product_1_id,
+                        product_2_id=product_2_id,
+                        support=rule['support'],
+                        confidence=rule['confidence'],
+                        lift=rule['lift']
+                    )
+                    
+                    created_pairs.add(pair_key)
+                    rules_created += 1
+                    
+                except Exception as e:
+                    print(f"Error creating rule: {e}")
+                    continue
+            
+            return Response({
+                "message": "Association rules updated successfully",
+                "rules_created": rules_created
+            })
+            
+        except Exception as e:
+            return Response({
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def calculate_association_rules(self, transactions, min_support=0.01, min_confidence=0.1):
         item_counts = defaultdict(int)
@@ -109,8 +142,6 @@ class UpdateAssociationRulesAPI(APIView):
         return association_rules
 
 class AssociationRulesListAPI(APIView):
-    """API to get association rules"""
-    
     def get(self, request):
         rules = ProductAssociation.objects.all().select_related(
             'product_1',

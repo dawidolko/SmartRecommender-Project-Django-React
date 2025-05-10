@@ -220,7 +220,7 @@ class RiskDashboardView(APIView):
                     entity_name = User.objects.get(id=risk.entity_id).email
                 except User.DoesNotExist:
                     entity_name = f"User #{risk.entity_id}"
-            else:  # product
+            else:
                 try:
                     entity_name = Product.objects.get(id=risk.entity_id).name
                 except Product.DoesNotExist:

@@ -43,6 +43,7 @@ from .recommendation_views import (
     ProcessRecommendationsView, 
     RecommendationPreviewView, 
     RecommendationSettingsView,
+    UpdateProductSimilarityView,
 )
 
 from .sentiment_views import (
@@ -122,4 +123,5 @@ urlpatterns = [
     path('api/admin-purchase-patterns/', AdminPurchasePatternsView.as_view(), name='admin-purchase-patterns'),
     path('api/admin-product-recommendations/', AdminProductRecommendationsView.as_view(), name='admin-product-recommendations'),
     path('api/admin-churn-prediction/', AdminChurnPredictionView.as_view(), name='admin-churn-prediction'),
+    path('api/admin/update-product-similarity/', UpdateProductSimilarityView.as_view(), name='update-product-similarity'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,27 +1,33 @@
-from home.models import *
-from django.contrib.auth.hashers import make_password
+import random
+import numpy as np
+import time
+from tqdm import tqdm 
+from colorama import Fore, init  
+from textblob import TextBlob
+from sklearn.metrics.pairwise import cosine_similarity
+from decimal import Decimal
+from datetime import datetime, timedelta, date
+from django.db import connection
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ValidationError
-from django.contrib.auth.password_validation import validate_password
-from datetime import datetime, timedelta
-from tqdm import tqdm 
-from colorama import Fore, Style, init  
-import random
-from home.models import Product, ProductSentimentSummary, SentimentAnalysis
-from textblob import TextBlob
-from django.db import connection
-from django.contrib.auth import get_user_model, authenticate
-from home.models import Product, Tag, PhotoProduct, Category, ProductCategory, Sale, Opinion, Order, Complaint, OrderProduct, Specification
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.db.models import Count, Sum, Avg, F
-from django.db.models.functions import TruncMonth, TruncDay, TruncHour
-from datetime import datetime, timedelta, date
-from decimal import Decimal
-from django.utils import timezone
+from django.db.models.functions import TruncMonth
+from home.models import ProductSimilarity
+from home.signals import calculate_association_rules
+from home.signals import update_content_based_similarity
+from home.models import *
+from home.models import Order, ProductAssociation
+from home.models import Product, ProductSentimentSummary, SentimentAnalysis
+from home.models import Product, Tag, PhotoProduct, Category, ProductCategory, Sale, Opinion, Order, Complaint, OrderProduct, Specification
 from home.models import (
     User, Product, Order, OrderProduct, Category,
     PurchaseProbability, SalesForecast, UserPurchasePattern,
     ProductDemandForecast, RiskAssessment
 )
+
 init(autoreset=True)  
 User = get_user_model()
 
@@ -49,26 +55,23 @@ class Command(BaseCommand):
         generate_user_purchase_patterns()
         generate_product_demand_forecasts()
         generate_risk_assessments()
+        generate_product_similarities()
 
         self.stdout.write(Fore.BLUE + 'Database seeding completed.')
 
 def reset_sequences():
-    """Resetuje sekwencje ID dla wszystkich modeli."""
-    from django.db import connection
-    from colorama import Fore
 
     tables = [
-        'product', 
-        'photo_product',
-        'order',
-        'order_product',
-        'opinion',
-        'complaint',
-        'category',
-        'sale',
-        'tag',
-        'specification',
-        'user'
+        'db_product', 
+        'db_photo_product',
+        'db_order_product',
+        'db_opinion',
+        'db_complaint',
+        'db_category',
+        'db_sale',
+        'db_tag',
+        'db_specification',
+        'db_user'
     ]
     
     for table in tables:
@@ -147,7 +150,7 @@ def seed_categories():
         except Exception as e:
             print(Fore.RED + f"Error seeding Category {category_data['name']} (ID {category_data['id']}): {e}")
 
-    print(Fore.GREEN + "Categories successfully seeded.")
+    print(Fore.BLUE + "Categories successfully seeded.")
 
 def seed_product_categories():
     ProductCategory.objects.all().delete()
@@ -218,7 +221,7 @@ def seed_product_categories():
         except Exception as ex:
             print(Fore.RED + f"Unexpected error: {ex}")
 
-    print(Fore.GREEN + "ProductCategory successfully seeded.")
+    print(Fore.BLUE + "ProductCategory successfully seeded.")
 
 def seed_sales():
     Sale.objects.all().delete()
@@ -288,7 +291,7 @@ def seed_sales():
             except Exception as ex:
                 print(Fore.RED + f"Error adding promotion ID {promotion['id']}: {ex}")
 
-    print(Fore.GREEN + "Sales successfully seeded.")
+    print(Fore.BLUE + "Sales successfully seeded.")
 
 def seed_users():
     User.objects.all().delete()
@@ -325,7 +328,7 @@ def seed_users():
             last_name=user_data["last_name"]
         )
 
-    print("Users successfully seeded.")
+    print(Fore.BLUE + "Users successfully seeded.")
 
 def seed_tags():
     Tag.objects.all().delete()
@@ -346,7 +349,7 @@ def seed_tags():
     for tag_name in tag_names:
         Tag.objects.create(name=tag_name)
 
-    print("✅ Tags successfully seeded.")
+    print(Fore.BLUE + "Tags successfully seeded.")
 
 
 def seed_products():
@@ -8434,7 +8437,7 @@ def seed_products():
         except Exception as e:
             print(Fore.RED + f"Error adding product {product_data['name']}: {e}")
 
-    print(Fore.GREEN + "Products successfully seeded.")
+    print(Fore.BLUE + "Products successfully seeded.")
 
 def seed_product_photos():
     PhotoProduct.objects.all().delete()
@@ -10424,27 +10427,25 @@ def seed_product_photos():
 
     PhotoProduct.objects.bulk_create(photo_instances)
 
-    # Reset sekwencji ID dla PhotoProduct
-    from django.db import connection
     with connection.cursor() as cursor:
-        cursor.execute("SELECT MAX(id) FROM photo_product")
+        cursor.execute("SELECT MAX(id) FROM db_photo_product")
         max_id = cursor.fetchone()[0] or 0
         next_id = max_id + 1
-        cursor.execute(f"ALTER SEQUENCE photo_product_id_seq RESTART WITH {next_id}")
+        cursor.execute(f"ALTER SEQUENCE db_photo_product_id_seq RESTART WITH {next_id}")
         print(Fore.GREEN + f"Reset PhotoProduct ID sequence to {next_id}")
 
-    print(Fore.GREEN + "Product photos successfully seeded.")
+    print(Fore.BLUE + "Product photos successfully seeded.")
 
 def seed_product_tags():
     products = Product.objects.all()
     tags = {tag.name.lower(): tag for tag in Tag.objects.all()}
 
     if not products.exists():
-        print("No products found in database!")
+        print(Fore.RED + "No products found in database!")
         return
 
     if not tags:
-        print("No tags found in database!")
+        print(Fore.RED + "No tags found in database!")
         return
 
     for product in products:
@@ -10452,7 +10453,6 @@ def seed_product_tags():
         product_name_lower = product.name.lower()
         product_description_lower = product.description.lower() if product.description else ""
 
-        # Mapping based on categories
         category_mappings = {
             "gaming": ["Gaming", "High Performance", "RGB"],
             "learning": ["Educational", "Energy Efficient"],
@@ -10493,7 +10493,6 @@ def seed_product_tags():
                 if category_key in category_name_lower:
                     product_tags.update(category_tags)
 
-        # Mapping based on product name
         name_mappings = {
             "powerbank": ["Portable", "Fast Charging"],
             "magsafe": ["MagSafe Compatible", "Wireless"],
@@ -10520,7 +10519,6 @@ def seed_product_tags():
             if keyword in product_name_lower:
                 product_tags.update(tag_list)
 
-        # Mapping based on product description
         description_mappings = {
             "rgb": ["RGB"],
             "magsafe": ["MagSafe Compatible"],
@@ -10543,7 +10541,6 @@ def seed_product_tags():
             if keyword in product_description_lower:
                 product_tags.update(tag_list)
 
-        # Mapping based on price
         if product.price < 100:
             product_tags.add("Budget")
         elif product.price > 1000:
@@ -10552,17 +10549,13 @@ def seed_product_tags():
         if "Budget" in product_tags and "Premium" in product_tags:
             product_tags.discard("Premium")
 
-        print(f"✅ Product: {product.name}, Assigned Tags: {product_tags}")
+        print(f"Product: {product.name}, Assigned Tags: {product_tags}")
 
-        # Assigning tags to the product
         assigned_tags = [tags[tag.lower()] for tag in product_tags if tag.lower() in tags]
         product.tags.set(assigned_tags)
         product.save()
 
-    print("✅ Product tags successfully assigned with better accuracy.")
-
-
-# Seed product specifications
+    print(Fore.BLUE + "Product tags successfully assigned with better accuracy.")
 
 def seed_specifications():
     specifications = [
@@ -16588,11 +16581,12 @@ def seed_specifications():
         except Exception as e:
             print(Fore.RED + f"Error adding specification {spec['parameter_name']} for product ID {spec['product_id']}: {e}")
 
-    print(Fore.GREEN + "Specifications seeded successfully!")
+    print(Fore.BLUE + "Specifications seeded successfully!")
 
 
 def seed_opinions():
     Opinion.objects.all().delete()
+    print(Fore.GREEN + "All existing opinions deleted.")
 
     products = Product.objects.all()
     users = list(User.objects.all())
@@ -16652,25 +16646,39 @@ def seed_opinions():
         ("Not the best, but good enough for the price.", 3),
     ]
 
+    created_pairs = set()
+    opinions_added = 0
+
     for product in tqdm(products, desc="Seeding Opinions", unit="product"):
         num_opinions = random.randint(2, 5)
-
-        for _ in range(num_opinions):
+        opinions_for_product = 0
+        
+        attempts = 0
+        max_attempts = len(users) * 2
+        
+        while opinions_for_product < num_opinions and attempts < max_attempts:
+            attempts += 1
             user = random.choice(users)
-            content, rating = random.choice(opinion_contents_with_ratings)
+            pair_key = (user.id, product.id)
+            
+            if pair_key not in created_pairs:
+                content, rating = random.choice(opinion_contents_with_ratings)
+                
+                try:
+                    Opinion.objects.create(
+                        product=product,
+                        user=user,
+                        content=content,
+                        rating=rating
+                    )
+                    created_pairs.add(pair_key)
+                    opinions_added += 1
+                    opinions_for_product += 1
+                    print(Fore.GREEN + f"Added opinion for Product ID {product.id} by User ID {user.id}")
+                except Exception as e:
+                    print(Fore.RED + f"Error adding opinion for Product ID {product.id}: {e}")
 
-            try:
-                Opinion.objects.create(
-                    product=product,
-                    user=user,
-                    content=content,
-                    rating=rating
-                )
-                print(Fore.GREEN + f"Added opinion for Product ID {product.id} by User ID {user.id}")
-            except Exception as e:
-                print(Fore.RED + f"Error adding opinion for Product ID {product.id}: {e}")
-
-    print(Fore.GREEN + "Opinions successfully seeded.")
+    print(Fore.BLUE + f"Opinions successfully seeded. Total added: {opinions_added}")
 
 
 def seed_orders():
@@ -16712,7 +16720,7 @@ def seed_orders():
             except Exception as e:
                 print(Fore.RED + f"Error creating order for User ID {user.id}: {e}")
 
-    print(Fore.GREEN + "Orders successfully seeded.")
+    print(Fore.BLUE + "Orders successfully seeded.")
 
 
 def seed_complaints():
@@ -16760,11 +16768,9 @@ def seed_complaints():
             except Exception as e:
                 print(Fore.RED + f"Error creating complaint for Order ID {order.id}: {e}")
 
-    print(Fore.GREEN + "Complaints successfully seeded.")
+    print(Fore.BLUE + "Complaints successfully seeded.")
 
 def seed_sentiment_data():
-    """Generuje dane sentymentu dla wszystkich produktów."""
-    from colorama import Fore
     
     ProductSentimentSummary.objects.all().delete()
     SentimentAnalysis.objects.all().delete()
@@ -16837,11 +16843,9 @@ def seed_sentiment_data():
             print(Fore.YELLOW + f"Created default sentiment for: {product.name}")
     
     print(Fore.GREEN + f"Successfully processed {updated_count} products with opinions")
-    print(Fore.GREEN + "Sentiment data successfully seeded.")
+    print(Fore.BLUE + "Sentiment data successfully seeded.")
 
 def generate_initial_association_rules():
-    from home.signals import calculate_association_rules
-    from home.models import Order, ProductAssociation
 
     ProductAssociation.objects.all().delete()
     
@@ -16859,7 +16863,7 @@ def generate_initial_association_rules():
 
     ProductAssociation.objects.all().delete()
     
-    print(Fore.BLUE + "\nGenerating association rules...")
+    print(Fore.GREEN + "\nGenerating association rules...")
     
     for rule in tqdm(rules, desc="Creating association rules", unit="rule"):
         try:
@@ -16873,9 +16877,7 @@ def generate_initial_association_rules():
         except Exception as e:
             print(Fore.RED + f"Error creating association rule: {e}")
     
-    print(Fore.GREEN + f"Created {len(rules)} association rules.")
-
-from django.utils import timezone
+    print(Fore.BLUE + f"Created {len(rules)} association rules.")
 
 def generate_purchase_probabilities():
     users = User.objects.filter(role='client')
@@ -16910,7 +16912,7 @@ def generate_purchase_probabilities():
                 }
             )
     
-    print(f"Generated purchase probabilities for {users.count()} users and {products.count()} products")
+    print(Fore.BLUE + f"Generated purchase probabilities for {users.count()} users and {products.count()} products")
 
 def generate_sales_forecasts():
     products = Product.objects.all()
@@ -16952,7 +16954,7 @@ def generate_sales_forecasts():
                 }
             )
     
-    print(f"Generated sales forecasts for {products.count()} products")
+    print(Fore.BLUE + f"Generated sales forecasts for {products.count()} products")
 
 def generate_user_purchase_patterns():
     users = User.objects.filter(role='client')
@@ -17000,7 +17002,7 @@ def generate_user_purchase_patterns():
                 }
             )
     
-    print(f"Generated user purchase patterns for {users.count()} users")
+    print(Fore.BLUE +  f"Generated user purchase patterns for {users.count()} users")
 
 def generate_product_demand_forecasts():
     products = Product.objects.all()
@@ -17050,7 +17052,7 @@ def generate_product_demand_forecasts():
                 }
             )
     
-    print(f"Generated product demand forecasts for {products.count()} products")
+    print(Fore.BLUE +  f"Generated product demand forecasts for {products.count()} products")
 
 def generate_risk_assessments():
     users = User.objects.filter(role='client')
@@ -17104,7 +17106,7 @@ def generate_risk_assessments():
             mitigation_suggestion=mitigation_suggestion
         )
     
-    print(f"Generated risk assessments for {users.count()} users and {products.count()} products")
+    print(Fore.BLUE + f"Generated risk assessments for {users.count()} users and {products.count()} products")
 
 def get_seasonal_factor(month):
     seasons = {
@@ -17160,3 +17162,131 @@ def analyze_seasonality(user, category_id):
             seasonality[str(month)] = 0
     
     return seasonality
+
+def generate_product_similarities():
+    print(Fore.GREEN + "Generating product similarities...")
+    
+    ProductSimilarity.objects.all().delete()
+    
+    products_without_categories = Product.objects.filter(categories__isnull=True)
+    products_without_tags = Product.objects.filter(tags__isnull=True)
+    
+    if products_without_categories.exists():
+        print(Fore.YELLOW + f"Warning: {products_without_categories.count()} products do not have categories. Adding default categories...")
+        default_category, _ = Category.objects.get_or_create(name="General")
+        for product in products_without_categories:
+            product.categories.add(default_category)
+    
+    if products_without_tags.exists():
+        print(Fore.YELLOW + f"Warning: {products_without_tags.count()} products do not have tags. Adding default tags...")
+        default_tag, _ = Tag.objects.get_or_create(name="Featured")
+        for product in products_without_tags:
+            product.tags.add(default_tag)
+    
+    print(Fore.GREEN + "Calculating content-based similarities between products...")
+    
+    def seed_update_content_based_similarity():
+        start_time = time.time()
+        
+        SIMILARITY_THRESHOLD = 0.2
+        BATCH_SIZE = 1000 
+        
+        products = Product.objects.prefetch_related('categories', 'tags').all()
+        product_count = products.count()
+        print(Fore.GREEN + f"Starting similarity calculation for {product_count} products")
+        
+        print(Fore.GREEN + "Collecting product features...")
+        product_features = []
+        product_ids = []
+        
+        for i, product in enumerate(products):
+            feature_vector = []
+            categories = list(product.categories.all())
+            tags = list(product.tags.all())
+            
+            for cat in categories:
+                feature_vector.append(1)
+            for tag in tags:
+                feature_vector.append(1)
+            
+            if not feature_vector:
+                feature_vector.append(1)
+            
+            product_features.append(feature_vector)
+            product_ids.append(product.id)
+            
+            if (i+1) % 50 == 0 or i+1 == product_count:
+                print(Fore.GREEN + f"Collected features for {i+1}/{product_count} products ({((i+1)/product_count*100):.1f}%)")
+        
+        if len(product_features) < 2:
+            print(Fore.RED + "Not enough products to calculate similarity")
+            return 0
+        
+        print(Fore.GREEN + "Padding feature vectors...")
+        max_length = max(len(f) for f in product_features)
+        padded_features = []
+        for i, feature in enumerate(product_features):
+            padded = feature + [0] * (max_length - len(feature))
+            padded_features.append(padded)
+        
+        print(Fore.GREEN + f"Features padded to length {max_length}")
+        
+        print(Fore.GREEN + "Calculating similarity matrix...")
+        
+        feature_matrix = np.array(padded_features)
+        similarity_matrix = cosine_similarity(feature_matrix)
+        print(Fore.GREEN + f"Generated similarity matrix of shape {similarity_matrix.shape}")
+        
+        print(Fore.GREEN + "Saving similarities to database...")
+        
+        batch = []
+        similarity_count = 0
+        total_pairs = product_count * (product_count - 1) 
+        progress_interval = max(1, total_pairs // 100) 
+        current_pair = 0
+        
+        for i, product1_id in enumerate(product_ids):
+            for j, product2_id in enumerate(product_ids):
+                if i != j:
+                    current_pair += 1
+                    if similarity_matrix[i][j] > SIMILARITY_THRESHOLD:
+                        batch.append(
+                            ProductSimilarity(
+                                product1_id=product1_id,
+                                product2_id=product2_id,
+                                similarity_type='content_based',
+                                similarity_score=float(similarity_matrix[i][j])
+                            )
+                        )
+                        similarity_count += 1
+                    
+                    if current_pair % progress_interval == 0 or current_pair == total_pairs:
+                        percent_done = (current_pair / total_pairs) * 100
+                        elapsed_time = time.time() - start_time
+                        if percent_done > 0:
+                            estimated_total_time = elapsed_time / (percent_done / 100)
+                            remaining_time = estimated_total_time - elapsed_time
+                            time_info = f" - {elapsed_time:.1f}s elapsed, ~{remaining_time:.1f}s remaining"
+                        else:
+                            time_info = ""
+                            
+                        print(Fore.BLUE + f"Progress: {current_pair}/{total_pairs} pairs ({percent_done:.2f}%){time_info}")
+                    
+                    if len(batch) >= BATCH_SIZE:
+                        ProductSimilarity.objects.bulk_create(batch)
+                        print(Fore.GREEN + f"Created batch of {len(batch)} similarities (Product1: {product1_id}, Product2: {product2_id})")
+                        batch = []
+        
+        if batch:
+            ProductSimilarity.objects.bulk_create(batch)
+            print(Fore.GREEN + f"Created final batch of {len(batch)} similarities")
+        
+        elapsed_time = time.time() - start_time
+        print(Fore.GREEN + f"Generated {similarity_count} out of {total_pairs} possible similarity pairs in {elapsed_time:.2f} seconds")
+        print(Fore.GREEN + f"Similarity retention rate: {(similarity_count/total_pairs*100):.2f}% (threshold: {SIMILARITY_THRESHOLD})")
+        
+        return similarity_count
+    
+    similarity_count = seed_update_content_based_similarity()
+    
+    print(Fore.BLUE + f"Generated {similarity_count} product similarities")

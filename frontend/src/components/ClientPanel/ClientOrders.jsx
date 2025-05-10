@@ -127,7 +127,6 @@ const ClientOrders = () => {
   };
 
   const handleAddReview = (product) => {
-    // Make sure we're setting a valid product object with an ID
     if (product && product.id) {
       setSelectedProduct(product);
       setIsReviewModalOpen(true);
@@ -137,7 +136,6 @@ const ClientOrders = () => {
   };
 
   const handleReviewSubmitted = (reviewData) => {
-    console.log("Review submitted successfully:", reviewData);
     setIsReviewModalOpen(false);
   };
 
@@ -237,13 +235,11 @@ const ClientOrders = () => {
               {selectedOrder.order_products.map((op) => {
                 const product = op.product;
 
-                // Check if photos exists and has items before accessing [0]
                 const imgSrc =
                   product.photos && product.photos.length > 0
                     ? `${config.apiUrl}/media/${product.photos[0].path}`
                     : `${config.apiUrl}/media/placeholder-product.png`;
 
-                // Ensure price is a valid number greater than 0
                 const price =
                   product.price &&
                   !isNaN(parseFloat(product.price)) &&
@@ -259,25 +255,27 @@ const ClientOrders = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         border: "none",
-                        borderBottom: "1px solid #ddd",
                       }}>
                       <img
                         src={imgSrc}
                         alt={product.name}
                         style={{ width: "100px" }}
                         onError={(e) => {
-                          console.log("Image error, using fallback");
-                          e.target.onerror = null; // Prevent infinite loop
+                          e.target.onerror = null;
                           e.target.src = `${config.apiUrl}/media/placeholder-product.png`;
                         }}
                       />
                     </td>
-                    <td style={{ textAlign: "center" }}>{product.name}</td>
+                    <td c style={{ textAlign: "center" }}>
+                      {product.name}
+                    </td>
                     <td style={{ textAlign: "center" }}>{op.quantity}</td>
-                    <td style={{ textAlign: "center" }}>${price.toFixed(2)}</td>
+                    <td style={{ textAlign: "center", width: "85px" }}>
+                      ${price.toFixed(2)}
+                    </td>
                     <td style={{ textAlign: "center" }}>
                       <button
-                        className="btn-primary review-btn"
+                        className="btn-primary review-btn2"
                         onClick={() => handleAddReview(product)}>
                         Add Review
                       </button>

@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Category',
                 'verbose_name_plural': 'Categories',
-                'db_table': 'category',
+                'db_table': 'db_category',
                 'ordering': ['name'],
             },
         ),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Product',
                 'verbose_name_plural': 'Products',
-                'db_table': 'product',
+                'db_table': 'db_product',
                 'ordering': ['name'],
             },
         ),
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Sale',
                 'verbose_name_plural': 'Sales',
-                'db_table': 'sale',
+                'db_table': 'db_sale',
                 'ordering': ['start_date'],
             },
         ),
@@ -82,7 +82,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'User',
                 'verbose_name_plural': 'Users',
-                'db_table': 'user',
+                'db_table': 'db_user',
             },
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Order',
                 'verbose_name_plural': 'Orders',
-                'db_table': 'order',
+                'db_table': 'db_order',
                 'ordering': ['-date_order'],
             },
         ),
@@ -115,7 +115,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Complaint',
                 'verbose_name_plural': 'Complaints',
-                'db_table': 'complaint',
+                'db_table': 'db_complaint',
                 'ordering': ['-submission_date'],
             },
         ),
@@ -129,7 +129,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Photo',
                 'verbose_name_plural': 'Photos',
-                'db_table': 'photo_product',
+                'db_table': 'db_photo_product',
             },
         ),
         migrations.CreateModel(
@@ -143,7 +143,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Order Product',
                 'verbose_name_plural': 'Order Products',
-                'db_table': 'order_product',
+                'db_table': 'db_order_product',
             },
         ),
         migrations.CreateModel(
@@ -156,7 +156,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Product Category',
                 'verbose_name_plural': 'Product Categories',
-                'db_table': 'product_category',
+                'db_table': 'db_product_category',
                 'unique_together': {('product', 'category')},
             },
         ),
@@ -181,7 +181,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Specification',
                 'verbose_name_plural': 'Specifications',
-                'db_table': 'specification',
+                'db_table': 'db_specification',
             },
         ),
         migrations.CreateModel(
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Opinion',
                 'verbose_name_plural': 'Opinions',
-                'db_table': 'opinion',
+                'db_table': 'db_opinion',
                 'constraints': [models.CheckConstraint(condition=models.Q(('rating__gte', 1), ('rating__lte', 5)), name='rating_range')],
             },
         ),
@@ -209,7 +209,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Tag',
                 'verbose_name_plural': 'Tags',
-                'db_table': 'tag',
+                'db_table': 'db_tag',
             },
         ),
         migrations.AlterField(
@@ -244,7 +244,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Sentiment Analysis',
                 'verbose_name_plural': 'Sentiment Analyses',
-                'db_table': 'sentiment_analysis',
+                'db_table': 'method_sentiment_analysis',
                 'indexes': [
                     models.Index(fields=['product'], name='home_senti_product_idx'),
                     models.Index(fields=['sentiment_category'], name='home_senti_category_idx'),
@@ -266,7 +266,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Product Sentiment Summary',
                 'verbose_name_plural': 'Product Sentiment Summaries',
-                'db_table': 'product_sentiment_summary',
+                'db_table': 'method_product_sentiment_summary',
             },
         ),
         migrations.CreateModel(
@@ -279,7 +279,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'db_table': 'user_interactions',
+                'db_table': 'method_user_interactions',
                 'indexes': [
                     models.Index(fields=['user', 'product'], name='home_useri_user_id_product_id_idx'),
                     models.Index(fields=['interaction_type'], name='home_useri_interaction_idx'),
@@ -297,7 +297,7 @@ class Migration(migrations.Migration):
                 ('product2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='similarity_to', to='home.product')),
             ],
             options={
-                'db_table': 'product_similarity',
+                'db_table': 'method_product_similarity',
                 'unique_together': {('product1', 'product2', 'similarity_type')},
             },
         ),
@@ -312,7 +312,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'db_table': 'user_product_recommendation',
+                'db_table': 'method_user_product_recommendation',
                 'ordering': ['-score'],
                 'unique_together': {('user', 'product', 'recommendation_type')},
             },
@@ -326,7 +326,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'db_table': 'recommendation_settings',
+                'db_table': 'method_recommendation_settings',
                 'unique_together': {('user', 'active_algorithm')},
             },
         ),
@@ -357,7 +357,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'db_table': 'purchase_probability',
+                'db_table': 'method_purchase_probability',
                 'unique_together': {('user', 'product')},
             },
         ),
@@ -374,7 +374,7 @@ class Migration(migrations.Migration):
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
             ],
             options={
-                'db_table': 'sales_forecast',
+                'db_table': 'method_sales_forecast',
                 'ordering': ['-forecast_date'],
                 'unique_together': {('product', 'forecast_date')},
             },
@@ -397,7 +397,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'db_table': 'user_purchase_pattern',
+                'db_table': 'method_user_purchase_pattern',
                 'unique_together': {('user', 'category')},
             },
         ),
@@ -419,7 +419,7 @@ class Migration(migrations.Migration):
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.product')),
             ],
             options={
-                'db_table': 'product_demand_forecast',
+                'db_table': 'method_product_demand_forecast',
                 'ordering': ['-period_start'],
                 'unique_together': {('product', 'forecast_period', 'period_start')},
             },
@@ -445,7 +445,7 @@ class Migration(migrations.Migration):
                 ('assessment_date', models.DateTimeField(auto_now=True)),
             ],
             options={
-                'db_table': 'risk_assessment',
+                'db_table': 'method_risk_assessment',
             },
         ),
         migrations.AddIndex(
