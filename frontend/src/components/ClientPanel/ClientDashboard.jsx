@@ -23,7 +23,7 @@ const ClientDashboard = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentAlgorithm, setCurrentAlgorithm] = useState("collaborative");
+  const [, setCurrentAlgorithm] = useState("collaborative");
   const [recommendationTitle, setRecommendationTitle] = useState(
     "Recommended For You (Collaborative Filtering)"
   );
