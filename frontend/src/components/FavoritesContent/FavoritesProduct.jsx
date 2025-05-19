@@ -1,4 +1,3 @@
-import React from "react";
 import config from "../../config/config";
 import { Link } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import axios from "axios";
 import config from "../../config/config";
