@@ -11,7 +11,7 @@ const AboutContent = ({
   showIcons = true,
 }) => {
   return (
-    <section className="about container">
+    <section className="about">
       <div className="about__container container">
         <div className="about__img-container">
           <img className="about__img" src={img} alt={alt} />
@@ -25,16 +25,19 @@ const AboutContent = ({
           {showIcons && (
             <>
               <p className="about__marks">
-                <GiCheckMark className="about__mark" />A wide selection of the
-                latest electronics and accessories
+                <GiCheckMark className="about__mark" />Advanced recommendation algorithms considering individual preferences
               </p>
               <p className="about__marks">
                 <GiCheckMark className="about__mark" />
-                Professional technical support and advice
+                Multidimensional analysis of product technical parameters
               </p>
               <p className="about__marks">
                 <GiCheckMark className="about__mark" />
-                Quality assurance and fast delivery
+                Personalized suggestions based on browsing history and interactions
+              </p>
+              <p className="about__marks">
+                <GiCheckMark className="about__mark" />
+                Continuous system improvement through machine learning
               </p>
             </>
           )}

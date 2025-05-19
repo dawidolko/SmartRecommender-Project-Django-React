@@ -1,10 +1,6 @@
-import React, { useContext } from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { useContext } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
-import ClientDashboard from "./ClientDashboard";
-import OrdersRoutes from "./OrdersRoutes";
-import ClientComplaints from "./ClientComplaints";
-import ClientAccount from "./ClientAccount";
 import "./ClientPanel.scss";
 import { AuthContext } from "../../context/AuthContext";
 

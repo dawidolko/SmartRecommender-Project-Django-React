@@ -18,7 +18,7 @@ const Home = () => {
       <FixedBg
         cName="fixed"
         text="WHATEVER YOUR TECH NEEDS ARE…"
-        title="… We’ve got the Perfect Solution for You!"
+        title="… Our Recommendation System Will Find the Optimal Solution!"
       />
       <NewProducts />
       <Counter />
@@ -26,7 +26,7 @@ const Home = () => {
       <FixedBg
         cName="fixed__secondary"
         text="Welcome to SmartRecommender…"
-        title="… Your Partner in Smart Technology Choices!"
+        title="… Your Guide to the World of Technology!"
       />
       <Pricing />
       <Testimonials />

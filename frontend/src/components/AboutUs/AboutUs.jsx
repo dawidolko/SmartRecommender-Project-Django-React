@@ -8,8 +8,8 @@ const AboutUs = () => {
         img={about}
         alt="An electronics shop showcasing laptops, smartphones, and accessories."
         title="Discover the Future of"
-        span="Technology with SmartRecommender"
-        text="At SmartRecommender, we are committed to providing the latest in computers, electronics, and accessories. Our mission is to deliver exceptional value, combining innovative products with professional support. Whether you're looking for the newest laptop, cutting-edge smartphone, or high-quality peripherals, we have everything you need. Explore our wide selection, experience seamless shopping, and join our community of tech enthusiasts."
+        span="Recommendations with SmartRecommender!"
+        text="At SmartRecommender, we utilize advanced machine learning algorithms to provide intelligent recommendations for computers, electronics, and accessories. Our mission is to deliver exceptional value by combining precise product recommendations with professional technical support. Whether you're looking for a powerful laptop, modern smartphone, or specialized peripherals, our system will help you find the perfect match."
       />
     </>
   );

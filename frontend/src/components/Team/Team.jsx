@@ -18,9 +18,7 @@ const Team = () => {
       ref={ref}>
       <h2 className="team__title">Meet Our Project Team</h2>
       <p className="team__subtitle">
-        Get to know the talented individuals behind SmartRecommender. Our team
-        combines technical expertise and academic guidance to create this
-        innovative product recommendation system.
+        Meet the team behind SmartRecommender. We combine engineering knowledge with an academic approach, <br></br> creating an innovative product recommendation system based on advanced machine learning models and data analysis.
       </p>
       <motion.div
         variants={AnimationVariants.slideIn}

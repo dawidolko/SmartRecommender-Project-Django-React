@@ -136,7 +136,7 @@ const Testimonials = () => {
         ? "Personalized Recommendations (Collaborative Filtering)"
         : "Personalized Recommendations (Content-Based)";
     }
-    return "Explore Our Latest Products";
+    return "Discover Our Products";
   };
 
   const getSubtitle = () => {
@@ -145,7 +145,7 @@ const Testimonials = () => {
         ? "Based on what users like you are buying"
         : "Based on products similar to your preferences";
     }
-    return "Check out a few random picks from our store – swipe to see more!";
+    return "Check out selected proposals from our product database – scroll to see more and test our recommendation system in action!";
   };
 
   if (productsState.isLoading) {

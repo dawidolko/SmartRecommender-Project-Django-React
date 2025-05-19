@@ -17,9 +17,9 @@ const TechOverview = () => {
       <AboutContent
         img={techImage}
         alt="Modern technology setup"
-        title="Technology is the Solution..."
-        span="WHENEVER THE QUESTION IS YOUR TECH NEEDS!"
-        text="With a belief that technology is not just a tool but a way of enhancing everyday life, we have created a platform to meet your needs. Whether you're looking for cutting-edge devices, expert advice, or unparalleled support, our team is here to provide a seamless experience tailored just for you."
+        title="Technology Is the Answer..."
+        span="WHEN THE QUESTION IS YOUR HARDWARE NEEDS!"
+        text="Based on the principle that proper technology selection is key to effective use, we've created a platform utilizing advanced recommendation algorithms. Whether you're looking for efficient work equipment, high-end gaming setups, or business solutions, our system analyzes your preferences to deliver personalized recommendations tailored to your requirements."
         showIcons={false}
       />
     </motion.div>
