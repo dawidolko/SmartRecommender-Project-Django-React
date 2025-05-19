@@ -1,5 +1,4 @@
 @echo off
-SETLOCAL EnableDelayedExpansion
 
 REM Environment variables for PostgreSQL
 set PGPASSWORD=admin
@@ -10,12 +9,8 @@ set PGPORT=5432
 
 REM Creating the database
 echo Creating database 'product_recommendation'...
+psql -U %PGUSER% -d %PGDATABASE% -h %PGHOST% -p %PGPORT% -c "DROP DATABASE IF EXISTS product_recommendation;" >nul 2>&1
 psql -U %PGUSER% -d %PGDATABASE% -h %PGHOST% -p %PGPORT% -c "CREATE DATABASE product_recommendation;" >nul 2>&1
-
-REM Drop and recreate database to ensure clean state
-echo Recreating database 'product_recommendation'...
-psql -U %$PGUSER% -d %$PGDATABASE% -h %$PGHOST% -p %$PGPORT% -c "DROP DATABASE IF EXISTS product_recommendation;" >nul 2>&1
-psql -U %$PGUSER% -d %$PGDATABASE% -h %$PGHOST% -p %$PGPORT% -c "CREATE DATABASE product_recommendation;" >nul 2>&1
 
 if %errorlevel% neq 0 (
     echo Failed to create the database or it already exists.
@@ -46,7 +41,7 @@ if not exist ".venv" (
 
 REM Activating virtual environment
 echo Activating virtual environment...
-call .venv\Scripts\activate.bat
+call .venv\Scripts\activate
 
 REM Installing required packages
 echo Installing dependencies from requirements.txt...
@@ -56,8 +51,7 @@ pip install colorama
 
 REM Installing psycopg2-binary
 echo Installing psycopg...
-pip uninstall -y psycopg2-binary
-pip install psycopg[c]
+pip install psycopg2-binary
 pip install djangorestframework-simplejwt
 pip install Pillow
 python -m textblob.download_corpora
@@ -106,4 +100,3 @@ REM Start Django server
 python manage.py runserver
 
 pause
-ENDLOCAL

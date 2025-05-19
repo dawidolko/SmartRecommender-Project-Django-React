@@ -33,7 +33,7 @@ call npm install react-toastify react-countup jwt-decode axios react-router-dom 
 
 echo.
 echo Starting development server...
-start "" http://localhost:3000
+@REM start "" http://localhost:3000
 npm start
 
 ENDLOCAL
