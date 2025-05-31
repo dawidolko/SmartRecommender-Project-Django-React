@@ -48,6 +48,7 @@
 
       span {
         display: none;
+
         @media (min-width: 768px) {
           display: inline;
         }
@@ -107,7 +108,8 @@
 
       .chart-container {
         margin-bottom: 2rem;
-        height: 400px;
+        height: 600px;
+        width: 100%;
       }
 
       .forecast-table {
@@ -284,6 +286,7 @@
                 font-weight: 500;
 
                 &.score {
+
                   &-8,
                   &-9,
                   &-10 {
@@ -502,6 +505,7 @@
 
 .stat-item {
   color: rgb(0, 0, 0);
+
   span {
     color: rgb(0, 0, 0);
   }

@@ -166,6 +166,7 @@
         background-color: #dc3545;
         border: 1px solid #dc3545;
         color: $realwhite;
+
         &:hover {
           background-color: black;
           border: 1px solid #dc3545;
@@ -214,9 +215,11 @@
       padding: 30px;
       flex: 1;
       max-width: 1200px;
+
       @media (max-width: 600px) {
         padding: 0px;
       }
+
       @media (max-width: 400px) {
         padding-top: 10px;
       }
@@ -235,6 +238,7 @@
     border-bottom: #7d8fad 1px solid;
     box-shadow: 0 8px 8px rgba(118, 118, 118, 0.2);
     letter-spacing: 0.2rem;
+
     @media (max-width: 1000px) {
       text-align: left;
     }
@@ -360,6 +364,7 @@
       transition: background-color 0.3s ease;
       margin-top: 0.5rem;
       font-size: 2rem;
+
       &:hover {
         background-color: black;
         color: #007bff;
@@ -431,6 +436,7 @@
         border-color: #4caf50;
         outline: none;
       }
+
       &.admin-status-pending {
         color: #431407;
         border-color: #f97316;
@@ -569,6 +575,7 @@
   border: 1px solid #007bff;
   color: white;
   padding: 4px 6px;
+
   &:hover {
     background-color: black;
     border: 1px solid #007bff;
@@ -620,6 +627,7 @@
     display: none;
   }
 }
+
 @media (max-width: 500px) {
   .hide-responsive2 {
     display: none;
@@ -1028,6 +1036,7 @@
         td {
           color: black;
         }
+
         td:last-child {
           font-weight: 500;
         }
@@ -1097,6 +1106,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -1110,10 +1120,12 @@
     align-items: center;
     gap: 2rem;
     margin-bottom: 3rem;
+
     @media (max-width: 1400px) {
       flex-direction: column;
       max-width: 500px;
     }
+
     @media (max-width: 500px) {
       flex-direction: column;
       max-width: 300px;
@@ -1202,6 +1214,7 @@
 
   &-item {
     color: white;
+
     span {
       color: white;
     }
@@ -1399,6 +1412,7 @@
       color: white;
       cursor: pointer;
       border-radius: 4px;
+
       &:hover {
         background-color: black;
         border: 1px solid #e74c3c;
@@ -1466,20 +1480,25 @@ select {
 }
 
 .product {
+
   &-table-container,
   &-form {
     @media (max-width: 1400px) {
       max-width: 1000px;
     }
+
     @media (max-width: 1350px) {
       max-width: 800px;
     }
+
     @media (max-width: 1150px) {
       max-width: 600px;
     }
+
     @media (max-width: 950px) {
       max-width: 400px;
     }
+
     @media (max-width: 500px) {
       max-width: 300px;
     }
@@ -1658,6 +1677,7 @@ select {
 
     tbody {
       background-color: rgb(207, 207, 207);
+
       tr {
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         transition: background-color 0.2s ease;
@@ -1751,6 +1771,7 @@ select {
     }
 
     .btn {
+
       &-edit,
       &-delete,
       &-save,
@@ -1830,11 +1851,9 @@ select {
     }
 
     .chart-item {
-      background: linear-gradient(
-        135deg,
-        rgba(37, 47, 64, 0.9),
-        rgba(33, 43, 62, 0.9)
-      );
+      background: linear-gradient(135deg,
+          rgba(37, 47, 64, 0.9),
+          rgba(33, 43, 62, 0.9));
       border-radius: 16px;
       padding: 1.5rem;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -1935,6 +1954,171 @@ select {
 
       .search-container input {
         min-width: 200px;
+      }
+    }
+  }
+}
+
+.algorithm-status {
+  &-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #eaeef1, #dfe1e3);
+    border-radius: 8px;
+  }
+
+  &-card {
+    background: linear-gradient(135deg, #eaeef1, #dfe1e3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  &-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    color: black;
+
+    .algorithm-status-icon {
+      color: #4f46e5;
+    }
+  }
+
+  &-content {
+    .algorithm-status-description {
+      color: black;
+      margin-bottom: 1.5rem;
+    }
+
+    .algorithms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+
+      .algorithm-item {
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+
+        .algorithm-name {
+          color: black;
+          font-size: 1.2rem;
+          margin-bottom: 1rem;
+          font-weight: 600;
+        }
+
+        .algorithm-details {
+          margin-bottom: 1rem;
+
+          p {
+            margin: 0.5rem 0;
+            color: black;
+
+            strong {
+              color: #374151;
+            }
+          }
+        }
+
+        .implementation-badge {
+          display: inline-block;
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          font-size: 0.75rem;
+          font-weight: 500;
+
+          &.custom {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+          }
+
+          &.library {
+            background: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+          }
+        }
+      }
+    }
+
+    .custom-implementations {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 1rem;
+
+      h4 {
+        color: #166534;
+        margin-bottom: 0.5rem;
+      }
+
+      .custom-methods {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+
+        .custom-method-badge {
+          background: #166534;
+          color: white;
+          padding: 0.25rem 0.75rem;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+.custom-implementation-badge {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+.association-rules {
+  &-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    color: black;
+
+    .custom-implementation-badge {
+      margin-left: auto;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .algorithm-status {
+    &-content {
+      .algorithms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .custom-methods {
+        .custom-method-badge {
+          font-size: 0.7rem;
+          padding: 0.2rem 0.5rem;
+        }
       }
     }
   }

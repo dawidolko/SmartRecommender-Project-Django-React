@@ -13,6 +13,8 @@ import {
   List,
   Link2,
   RefreshCw,
+  Code,
+  Info,
 } from "lucide-react";
 import StatCard from "./StatCard";
 import config from "../../config/config";
@@ -40,11 +42,13 @@ const AdminStatistics = () => {
   const [associationRules, setAssociationRules] = useState([]);
   const [associationLoading, setAssociationLoading] = useState(false);
   const [isUpdatingRules, setIsUpdatingRules] = useState(false);
+  const [algorithmStatus, setAlgorithmStatus] = useState(null);
 
   useEffect(() => {
     fetchStats();
     fetchRecommendationSettings();
     fetchAssociationRules();
+    fetchAlgorithmStatus();
   }, []);
 
   useEffect(() => {
@@ -80,6 +84,21 @@ const AdminStatistics = () => {
       console.error("Error fetching statistics:", err);
       toast.error("Failed to fetch statistics. Please try again.");
       setLoading(false);
+    }
+  };
+
+  const fetchAlgorithmStatus = async () => {
+    const token = localStorage.getItem("access");
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/api/recommendation-algorithm-status/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setAlgorithmStatus(res.data);
+    } catch (err) {
+      console.error("Error fetching algorithm status:", err);
     }
   };
 
@@ -124,7 +143,7 @@ const AdminStatistics = () => {
       const res = await axios.get(`${config.apiUrl}/api/association-rules/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAssociationRules(res.data.slice(0, 10));
+      setAssociationRules(res.data.rules ? res.data.rules.slice(0, 10) : []);
     } catch (err) {
       console.error("Error fetching association rules:", err);
       toast.error("Failed to fetch association rules.");
@@ -145,7 +164,7 @@ const AdminStatistics = () => {
         }
       );
       toast.success(
-        `Successfully updated association rules! Created ${res.data.rules_created} rules.`
+        `Successfully updated association rules using custom Apriori algorithm! Created ${res.data.rules_created} rules.`
       );
       fetchAssociationRules();
     } catch (err) {
@@ -295,6 +314,56 @@ const AdminStatistics = () => {
         </div>
       </motion.div>
 
+      {algorithmStatus && (
+        <motion.div
+          className="algorithm-status-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}>
+          <div className="algorithm-status-card">
+            <div className="algorithm-status-header">
+              <h2 className="algorithm-status-title">
+                <Code className="algorithm-status-icon" />
+                Implementation Status
+              </h2>
+            </div>
+            <div className="algorithm-status-content">
+              <p className="algorithm-status-description">
+                Overview of recommendation algorithm implementations:
+              </p>
+              <div className="algorithms-grid">
+                {Object.entries(algorithmStatus.algorithms).map(([key, algo]) => (
+                  <div key={key} className="algorithm-item">
+                    <h4 className="algorithm-name">
+                      {key === 'content_based' ? 'Content-Based Filtering' : 'Collaborative Filtering'}
+                    </h4>
+                    <div className="algorithm-details">
+                      <p><strong>Implementation:</strong> {algo.implementation}</p>
+                      <p><strong>Similarities:</strong> {algo.similarity_count}</p>
+                      <p><strong>Description:</strong> {algo.description}</p>
+                    </div>
+                    <div className={`implementation-badge ${algo.implementation.includes('Custom') ? 'custom' : 'library'
+                      }`}>
+                      {algo.implementation.includes('Custom') ? 'Manual Implementation' : 'Library Implementation'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="custom-implementations">
+                <h4>Custom Manual Implementations:</h4>
+                <div className="custom-methods">
+                  {algorithmStatus.custom_implementations.map((method, index) => (
+                    <span key={index} className="custom-method-badge">
+                      {method.replace('_', ' ').toUpperCase()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       <motion.div
         className="association-rules-section"
         initial={{ opacity: 0, y: 20 }}
@@ -305,6 +374,7 @@ const AdminStatistics = () => {
             <h2 className="association-rules-title">
               <Link2 className="association-rules-icon" />
               Association Rules Management
+              <span className="custom-implementation-badge">Custom Apriori</span>
             </h2>
             <button
               className="update-rules-btn"
@@ -321,7 +391,7 @@ const AdminStatistics = () => {
             <p className="association-rules-description">
               Association rules help identify products frequently bought
               together. These rules power the "Frequently Bought Together"
-              recommendations in the shopping cart.
+              recommendations in the shopping cart. <strong>Using custom manual Apriori algorithm implementation.</strong>
             </p>
 
             {associationLoading ? (
@@ -342,7 +412,7 @@ const AdminStatistics = () => {
                   </thead>
                   <tbody>
                     {associationRules.map((rule, index) => (
-                      <tr key={index}>
+                      <tr key={rule.id || index}>
                         <td>{rule.product_1.name}</td>
                         <td>{rule.product_2.name}</td>
                         <td>{(rule.support * 100).toFixed(1)}%</td>
@@ -356,7 +426,7 @@ const AdminStatistics = () => {
             ) : (
               <div className="association-rules-empty">
                 No association rules found. Click "Update Rules" to generate
-                them.
+                them using custom Apriori algorithm.
               </div>
             )}
           </div>
@@ -383,7 +453,7 @@ const AdminStatistics = () => {
                       onChange={() => handleAlgorithmChange("collaborative")}
                       disabled={isProcessing}
                     />
-                    Collaborative Filtering (CF)
+                    Collaborative Filtering (CF) - Library Implementation
                   </label>
                   <label className="radio-label">
                     <input
@@ -393,7 +463,7 @@ const AdminStatistics = () => {
                       onChange={() => handleAlgorithmChange("content_based")}
                       disabled={isProcessing}
                     />
-                    Content-Based Filtering (CBF)
+                    Content-Based Filtering (CBF) - <strong>Custom Manual Implementation</strong>
                   </label>
                 </div>
               </div>
@@ -416,8 +486,8 @@ const AdminStatistics = () => {
           <div className="recommendation-preview">
             <h3 className="preview-title">
               {currentAlgorithm === "collaborative"
-                ? "Collaborative Filtering Preview"
-                : "Content-Based Filtering Preview"}
+                ? "Collaborative Filtering Preview (Library)"
+                : "Content-Based Filtering Preview (Custom Manual)"}
             </h3>
             <div className="preview-content">
               {recommendationPreview.length > 0 ? (

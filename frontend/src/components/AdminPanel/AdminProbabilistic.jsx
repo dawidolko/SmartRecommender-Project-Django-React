@@ -70,6 +70,7 @@ const AdminProbabilistic = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -113,6 +114,7 @@ const AdminProbabilistic = () => {
       const demand = await demandRes.json();
 
       setSalesForecasts(forecast.forecasts || []);
+      setChartData(forecast.chart_data || []);
       setRiskData(risk || { high_risk_alerts: [], risk_overview: {} });
       setDemandForecasts(demand.demand_forecasts || []);
       setLoading(false);
@@ -123,14 +125,15 @@ const AdminProbabilistic = () => {
   };
 
   const getForecastChartData = () => {
-    if (!salesForecasts.length) {
+    if (!chartData.length) {
       return {
         labels: ["No Data"],
         datasets: [
           {
-            label: "Predicted Quantity",
+            label: "Total Predicted Quantity",
             data: [0],
             borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(75, 192, 192, 0.1)",
             tension: 0.1,
             fill: false,
           },
@@ -138,38 +141,122 @@ const AdminProbabilistic = () => {
       };
     }
 
-    const labels = salesForecasts.map((f) =>
-      new Date(f.forecast_date).toLocaleDateString()
+    const labels = chartData.map((data) => {
+      const date = new Date(data.date);
+      return date.toLocaleDateString("pl-PL", {
+        month: "short",
+        day: "numeric",
+        weekday: "short",
+      });
+    });
+
+    const totalPredicted = chartData.map(
+      (data) => data.total_predicted_quantity
     );
-    const predicted = salesForecasts.map((f) => f.predicted_quantity);
-    const lower = salesForecasts.map((f) => f.confidence_interval[0]);
-    const upper = salesForecasts.map((f) => f.confidence_interval[1]);
+    const totalLower = chartData.map((data) => data.total_confidence_lower);
+    const totalUpper = chartData.map((data) => data.total_confidence_upper);
 
     return {
       labels,
       datasets: [
         {
-          label: "Predicted Quantity",
-          data: predicted,
+          label: "Total Predicted Quantity",
+          data: totalPredicted,
           borderColor: "rgb(75, 192, 192)",
-          tension: 0.1,
-          fill: false,
+          backgroundColor: "rgba(75, 192, 192, 0.1)",
+          tension: 0.3,
+          fill: true,
+          pointRadius: 6,
+          pointHoverRadius: 8,
         },
         {
-          label: "Lower Bound",
-          data: lower,
-          borderColor: "rgba(255, 99, 132, 0.5)",
+          label: "Confidence Lower Bound",
+          data: totalLower,
+          borderColor: "rgba(255, 99, 132, 0.7)",
+          backgroundColor: "rgba(255, 99, 132, 0.1)",
           borderDash: [5, 5],
           fill: false,
+          pointRadius: 3,
+          tension: 0.2,
         },
         {
-          label: "Upper Bound",
-          data: upper,
-          borderColor: "rgba(255, 99, 132, 0.5)",
+          label: "Confidence Upper Bound",
+          data: totalUpper,
+          borderColor: "rgba(255, 99, 132, 0.7)",
+          backgroundColor: "rgba(255, 99, 132, 0.1)",
           borderDash: [5, 5],
           fill: false,
+          pointRadius: 3,
+          tension: 0.2,
         },
       ],
+    };
+  };
+
+  const getForecastChartOptions = () => {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: "Sales Forecast - Aggregated Daily Totals",
+          font: {
+            size: 16,
+            weight: "bold",
+          },
+        },
+        legend: {
+          display: true,
+          position: "top",
+        },
+        tooltip: {
+          callbacks: {
+            title: function (context) {
+              const dataIndex = context[0].dataIndex;
+              const data = chartData[dataIndex];
+              return `${context[0].label} (${data.products_count} products)`;
+            },
+            afterBody: function (context) {
+              const dataIndex = context[0].dataIndex;
+              const data = chartData[dataIndex];
+              return [
+                "",
+                `Products included: ${data.products.join(", ")}${data.products_count > 5 ? "..." : ""
+                }`,
+                `Total products: ${data.products_count}`,
+              ];
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Forecast Date",
+          },
+          grid: {
+            display: true,
+            color: "rgba(0,0,0,0.1)",
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Predicted Quantity (Total)",
+          },
+          beginAtZero: true,
+          grid: {
+            display: true,
+            color: "rgba(0,0,0,0.1)",
+          },
+        },
+      },
     };
   };
 
@@ -215,7 +302,8 @@ const AdminProbabilistic = () => {
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       className={`tab-button ${activeTab === id ? "active" : ""}`}
-      onClick={() => setActiveTab(id)}>
+      onClick={() => setActiveTab(id)}
+    >
       <Icon size={20} />
       <span>{label}</span>
     </button>
@@ -517,7 +605,8 @@ const AdminProbabilistic = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="tab-content">
+        className="tab-content"
+      >
         {activeTab === "forecast" && (
           <div className="forecast-section">
             <div className="forecast-header">
@@ -527,16 +616,47 @@ const AdminProbabilistic = () => {
                   <h3>Total Predicted Units</h3>
                   <p>
                     {salesForecasts.length > 0
-                      ? salesForecasts.reduce(
+                      ? salesForecasts
+                        .reduce(
                           (acc, curr) => acc + curr.predicted_quantity,
                           0
                         )
+                        .toLocaleString()
                       : 0}
                   </p>
+                  <small>All products combined</small>
                 </div>
                 <div className="summary-card">
                   <h3>Forecast Period</h3>
                   <p>30 days</p>
+                  <small>
+                    {chartData.length > 0
+                      ? `${chartData.length} unique dates`
+                      : "No data"}
+                  </small>
+                </div>
+                <div className="summary-card">
+                  <h3>Products Analyzed</h3>
+                  <p>
+                    {salesForecasts.length > 0
+                      ? new Set(salesForecasts.map((f) => f.product.id)).size
+                      : 0}
+                  </p>
+                  <small>Unique products</small>
+                </div>
+                <div className="summary-card">
+                  <h3>Avg Daily Forecast</h3>
+                  <p>
+                    {chartData.length > 0
+                      ? Math.round(
+                        chartData.reduce(
+                          (acc, curr) => acc + curr.total_predicted_quantity,
+                          0
+                        ) / chartData.length
+                      ).toLocaleString()
+                      : 0}
+                  </p>
+                  <small>Units per day</small>
                 </div>
               </div>
             </div>
@@ -544,7 +664,7 @@ const AdminProbabilistic = () => {
             <div className="chart-container">
               <Line
                 data={getForecastChartData()}
-                options={{ responsive: true }}
+                options={getForecastChartOptions()}
               />
             </div>
 
@@ -599,11 +719,11 @@ const AdminProbabilistic = () => {
                 {demandForecasts.some(
                   (d) => d.expected_demand > d.reorder_point
                 ) && (
-                  <div className="alert alert-warning">
-                    <AlertTriangle />
-                    <span>Some products need reordering</span>
-                  </div>
-                )}
+                    <div className="alert alert-warning">
+                      <AlertTriangle />
+                      <span>Some products need reordering</span>
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -687,7 +807,8 @@ const AdminProbabilistic = () => {
                         <span
                           className={`risk-score score-${Math.floor(
                             alert.risk_score * 10
-                          )}`}>
+                          )}`}
+                        >
                           Risk: {(alert.risk_score * 100).toFixed(0)}%
                         </span>
                       </div>
@@ -722,9 +843,9 @@ const AdminProbabilistic = () => {
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className={`pagination-button ${
-                        currentPage === 1 ? "disabled" : ""
-                      }`}>
+                      className={`pagination-button ${currentPage === 1 ? "disabled" : ""
+                        }`}
+                    >
                       <ChevronLeft size={16} />
                       <span>&lt;</span>
                     </button>
@@ -733,9 +854,9 @@ const AdminProbabilistic = () => {
                         <button
                           key={index}
                           onClick={() => paginate(index + 1)}
-                          className={`pagination-number ${
-                            currentPage === index + 1 ? "active" : ""
-                          }`}>
+                          className={`pagination-number ${currentPage === index + 1 ? "active" : ""
+                            }`}
+                        >
                           {index + 1}
                         </button>
                       ))
@@ -746,9 +867,9 @@ const AdminProbabilistic = () => {
                     <button
                       onClick={() => paginate(currentPage + 1)}
                       disabled={currentPage >= totalPages}
-                      className={`pagination-button ${
-                        currentPage >= totalPages ? "disabled" : ""
-                      }`}>
+                      className={`pagination-button ${currentPage >= totalPages ? "disabled" : ""
+                        }`}
+                    >
                       <ChevronRight size={16} />
                       <span>&gt;</span>
                     </button>
@@ -775,7 +896,8 @@ const AdminProbabilistic = () => {
                 <p>Analyzing user purchase behavior across categories</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("purchase_patterns")}>
+                  onClick={() => handleInsightView("purchase_patterns")}
+                >
                   View Details
                 </button>
               </div>
@@ -784,7 +906,8 @@ const AdminProbabilistic = () => {
                 <p>Segment users based on buying behavior</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("customer_segmentation")}>
+                  onClick={() => handleInsightView("customer_segmentation")}
+                >
                   View Details
                 </button>
               </div>
@@ -793,7 +916,8 @@ const AdminProbabilistic = () => {
                 <p>Identify customers at risk of churning</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("churn_prediction")}>
+                  onClick={() => handleInsightView("churn_prediction")}
+                >
                   View Details
                 </button>
               </div>
@@ -802,7 +926,8 @@ const AdminProbabilistic = () => {
                 <p>Personalized product recommendations</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("product_recommendations")}>
+                  onClick={() => handleInsightView("product_recommendations")}
+                >
                   View Details
                 </button>
               </div>
