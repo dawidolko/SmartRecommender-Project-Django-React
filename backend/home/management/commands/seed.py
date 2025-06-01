@@ -16,8 +16,8 @@ from django.contrib.auth.hashers import make_password
 from django.db.models import Count, Sum, Avg, F
 from django.db.models.functions import TruncMonth
 from home.models import ProductSimilarity
-# from home.signals import calculate_association_rules
 from home.association_views import UpdateAssociationRulesAPI
+from home.custom_recommendation_engine import calculate_association_rules, CustomSentimentAnalysis
 from home.signals import update_content_based_similarity
 from home.models import *
 from home.models import Order, ProductAssociation
@@ -16772,9 +16772,14 @@ def seed_complaints():
     print(Fore.BLUE + "Complaints successfully seeded.")
 
 def seed_sentiment_data():
+    """Seed sentiment data using custom sentiment analysis"""
+    print(Fore.GREEN + "\nSeeding sentiment data using custom sentiment analysis...")
     
     ProductSentimentSummary.objects.all().delete()
     SentimentAnalysis.objects.all().delete()
+    
+    # Use custom sentiment analyzer
+    sentiment_analyzer = CustomSentimentAnalysis()
     
     products = Product.objects.prefetch_related('opinion_set').all()
     updated_count = 0
@@ -16790,14 +16795,8 @@ def seed_sentiment_data():
             
             for opinion in opinions:
                 if opinion.content:
-                    blob = TextBlob(opinion.content)
-                    sentiment_score = blob.sentiment.polarity
-                    
-                    sentiment_category = 'neutral'
-                    if sentiment_score > 0.05:
-                        sentiment_category = 'positive'
-                    elif sentiment_score < -0.05:
-                        sentiment_category = 'negative'
+                    # Use custom sentiment analysis
+                    sentiment_score, sentiment_category = sentiment_analyzer.analyze_sentiment(opinion.content)
                     
                     SentimentAnalysis.objects.update_or_create(
                         opinion=opinion,
@@ -16810,9 +16809,9 @@ def seed_sentiment_data():
                     
                     total_sentiment += sentiment_score
                     
-                    if sentiment_score > 0.05:
+                    if sentiment_category == 'positive':
                         positive_count += 1
-                    elif sentiment_score < -0.05:
+                    elif sentiment_category == 'negative':
                         negative_count += 1
                     else:
                         neutral_count += 1
@@ -16843,11 +16842,13 @@ def seed_sentiment_data():
             )
             print(Fore.YELLOW + f"Created default sentiment for: {product.name}")
     
-    print(Fore.GREEN + f"Successfully processed {updated_count} products with opinions")
+    print(Fore.GREEN + f"Successfully processed {updated_count} products with opinions using custom sentiment analysis")
     print(Fore.BLUE + "Sentiment data successfully seeded.")
 
 def generate_initial_association_rules():
-
+    """Generate initial association rules using custom implementation"""
+    print(Fore.GREEN + "\nGenerating association rules using custom Apriori algorithm...")
+    
     ProductAssociation.objects.all().delete()
     
     orders = Order.objects.prefetch_related('orderproduct_set__product').all()
@@ -16857,28 +16858,56 @@ def generate_initial_association_rules():
         product_ids = []
         for item in order.orderproduct_set.all():
             product_ids.append(str(item.product_id))
-        if product_ids:
+        if len(product_ids) >= 2:
             transactions.append(product_ids)
 
-    rules = calculate_association_rules(transactions)
+    print(f"Found {len(transactions)} transactions to process")
+    
+    if len(transactions) < 10:
+        print(Fore.YELLOW + "Warning: Very few transactions found. Association rules may not be meaningful.")
+        print(f"Transaction examples: {transactions[:3]}")
+    
+    if len(transactions) < 2:
+        print("Not enough transactions for association rules")
+        return
+    
+    from home.custom_recommendation_engine import CustomAssociationRules
+    
+    association_engine = CustomAssociationRules(min_support=0.005, min_confidence=0.05)
+    rules = association_engine.generate_association_rules(transactions)
 
-    ProductAssociation.objects.all().delete()
+    print(f"Generated {len(rules)} association rules")
     
-    print(Fore.GREEN + "\nGenerating association rules...")
+    if len(rules) == 0:
+        print(Fore.YELLOW + "No association rules generated. Trying with lower thresholds...")
+        association_engine_relaxed = CustomAssociationRules(min_support=0.001, min_confidence=0.01)
+        rules = association_engine_relaxed.generate_association_rules(transactions)
+        print(f"Generated {len(rules)} association rules with relaxed thresholds")
     
-    for rule in tqdm(rules, desc="Creating association rules", unit="rule"):
+    created_count = 0
+    for rule in rules[:500]:
         try:
             ProductAssociation.objects.get_or_create(
                 product_1_id=int(rule['product_1']),
                 product_2_id=int(rule['product_2']),
-                support=rule['support'],
-                confidence=rule['confidence'],
-                lift=rule['lift']
+                defaults={
+                    'support': rule['support'],
+                    'confidence': rule['confidence'],
+                    'lift': rule['lift']
+                }
             )
+            created_count += 1
         except Exception as e:
             print(Fore.RED + f"Error creating association rule: {e}")
+            continue
     
-    print(Fore.BLUE + f"Created {len(rules)} association rules.")
+    print(Fore.BLUE + f"Created {created_count} association rules using custom Apriori algorithm.")
+    
+    if created_count > 0:
+        sample_rules = ProductAssociation.objects.all()[:3]
+        for rule in sample_rules:
+            print(f"Sample rule: {rule.product_1.name} -> {rule.product_2.name} (confidence: {rule.confidence:.3f}, lift: {rule.lift:.3f})")
+
 
 def generate_purchase_probabilities():
     users = User.objects.filter(role='client')
@@ -17165,9 +17194,10 @@ def analyze_seasonality(user, category_id):
     return seasonality
 
 def generate_product_similarities():
-    print(Fore.GREEN + "Generating product similarities...")
+    """Generate product similarities using custom content-based filtering with performance limits"""
+    print(Fore.GREEN + "Generating product similarities using custom content-based filtering...")
     
-    ProductSimilarity.objects.all().delete()
+    ProductSimilarity.objects.filter(similarity_type='content_based').delete()
     
     products_without_categories = Product.objects.filter(categories__isnull=True)
     products_without_tags = Product.objects.filter(tags__isnull=True)
@@ -17184,110 +17214,14 @@ def generate_product_similarities():
         for product in products_without_tags:
             product.tags.add(default_tag)
     
-    print(Fore.GREEN + "Calculating content-based similarities between products...")
+    from home.custom_recommendation_engine import CustomContentBasedFilter
     
-    def seed_update_content_based_similarity():
-        start_time = time.time()
-        
-        SIMILARITY_THRESHOLD = 0.2
-        BATCH_SIZE = 1000 
-        
-        products = Product.objects.prefetch_related('categories', 'tags').all()
-        product_count = products.count()
-        print(Fore.GREEN + f"Starting similarity calculation for {product_count} products")
-        
-        print(Fore.GREEN + "Collecting product features...")
-        product_features = []
-        product_ids = []
-        
-        for i, product in enumerate(products):
-            feature_vector = []
-            categories = list(product.categories.all())
-            tags = list(product.tags.all())
-            
-            for cat in categories:
-                feature_vector.append(1)
-            for tag in tags:
-                feature_vector.append(1)
-            
-            if not feature_vector:
-                feature_vector.append(1)
-            
-            product_features.append(feature_vector)
-            product_ids.append(product.id)
-            
-            if (i+1) % 50 == 0 or i+1 == product_count:
-                print(Fore.GREEN + f"Collected features for {i+1}/{product_count} products ({((i+1)/product_count*100):.1f}%)")
-        
-        if len(product_features) < 2:
-            print(Fore.RED + "Not enough products to calculate similarity")
-            return 0
-        
-        print(Fore.GREEN + "Padding feature vectors...")
-        max_length = max(len(f) for f in product_features)
-        padded_features = []
-        for i, feature in enumerate(product_features):
-            padded = feature + [0] * (max_length - len(feature))
-            padded_features.append(padded)
-        
-        print(Fore.GREEN + f"Features padded to length {max_length}")
-        
-        print(Fore.GREEN + "Calculating similarity matrix...")
-        
-        feature_matrix = np.array(padded_features)
-        similarity_matrix = cosine_similarity(feature_matrix)
-        print(Fore.GREEN + f"Generated similarity matrix of shape {similarity_matrix.shape}")
-        
-        print(Fore.GREEN + "Saving similarities to database...")
-        
-        batch = []
-        similarity_count = 0
-        total_pairs = product_count * (product_count - 1) 
-        progress_interval = max(1, total_pairs // 100) 
-        current_pair = 0
-        
-        for i, product1_id in enumerate(product_ids):
-            for j, product2_id in enumerate(product_ids):
-                if i != j:
-                    current_pair += 1
-                    if similarity_matrix[i][j] > SIMILARITY_THRESHOLD:
-                        batch.append(
-                            ProductSimilarity(
-                                product1_id=product1_id,
-                                product2_id=product2_id,
-                                similarity_type='content_based',
-                                similarity_score=float(similarity_matrix[i][j])
-                            )
-                        )
-                        similarity_count += 1
-                    
-                    if current_pair % progress_interval == 0 or current_pair == total_pairs:
-                        percent_done = (current_pair / total_pairs) * 100
-                        elapsed_time = time.time() - start_time
-                        if percent_done > 0:
-                            estimated_total_time = elapsed_time / (percent_done / 100)
-                            remaining_time = estimated_total_time - elapsed_time
-                            time_info = f" - {elapsed_time:.1f}s elapsed, ~{remaining_time:.1f}s remaining"
-                        else:
-                            time_info = ""
-                            
-                        print(Fore.BLUE + f"Progress: {current_pair}/{total_pairs} pairs ({percent_done:.2f}%){time_info}")
-                    
-                    if len(batch) >= BATCH_SIZE:
-                        ProductSimilarity.objects.bulk_create(batch)
-                        print(Fore.GREEN + f"Created batch of {len(batch)} similarities (Product1: {product1_id}, Product2: {product2_id})")
-                        batch = []
-        
-        if batch:
-            ProductSimilarity.objects.bulk_create(batch)
-            print(Fore.GREEN + f"Created final batch of {len(batch)} similarities")
-        
-        elapsed_time = time.time() - start_time
-        print(Fore.GREEN + f"Generated {similarity_count} out of {total_pairs} possible similarity pairs in {elapsed_time:.2f} seconds")
-        print(Fore.GREEN + f"Similarity retention rate: {(similarity_count/total_pairs*100):.2f}% (threshold: {SIMILARITY_THRESHOLD})")
-        
-        return similarity_count
+    content_filter = CustomContentBasedFilter()
+    similarity_count = content_filter.generate_similarities_for_all_products()
     
-    similarity_count = seed_update_content_based_similarity()
+    print(Fore.BLUE + f"Generated {similarity_count} product similarities using custom content-based filtering")
+
     
-    print(Fore.BLUE + f"Generated {similarity_count} product similarities")
+    # similarity_count = seed_update_content_based_similarity()
+    
+    # print(Fore.BLUE + f"Generated {similarity_count} product similarities")

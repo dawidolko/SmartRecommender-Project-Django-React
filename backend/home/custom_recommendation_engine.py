@@ -6,7 +6,10 @@ from django.db.models import Count, Sum, Avg
 
 class CustomContentBasedFilter:
     def __init__(self):
-        self.similarity_threshold = 0.1
+        self.similarity_threshold = 0.2
+        self.max_products_for_similarity = 200
+        self.batch_size = 50
+        self.max_comparisons_per_product = 20
 
     def calculate_product_similarity(self, product1, product2):
         features1 = self._extract_features(product1)
@@ -23,15 +26,12 @@ class CustomContentBasedFilter:
     def _extract_features(self, product):
         features = set()
 
-        # Add categories
         for category in product.categories.all():
             features.add(f"category_{category.name.lower()}")
 
-        # Add tags
         for tag in product.tags.all():
             features.add(f"tag_{tag.name.lower()}")
 
-        # Add price range as feature
         if product.price < 100:
             features.add("price_low")
         elif product.price < 500:
@@ -44,33 +44,47 @@ class CustomContentBasedFilter:
     def generate_similarities_for_all_products(self):
         from home.models import Product, ProductSimilarity
 
-        products = list(Product.objects.prefetch_related("categories", "tags").all())
+        products = list(
+            Product.objects.prefetch_related("categories", "tags").all()[:self.max_products_for_similarity]
+        )
         similarities_created = 0
 
         ProductSimilarity.objects.filter(similarity_type="content_based").delete()
 
+        print(f"Processing {len(products)} products for content-based similarity (limited for performance)")
+
         for i, product1 in enumerate(products):
-            for j, product2 in enumerate(products):
-                if i != j:
-                    similarity_score = self.calculate_product_similarity(
-                        product1, product2
+            if i % 10 == 0:
+                print(f"Processed {i}/{len(products)} products")
+                
+            comparison_products = products[i + 1:i + 1 + self.max_comparisons_per_product]
+
+            for product2 in comparison_products:
+                similarity_score = self.calculate_product_similarity(product1, product2)
+
+                if similarity_score > self.similarity_threshold:
+                    ProductSimilarity.objects.create(
+                        product1=product1,
+                        product2=product2,
+                        similarity_type="content_based",
+                        similarity_score=similarity_score,
                     )
+                    ProductSimilarity.objects.create(
+                        product1=product2,
+                        product2=product1,
+                        similarity_type="content_based",
+                        similarity_score=similarity_score,
+                    )
+                    similarities_created += 2
 
-                    if similarity_score > self.similarity_threshold:
-                        ProductSimilarity.objects.create(
-                            product1=product1,
-                            product2=product2,
-                            similarity_type="content_based",
-                            similarity_score=similarity_score,
-                        )
-                        similarities_created += 1
-
+        print(f"Created {similarities_created} content-based similarities")
         return similarities_created
 
 
 class CustomFuzzySearch:
     def __init__(self):
         self.default_threshold = 0.6
+        self.max_distance_calc_length = 100
 
     def calculate_fuzzy_score(self, query, text):
         if not text or not query:
@@ -94,44 +108,49 @@ class CustomFuzzySearch:
         else:
             word_score = 0.0
 
-        # Character-based similarity (Levenshtein-like)
-        char_score = self._calculate_character_similarity(query, text)
+        if (
+            len(query) <= self.max_distance_calc_length
+            and len(text) <= self.max_distance_calc_length
+        ):
+            char_score = self._calculate_character_similarity(query, text)
+        else:
+            char_score = 0.0
 
-        # Combined score
         final_score = max(word_score * 0.7, char_score * 0.3)
-
         return final_score
 
     def _calculate_character_similarity(self, s1, s2):
         if not s1 or not s2:
             return 0.0
 
-        len1, len2 = len(s1), len(s2)
-        matrix = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+        s1 = s1[:self.max_distance_calc_length]
+        s2 = s2[:self.max_distance_calc_length]
 
-        for i in range(len1 + 1):
-            matrix[i][0] = i
-        for j in range(len2 + 1):
-            matrix[0][j] = j
+        len1, len2 = len(s1), len(s2)
+
+        prev_row = list(range(len2 + 1))
+        curr_row = [0] * (len2 + 1)
 
         for i in range(1, len1 + 1):
+            curr_row[0] = i
             for j in range(1, len2 + 1):
                 if s1[i - 1] == s2[j - 1]:
                     cost = 0
                 else:
                     cost = 1
 
-                matrix[i][j] = min(
-                    matrix[i - 1][j] + 1,
-                    matrix[i][j - 1] + 1,
-                    matrix[i - 1][j - 1] + cost,
+                curr_row[j] = min(
+                    prev_row[j] + 1,
+                    curr_row[j - 1] + 1,
+                    prev_row[j - 1] + cost,
                 )
+            prev_row, curr_row = curr_row, prev_row
 
         max_len = max(len1, len2)
         if max_len == 0:
             return 1.0
 
-        distance = matrix[len1][len2]
+        distance = prev_row[len2]
         similarity = 1 - (distance / max_len)
 
         return max(0.0, similarity)
@@ -154,7 +173,7 @@ class CustomFuzzySearch:
 
             spec_scores = [
                 self.calculate_fuzzy_score(query, spec.specification or "")
-                for spec in product.specification_set.all()
+                for spec in product.specification_set.all()[:5]
             ]
             spec_score = max(spec_scores) if spec_scores else 0
 
@@ -185,14 +204,23 @@ class CustomAssociationRules:
     def __init__(self, min_support=0.01, min_confidence=0.1):
         self.min_support = min_support
         self.min_confidence = min_confidence
+        self.max_transactions = 2000
+        self.max_items_per_transaction = 15
 
     def generate_association_rules(self, transactions):
-        if len(transactions) < 2:
+        filtered_transactions = []
+        for transaction in transactions[:self.max_transactions]:
+            limited_transaction = transaction[:self.max_items_per_transaction]
+            if len(limited_transaction) >= 2:
+                filtered_transactions.append(limited_transaction)
+
+        if len(filtered_transactions) < 2:
             return []
 
-        frequent_itemsets = self._find_frequent_itemsets(transactions)
+        print(f"Processing {len(filtered_transactions)} transactions for association rules")
 
-        rules = self._generate_rules_from_itemsets(frequent_itemsets, transactions)
+        frequent_itemsets = self._find_frequent_itemsets(filtered_transactions)
+        rules = self._generate_rules_from_itemsets(frequent_itemsets, filtered_transactions)
 
         return rules
 
@@ -210,9 +238,13 @@ class CustomAssociationRules:
             if support >= self.min_support:
                 frequent_items[frozenset([item])] = support
 
+        print(f"Found {len(frequent_items)} frequent individual items")
+
         frequent_2_itemsets = self._generate_2_itemsets(
             transactions, frequent_items, total_transactions
         )
+
+        print(f"Found {len(frequent_2_itemsets)} frequent 2-itemsets")
 
         all_frequent = {}
         all_frequent.update(frequent_items)
@@ -220,16 +252,14 @@ class CustomAssociationRules:
 
         return all_frequent
 
-    def _generate_2_itemsets(
-        self, transactions, frequent_1_itemsets, total_transactions
-    ):
+    def _generate_2_itemsets(self, transactions, frequent_1_itemsets, total_transactions):
         frequent_items = [list(itemset)[0] for itemset in frequent_1_itemsets.keys()]
         pair_counts = defaultdict(int)
 
         for transaction in transactions:
             transaction_items = [item for item in transaction if item in frequent_items]
-            for i in range(len(transaction_items)):
-                for j in range(i + 1, len(transaction_items)):
+            for i in range(min(len(transaction_items), 10)):
+                for j in range(i + 1, min(len(transaction_items), 10)):
                     pair = frozenset([transaction_items[i], transaction_items[j]])
                     pair_counts[pair] += 1
 
@@ -293,147 +323,27 @@ class CustomAssociationRules:
 class CustomSentimentAnalysis:
     def __init__(self):
         self.positive_words = {
-            "excellent",
-            "great",
-            "amazing",
-            "wonderful",
-            "fantastic",
-            "awesome",
-            "good",
-            "nice",
-            "perfect",
-            "outstanding",
-            "brilliant",
-            "superb",
-            "magnificent",
-            "marvelous",
-            "terrific",
-            "fabulous",
-            "incredible",
-            "remarkable",
-            "exceptional",
-            "phenomenal",
-            "spectacular",
-            "divine",
-            "love",
-            "like",
-            "enjoy",
-            "recommend",
-            "satisfied",
-            "happy",
-            "pleased",
-            "delighted",
-            "thrilled",
-            "excited",
-            "impressed",
-            "quality",
-            "fast",
-            "quick",
-            "efficient",
-            "reliable",
-            "durable",
-            "comfortable",
-            "beautiful",
-            "stylish",
-            "elegant",
-            "smooth",
-            "easy",
-            "simple",
-            "convenient",
-            "useful",
-            "helpful",
-            "valuable",
-            "worth",
-            "affordable",
-            "cheap",
-            "reasonable",
-            "bargain",
+            "excellent", "great", "amazing", "wonderful", "fantastic", "awesome",
+            "good", "nice", "perfect", "outstanding", "brilliant", "superb",
+            "love", "like", "enjoy", "recommend", "satisfied", "happy",
+            "pleased", "delighted", "quality", "fast", "beautiful", "comfortable"
         }
 
         self.negative_words = {
-            "terrible",
-            "awful",
-            "horrible",
-            "bad",
-            "worst",
-            "disappointing",
-            "poor",
-            "useless",
-            "worthless",
-            "pathetic",
-            "disgusting",
-            "hate",
-            "dislike",
-            "regret",
-            "waste",
-            "money",
-            "expensive",
-            "overpriced",
-            "slow",
-            "delayed",
-            "broken",
-            "defective",
-            "damaged",
-            "faulty",
-            "uncomfortable",
-            "ugly",
-            "cheap",
-            "flimsy",
-            "fragile",
-            "unreliable",
-            "difficult",
-            "hard",
-            "complicated",
-            "confusing",
-            "frustrating",
-            "annoying",
-            "disappointing",
-            "unsatisfied",
-            "unhappy",
-            "angry",
-            "furious",
-            "mad",
-            "upset",
-            "disappointed",
-            "dissatisfied",
-            "problem",
-            "issue",
-            "error",
-            "bug",
-            "glitch",
-            "fail",
-            "failure",
-            "cancel",
-            "return",
-            "refund",
-            "complaint",
-            "complain",
+            "terrible", "awful", "horrible", "bad", "worst", "disappointing",
+            "poor", "useless", "hate", "dislike", "regret", "waste",
+            "expensive", "slow", "broken", "defective", "uncomfortable",
+            "ugly", "problem", "issue", "error", "fail", "complaint"
         }
 
-        # Intensifiers and negations
-        self.intensifiers = {
-            "very",
-            "extremely",
-            "really",
-            "quite",
-            "totally",
-            "absolutely",
-        }
-        self.negations = {
-            "not",
-            "no",
-            "never",
-            "nothing",
-            "nobody",
-            "nowhere",
-            "neither",
-            "nor",
-        }
+        self.intensifiers = {"very", "extremely", "really", "quite", "totally"}
+        self.negations = {"not", "no", "never", "nothing", "neither", "nor"}
 
     def analyze_sentiment(self, text):
         if not text:
             return 0.0, "neutral"
 
+        text = text[:500]
         words = self._tokenize_text(text.lower())
 
         positive_score = 0
@@ -475,7 +385,6 @@ class CustomSentimentAnalysis:
             positive_ratio = positive_score / total_words
             negative_ratio = negative_score / total_words
             sentiment_score = positive_ratio - negative_ratio
-
             sentiment_score = max(-1.0, min(1.0, sentiment_score))
 
         if sentiment_score > 0.05:
@@ -534,3 +443,8 @@ class CustomSentimentAnalysis:
             "negative_count": negative_count,
             "total_opinions": len(sentiment_scores),
         }
+
+
+def calculate_association_rules(transactions, min_support=0.01, min_confidence=0.1):
+    association_engine = CustomAssociationRules(min_support, min_confidence)
+    return association_engine.generate_association_rules(transactions)

@@ -15,27 +15,43 @@ class FrequentlyBoughtTogetherAPI(APIView):
         if not cart_product_ids:
             return Response([], status=status.HTTP_200_OK)
 
+        print(f"Received cart product IDs: {cart_product_ids}")
+
         recommendations = []
+        seen_product_ids = set()
 
         for product_id in cart_product_ids:
+            try:
+                product_id_int = int(product_id)
+            except ValueError:
+                continue
+
             associations = (
-                ProductAssociation.objects.filter(product_1_id=product_id)
+                ProductAssociation.objects.filter(product_1_id=product_id_int)
                 .select_related("product_2")
-                .order_by("-lift")[:3]
+                .order_by("-lift", "-confidence")[:5]
             )
 
-            for assoc in associations:
-                if str(assoc.product_2_id) not in cart_product_ids:
-                    recommendations.append(
-                        {
-                            "product": ProductSerializer(assoc.product_2).data,
-                            "confidence": round(assoc.confidence, 2),
-                            "lift": round(assoc.lift, 2),
-                            "support": round(assoc.support, 3),
-                        }
-                    )
+            print(f"Found {associations.count()} associations for product {product_id}")
 
-        recommendations = sorted(recommendations, key=lambda x: x["lift"], reverse=True)
+            for assoc in associations:
+                if str(assoc.product_2_id) not in cart_product_ids and assoc.product_2_id not in seen_product_ids:
+                    try:
+                        product_data = ProductSerializer(assoc.product_2).data
+                        recommendations.append(
+                            {
+                                "product": product_data,
+                                "confidence": round(float(assoc.confidence), 2),
+                                "lift": round(float(assoc.lift), 2),
+                                "support": round(float(assoc.support), 3),
+                            }
+                        )
+                        seen_product_ids.add(assoc.product_2_id)
+                    except Exception as e:
+                        print(f"Error serializing product {assoc.product_2_id}: {e}")
+                        continue
+
+        recommendations = sorted(recommendations, key=lambda x: (x["lift"], x["confidence"]), reverse=True)
 
         unique_recommendations = []
         seen_ids = set()
@@ -45,6 +61,7 @@ class FrequentlyBoughtTogetherAPI(APIView):
                 unique_recommendations.append(rec)
                 seen_ids.add(rec["product"]["id"])
 
+        print(f"Returning {len(unique_recommendations)} unique recommendations")
         return Response(unique_recommendations[:5])
 
 
@@ -53,6 +70,7 @@ class UpdateAssociationRulesAPI(APIView):
 
     def post(self, request):
         try:
+            print("Starting association rules update...")
             ProductAssociation.objects.all().delete()
 
             orders = Order.objects.prefetch_related(
@@ -60,14 +78,14 @@ class UpdateAssociationRulesAPI(APIView):
                     "orderproduct_set",
                     queryset=OrderProduct.objects.select_related("product"),
                 )
-            ).all()
+            ).all()[:1000]
 
             transactions = []
             for order in orders:
                 product_ids = [
                     str(item.product_id) for item in order.orderproduct_set.all()
                 ]
-                if product_ids:
+                if len(product_ids) >= 2:
                     transactions.append(product_ids)
 
             if len(transactions) < 2:
@@ -78,6 +96,8 @@ class UpdateAssociationRulesAPI(APIView):
                     }
                 )
 
+            print(f"Processing {len(transactions)} transactions")
+
             association_engine = CustomAssociationRules(
                 min_support=0.01, min_confidence=0.1
             )
@@ -86,12 +106,11 @@ class UpdateAssociationRulesAPI(APIView):
             rules_created = 0
             created_pairs = set()
 
-            for rule in rules:
+            for rule in rules[:500]:
                 try:
                     product_1_id = int(rule["product_1"])
                     product_2_id = int(rule["product_2"])
 
-                    # Avoid duplicate pairs
                     pair_key = (product_1_id, product_2_id)
                     if pair_key in created_pairs:
                         continue
@@ -111,6 +130,8 @@ class UpdateAssociationRulesAPI(APIView):
                     print(f"Error creating rule: {e}")
                     continue
 
+            print(f"Created {rules_created} association rules")
+
             return Response(
                 {
                     "message": f"Association rules updated successfully using custom implementation",
@@ -121,6 +142,7 @@ class UpdateAssociationRulesAPI(APIView):
             )
 
         except Exception as e:
+            print(f"Error in association rules update: {e}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
@@ -161,7 +183,6 @@ class AssociationRulesAnalysisAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Get top rules by different metrics
         top_support = ProductAssociation.objects.select_related(
             "product_1", "product_2"
         ).order_by("-support")[:5]
