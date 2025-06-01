@@ -153,14 +153,12 @@ urlpatterns = [
         ResetPhotoSequenceView.as_view(),
         name="reset-photo-sequence",
     ),
-    # search endpoints with custom implementations
     path(
         "api/sentiment-search/",
         SentimentSearchAPIView.as_view(),
         name="sentiment-search",
     ),
     path("api/fuzzy-search/", FuzzySearchAPIView.as_view(), name="fuzzy-search"),
-    # Recommendation system endpoints
     path(
         "api/recommendation-settings/",
         RecommendationSettingsView.as_view(),
@@ -196,7 +194,6 @@ urlpatterns = [
         RecommendationAlgorithmStatusView.as_view(),
         name="recommendation-algorithm-status",
     ),
-    # Association rules endpoints with custom implementation
     path(
         "api/frequently-bought-together/",
         FrequentlyBoughtTogetherAPI.as_view(),
@@ -217,7 +214,6 @@ urlpatterns = [
         AssociationRulesAnalysisAPI.as_view(),
         name="association-rules-analysis",
     ),
-    # Probabilistic methods endpoints
     path(
         "api/purchase-prediction/",
         UserPurchasePredictionView.as_view(),

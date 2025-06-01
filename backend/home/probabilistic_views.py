@@ -193,7 +193,7 @@ class SalesForecastView(APIView):
                     "products_count": data["count"],
                     "products": data["products"][
                         :5
-                    ],  # Limit to top 5 products for display
+                    ], 
                 }
             )
 

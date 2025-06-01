@@ -16,7 +16,8 @@ from django.contrib.auth.hashers import make_password
 from django.db.models import Count, Sum, Avg, F
 from django.db.models.functions import TruncMonth
 from home.models import ProductSimilarity
-from home.signals import calculate_association_rules
+# from home.signals import calculate_association_rules
+from home.association_views import UpdateAssociationRulesAPI
 from home.signals import update_content_based_similarity
 from home.models import *
 from home.models import Order, ProductAssociation

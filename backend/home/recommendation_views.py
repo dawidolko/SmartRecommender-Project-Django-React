@@ -98,7 +98,6 @@ class ProcessRecommendationsView(APIView):
                 row.append(user_product_matrix[user_id].get(product_id, 0))
             matrix.append(row)
 
-        # numpy for collaborative filtering as it's too complex to implement manually
         import numpy as np
         from sklearn.metrics.pairwise import cosine_similarity
 
@@ -107,7 +106,6 @@ class ProcessRecommendationsView(APIView):
         if matrix.shape[0] > 1 and matrix.shape[1] > 1:
             product_similarity = cosine_similarity(matrix.T)
 
-            # Clear existing collaborative similarities
             ProductSimilarity.objects.filter(similarity_type="collaborative").delete()
 
             for i, product1_id in enumerate(product_ids):
