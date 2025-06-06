@@ -1,3 +1,5 @@
+To be corrected: 06/06/2025
+
 # 🧠 Sentiment Analysis in Product Search
 
 ## What Is "Sentiment-Based Search" in Shop?
