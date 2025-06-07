@@ -1,3 +1,5 @@
+To be corrected: 06/06/2025
+
 # 🔍 Fuzzy Logic in Product Search
 
 ## What Is "Fuzzy Search" in Shop?
