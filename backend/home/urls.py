@@ -60,17 +60,23 @@ from .association_views import (
 )
 
 from .probabilistic_views import (
-    AdminChurnPredictionView,
-    AdminProductRecommendationsView,
-    AdminPurchasePatternsView,
-    UserPurchasePredictionView,
-    PersonalizedRecommendationsView,
+    MarkovRecommendationsAPI,
+    BayesianInsightsAPI,
+    ProbabilisticAnalysisAdminAPI,
+)
+
+from .analytics_views import (
+    RiskDashboardView,
     SalesForecastView,
     ProductDemandView,
-    RiskDashboardView,
-    UserInsightsView,
-    ClientProbabilisticInsightsView,
+    UserPurchasePatternsView,
+    AdminPurchasePatternsView,
+    AdminProductRecommendationsView,
+    AdminChurnPredictionView,
+    MyShoppingInsightsView,
 )
+
+from .seasonal_views import SeasonalTrendsView
 
 urlpatterns = [
     path("", home_view, name="home"),
@@ -214,28 +220,42 @@ urlpatterns = [
         AssociationRulesAnalysisAPI.as_view(),
         name="association-rules-analysis",
     ),
+    # NOWE: Probabilistic Models Endpoints
     path(
-        "api/purchase-prediction/",
-        UserPurchasePredictionView.as_view(),
-        name="purchase-prediction",
+        "api/markov-recommendations/",
+        MarkovRecommendationsAPI.as_view(),
+        name="markov-recommendations",
     ),
     path(
-        "api/personalized-recommendations/",
-        PersonalizedRecommendationsView.as_view(),
-        name="personalized-recommendations",
-    ),
-    path("api/sales-forecast/", SalesForecastView.as_view(), name="sales-forecast"),
-    path("api/product-demand/", ProductDemandView.as_view(), name="product-demand"),
-    path("api/risk-dashboard/", RiskDashboardView.as_view(), name="risk-dashboard"),
-    path(
-        "api/user-insights/<int:user_id>/",
-        UserInsightsView.as_view(),
-        name="user-insights",
+        "api/bayesian-insights/",
+        BayesianInsightsAPI.as_view(),
+        name="bayesian-insights",
     ),
     path(
-        "api/my-shopping-insights/",
-        ClientProbabilisticInsightsView.as_view(),
-        name="client-insights",
+        "api/admin/probabilistic-analysis/",
+        ProbabilisticAnalysisAdminAPI.as_view(),
+        name="probabilistic-admin-analysis",
+    ),
+    # Analytics endpoints
+    path(
+        "api/risk-dashboard/",
+        RiskDashboardView.as_view(),
+        name="risk-dashboard",
+    ),
+    path(
+        "api/sales-forecast/",
+        SalesForecastView.as_view(),
+        name="sales-forecast",
+    ),
+    path(
+        "api/product-demand/",
+        ProductDemandView.as_view(),
+        name="product-demand",
+    ),
+    path(
+        "api/user-purchase-patterns/",
+        UserPurchasePatternsView.as_view(),
+        name="user-purchase-patterns",
     ),
     path(
         "api/admin-purchase-patterns/",
@@ -251,5 +271,20 @@ urlpatterns = [
         "api/admin-churn-prediction/",
         AdminChurnPredictionView.as_view(),
         name="admin-churn-prediction",
+    ),
+    path(
+        "api/my-shopping-insights/",
+        MyShoppingInsightsView.as_view(),
+        name="my-shopping-insights",
+    ),
+    path(
+        "api/personalized-recommendations/",
+        RecommendedProductsAPIView.as_view(),
+        name="personalized-recommendations",
+    ),
+    path(
+        "api/seasonal-trends/",
+        SeasonalTrendsView.as_view(),
+        name="seasonal-trends",
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

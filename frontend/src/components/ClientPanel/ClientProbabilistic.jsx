@@ -57,6 +57,8 @@ const ClientProbabilistic = () => {
   const [recommendationsData, setRecommendationsData] = useState([]);
   const [shoppingProfile, setShoppingProfile] = useState({});
   const [seasonalTips, setSeasonalTips] = useState([]);
+  const [markovData, setMarkovData] = useState(null);
+  const [bayesianData, setBayesianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalContent, setModalContent] = useState(null);
@@ -73,39 +75,56 @@ const ClientProbabilistic = () => {
     setError(null);
 
     try {
-      const insightsRes = await fetch(
-        `${config.apiUrl}/api/my-shopping-insights/`,
-        {
+      // Równoległe pobieranie danych z wszystkich endpoints
+      const [insightsRes, markovRes, bayesianRes] = await Promise.all([
+        fetch(`${config.apiUrl}/api/my-shopping-insights/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
-      );
+        }),
+        fetch(`${config.apiUrl}/api/markov-recommendations/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+        fetch(`${config.apiUrl}/api/bayesian-insights/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+      ]);
 
-      if (!insightsRes.ok) {
-        throw new Error(`HTTP error! status: ${insightsRes.status}`);
+      const [insightsData, markovDataRes, bayesianDataRes] = await Promise.all([
+        insightsRes.ok ? insightsRes.json() : null,
+        markovRes.ok ? markovRes.json() : null,
+        bayesianRes.ok ? bayesianRes.json() : null,
+      ]);
+
+      if (insightsData) {
+        const enhancedRecommendations = (
+          insightsData.personalized_suggestions || []
+        ).map((product) => {
+          const imageUrl =
+            product.photos && product.photos[0] && product.photos[0].path
+              ? `${config.apiUrl}/media/${product.photos[0].path}`
+              : null;
+
+          return {
+            ...product,
+            image_url: product.image_url || imageUrl || null,
+          };
+        });
+
+        setRecommendationsData(enhancedRecommendations);
+        setShoppingProfile(insightsData.your_shopping_profile || {});
+        setSeasonalTips(insightsData.recommendations?.seasonal_tips || []);
       }
 
-      const insightsData = await insightsRes.json();
-
-      const enhancedRecommendations = (
-        insightsData.personalized_suggestions || []
-      ).map((product) => {
-        const imageUrl =
-          product.photos && product.photos[0] && product.photos[0].path
-            ? `${config.apiUrl}/media/${product.photos[0].path}`
-            : null;
-
-        return {
-          ...product,
-          image_url: product.image_url || imageUrl || null,
-        };
-      });
-
-      setRecommendationsData(enhancedRecommendations);
-      setShoppingProfile(insightsData.your_shopping_profile || {});
-      setSeasonalTips(insightsData.recommendations?.seasonal_tips || []);
+      setMarkovData(markovDataRes);
+      setBayesianData(bayesianDataRes);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -235,7 +254,7 @@ const ClientProbabilistic = () => {
         break;
 
       case "seasonal_trends":
-        fetch(`${config.apiUrl}/api/personalized-recommendations/`, {
+        fetch(`${config.apiUrl}/api/seasonal-trends/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -318,6 +337,8 @@ const ClientProbabilistic = () => {
         <TabButton id="profile" label="Shopping Profile" icon={ShoppingBag} />
         <TabButton id="timing" label="Purchase Timing" icon={Clock} />
         <TabButton id="trends" label="Seasonal Trends" icon={TrendingUp} />
+        <TabButton id="markov" label="Next Purchase" icon={Clock} />
+        <TabButton id="bayesian" label="Behavior Insights" icon={TrendingUp} />
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={modalTitle}>
@@ -594,6 +615,210 @@ const ClientProbabilistic = () => {
                 View Detailed Analysis
               </button>
             </div>
+          </div>
+        )}
+
+        {activeTab === "markov" && (
+          <div className="markov-section">
+            <div className="section-header">
+              <h2>Next Purchase Predictions</h2>
+              <p>
+                Our Markov chain models analyze your shopping sequences to predict what you're likely to buy next.
+              </p>
+            </div>
+
+            {markovData ? (
+              <>
+                <div className="prediction-cards">
+                  <div className="prediction-card">
+                    <div className="card-header">
+                      <h3>Next Purchase Probability</h3>
+                    </div>
+                    <div className="card-body">
+                      <div className="probability-display">
+                        <span className="probability-value">
+                          {Math.round(markovData.next_purchase_probability * 100)}%
+                        </span>
+                        <span className="probability-label">within 30 days</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="prediction-card">
+                    <div className="card-header">
+                      <h3>Expected Days Until Next Purchase</h3>
+                    </div>
+                    <div className="card-body">
+                      <div className="days-display">
+                        <span className="days-value">
+                          {markovData.expected_days_to_next_purchase || 'N/A'}
+                        </span>
+                        <span className="days-label">days</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="sequence-predictions">
+                  <h3>Likely Next Products</h3>
+                  <div className="products-grid">
+                    {markovData.predicted_products && markovData.predicted_products.map((product, idx) => (
+                      <Link
+                        key={idx}
+                        to={`/product/${product.id}`}
+                        className="product-card-link">
+                        <div className="product-card prediction-card">
+                          <div className="product-image">
+                            {product.image_url ? (
+                              <img src={product.image_url} alt={product.name} />
+                            ) : (
+                              <div className="placeholder-image">
+                                {product.name.substring(0, 2).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          <div className="product-details">
+                            <h4>{product.name}</h4>
+                            <p className="product-price">${product.price}</p>
+                            <div className="prediction-score">
+                              <div className="score-label">Prediction Score:</div>
+                              <div className="score-bar">
+                                <div
+                                  className="score-fill"
+                                  style={{
+                                    width: `${product.prediction_score * 100}%`,
+                                  }}></div>
+                                <span>{Math.round(product.prediction_score * 100)}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {markovData.sequence_analysis && (
+                  <div className="sequence-analysis">
+                    <h3>Your Shopping Patterns</h3>
+                    <div className="pattern-insights">
+                      <div className="insight-item">
+                        <h4>Most Common Sequence</h4>
+                        <p>{markovData.sequence_analysis.most_common_sequence || 'Not enough data'}</p>
+                      </div>
+                      <div className="insight-item">
+                        <h4>Purchase Cycle Length</h4>
+                        <p>{markovData.sequence_analysis.average_cycle_length || 'N/A'} products per cycle</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="no-data">
+                <p>Not enough purchase data to generate Markov predictions. Make a few more purchases to see personalized insights!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "bayesian" && (
+          <div className="bayesian-section">
+            <div className="section-header">
+              <h2>Behavioral Insights</h2>
+              <p>
+                Our Bayesian models analyze your behavior patterns to provide deep insights into your shopping preferences.
+              </p>
+            </div>
+
+            {bayesianData ? (
+              <>
+                <div className="insights-cards">
+                  <div className="insight-card">
+                    <div className="card-header">
+                      <h3>Purchase Likelihood</h3>
+                    </div>
+                    <div className="card-body">
+                      <div className="likelihood-chart">
+                        {bayesianData.category_preferences && Object.entries(bayesianData.category_preferences).map(([category, likelihood], idx) => (
+                          <div key={idx} className="likelihood-bar">
+                            <span className="category-name">{category}</span>
+                            <div className="bar-container">
+                              <div
+                                className="bar-fill"
+                                style={{ width: `${likelihood * 100}%` }}></div>
+                              <span className="likelihood-value">{Math.round(likelihood * 100)}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="insight-card">
+                    <div className="card-header">
+                      <h3>Churn Risk Analysis</h3>
+                    </div>
+                    <div className="card-body">
+                      <div className="churn-display">
+                        <div className={`churn-indicator ${bayesianData.churn_risk < 0.3 ? 'low' : bayesianData.churn_risk < 0.7 ? 'medium' : 'high'}`}>
+                          <span className="churn-percentage">
+                            {Math.round(bayesianData.churn_risk * 100)}%
+                          </span>
+                          <span className="churn-label">
+                            {bayesianData.churn_risk < 0.3 ? 'Low Risk' : bayesianData.churn_risk < 0.7 ? 'Medium Risk' : 'High Risk'}
+                          </span>
+                        </div>
+                        <p className="churn-explanation">
+                          {bayesianData.churn_risk < 0.3 
+                            ? 'You are a loyal customer with consistent shopping patterns.'
+                            : bayesianData.churn_risk < 0.7 
+                            ? 'Your shopping frequency has decreased slightly. Consider exploring new products!'
+                            : 'We miss you! Check out our latest offers to rediscover great products.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="behavioral-patterns">
+                  <h3>Shopping Behavior Analysis</h3>
+                  <div className="patterns-grid">
+                    {bayesianData.behavioral_insights && bayesianData.behavioral_insights.map((insight, idx) => (
+                      <div key={idx} className="pattern-card">
+                        <h4>{insight.pattern_name}</h4>
+                        <p className="pattern-description">{insight.description}</p>
+                        <div className="pattern-confidence">
+                          <span>Confidence: {Math.round(insight.confidence * 100)}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {bayesianData.recommendations && (
+                  <div className="bayesian-recommendations">
+                    <h3>Personalized Suggestions</h3>
+                    <div className="suggestions-list">
+                      {bayesianData.recommendations.map((rec, idx) => (
+                        <div key={idx} className="suggestion-item">
+                          <div className="suggestion-icon">💡</div>
+                          <div className="suggestion-content">
+                            <h4>{rec.title}</h4>
+                            <p>{rec.description}</p>
+                            <span className="suggestion-confidence">Confidence: {Math.round(rec.confidence * 100)}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="no-data">
+                <p>Not enough behavioral data to generate insights. Continue shopping to see personalized behavioral analysis!</p>
+              </div>
+            )}
           </div>
         )}
       </div>

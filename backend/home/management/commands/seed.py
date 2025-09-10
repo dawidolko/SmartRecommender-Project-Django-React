@@ -16647,7 +16647,9 @@ def seed_opinions():
         ("Not the best, but good enough for the price.", 3),
     ]
 
-    created_pairs = set()
+    # Pobierz już istniejące pary (user, product) z bazy danych  
+    existing_pairs = set(Opinion.objects.values_list('user_id', 'product_id'))
+    created_pairs = existing_pairs.copy()
     opinions_added = 0
 
     for product in tqdm(products, desc="Seeding Opinions", unit="product"):
@@ -16666,20 +16668,74 @@ def seed_opinions():
                 content, rating = random.choice(opinion_contents_with_ratings)
                 
                 try:
-                    Opinion.objects.create(
-                        product=product,
-                        user=user,
-                        content=content,
-                        rating=rating
-                    )
-                    created_pairs.add(pair_key)
-                    opinions_added += 1
-                    opinions_for_product += 1
-                    print(Fore.GREEN + f"Added opinion for Product ID {product.id} by User ID {user.id}")
+                    # Sprawdź ponownie w bazie czy para nie istnieje (race condition)
+                    if not Opinion.objects.filter(user=user, product=product).exists():
+                        # Tymczasowo wyłączamy sentiment analysis podczas seedowania
+                        opinion = Opinion(
+                            product=product,
+                            user=user,
+                            content=content,
+                            rating=rating
+                        )
+                        opinion._skip_sentiment_update = True
+                        opinion.save()
+                        created_pairs.add(pair_key)
+                        opinions_added += 1
+                        opinions_for_product += 1
+                        # Usunięto print, żeby nie spamować
+                    else:
+                        created_pairs.add(pair_key)  # Dodaj do pamięci, że para istnieje
                 except Exception as e:
                     print(Fore.RED + f"Error adding opinion for Product ID {product.id}: {e}")
+                    # Dodaj parę do pamięci, żeby nie próbować ponownie
+                    created_pairs.add(pair_key)
 
     print(Fore.BLUE + f"Opinions successfully seeded. Total added: {opinions_added}")
+    
+    # Teraz ręcznie tworzymy sentiment analysis dla wszystkich opinii
+    print(Fore.YELLOW + "Creating sentiment analysis for seeded opinions...")
+    create_sentiment_summaries_after_seeding()
+
+
+def create_sentiment_summaries_after_seeding():
+    """Create sentiment summaries after seeding, bypassing signals"""
+    
+    sentiment_analyzer = CustomSentimentAnalysis()
+    opinions_without_sentiment = Opinion.objects.filter(sentimentanalysis__isnull=True)
+    
+    print(f"Processing {opinions_without_sentiment.count()} opinions for sentiment analysis...")
+    
+    for opinion in tqdm(opinions_without_sentiment, desc="Creating sentiment analysis"):
+        try:
+            if opinion.content:
+                sentiment_score, sentiment_category = sentiment_analyzer.analyze_sentiment(
+                    opinion.content
+                )
+                
+                SentimentAnalysis.objects.get_or_create(
+                    opinion=opinion,
+                    defaults={
+                        "product": opinion.product,
+                        "sentiment_score": sentiment_score,
+                        "sentiment_category": sentiment_category,
+                    },
+                )
+        except Exception as e:
+            print(f"Error creating sentiment for opinion {opinion.id}: {e}")
+    
+    # Teraz tworzymy podsumowania dla produktów
+    print("Creating product sentiment summaries...")
+    products_with_opinions = Product.objects.filter(opinion__isnull=False).distinct()
+    
+    for product in tqdm(products_with_opinions, desc="Creating sentiment summaries"):
+        try:
+            sentiment_data = sentiment_analyzer.analyze_product_sentiment(product)
+            ProductSentimentSummary.objects.update_or_create(
+                product=product, 
+                defaults=sentiment_data
+            )
+        except Exception as e:
+            print(f"Error creating sentiment summary for product {product.id}: {e}")
 
 
 def seed_orders():
@@ -16772,13 +16828,11 @@ def seed_complaints():
     print(Fore.BLUE + "Complaints successfully seeded.")
 
 def seed_sentiment_data():
-    """Seed sentiment data using custom sentiment analysis"""
     print(Fore.GREEN + "\nSeeding sentiment data using custom sentiment analysis...")
     
     ProductSentimentSummary.objects.all().delete()
     SentimentAnalysis.objects.all().delete()
     
-    # Use custom sentiment analyzer
     sentiment_analyzer = CustomSentimentAnalysis()
     
     products = Product.objects.prefetch_related('opinion_set').all()
@@ -16795,7 +16849,6 @@ def seed_sentiment_data():
             
             for opinion in opinions:
                 if opinion.content:
-                    # Use custom sentiment analysis
                     sentiment_score, sentiment_category = sentiment_analyzer.analyze_sentiment(opinion.content)
                     
                     SentimentAnalysis.objects.update_or_create(
@@ -16846,7 +16899,6 @@ def seed_sentiment_data():
     print(Fore.BLUE + "Sentiment data successfully seeded.")
 
 def generate_initial_association_rules():
-    """Generate initial association rules using custom implementation"""
     print(Fore.GREEN + "\nGenerating association rules using custom Apriori algorithm...")
     
     ProductAssociation.objects.all().delete()
@@ -17194,7 +17246,6 @@ def analyze_seasonality(user, category_id):
     return seasonality
 
 def generate_product_similarities():
-    """Generate product similarities using custom content-based filtering with performance limits"""
     print(Fore.GREEN + "Generating product similarities using custom content-based filtering...")
     
     ProductSimilarity.objects.filter(similarity_type='content_based').delete()

@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Q
+from django.core.cache import cache
+from django.conf import settings
 from .models import (
     Product,
     User,
@@ -18,6 +20,9 @@ from .serializers import ProductSerializer
 from collections import defaultdict
 from rest_framework.permissions import IsAdminUser
 from .custom_recommendation_engine import CustomContentBasedFilter
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import MinMaxScaler
 
 
 class RecommendationSettingsView(APIView):
@@ -81,9 +86,20 @@ class ProcessRecommendationsView(APIView):
             )
 
     def process_collaborative_filtering(self):
+        # Sprawdź cache
+        cache_key = "collaborative_similarity_matrix"
+        cached_result = cache.get(cache_key)
+        
+        if cached_result:
+            print("Using cached collaborative filtering results")
+            return cached_result
+        
         users = User.objects.all()
         products = Product.objects.all()
+        
+        print(f"Processing collaborative filtering for {users.count()} users and {products.count()} products")
 
+        # Budowanie macierzy użytkownik-produkt
         user_product_matrix = defaultdict(dict)
         for order in OrderProduct.objects.select_related("order", "product").all():
             user_product_matrix[order.order.user_id][order.product_id] = order.quantity
@@ -91,6 +107,11 @@ class ProcessRecommendationsView(APIView):
         user_ids = list(user_product_matrix.keys())
         product_ids = list(products.values_list("id", flat=True))
 
+        if len(user_ids) < 2 or len(product_ids) < 2:
+            print("Insufficient data for collaborative filtering")
+            return 0
+
+        # Tworzenie macierzy numerycznej
         matrix = []
         for user_id in user_ids:
             row = []
@@ -98,34 +119,73 @@ class ProcessRecommendationsView(APIView):
                 row.append(user_product_matrix[user_id].get(product_id, 0))
             matrix.append(row)
 
-        import numpy as np
-        from sklearn.metrics.pairwise import cosine_similarity
+        matrix = np.array(matrix, dtype=np.float32)
+        
+        # NOWE: Normalizacja macierzy (Min-Max Scaling)
+        print("Applying MinMax normalization to user-product matrix")
+        scaler = MinMaxScaler()
+        
+        # Normalizacja dla każdego użytkownika osobno (po wierszach)
+        normalized_matrix = np.zeros_like(matrix)
+        for i, user_row in enumerate(matrix):
+            if np.sum(user_row) > 0:  # Tylko jeśli użytkownik ma jakieś zakupy
+                user_row_reshaped = user_row.reshape(-1, 1)
+                normalized_row = scaler.fit_transform(user_row_reshaped).flatten()
+                normalized_matrix[i] = normalized_row
+            else:
+                normalized_matrix[i] = user_row
 
-        matrix = np.array(matrix)
-
-        if matrix.shape[0] > 1 and matrix.shape[1] > 1:
-            product_similarity = cosine_similarity(matrix.T)
-
+        # Obliczanie podobieństwa produktów na znormalizowanej macierzy
+        if normalized_matrix.shape[0] > 1 and normalized_matrix.shape[1] > 1:
+            product_similarity = cosine_similarity(normalized_matrix.T)
+            
+            # Usuwanie starych podobieństw
             ProductSimilarity.objects.filter(similarity_type="collaborative").delete()
-
+            
+            similarities_to_create = []
+            similarity_count = 0
+            
+            # ZMIENIONY: Próg zwiększony z 0.1 do 0.3
+            similarity_threshold = 0.3
+            
             for i, product1_id in enumerate(product_ids):
                 for j, product2_id in enumerate(product_ids):
-                    if i != j and product_similarity[i][j] > 0.1:
-                        ProductSimilarity.objects.update_or_create(
-                            product1_id=product1_id,
-                            product2_id=product2_id,
-                            similarity_type="collaborative",
-                            defaults={
-                                "similarity_score": float(product_similarity[i][j])
-                            },
+                    if i != j and product_similarity[i][j] > similarity_threshold:
+                        similarities_to_create.append(
+                            ProductSimilarity(
+                                product1_id=product1_id,
+                                product2_id=product2_id,
+                                similarity_type="collaborative",
+                                similarity_score=float(product_similarity[i][j])
+                            )
                         )
+                        similarity_count += 1
+                        
+                        # Bulk create co 1000 rekordów
+                        if len(similarities_to_create) >= 1000:
+                            ProductSimilarity.objects.bulk_create(similarities_to_create)
+                            similarities_to_create = []
+                            
+            # Utworzenie pozostałych podobieństw
+            if similarities_to_create:
+                ProductSimilarity.objects.bulk_create(similarities_to_create)
+            
+            print(f"Created {similarity_count} collaborative similarities with threshold {similarity_threshold}")
+            
+            # Cache wyników na 2 godziny
+            cache.set(cache_key, similarity_count, timeout=getattr(settings, 'CACHE_TIMEOUT_LONG', 7200))
+            
+            return similarity_count
+        
+        return 0
 
     def process_content_based_filtering(self):
         content_filter = CustomContentBasedFilter()
         similarity_count = content_filter.generate_similarities_for_all_products()
         print(
-            f"Custom content-based filtering generated {similarity_count} similarities"
+            f"Enhanced content-based filtering generated {similarity_count} similarities"
         )
+        return similarity_count
 
 
 class RecommendationPreviewView(APIView):
@@ -160,6 +220,23 @@ class GenerateUserRecommendationsView(APIView):
 
     def post(self, request):
         algorithm = request.data.get("algorithm", "collaborative")
+        
+        # Cache key specific for user and algorithm
+        cache_key = f"user_recommendations_{request.user.id}_{algorithm}"
+        cached_result = cache.get(cache_key)
+        
+        if cached_result:
+            return Response({
+                "success": True,
+                "message": f"User recommendations loaded from cache for {algorithm} algorithm",
+                "recommendations_count": cached_result,
+                "implementation": (
+                    "Custom Manual Implementation"
+                    if algorithm == "content_based"
+                    else "Collaborative Filtering"
+                ),
+                "cached": True
+            })
 
         user_products = []
 
@@ -183,13 +260,24 @@ class GenerateUserRecommendationsView(APIView):
                     similarity.similarity_score
                 )
 
+        # Bulk update recommendations
+        recommendations_to_update = []
         for product_id, score in recommendations.items():
-            UserProductRecommendation.objects.update_or_create(
+            recommendation, created = UserProductRecommendation.objects.get_or_create(
                 user=request.user,
                 product_id=product_id,
                 recommendation_type=algorithm,
-                defaults={"score": score},
+                defaults={"score": score}
             )
+            if not created and recommendation.score != score:
+                recommendation.score = score
+                recommendations_to_update.append(recommendation)
+                
+        if recommendations_to_update:
+            UserProductRecommendation.objects.bulk_update(recommendations_to_update, ['score'])
+
+        # Cache the result for 30 minutes
+        cache.set(cache_key, len(recommendations), timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 1800))
 
         return Response(
             {
@@ -201,6 +289,7 @@ class GenerateUserRecommendationsView(APIView):
                     if algorithm == "content_based"
                     else "Collaborative Filtering"
                 ),
+                "cached": False
             }
         )
 

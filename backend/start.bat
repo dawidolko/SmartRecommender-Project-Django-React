@@ -78,6 +78,14 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
+REM Creating cache table
+echo Creating cache table...
+python manage.py createcachetable
+if %errorlevel% neq 0 (
+    echo Error during cache table creation.
+    exit /b %errorlevel%
+)
+
 REM Seeding the database
 echo Seeding the database...
 python manage.py seed

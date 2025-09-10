@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from collections import defaultdict
+from django.core.cache import cache
+from django.conf import settings
 from .models import Order, OrderProduct, ProductAssociation, Product
 from .serializers import ProductSerializer
 from django.db.models import Prefetch
@@ -35,7 +37,10 @@ class FrequentlyBoughtTogetherAPI(APIView):
             print(f"Found {associations.count()} associations for product {product_id}")
 
             for assoc in associations:
-                if str(assoc.product_2_id) not in cart_product_ids and assoc.product_2_id not in seen_product_ids:
+                if (
+                    str(assoc.product_2_id) not in cart_product_ids
+                    and assoc.product_2_id not in seen_product_ids
+                ):
                     try:
                         product_data = ProductSerializer(assoc.product_2).data
                         recommendations.append(
@@ -51,7 +56,9 @@ class FrequentlyBoughtTogetherAPI(APIView):
                         print(f"Error serializing product {assoc.product_2_id}: {e}")
                         continue
 
-        recommendations = sorted(recommendations, key=lambda x: (x["lift"], x["confidence"]), reverse=True)
+        recommendations = sorted(
+            recommendations, key=lambda x: (x["lift"], x["confidence"]), reverse=True
+        )
 
         unique_recommendations = []
         seen_ids = set()
@@ -70,76 +77,117 @@ class UpdateAssociationRulesAPI(APIView):
 
     def post(self, request):
         try:
-            print("Starting association rules update...")
-            ProductAssociation.objects.all().delete()
-
-            orders = Order.objects.prefetch_related(
-                Prefetch(
-                    "orderproduct_set",
-                    queryset=OrderProduct.objects.select_related("product"),
-                )
-            ).all()[:1000]
-
-            transactions = []
-            for order in orders:
-                product_ids = [
-                    str(item.product_id) for item in order.orderproduct_set.all()
-                ]
-                if len(product_ids) >= 2:
-                    transactions.append(product_ids)
-
-            if len(transactions) < 2:
+            print("Starting enhanced association rules update...")
+            
+            # Sprawdź cache
+            cache_key = "association_rules_processing"
+            if cache.get(cache_key):
                 return Response(
                     {
-                        "message": "Not enough transactions to generate association rules.",
-                        "rules_created": 0,
+                        "message": "Association rules update already in progress",
+                        "cached": True
                     }
                 )
+            
+            # Ustaw cache że przetwarzanie trwa
+            cache.set(cache_key, True, timeout=300)  # 5 minut
+            
+            try:
+                # Usuwanie starych reguł
+                ProductAssociation.objects.all().delete()
 
-            print(f"Processing {len(transactions)} transactions")
+                # ZWIĘKSZONE: z 1000 do 2000 zamówień
+                orders = Order.objects.prefetch_related(
+                    Prefetch(
+                        "orderproduct_set",
+                        queryset=OrderProduct.objects.select_related("product"),
+                    )
+                ).all()[:2000]
 
-            association_engine = CustomAssociationRules(
-                min_support=0.01, min_confidence=0.1
-            )
-            rules = association_engine.generate_association_rules(transactions)
+                transactions = []
+                for order in orders:
+                    product_ids = [
+                        str(item.product_id) for item in order.orderproduct_set.all()
+                    ]
+                    if len(product_ids) >= 2:
+                        transactions.append(product_ids)
 
-            rules_created = 0
-            created_pairs = set()
-
-            for rule in rules[:500]:
-                try:
-                    product_1_id = int(rule["product_1"])
-                    product_2_id = int(rule["product_2"])
-
-                    pair_key = (product_1_id, product_2_id)
-                    if pair_key in created_pairs:
-                        continue
-
-                    ProductAssociation.objects.create(
-                        product_1_id=product_1_id,
-                        product_2_id=product_2_id,
-                        support=rule["support"],
-                        confidence=rule["confidence"],
-                        lift=rule["lift"],
+                if len(transactions) < 2:
+                    return Response(
+                        {
+                            "message": "Not enough transactions to generate association rules.",
+                            "rules_created": 0,
+                        }
                     )
 
-                    created_pairs.add(pair_key)
-                    rules_created += 1
+                print(f"Processing {len(transactions)} transactions with enhanced algorithm")
 
-                except Exception as e:
-                    print(f"Error creating rule: {e}")
-                    continue
+                # NOWA: Ulepszona wersja z bitmap pruning
+                association_engine = CustomAssociationRules(
+                    min_support=0.008, min_confidence=0.08  # Nieco niższe progi dla większej ilości reguł
+                )
+                rules = association_engine.generate_association_rules(transactions)
 
-            print(f"Created {rules_created} association rules")
+                # BULK OPERATIONS: Tworzenie reguł w batch'ach
+                associations_to_create = []
+                created_pairs = set()
+                rules_processed = 0
 
-            return Response(
-                {
-                    "message": f"Association rules updated successfully using custom implementation",
-                    "rules_created": rules_created,
-                    "total_transactions": len(transactions),
-                    "algorithm": "Custom Apriori Implementation",
-                }
-            )
+                # ZWIĘKSZONE: z 500 do 1000 reguł
+                for rule in rules[:1000]:
+                    try:
+                        product_1_id = int(rule["product_1"])
+                        product_2_id = int(rule["product_2"])
+
+                        pair_key = (product_1_id, product_2_id)
+                        if pair_key in created_pairs:
+                            continue
+
+                        # Dodanie do listy bulk create
+                        associations_to_create.append(
+                            ProductAssociation(
+                                product_1_id=product_1_id,
+                                product_2_id=product_2_id,
+                                support=rule["support"],
+                                confidence=rule["confidence"],
+                                lift=rule["lift"],
+                            )
+                        )
+
+                        created_pairs.add(pair_key)
+                        rules_processed += 1
+
+                        # BULK CREATE co 200 reguł
+                        if len(associations_to_create) >= 200:
+                            ProductAssociation.objects.bulk_create(associations_to_create)
+                            associations_to_create = []
+
+                    except (ValueError, KeyError) as e:
+                        print(f"Error processing rule: {e}")
+                        continue
+
+                # Utworzenie pozostałych reguł
+                if associations_to_create:
+                    ProductAssociation.objects.bulk_create(associations_to_create)
+
+                print(f"Created {rules_processed} enhanced association rules using bitmap pruning")
+                
+                # Invalidate related caches
+                cache.delete("association_rules_list")
+                
+                return Response(
+                    {
+                        "message": f"Enhanced association rules updated successfully",
+                        "rules_created": rules_processed,
+                        "total_transactions": len(transactions),
+                        "algorithm": "Enhanced Apriori with Bitmap Pruning",
+                        "optimization": "Bulk operations + Caching",
+                    }
+                )
+                
+            finally:
+                # Usuń cache przetwarzania
+                cache.delete(cache_key)
 
         except Exception as e:
             print(f"Error in association rules update: {e}")
@@ -150,6 +198,16 @@ class UpdateAssociationRulesAPI(APIView):
 
 class AssociationRulesListAPI(APIView):
     def get(self, request):
+        # Sprawdź cache
+        cache_key = "association_rules_list"
+        cached_result = cache.get(cache_key)
+        
+        if cached_result:
+            return Response({
+                **cached_result,
+                "cached": True
+            })
+
         rules = (
             ProductAssociation.objects.all()
             .select_related("product_1", "product_2")
@@ -170,13 +228,17 @@ class AssociationRulesListAPI(APIView):
                 }
             )
 
-        return Response(
-            {
-                "rules": serialized_rules,
-                "total_rules": len(serialized_rules),
-                "implementation": "Custom Apriori Algorithm",
-            }
-        )
+        result = {
+            "rules": serialized_rules,
+            "total_rules": len(serialized_rules),
+            "implementation": "Enhanced Apriori Algorithm with Bitmap Pruning",
+            "cached": False
+        }
+        
+        # Cache wyników na 30 minut
+        cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 1800))
+        
+        return Response(result)
 
 
 class AssociationRulesAnalysisAPI(APIView):

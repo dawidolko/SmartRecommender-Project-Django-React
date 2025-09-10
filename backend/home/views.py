@@ -441,13 +441,37 @@ class AdminStatsView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request):
-        data = {
-            "products": Product.objects.count(),
-            "clients": User.objects.filter(role="client").count(),
-            "orders": Order.objects.count(),
-            "complaints": Complaint.objects.count(),
-        }
-        return Response(data)
+        try:
+            # Debug: Check all users and their roles
+            total_users = User.objects.count()
+            client_users = User.objects.filter(role="client").count()
+            admin_users = User.objects.filter(role="admin").count()
+            
+            # Get all role values for debugging
+            all_roles = list(User.objects.values_list('role', flat=True).distinct())
+            
+            data = {
+                "products": Product.objects.count(),
+                "clients": client_users,
+                "orders": Order.objects.count(),
+                "complaints": Complaint.objects.count(),
+                # Debug information
+                "debug_info": {
+                    "total_users": total_users,
+                    "client_users": client_users,
+                    "admin_users": admin_users,
+                    "all_roles": all_roles
+                }
+            }
+            return Response(data)
+        except Exception as e:
+            return Response({
+                "error": str(e),
+                "products": 0,
+                "clients": 0,
+                "orders": 0,
+                "complaints": 0
+            }, status=500)
 
 class AdminDashboardStatsView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -696,10 +720,65 @@ class RecommendedProductsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        recommended_products = Product.objects.filter(id__in=[100, 200, 300, 400])
-
-        serializer = ProductSerializer(recommended_products, many=True)
-        return Response(serializer.data)
+        user = request.user
+        try:
+            from .models import UserProductRecommendation, RecommendationSettings
+            
+            # Get user's preferred algorithm
+            settings = RecommendationSettings.objects.filter(user=user).first()
+            algorithm = settings.active_algorithm if settings else "collaborative"
+            
+            # Get personalized recommendations
+            user_recommendations = UserProductRecommendation.objects.filter(
+                user=user,
+                recommendation_type=algorithm
+            ).select_related('product').order_by('-score')[:12]
+            
+            if user_recommendations.exists():
+                recommended_products = [rec.product for rec in user_recommendations]
+            else:
+                # Fallback: get products from similar users or popular products
+                recommended_products = self.get_fallback_recommendations(user)
+            
+            serializer = ProductSerializer(recommended_products, many=True)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            # Fallback to popular products
+            recommended_products = Product.objects.annotate(
+                order_count=Count('orderproduct')
+            ).order_by('-order_count')[:12]
+            
+            serializer = ProductSerializer(recommended_products, many=True)
+            return Response(serializer.data)
+    
+    def get_fallback_recommendations(self, user):
+        """Get fallback recommendations when no personalized data exists"""
+        try:
+            # Try to get products from user's purchase history categories
+            user_orders = Order.objects.filter(user=user)
+            if user_orders.exists():
+                # Get categories user has purchased from
+                purchased_categories = Product.objects.filter(
+                    orderproduct__order__user=user
+                ).values_list('categories__id', flat=True).distinct()
+                
+                if purchased_categories:
+                    # Get popular products from those categories
+                    return Product.objects.filter(
+                        categories__id__in=purchased_categories
+                    ).annotate(
+                        order_count=Count('orderproduct')
+                    ).order_by('-order_count')[:12]
+            
+            # Ultimate fallback: most popular products overall
+            return Product.objects.annotate(
+                order_count=Count('orderproduct')
+            ).order_by('-order_count')[:12]
+            
+        except Exception:
+            # Last resort: first 12 products
+            return Product.objects.all()[:12]
 
 class ResetPhotoSequenceView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]

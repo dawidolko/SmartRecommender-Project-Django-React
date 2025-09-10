@@ -82,41 +82,55 @@ const AdminProbabilistic = () => {
     setError(null);
 
     try {
-      const forecastRes = await fetch(`${config.apiUrl}/api/sales-forecast/`, {
+      // Pobieranie danych z nowego endpoint probabilistic analysis
+      const probabilisticRes = await fetch(`${config.apiUrl}/api/admin/probabilistic-analysis/`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
-      if (!forecastRes.ok) {
-        throw new Error(`HTTP error! status: ${forecastRes.status}`);
+      if (probabilisticRes.ok) {
+        const probabilisticData = await probabilisticRes.json();
+        
+        // Ustawienie danych z nowego endpoint
+        setSalesForecasts(probabilisticData.markov_predictions?.user_predictions || []);
+        setChartData(probabilisticData.predictive_charts?.forecast_data || []);
+        setRiskData(probabilisticData.risk_analysis || { high_risk_alerts: [], risk_overview: {} });
+        setDemandForecasts(probabilisticData.bayesian_insights?.product_insights || []);
+      } else {
+        // Fallback do starych endpoints jeśli nowy nie działa
+        const [forecastRes, riskRes, demandRes] = await Promise.all([
+          fetch(`${config.apiUrl}/api/sales-forecast/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }).catch(() => null),
+          fetch(`${config.apiUrl}/api/risk-dashboard/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }).catch(() => null),
+          fetch(`${config.apiUrl}/api/product-demand/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }).catch(() => null),
+        ]);
+
+        const forecast = forecastRes?.ok ? await forecastRes.json() : {};
+        const risk = riskRes?.ok ? await riskRes.json() : {};
+        const demand = demandRes?.ok ? await demandRes.json() : {};
+
+        setSalesForecasts(forecast.forecasts || []);
+        setChartData(forecast.chart_data || []);
+        setRiskData(risk || { high_risk_alerts: [], risk_overview: {} });
+        setDemandForecasts(demand.demand_forecasts || []);
       }
 
-      const forecast = await forecastRes.json();
-
-      const riskRes = await fetch(`${config.apiUrl}/api/risk-dashboard/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const risk = await riskRes.json();
-
-      const demandRes = await fetch(`${config.apiUrl}/api/product-demand/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const demand = await demandRes.json();
-
-      setSalesForecasts(forecast.forecasts || []);
-      setChartData(forecast.chart_data || []);
-      setRiskData(risk || { high_risk_alerts: [], risk_overview: {} });
-      setDemandForecasts(demand.demand_forecasts || []);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -590,10 +604,10 @@ const AdminProbabilistic = () => {
   return (
     <div className="admin-probabilistic">
       <div className="probabilistic-tabs">
-        <TabButton id="forecast" label="Sales Forecast" icon={TrendingUp} />
-        <TabButton id="demand" label="Product Demand" icon={Package} />
+        <TabButton id="forecast" label="Markov Analysis" icon={TrendingUp} />
+        <TabButton id="demand" label="Bayesian Insights" icon={Package} />
         <TabButton id="risk" label="Risk Dashboard" icon={AlertTriangle} />
-        <TabButton id="insights" label="User Insights" icon={Users} />
+        <TabButton id="insights" label="User Predictions" icon={Users} />
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={modalTitle}>
@@ -610,7 +624,7 @@ const AdminProbabilistic = () => {
         {activeTab === "forecast" && (
           <div className="forecast-section">
             <div className="forecast-header">
-              <h2>Sales Forecasting</h2>
+              <h2>Markov Chain Analysis</h2>
               <div className="summary-cards">
                 <div className="summary-card">
                   <h3>Total Predicted Units</h3>
@@ -714,7 +728,7 @@ const AdminProbabilistic = () => {
         {activeTab === "demand" && (
           <div className="demand-section">
             <div className="demand-header">
-              <h2>Product Demand Forecasting</h2>
+              <h2>Bayesian Insights Dashboard</h2>
               <div className="alerts">
                 {demandForecasts.some(
                   (d) => d.expected_demand > d.reorder_point
@@ -883,7 +897,7 @@ const AdminProbabilistic = () => {
         {activeTab === "insights" && (
           <div className="insights-section">
             <div className="insights-header">
-              <h2>User Behavior Insights</h2>
+              <h2>User Prediction Analysis</h2>
               <button className="insights-refresh" onClick={fetchData}>
                 <BarChart2 />
                 Refresh Data
