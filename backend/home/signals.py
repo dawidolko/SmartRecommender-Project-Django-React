@@ -47,13 +47,9 @@ def log_interaction_on_purchase(sender, instance, created, **kwargs):
             product=instance.product,
             interaction_type="purchase",
         )
-        # Invalidate collaborative filtering cache gdy nowe zakupy
         cache.delete("collaborative_similarity_matrix")
-        # Invalidate content-based filtering cache
         cache.delete("content_based_similarity_matrix")
-        # Invalidate association rules cache
         cache.delete("association_rules_list")
-        # Invalidate user recommendations cache
         user_id = instance.order.user.id
         cache.delete(f"user_recommendations_{user_id}_collaborative")
         cache.delete(f"user_recommendations_{user_id}_content_based")
@@ -81,7 +77,6 @@ def handle_product_changes(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Opinion)
 def handle_sentiment_analysis(sender, instance, created, **kwargs):
-    # Skip sentiment analysis during seeding
     if getattr(instance, "_skip_sentiment_update", False):
         return
         
@@ -100,9 +95,7 @@ def handle_sentiment_analysis(sender, instance, created, **kwargs):
             },
         )
 
-        # Invalidate sentiment cache for the product
         cache_pattern = f"product_sentiment_{instance.product.id}_*"
-        # Nie mamy wildcard delete, więc usuniemy konkretny klucz
         cache.delete(f"product_sentiment_{instance.product.id}_static")
         
         sentiment_data = sentiment_analyzer.analyze_product_sentiment(

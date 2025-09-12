@@ -94,6 +94,14 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
+REM Creating custom cache table
+echo Creating custom cache table 'recommendation_cache_table'...
+python manage.py createcachetable recommendation_cache_table
+if %errorlevel% neq 0 (
+    echo Error during custom cache table creation.
+    exit /b %errorlevel%
+)
+
 REM Running Django server
 echo Starting Django server...
 start "" http://127.0.0.1:8000

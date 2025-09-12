@@ -122,11 +122,11 @@ CACHES = {
         "LOCATION": "recommendation_cache_table",
         "OPTIONS": {
             "MAX_ENTRIES": 5000,
-            "CULL_FREQUENCY": 4,  # Usuwa 1/4 wpisów gdy cache jest pełny
+            "CULL_FREQUENCY": 4, 
         },
     }
 }
 
-CACHE_TIMEOUT_SHORT = 300  # 5 minut dla szybko zmieniających się danych
-CACHE_TIMEOUT_MEDIUM = 1800  # 30 minut dla rekomendacji
-CACHE_TIMEOUT_LONG = 7200  # 2 godziny dla podobieństw produktów
+CACHE_TIMEOUT_SHORT = 300 
+CACHE_TIMEOUT_MEDIUM = 1800 
+CACHE_TIMEOUT_LONG = 7200 

@@ -79,7 +79,6 @@ class UpdateAssociationRulesAPI(APIView):
         try:
             print("Starting enhanced association rules update...")
             
-            # Sprawdź cache
             cache_key = "association_rules_processing"
             if cache.get(cache_key):
                 return Response(
@@ -89,14 +88,11 @@ class UpdateAssociationRulesAPI(APIView):
                     }
                 )
             
-            # Ustaw cache że przetwarzanie trwa
-            cache.set(cache_key, True, timeout=300)  # 5 minut
+            cache.set(cache_key, True, timeout=300)
             
             try:
-                # Usuwanie starych reguł
                 ProductAssociation.objects.all().delete()
 
-                # ZWIĘKSZONE: z 1000 do 2000 zamówień
                 orders = Order.objects.prefetch_related(
                     Prefetch(
                         "orderproduct_set",
@@ -122,18 +118,15 @@ class UpdateAssociationRulesAPI(APIView):
 
                 print(f"Processing {len(transactions)} transactions with enhanced algorithm")
 
-                # NOWA: Ulepszona wersja z bitmap pruning
                 association_engine = CustomAssociationRules(
-                    min_support=0.008, min_confidence=0.08  # Nieco niższe progi dla większej ilości reguł
+                    min_support=0.008, min_confidence=0.08
                 )
                 rules = association_engine.generate_association_rules(transactions)
 
-                # BULK OPERATIONS: Tworzenie reguł w batch'ach
                 associations_to_create = []
                 created_pairs = set()
                 rules_processed = 0
 
-                # ZWIĘKSZONE: z 500 do 1000 reguł
                 for rule in rules[:1000]:
                     try:
                         product_1_id = int(rule["product_1"])
@@ -143,7 +136,6 @@ class UpdateAssociationRulesAPI(APIView):
                         if pair_key in created_pairs:
                             continue
 
-                        # Dodanie do listy bulk create
                         associations_to_create.append(
                             ProductAssociation(
                                 product_1_id=product_1_id,
@@ -157,7 +149,6 @@ class UpdateAssociationRulesAPI(APIView):
                         created_pairs.add(pair_key)
                         rules_processed += 1
 
-                        # BULK CREATE co 200 reguł
                         if len(associations_to_create) >= 200:
                             ProductAssociation.objects.bulk_create(associations_to_create)
                             associations_to_create = []
@@ -166,13 +157,11 @@ class UpdateAssociationRulesAPI(APIView):
                         print(f"Error processing rule: {e}")
                         continue
 
-                # Utworzenie pozostałych reguł
                 if associations_to_create:
                     ProductAssociation.objects.bulk_create(associations_to_create)
 
                 print(f"Created {rules_processed} enhanced association rules using bitmap pruning")
                 
-                # Invalidate related caches
                 cache.delete("association_rules_list")
                 
                 return Response(
@@ -186,7 +175,6 @@ class UpdateAssociationRulesAPI(APIView):
                 )
                 
             finally:
-                # Usuń cache przetwarzania
                 cache.delete(cache_key)
 
         except Exception as e:
@@ -198,7 +186,6 @@ class UpdateAssociationRulesAPI(APIView):
 
 class AssociationRulesListAPI(APIView):
     def get(self, request):
-        # Sprawdź cache
         cache_key = "association_rules_list"
         cached_result = cache.get(cache_key)
         
@@ -235,7 +222,6 @@ class AssociationRulesListAPI(APIView):
             "cached": False
         }
         
-        # Cache wyników na 30 minut
         cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 1800))
         
         return Response(result)

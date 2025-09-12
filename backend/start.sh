@@ -103,6 +103,10 @@ if [ $? -ne 0 ]; then
     echo "Warning: Error during database seeding, but continuing..."
 fi
 
+# Creating custom cache table
+echo "Creating custom cache table 'recommendation_cache_table'..."
+python manage.py createcachetable recommendation_cache_table
+
 # Running check_media.py if it exists
 if [ -f "check_media.py" ]; then
     echo "Running media check..."

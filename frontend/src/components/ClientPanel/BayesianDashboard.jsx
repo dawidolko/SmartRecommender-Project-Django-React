@@ -14,18 +14,18 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { 
-  TrendingUp, 
-  Target, 
-  Activity, 
-  Brain, 
-  BarChart3, 
-  PieChart, 
+import {
+  TrendingUp,
+  Target,
+  Activity,
+  Brain,
+  BarChart3,
+  PieChart,
   Radar as RadarIcon,
   AlertTriangle,
   Info,
   Eye,
-  Settings
+  Settings,
 } from "react-feather";
 import "./BayesianDashboard.scss";
 
@@ -63,14 +63,13 @@ const BayesianDashboard = ({
     confidence: useRef(null),
   };
 
-  // Default data for demonstration if no props provided
   const defaultCategoryPreferences = {
-    "Electronics": 0.85,
-    "Books": 0.72,
-    "Clothing": 0.68,
+    Electronics: 0.85,
+    Books: 0.72,
+    Clothing: 0.68,
     "Home & Garden": 0.45,
-    "Sports": 0.63,
-    "Beauty": 0.54
+    Sports: 0.63,
+    Beauty: 0.54,
   };
 
   const defaultBehavioralInsights = [
@@ -79,44 +78,51 @@ const BayesianDashboard = ({
       score: 0.76,
       confidence: 0.89,
       description: "Moderate price sensitivity with preference for value deals",
-      trend: "increasing"
+      trend: "increasing",
     },
     {
       name: "Brand Loyalty",
       score: 0.62,
       confidence: 0.82,
       description: "Shows moderate brand loyalty patterns",
-      trend: "stable"
+      trend: "stable",
     },
     {
       name: "Seasonal Behavior",
       score: 0.91,
       confidence: 0.94,
       description: "Strong seasonal shopping patterns detected",
-      trend: "seasonal"
+      trend: "seasonal",
     },
     {
       name: "Impulse Buying",
       score: 0.34,
       confidence: 0.71,
       description: "Low impulse buying tendency",
-      trend: "decreasing"
-    }
+      trend: "decreasing",
+    },
   ];
 
   const defaultConfidenceIntervals = {
     "Next Purchase": { lower: 0.65, upper: 0.89, mean: 0.77 },
     "Category Switch": { lower: 0.23, upper: 0.51, mean: 0.37 },
     "Churn Risk": { lower: 0.18, upper: 0.32, mean: 0.25 },
-    "Price Sensitivity": { lower: 0.68, upper: 0.84, mean: 0.76 }
+    "Price Sensitivity": { lower: 0.68, upper: 0.84, mean: 0.76 },
   };
 
-  // Use props or defaults
-  const categoryData = Object.keys(categoryPreferences).length > 0 ? categoryPreferences : defaultCategoryPreferences;
-  const behaviorData = behavioralInsights.length > 0 ? behavioralInsights : defaultBehavioralInsights;
-  const confidenceData = Object.keys(confidenceIntervals).length > 0 ? confidenceIntervals : defaultConfidenceIntervals;
+  const categoryData =
+    Object.keys(categoryPreferences).length > 0
+      ? categoryPreferences
+      : defaultCategoryPreferences;
+  const behaviorData =
+    behavioralInsights.length > 0
+      ? behavioralInsights
+      : defaultBehavioralInsights;
+  const confidenceData =
+    Object.keys(confidenceIntervals).length > 0
+      ? confidenceIntervals
+      : defaultConfidenceIntervals;
 
-  // Color schemes
   const colors = {
     primary: "#0066cc",
     secondary: "#4caf50",
@@ -129,11 +135,10 @@ const BayesianDashboard = ({
       primary: ["#0066cc", "#4d94ff"],
       secondary: ["#4caf50", "#81c784"],
       accent: ["#ff9800", "#ffb74d"],
-      danger: ["#f44336", "#e57373"]
-    }
+      danger: ["#f44336", "#e57373"],
+    },
   };
 
-  // Generate radar chart data for category preferences
   const getRadarChartData = () => {
     const categories = Object.keys(categoryData);
     const values = Object.values(categoryData);
@@ -156,7 +161,7 @@ const BayesianDashboard = ({
         },
         {
           label: "Market Average",
-          data: categories.map(() => 0.5), // Baseline comparison
+          data: categories.map(() => 0.5),
           backgroundColor: "rgba(117, 117, 117, 0.1)",
           borderColor: "#757575",
           borderWidth: 1,
@@ -166,12 +171,11 @@ const BayesianDashboard = ({
           pointBorderWidth: 1,
           pointRadius: 4,
           fill: true,
-        }
+        },
       ],
     };
   };
 
-  // Generate gauge chart data for churn risk
   const getGaugeChartData = () => {
     const riskLevel = churnRisk;
     const remaining = 1 - riskLevel;
@@ -197,16 +201,15 @@ const BayesianDashboard = ({
           cutout: "70%",
           rotation: -90,
           circumference: 180,
-        }
+        },
       ],
     };
   };
 
-  // Generate behavioral insights bar chart
   const getBehavioralInsightsChart = () => {
-    const labels = behaviorData.map(item => item.name);
-    const scores = behaviorData.map(item => item.score);
-    const confidences = behaviorData.map(item => item.confidence);
+    const labels = behaviorData.map((item) => item.name);
+    const scores = behaviorData.map((item) => item.score);
+    const confidences = behaviorData.map((item) => item.confidence);
 
     return {
       labels: labels,
@@ -228,17 +231,16 @@ const BayesianDashboard = ({
           borderWidth: 1,
           borderRadius: 8,
           borderSkipped: false,
-        }
+        },
       ],
     };
   };
 
-  // Generate confidence intervals chart
   const getConfidenceIntervalsChart = () => {
     const labels = Object.keys(confidenceData);
-    const means = labels.map(key => confidenceData[key].mean);
-    const lowerBounds = labels.map(key => confidenceData[key].lower);
-    const upperBounds = labels.map(key => confidenceData[key].upper);
+    const means = labels.map((key) => confidenceData[key].mean);
+    const lowerBounds = labels.map((key) => confidenceData[key].lower);
+    const upperBounds = labels.map((key) => confidenceData[key].upper);
 
     return {
       labels: labels,
@@ -249,7 +251,7 @@ const BayesianDashboard = ({
           backgroundColor: colors.primary,
           borderColor: colors.primary,
           borderWidth: 2,
-          type: 'line',
+          type: "line",
           pointRadius: 6,
           pointHoverRadius: 8,
         },
@@ -267,33 +269,32 @@ const BayesianDashboard = ({
           backgroundColor: "rgba(0, 102, 204, 0.3)",
           borderColor: "rgba(0, 102, 204, 0.5)",
           borderWidth: 1,
-          fill: '-1',
-        }
+          fill: "-1",
+        },
       ],
     };
   };
 
-  // Chart options
   const radarOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       title: {
         display: true,
-        text: 'Category Preference Analysis',
-        font: { size: 16, weight: 'bold' }
+        text: "Category Preference Analysis",
+        font: { size: 16, weight: "bold" },
       },
       tooltip: {
         callbacks: {
           label: (context) => {
             const value = (context.parsed.r * 100).toFixed(1);
             return `${context.dataset.label}: ${value}%`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       r: {
@@ -301,20 +302,20 @@ const BayesianDashboard = ({
         max: 1,
         ticks: {
           stepSize: 0.2,
-          callback: (value) => `${(value * 100).toFixed(0)}%`
+          callback: (value) => `${(value * 100).toFixed(0)}%`,
         },
         grid: {
           color: "#e0e0e0",
         },
         pointLabels: {
-          font: { size: 12, weight: '500' }
-        }
-      }
+          font: { size: 12, weight: "500" },
+        },
+      },
     },
     animation: {
       duration: animationEnabled ? 1500 : 0,
-      easing: 'easeInOutCubic'
-    }
+      easing: "easeInOutCubic",
+    },
   };
 
   const gaugeOptions = {
@@ -326,22 +327,22 @@ const BayesianDashboard = ({
       },
       title: {
         display: true,
-        text: 'Churn Risk Assessment',
-        font: { size: 16, weight: 'bold' }
+        text: "Churn Risk Assessment",
+        font: { size: 16, weight: "bold" },
       },
       tooltip: {
         callbacks: {
           label: (context) => {
             if (context.label === "Safe Zone") return null;
             return `Churn Risk: ${context.parsed.toFixed(1)}%`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     animation: {
       duration: animationEnabled ? 2000 : 0,
-      easing: 'easeOutBounce'
-    }
+      easing: "easeOutBounce",
+    },
   };
 
   const behavioralOptions = {
@@ -349,27 +350,27 @@ const BayesianDashboard = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       title: {
         display: true,
-        text: 'Behavioral Insights Analysis',
-        font: { size: 16, weight: 'bold' }
-      }
+        text: "Behavioral Insights Analysis",
+        font: { size: 16, weight: "bold" },
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         max: 1,
         ticks: {
-          callback: (value) => `${(value * 100).toFixed(0)}%`
-        }
-      }
+          callback: (value) => `${(value * 100).toFixed(0)}%`,
+        },
+      },
     },
     animation: {
       duration: animationEnabled ? 1200 : 0,
-      delay: (context) => context.dataIndex * 100
-    }
+      delay: (context) => context.dataIndex * 100,
+    },
   };
 
   const confidenceOptions = {
@@ -377,29 +378,28 @@ const BayesianDashboard = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       title: {
         display: true,
-        text: 'Prediction Confidence Intervals',
-        font: { size: 16, weight: 'bold' }
-      }
+        text: "Prediction Confidence Intervals",
+        font: { size: 16, weight: "bold" },
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         max: 1,
         ticks: {
-          callback: (value) => `${(value * 100).toFixed(0)}%`
-        }
-      }
+          callback: (value) => `${(value * 100).toFixed(0)}%`,
+        },
+      },
     },
     animation: {
-      duration: animationEnabled ? 1500 : 0
-    }
+      duration: animationEnabled ? 1500 : 0,
+    },
   };
 
-  // Tab component
   const TabButton = ({ id, label, icon: Icon, count }) => (
     <button
       className={`tab-button ${activeView === id ? "active" : ""}`}
@@ -412,25 +412,24 @@ const BayesianDashboard = ({
     </button>
   );
 
-  // Handle chart interactions
   const handleChartClick = (event, elements, chartType) => {
     if (elements.length > 0 && onInsightClick) {
       const elementIndex = elements[0].index;
       let clickedData = null;
 
       switch (chartType) {
-        case 'radar':
+        case "radar":
           const categories = Object.keys(categoryData);
           clickedData = {
-            type: 'category',
+            type: "category",
             name: categories[elementIndex],
-            value: Object.values(categoryData)[elementIndex]
+            value: Object.values(categoryData)[elementIndex],
           };
           break;
-        case 'behavioral':
+        case "behavioral":
           clickedData = {
-            type: 'behavioral',
-            ...behaviorData[elementIndex]
+            type: "behavioral",
+            ...behaviorData[elementIndex],
           };
           break;
         default:
@@ -443,7 +442,6 @@ const BayesianDashboard = ({
     }
   };
 
-  // Get risk level info
   const getRiskLevelInfo = () => {
     if (churnRisk < 0.3) {
       return {
@@ -454,8 +452,8 @@ const BayesianDashboard = ({
         recommendations: [
           "Continue current engagement strategies",
           "Introduce premium features or loyalty programs",
-          "Use as reference for similar customer segments"
-        ]
+          "Use as reference for similar customer segments",
+        ],
       };
     } else if (churnRisk < 0.7) {
       return {
@@ -466,8 +464,8 @@ const BayesianDashboard = ({
         recommendations: [
           "Implement targeted retention campaigns",
           "Offer personalized deals and recommendations",
-          "Increase communication frequency with relevant content"
-        ]
+          "Increase communication frequency with relevant content",
+        ],
       };
     } else {
       return {
@@ -478,8 +476,8 @@ const BayesianDashboard = ({
         recommendations: [
           "Immediate intervention required",
           "Offer significant incentives to retain",
-          "Personal outreach from customer success team"
-        ]
+          "Personal outreach from customer success team",
+        ],
       };
     }
   };
@@ -496,7 +494,7 @@ const BayesianDashboard = ({
           </div>
           <div className="header-controls">
             <button
-              className={`control-button ${animationEnabled ? 'active' : ''}`}
+              className={`control-button ${animationEnabled ? "active" : ""}`}
               onClick={() => setAnimationEnabled(!animationEnabled)}
               title="Toggle animations">
               <Activity size={16} />
@@ -505,7 +503,8 @@ const BayesianDashboard = ({
           </div>
         </div>
         <p className="dashboard-description">
-          Advanced Bayesian analysis providing probabilistic insights into customer behavior, preferences, and risk assessment.
+          Advanced Bayesian analysis providing probabilistic insights into
+          customer behavior, preferences, and risk assessment.
         </p>
       </div>
 
@@ -516,27 +515,15 @@ const BayesianDashboard = ({
           icon={Eye}
           count={Object.keys(categoryData).length}
         />
-        <TabButton
-          id="preferences"
-          label="Preferences"
-          icon={RadarIcon}
-        />
-        <TabButton
-          id="risk"
-          label="Churn Risk"
-          icon={AlertTriangle}
-        />
+        <TabButton id="preferences" label="Preferences" icon={RadarIcon} />
+        <TabButton id="risk" label="Churn Risk" icon={AlertTriangle} />
         <TabButton
           id="behavior"
           label="Behavior"
           icon={BarChart3}
           count={behaviorData.length}
         />
-        <TabButton
-          id="confidence"
-          label="Confidence"
-          icon={TrendingUp}
-        />
+        <TabButton id="confidence" label="Confidence" icon={TrendingUp} />
       </div>
 
       <div className="tab-content">
@@ -553,13 +540,18 @@ const BayesianDashboard = ({
                     data={getRadarChartData()}
                     options={{
                       ...radarOptions,
-                      plugins: { ...radarOptions.plugins, title: { display: false } }
+                      plugins: {
+                        ...radarOptions.plugins,
+                        title: { display: false },
+                      },
                     }}
                   />
                 </div>
                 <div className="card-footer">
                   <span>Top preference: {Object.keys(categoryData)[0]}</span>
-                  <button onClick={() => setActiveView('preferences')}>View Details</button>
+                  <button onClick={() => setActiveView("preferences")}>
+                    View Details
+                  </button>
                 </div>
               </div>
 
@@ -569,14 +561,18 @@ const BayesianDashboard = ({
                   <h3>Churn Risk</h3>
                 </div>
                 <div className="gauge-display">
-                  <div className="gauge-value" style={{ color: riskInfo.color }}>
+                  <div
+                    className="gauge-value"
+                    style={{ color: riskInfo.color }}>
                     {(churnRisk * 100).toFixed(1)}%
                   </div>
                   <div className="gauge-label">{riskInfo.level}</div>
                 </div>
                 <div className="card-footer">
                   <span>{riskInfo.message}</span>
-                  <button onClick={() => setActiveView('risk')}>View Analysis</button>
+                  <button onClick={() => setActiveView("risk")}>
+                    View Analysis
+                  </button>
                 </div>
               </div>
 
@@ -594,44 +590,71 @@ const BayesianDashboard = ({
                           className="insight-fill"
                           style={{
                             width: `${insight.score * 100}%`,
-                            backgroundColor: colors.primary
+                            backgroundColor: colors.primary,
                           }}
                         />
-                        <span className="insight-value">{(insight.score * 100).toFixed(0)}%</span>
+                        <span className="insight-value">
+                          {(insight.score * 100).toFixed(0)}%
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="card-footer">
-                  <button onClick={() => setActiveView('behavior')}>View All Insights</button>
+                  <button onClick={() => setActiveView("behavior")}>
+                    View All Insights
+                  </button>
                 </div>
               </div>
             </div>
 
             <div className="summary-cards">
               <div className="summary-card">
-                <div className="summary-icon" style={{ backgroundColor: colors.primary + '20', color: colors.primary }}>
+                <div
+                  className="summary-icon"
+                  style={{
+                    backgroundColor: colors.primary + "20",
+                    color: colors.primary,
+                  }}>
                   <Target size={24} />
                 </div>
                 <div className="summary-content">
                   <h4>Prediction Accuracy</h4>
                   <div className="summary-value">
-                    {(Object.values(confidenceData).reduce((sum, item) => sum + item.mean, 0) / Object.keys(confidenceData).length * 100).toFixed(1)}%
+                    {(
+                      (Object.values(confidenceData).reduce(
+                        (sum, item) => sum + item.mean,
+                        0
+                      ) /
+                        Object.keys(confidenceData).length) *
+                      100
+                    ).toFixed(1)}
+                    %
                   </div>
                   <p>Average model confidence</p>
                 </div>
               </div>
 
               <div className="summary-card">
-                <div className="summary-icon" style={{ backgroundColor: colors.secondary + '20', color: colors.secondary }}>
+                <div
+                  className="summary-icon"
+                  style={{
+                    backgroundColor: colors.secondary + "20",
+                    color: colors.secondary,
+                  }}>
                   <TrendingUp size={24} />
                 </div>
                 <div className="summary-content">
                   <h4>Engagement Level</h4>
                   <div className="summary-value">
-                    {behaviorData.find(item => item.name === "Brand Loyalty")?.score ? 
-                      (behaviorData.find(item => item.name === "Brand Loyalty").score * 100).toFixed(0) + '%' : 
-                      'N/A'}
+                    {behaviorData.find((item) => item.name === "Brand Loyalty")
+                      ?.score
+                      ? (
+                          behaviorData.find(
+                            (item) => item.name === "Brand Loyalty"
+                          ).score * 100
+                        ).toFixed(0) + "%"
+                      : "N/A"}
                   </div>
                   <p>Customer loyalty score</p>
                 </div>
@@ -644,7 +667,10 @@ const BayesianDashboard = ({
           <div className="preferences-section">
             <div className="section-header">
               <h2>Category Preference Analysis</h2>
-              <p>Bayesian analysis of customer preferences across different product categories</p>
+              <p>
+                Bayesian analysis of customer preferences across different
+                product categories
+              </p>
             </div>
 
             <div className="preferences-content">
@@ -655,7 +681,8 @@ const BayesianDashboard = ({
                     data={getRadarChartData()}
                     options={{
                       ...radarOptions,
-                      onClick: (event, elements) => handleChartClick(event, elements, 'radar')
+                      onClick: (event, elements) =>
+                        handleChartClick(event, elements, "radar"),
                     }}
                   />
                 </div>
@@ -665,30 +692,40 @@ const BayesianDashboard = ({
                 <h3>Category Breakdown</h3>
                 <div className="category-list">
                   {Object.entries(categoryData)
-                    .sort(([,a], [,b]) => b - a)
+                    .sort(([, a], [, b]) => b - a)
                     .map(([category, probability], idx) => (
-                    <div
-                      key={idx}
-                      className={`category-item ${selectedCategory === category ? 'selected' : ''}`}
-                      onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}>
-                      <div className="category-info">
-                        <span className="category-name">{category}</span>
-                        <span className="category-rank">#{idx + 1}</span>
-                      </div>
-                      <div className="probability-display">
-                        <div className="probability-bar">
-                          <div
-                            className="probability-fill"
-                            style={{
-                              width: `${probability * 100}%`,
-                              backgroundColor: `hsl(${120 * probability}, 70%, 50%)`
-                            }}
-                          />
+                      <div
+                        key={idx}
+                        className={`category-item ${
+                          selectedCategory === category ? "selected" : ""
+                        }`}
+                        onClick={() =>
+                          setSelectedCategory(
+                            selectedCategory === category ? null : category
+                          )
+                        }>
+                        <div className="category-info">
+                          <span className="category-name">{category}</span>
+                          <span className="category-rank">#{idx + 1}</span>
                         </div>
-                        <span className="probability-value">{(probability * 100).toFixed(1)}%</span>
+                        <div className="probability-display">
+                          <div className="probability-bar">
+                            <div
+                              className="probability-fill"
+                              style={{
+                                width: `${probability * 100}%`,
+                                backgroundColor: `hsl(${
+                                  120 * probability
+                                }, 70%, 50%)`,
+                              }}
+                            />
+                          </div>
+                          <span className="probability-value">
+                            {(probability * 100).toFixed(1)}%
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 {selectedCategory && (
@@ -697,13 +734,18 @@ const BayesianDashboard = ({
                     <div className="detail-stats">
                       <div className="stat">
                         <span className="stat-label">Preference Score</span>
-                        <span className="stat-value">{(categoryData[selectedCategory] * 100).toFixed(1)}%</span>
+                        <span className="stat-value">
+                          {(categoryData[selectedCategory] * 100).toFixed(1)}%
+                        </span>
                       </div>
                       <div className="stat">
                         <span className="stat-label">Market Position</span>
                         <span className="stat-value">
-                          {categoryData[selectedCategory] > 0.7 ? 'High' : 
-                           categoryData[selectedCategory] > 0.4 ? 'Medium' : 'Low'}
+                          {categoryData[selectedCategory] > 0.7
+                            ? "High"
+                            : categoryData[selectedCategory] > 0.4
+                            ? "Medium"
+                            : "Low"}
                         </span>
                       </div>
                     </div>
@@ -718,7 +760,9 @@ const BayesianDashboard = ({
           <div className="risk-section">
             <div className="section-header">
               <h2>Churn Risk Assessment</h2>
-              <p>Bayesian probability model for customer retention prediction</p>
+              <p>
+                Bayesian probability model for customer retention prediction
+              </p>
             </div>
 
             <div className="risk-content">
@@ -731,7 +775,9 @@ const BayesianDashboard = ({
                   />
                   <div className="gauge-overlay">
                     <div className="gauge-center">
-                      <span className="gauge-percentage" style={{ color: riskInfo.color }}>
+                      <span
+                        className="gauge-percentage"
+                        style={{ color: riskInfo.color }}>
                         {(churnRisk * 100).toFixed(1)}%
                       </span>
                       <span className="gauge-label">Risk Level</span>
@@ -741,9 +787,14 @@ const BayesianDashboard = ({
               </div>
 
               <div className="risk-analysis">
-                <div className="risk-info-card" style={{ borderLeftColor: riskInfo.color }}>
+                <div
+                  className="risk-info-card"
+                  style={{ borderLeftColor: riskInfo.color }}>
                   <div className="risk-header">
-                    <riskInfo.icon size={24} style={{ color: riskInfo.color }} />
+                    <riskInfo.icon
+                      size={24}
+                      style={{ color: riskInfo.color }}
+                    />
                     <h3 style={{ color: riskInfo.color }}>{riskInfo.level}</h3>
                   </div>
                   <p className="risk-message">{riskInfo.message}</p>
@@ -787,7 +838,10 @@ const BayesianDashboard = ({
           <div className="behavior-section">
             <div className="section-header">
               <h2>Behavioral Insights Analysis</h2>
-              <p>Deep learning insights into customer behavioral patterns and tendencies</p>
+              <p>
+                Deep learning insights into customer behavioral patterns and
+                tendencies
+              </p>
             </div>
 
             <div className="behavior-content">
@@ -798,7 +852,8 @@ const BayesianDashboard = ({
                     data={getBehavioralInsightsChart()}
                     options={{
                       ...behavioralOptions,
-                      onClick: (event, elements) => handleChartClick(event, elements, 'behavioral')
+                      onClick: (event, elements) =>
+                        handleChartClick(event, elements, "behavioral"),
                     }}
                   />
                 </div>
@@ -810,21 +865,25 @@ const BayesianDashboard = ({
                     <div className="insight-header">
                       <h4>{insight.name}</h4>
                       <div className={`trend-indicator ${insight.trend}`}>
-                        {insight.trend === 'increasing' && '↗️'}
-                        {insight.trend === 'decreasing' && '↘️'}
-                        {insight.trend === 'stable' && '➡️'}
-                        {insight.trend === 'seasonal' && '🔄'}
+                        {insight.trend === "increasing" && "↗️"}
+                        {insight.trend === "decreasing" && "↘️"}
+                        {insight.trend === "stable" && "➡️"}
+                        {insight.trend === "seasonal" && "🔄"}
                       </div>
                     </div>
-                    
+
                     <div className="insight-metrics">
                       <div className="metric">
                         <span className="metric-label">Score</span>
-                        <span className="metric-value">{(insight.score * 100).toFixed(0)}%</span>
+                        <span className="metric-value">
+                          {(insight.score * 100).toFixed(0)}%
+                        </span>
                       </div>
                       <div className="metric">
                         <span className="metric-label">Confidence</span>
-                        <span className="metric-value">{(insight.confidence * 100).toFixed(0)}%</span>
+                        <span className="metric-value">
+                          {(insight.confidence * 100).toFixed(0)}%
+                        </span>
                       </div>
                     </div>
 
@@ -836,7 +895,7 @@ const BayesianDashboard = ({
                           className="mini-bar-fill"
                           style={{
                             width: `${insight.score * 100}%`,
-                            backgroundColor: colors.primary
+                            backgroundColor: colors.primary,
                           }}
                         />
                       </div>
@@ -845,7 +904,7 @@ const BayesianDashboard = ({
                           className="confidence-fill"
                           style={{
                             width: `${insight.confidence * 100}%`,
-                            backgroundColor: colors.secondary
+                            backgroundColor: colors.secondary,
                           }}
                         />
                       </div>
@@ -861,7 +920,9 @@ const BayesianDashboard = ({
           <div className="confidence-section">
             <div className="section-header">
               <h2>Prediction Confidence Intervals</h2>
-              <p>Statistical confidence bounds for Bayesian model predictions</p>
+              <p>
+                Statistical confidence bounds for Bayesian model predictions
+              </p>
             </div>
 
             <div className="confidence-content">
@@ -878,36 +939,48 @@ const BayesianDashboard = ({
               <div className="confidence-details">
                 <h3>Statistical Summary</h3>
                 <div className="confidence-grid">
-                  {Object.entries(confidenceData).map(([key, interval], idx) => (
-                    <div key={idx} className="confidence-card">
-                      <h4>{key}</h4>
-                      <div className="interval-display">
-                        <div className="interval-bar">
-                          <div className="interval-range">
-                            <div
-                              className="range-fill"
-                              style={{
-                                left: `${interval.lower * 100}%`,
-                                width: `${(interval.upper - interval.lower) * 100}%`
-                              }}
-                            />
-                            <div
-                              className="mean-indicator"
-                              style={{ left: `${interval.mean * 100}%` }}
-                            />
+                  {Object.entries(confidenceData).map(
+                    ([key, interval], idx) => (
+                      <div key={idx} className="confidence-card">
+                        <h4>{key}</h4>
+                        <div className="interval-display">
+                          <div className="interval-bar">
+                            <div className="interval-range">
+                              <div
+                                className="range-fill"
+                                style={{
+                                  left: `${interval.lower * 100}%`,
+                                  width: `${
+                                    (interval.upper - interval.lower) * 100
+                                  }%`,
+                                }}
+                              />
+                              <div
+                                className="mean-indicator"
+                                style={{ left: `${interval.mean * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="interval-values">
+                            <span className="lower">
+                              {(interval.lower * 100).toFixed(1)}%
+                            </span>
+                            <span className="mean">
+                              {(interval.mean * 100).toFixed(1)}%
+                            </span>
+                            <span className="upper">
+                              {(interval.upper * 100).toFixed(1)}%
+                            </span>
                           </div>
                         </div>
-                        <div className="interval-values">
-                          <span className="lower">{(interval.lower * 100).toFixed(1)}%</span>
-                          <span className="mean">{(interval.mean * 100).toFixed(1)}%</span>
-                          <span className="upper">{(interval.upper * 100).toFixed(1)}%</span>
+                        <div className="confidence-width">
+                          Confidence Width:{" "}
+                          {((interval.upper - interval.lower) * 100).toFixed(1)}
+                          %
                         </div>
                       </div>
-                      <div className="confidence-width">
-                        Confidence Width: {((interval.upper - interval.lower) * 100).toFixed(1)}%
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
 
                 <div className="model-info">
@@ -916,7 +989,15 @@ const BayesianDashboard = ({
                     <div className="model-stat">
                       <span className="stat-label">Average Confidence</span>
                       <span className="stat-value">
-                        {(Object.values(confidenceData).reduce((sum, item) => sum + (item.upper - item.lower), 0) / Object.keys(confidenceData).length * 100).toFixed(1)}%
+                        {(
+                          (Object.values(confidenceData).reduce(
+                            (sum, item) => sum + (item.upper - item.lower),
+                            0
+                          ) /
+                            Object.keys(confidenceData).length) *
+                          100
+                        ).toFixed(1)}
+                        %
                       </span>
                     </div>
                     <div className="model-stat">

@@ -82,24 +82,33 @@ const AdminProbabilistic = () => {
     setError(null);
 
     try {
-      // Pobieranie danych z nowego endpoint probabilistic analysis
-      const probabilisticRes = await fetch(`${config.apiUrl}/api/admin/probabilistic-analysis/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const probabilisticRes = await fetch(
+        `${config.apiUrl}/api/admin/probabilistic-analysis/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (probabilisticRes.ok) {
         const probabilisticData = await probabilisticRes.json();
-        
-        // Ustawienie danych z nowego endpoint
-        setSalesForecasts(probabilisticData.markov_predictions?.user_predictions || []);
+
+        setSalesForecasts(
+          probabilisticData.markov_predictions?.user_predictions || []
+        );
         setChartData(probabilisticData.predictive_charts?.forecast_data || []);
-        setRiskData(probabilisticData.risk_analysis || { high_risk_alerts: [], risk_overview: {} });
-        setDemandForecasts(probabilisticData.bayesian_insights?.product_insights || []);
+        setRiskData(
+          probabilisticData.risk_analysis || {
+            high_risk_alerts: [],
+            risk_overview: {},
+          }
+        );
+        setDemandForecasts(
+          probabilisticData.bayesian_insights?.product_insights || []
+        );
       } else {
-        // Fallback do starych endpoints jeśli nowy nie działa
         const [forecastRes, riskRes, demandRes] = await Promise.all([
           fetch(`${config.apiUrl}/api/sales-forecast/`, {
             headers: {
@@ -233,16 +242,22 @@ const AdminProbabilistic = () => {
             title: function (context) {
               const dataIndex = context[0].dataIndex;
               const data = chartData[dataIndex];
-              return `${context[0].label} (${data.products_count} products)`;
+              if (!data) return context[0].label;
+              const productsCount = data.products_count || 0;
+              return `${context[0].label} (${productsCount} products)`;
             },
             afterBody: function (context) {
               const dataIndex = context[0].dataIndex;
               const data = chartData[dataIndex];
+              if (!data) return [""];
+              const products = data.products || [];
+              const productsCount = data.products_count || 0;
               return [
                 "",
-                `Products included: ${data.products.join(", ")}${data.products_count > 5 ? "..." : ""
+                `Products included: ${products.join(", ")}${
+                  productsCount > 5 ? "..." : ""
                 }`,
-                `Total products: ${data.products_count}`,
+                `Total products: ${productsCount}`,
               ];
             },
           },
@@ -316,8 +331,7 @@ const AdminProbabilistic = () => {
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       className={`tab-button ${activeTab === id ? "active" : ""}`}
-      onClick={() => setActiveTab(id)}
-    >
+      onClick={() => setActiveTab(id)}>
       <Icon size={20} />
       <span>{label}</span>
     </button>
@@ -619,8 +633,7 @@ const AdminProbabilistic = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="tab-content"
-      >
+        className="tab-content">
         {activeTab === "forecast" && (
           <div className="forecast-section">
             <div className="forecast-header">
@@ -631,11 +644,11 @@ const AdminProbabilistic = () => {
                   <p>
                     {salesForecasts.length > 0
                       ? salesForecasts
-                        .reduce(
-                          (acc, curr) => acc + curr.predicted_quantity,
-                          0
-                        )
-                        .toLocaleString()
+                          .reduce(
+                            (acc, curr) => acc + curr.predicted_quantity,
+                            0
+                          )
+                          .toLocaleString()
                       : 0}
                   </p>
                   <small>All products combined</small>
@@ -663,11 +676,11 @@ const AdminProbabilistic = () => {
                   <p>
                     {chartData.length > 0
                       ? Math.round(
-                        chartData.reduce(
-                          (acc, curr) => acc + curr.total_predicted_quantity,
-                          0
-                        ) / chartData.length
-                      ).toLocaleString()
+                          chartData.reduce(
+                            (acc, curr) => acc + curr.total_predicted_quantity,
+                            0
+                          ) / chartData.length
+                        ).toLocaleString()
                       : 0}
                   </p>
                   <small>Units per day</small>
@@ -733,11 +746,11 @@ const AdminProbabilistic = () => {
                 {demandForecasts.some(
                   (d) => d.expected_demand > d.reorder_point
                 ) && (
-                    <div className="alert alert-warning">
-                      <AlertTriangle />
-                      <span>Some products need reordering</span>
-                    </div>
-                  )}
+                  <div className="alert alert-warning">
+                    <AlertTriangle />
+                    <span>Some products need reordering</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -821,8 +834,7 @@ const AdminProbabilistic = () => {
                         <span
                           className={`risk-score score-${Math.floor(
                             alert.risk_score * 10
-                          )}`}
-                        >
+                          )}`}>
                           Risk: {(alert.risk_score * 100).toFixed(0)}%
                         </span>
                       </div>
@@ -857,9 +869,9 @@ const AdminProbabilistic = () => {
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className={`pagination-button ${currentPage === 1 ? "disabled" : ""
-                        }`}
-                    >
+                      className={`pagination-button ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}>
                       <ChevronLeft size={16} />
                       <span>&lt;</span>
                     </button>
@@ -868,9 +880,9 @@ const AdminProbabilistic = () => {
                         <button
                           key={index}
                           onClick={() => paginate(index + 1)}
-                          className={`pagination-number ${currentPage === index + 1 ? "active" : ""
-                            }`}
-                        >
+                          className={`pagination-number ${
+                            currentPage === index + 1 ? "active" : ""
+                          }`}>
                           {index + 1}
                         </button>
                       ))
@@ -881,9 +893,9 @@ const AdminProbabilistic = () => {
                     <button
                       onClick={() => paginate(currentPage + 1)}
                       disabled={currentPage >= totalPages}
-                      className={`pagination-button ${currentPage >= totalPages ? "disabled" : ""
-                        }`}
-                    >
+                      className={`pagination-button ${
+                        currentPage >= totalPages ? "disabled" : ""
+                      }`}>
                       <ChevronRight size={16} />
                       <span>&gt;</span>
                     </button>
@@ -910,8 +922,7 @@ const AdminProbabilistic = () => {
                 <p>Analyzing user purchase behavior across categories</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("purchase_patterns")}
-                >
+                  onClick={() => handleInsightView("purchase_patterns")}>
                   View Details
                 </button>
               </div>
@@ -920,8 +931,7 @@ const AdminProbabilistic = () => {
                 <p>Segment users based on buying behavior</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("customer_segmentation")}
-                >
+                  onClick={() => handleInsightView("customer_segmentation")}>
                   View Details
                 </button>
               </div>
@@ -930,8 +940,7 @@ const AdminProbabilistic = () => {
                 <p>Identify customers at risk of churning</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("churn_prediction")}
-                >
+                  onClick={() => handleInsightView("churn_prediction")}>
                   View Details
                 </button>
               </div>
@@ -940,8 +949,7 @@ const AdminProbabilistic = () => {
                 <p>Personalized product recommendations</p>
                 <button
                   className="view-details"
-                  onClick={() => handleInsightView("product_recommendations")}
-                >
+                  onClick={() => handleInsightView("product_recommendations")}>
                   View Details
                 </button>
               </div>

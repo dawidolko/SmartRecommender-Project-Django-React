@@ -6,25 +6,27 @@ from django.core.cache import cache
 from django.conf import settings
 import math
 
+try:
+    from .models import Product, ProductSimilarity
+except ImportError as e:
+    print(f"Model import error: {e}")
+    Product = None
+    ProductSimilarity = None
 
 class CustomContentBasedFilter:
     def __init__(self):
         self.similarity_threshold = 0.2
-        # ZWIĘKSZONE: z 200 do 500
         self.max_products_for_similarity = 500
         self.batch_size = 100
-        # ZWIĘKSZONE: z 20 do 50 porównań na produkt
         self.max_comparisons_per_product = 50
         
-        # NOWE: System wag dla różnych cech
         self.feature_weights = {
-            'category': 0.40,    # 40% - najważniejsze
-            'tag': 0.30,        # 30% - ważne
-            'price': 0.20,      # 20% - średnie
-            'keywords': 0.10    # 10% - najmniej ważne
+            'category': 0.40,    
+            'tag': 0.30,        
+            'price': 0.20,      
+            'keywords': 0.10    
         }
         
-        # Słowa które ignorujemy przy ekstraktowaniu słów kluczowych
         self.stop_words = {
             'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
             'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 
@@ -39,7 +41,6 @@ class CustomContentBasedFilter:
         features1 = self._extract_weighted_features(product1)
         features2 = self._extract_weighted_features(product2)
         
-        # Obliczanie podobieństwa cosine z wagami
         dot_product = 0.0
         norm1 = 0.0
         norm2 = 0.0
@@ -63,26 +64,21 @@ class CustomContentBasedFilter:
         """Ekstraktuje cechy produktu z wagami"""
         features = {}
         
-        # KATEGORIE (40% wagi)
         for category in product.categories.all():
             feature_name = f"category_{category.name.lower()}"
             features[feature_name] = self.feature_weights['category']
         
-        # TAGI (30% wagi)
         for tag in product.tags.all():
             feature_name = f"tag_{tag.name.lower()}"
             features[feature_name] = self.feature_weights['tag']
         
-        # CENA (20% wagi)
         price_category = self._get_price_category(product.price)
         features[f"price_{price_category}"] = self.feature_weights['price']
         
-        # SŁOWA KLUCZOWE z opisu (10% wagi)
         if product.description:
             keywords = self._extract_keywords(product.description)
-            for keyword in keywords[:5]:  # Top 5 słów kluczowych
+            for keyword in keywords[:5]:
                 feature_name = f"keyword_{keyword}"
-                # Dzielimy wagę między słowa kluczowe
                 features[feature_name] = self.feature_weights['keywords'] / len(keywords[:5])
         
         return features
@@ -103,17 +99,14 @@ class CustomContentBasedFilter:
         if not text:
             return []
         
-        # Czyszczenie tekstu
         text = re.sub(r'[^\w\s]', ' ', text.lower())
         words = text.split()
         
-        # Filtrowanie stop words i krótkich słów
         filtered_words = [
             word for word in words 
             if len(word) > 3 and word not in self.stop_words
         ]
         
-        # Liczenie częstotliwości i zwracanie najczęstszych
         word_freq = Counter(filtered_words)
         return [word for word, freq in word_freq.most_common(10)]
 
@@ -121,7 +114,6 @@ class CustomContentBasedFilter:
         """Generuje podobieństwa dla wszystkich produktów z cache i bulk operations"""
         from home.models import Product, ProductSimilarity
 
-        # Sprawdź cache
         cache_key = "content_based_similarity_matrix"
         cached_result = cache.get(cache_key)
         
@@ -129,7 +121,6 @@ class CustomContentBasedFilter:
             print("Using cached content-based filtering results")
             return cached_result
 
-        # Pobierz produkty z optymalizacją
         products = list(
             Product.objects.prefetch_related(
                 "categories", "tags", "specification_set"
@@ -141,7 +132,6 @@ class CustomContentBasedFilter:
 
         print(f"Processing {len(products)} products for enhanced content-based similarity")
 
-        # Usuwanie starych podobieństw
         ProductSimilarity.objects.filter(similarity_type="content_based").delete()
 
         similarities_to_create = []
@@ -151,14 +141,12 @@ class CustomContentBasedFilter:
             if i % 25 == 0:
                 print(f"Processed {i}/{len(products)} products")
 
-            # Zwiększone porównania na produkt
             comparison_products = products[i + 1: i + 1 + self.max_comparisons_per_product]
 
             for product2 in comparison_products:
                 similarity_score = self.calculate_product_similarity(product1, product2)
 
                 if similarity_score > self.similarity_threshold:
-                    # Dwukierunkowe podobieństwa
                     similarities_to_create.extend([
                         ProductSimilarity(
                             product1=product1,
@@ -175,18 +163,15 @@ class CustomContentBasedFilter:
                     ])
                     similarities_created += 2
 
-                    # BULK CREATE co 1000 rekordów
                     if len(similarities_to_create) >= 1000:
                         ProductSimilarity.objects.bulk_create(similarities_to_create)
                         similarities_to_create = []
 
-        # Utworzenie pozostałych podobieństw
         if similarities_to_create:
             ProductSimilarity.objects.bulk_create(similarities_to_create)
 
         print(f"Created {similarities_created} enhanced content-based similarities")
         
-        # Cache wyników na 2 godziny
         cache.set(cache_key, similarities_created, timeout=getattr(settings, 'CACHE_TIMEOUT_LONG', 7200))
         
         return similarities_created
@@ -194,20 +179,17 @@ class CustomContentBasedFilter:
 
 class CustomFuzzySearch:
     def __init__(self):
-        self.default_threshold = 0.5  # Obniżone z 0.6 do 0.5 dla lepszego pokrycia
-        # ZWIĘKSZONE: z 100 do 200 znaków dla lepszego przetwarzania długich tekstów
+        self.default_threshold = 0.5
         self.max_distance_calc_length = 200
         
-        # NOWE: Konfiguracja dla chunking długich tekstów
         self.chunk_size = 150
         self.chunk_overlap = 30
         
-        # NOWE: Wagi dla różnych pól (optymalizowane)
         self.field_weights = {
-            'name': 0.45,        # Nazwa najważniejsza (zwiększone z 0.4)
-            'description': 0.25, # Opis średnio ważny (zmniejszone z 0.3) 
-            'category': 0.20,    # Kategoria ważna (bez zmian)
-            'specification': 0.10 # Specyfikacje najmniej ważne (bez zmian)
+            'name': 0.45,        
+            'description': 0.25, 
+            'category': 0.20,   
+            'specification': 0.10 
         }
 
     def calculate_fuzzy_score(self, query, text):
@@ -218,47 +200,37 @@ class CustomFuzzySearch:
         query = query.lower().strip()
         text = text.lower().strip()
 
-        # Cache check dla często używanych par query-text
         cache_key = f"fuzzy_{hash(query + text)}"
         cached_result = cache.get(cache_key)
         if cached_result is not None:
             return cached_result
 
-        # ETAP 1: Exact matching (najwyższa waga)
         if query == text:
             result = 1.0
         elif query in text:
-            # Bonus za zawieranie pełnego query jako substring
             result = 0.95
         else:
-            # ETAP 2: Multi-level analysis
             scores = []
             
-            # Word-level matching
             word_score = self._calculate_word_similarity(query, text)
             scores.append(('word', word_score, 0.5))
             
-            # NOWE: Trigram matching dla lepszego dopasowania
             trigram_score = self._calculate_trigram_similarity(query, text)
             scores.append(('trigram', trigram_score, 0.3))
             
-            # Character-level matching (dla krótkich tekstów lub jako fallback)
             if len(text) <= self.max_distance_calc_length:
                 char_score = self._calculate_character_similarity(query, text)
                 scores.append(('char', char_score, 0.2))
             else:
-                # CHUNKING dla długich tekstów
                 chunk_score = self._calculate_chunked_similarity(query, text)
                 scores.append(('chunk', chunk_score, 0.2))
             
-            # Weighted combination
             total_weight = sum(weight for _, _, weight in scores)
             if total_weight > 0:
                 result = sum(score * weight for _, score, weight in scores) / total_weight
             else:
                 result = 0.0
 
-        # Cache wyników na 5 minut (krótki TTL bo często się zmieniają)
         cache.set(cache_key, result, timeout=300)
         
         return min(1.0, max(0.0, result))
@@ -273,20 +245,18 @@ class CustomFuzzySearch:
         if not text_words:
             return 0.0
 
-        # Exact word intersection
         intersection = query_words.intersection(text_words)
         exact_score = len(intersection) / len(query_words)
         
-        # NOWE: Partial word matching (dla błędów w pisowni)
         partial_matches = 0
         for q_word in query_words:
-            if q_word not in intersection:  # Skip already matched words
+            if q_word not in intersection: 
                 best_match = 0.0
                 for t_word in text_words:
-                    if len(q_word) > 3 and len(t_word) > 3:  # Only for longer words
+                    if len(q_word) > 3 and len(t_word) > 3: 
                         similarity = self._calculate_character_similarity(q_word, t_word)
-                        if similarity > 0.7:  # Threshold for partial match
-                            best_match = max(best_match, similarity * 0.7)  # Reduced weight for partial
+                        if similarity > 0.7: 
+                            best_match = max(best_match, similarity * 0.7) 
                 if best_match > 0:
                     partial_matches += best_match
 

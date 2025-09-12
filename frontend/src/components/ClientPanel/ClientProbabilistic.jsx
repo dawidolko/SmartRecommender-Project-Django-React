@@ -75,7 +75,6 @@ const ClientProbabilistic = () => {
     setError(null);
 
     try {
-      // Równoległe pobieranie danych z wszystkich endpoints
       const [insightsRes, markovRes, bayesianRes] = await Promise.all([
         fetch(`${config.apiUrl}/api/my-shopping-insights/`, {
           headers: {
@@ -623,7 +622,8 @@ const ClientProbabilistic = () => {
             <div className="section-header">
               <h2>Next Purchase Predictions</h2>
               <p>
-                Our Markov chain models analyze your shopping sequences to predict what you're likely to buy next.
+                Our Markov chain models analyze your shopping sequences to
+                predict what you're likely to buy next.
               </p>
             </div>
 
@@ -637,9 +637,14 @@ const ClientProbabilistic = () => {
                     <div className="card-body">
                       <div className="probability-display">
                         <span className="probability-value">
-                          {Math.round(markovData.next_purchase_probability * 100)}%
+                          {Math.round(
+                            markovData.next_purchase_probability * 100
+                          )}
+                          %
                         </span>
-                        <span className="probability-label">within 30 days</span>
+                        <span className="probability-label">
+                          within 30 days
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -651,7 +656,7 @@ const ClientProbabilistic = () => {
                     <div className="card-body">
                       <div className="days-display">
                         <span className="days-value">
-                          {markovData.expected_days_to_next_purchase || 'N/A'}
+                          {markovData.expected_days_to_next_purchase || "N/A"}
                         </span>
                         <span className="days-label">days</span>
                       </div>
@@ -662,39 +667,50 @@ const ClientProbabilistic = () => {
                 <div className="sequence-predictions">
                   <h3>Likely Next Products</h3>
                   <div className="products-grid">
-                    {markovData.predicted_products && markovData.predicted_products.map((product, idx) => (
-                      <Link
-                        key={idx}
-                        to={`/product/${product.id}`}
-                        className="product-card-link">
-                        <div className="product-card prediction-card">
-                          <div className="product-image">
-                            {product.image_url ? (
-                              <img src={product.image_url} alt={product.name} />
-                            ) : (
-                              <div className="placeholder-image">
-                                {product.name.substring(0, 2).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          <div className="product-details">
-                            <h4>{product.name}</h4>
-                            <p className="product-price">${product.price}</p>
-                            <div className="prediction-score">
-                              <div className="score-label">Prediction Score:</div>
-                              <div className="score-bar">
-                                <div
-                                  className="score-fill"
-                                  style={{
-                                    width: `${product.prediction_score * 100}%`,
-                                  }}></div>
-                                <span>{Math.round(product.prediction_score * 100)}%</span>
+                    {markovData.predicted_products &&
+                      markovData.predicted_products.map((product, idx) => (
+                        <Link
+                          key={idx}
+                          to={`/product/${product.id}`}
+                          className="product-card-link">
+                          <div className="product-card prediction-card">
+                            <div className="product-image">
+                              {product.image_url ? (
+                                <img
+                                  src={product.image_url}
+                                  alt={product.name}
+                                />
+                              ) : (
+                                <div className="placeholder-image">
+                                  {product.name.substring(0, 2).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div className="product-details">
+                              <h4>{product.name}</h4>
+                              <p className="product-price">${product.price}</p>
+                              <div className="prediction-score">
+                                <div className="score-label">
+                                  Prediction Score:
+                                </div>
+                                <div className="score-bar">
+                                  <div
+                                    className="score-fill"
+                                    style={{
+                                      width: `${
+                                        product.prediction_score * 100
+                                      }%`,
+                                    }}></div>
+                                  <span>
+                                    {Math.round(product.prediction_score * 100)}
+                                    %
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      ))}
                   </div>
                 </div>
 
@@ -704,11 +720,18 @@ const ClientProbabilistic = () => {
                     <div className="pattern-insights">
                       <div className="insight-item">
                         <h4>Most Common Sequence</h4>
-                        <p>{markovData.sequence_analysis.most_common_sequence || 'Not enough data'}</p>
+                        <p>
+                          {markovData.sequence_analysis.most_common_sequence ||
+                            "Not enough data"}
+                        </p>
                       </div>
                       <div className="insight-item">
                         <h4>Purchase Cycle Length</h4>
-                        <p>{markovData.sequence_analysis.average_cycle_length || 'N/A'} products per cycle</p>
+                        <p>
+                          {markovData.sequence_analysis.average_cycle_length ||
+                            "N/A"}{" "}
+                          products per cycle
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -716,7 +739,10 @@ const ClientProbabilistic = () => {
               </>
             ) : (
               <div className="no-data">
-                <p>Not enough purchase data to generate Markov predictions. Make a few more purchases to see personalized insights!</p>
+                <p>
+                  Not enough purchase data to generate Markov predictions. Make
+                  a few more purchases to see personalized insights!
+                </p>
               </div>
             )}
           </div>
@@ -727,7 +753,8 @@ const ClientProbabilistic = () => {
             <div className="section-header">
               <h2>Behavioral Insights</h2>
               <p>
-                Our Bayesian models analyze your behavior patterns to provide deep insights into your shopping preferences.
+                Our Bayesian models analyze your behavior patterns to provide
+                deep insights into your shopping preferences.
               </p>
             </div>
 
@@ -740,17 +767,26 @@ const ClientProbabilistic = () => {
                     </div>
                     <div className="card-body">
                       <div className="likelihood-chart">
-                        {bayesianData.category_preferences && Object.entries(bayesianData.category_preferences).map(([category, likelihood], idx) => (
-                          <div key={idx} className="likelihood-bar">
-                            <span className="category-name">{category}</span>
-                            <div className="bar-container">
-                              <div
-                                className="bar-fill"
-                                style={{ width: `${likelihood * 100}%` }}></div>
-                              <span className="likelihood-value">{Math.round(likelihood * 100)}%</span>
-                            </div>
-                          </div>
-                        ))}
+                        {bayesianData.category_preferences &&
+                          Object.entries(bayesianData.category_preferences).map(
+                            ([category, likelihood], idx) => (
+                              <div key={idx} className="likelihood-bar">
+                                <span className="category-name">
+                                  {category}
+                                </span>
+                                <div className="bar-container">
+                                  <div
+                                    className="bar-fill"
+                                    style={{
+                                      width: `${likelihood * 100}%`,
+                                    }}></div>
+                                  <span className="likelihood-value">
+                                    {Math.round(likelihood * 100)}%
+                                  </span>
+                                </div>
+                              </div>
+                            )
+                          )}
                       </div>
                     </div>
                   </div>
@@ -761,20 +797,31 @@ const ClientProbabilistic = () => {
                     </div>
                     <div className="card-body">
                       <div className="churn-display">
-                        <div className={`churn-indicator ${bayesianData.churn_risk < 0.3 ? 'low' : bayesianData.churn_risk < 0.7 ? 'medium' : 'high'}`}>
+                        <div
+                          className={`churn-indicator ${
+                            bayesianData.churn_risk < 0.3
+                              ? "low"
+                              : bayesianData.churn_risk < 0.7
+                              ? "medium"
+                              : "high"
+                          }`}>
                           <span className="churn-percentage">
                             {Math.round(bayesianData.churn_risk * 100)}%
                           </span>
                           <span className="churn-label">
-                            {bayesianData.churn_risk < 0.3 ? 'Low Risk' : bayesianData.churn_risk < 0.7 ? 'Medium Risk' : 'High Risk'}
+                            {bayesianData.churn_risk < 0.3
+                              ? "Low Risk"
+                              : bayesianData.churn_risk < 0.7
+                              ? "Medium Risk"
+                              : "High Risk"}
                           </span>
                         </div>
                         <p className="churn-explanation">
-                          {bayesianData.churn_risk < 0.3 
-                            ? 'You are a loyal customer with consistent shopping patterns.'
-                            : bayesianData.churn_risk < 0.7 
-                            ? 'Your shopping frequency has decreased slightly. Consider exploring new products!'
-                            : 'We miss you! Check out our latest offers to rediscover great products.'}
+                          {bayesianData.churn_risk < 0.3
+                            ? "You are a loyal customer with consistent shopping patterns."
+                            : bayesianData.churn_risk < 0.7
+                            ? "Your shopping frequency has decreased slightly. Consider exploring new products!"
+                            : "We miss you! Check out our latest offers to rediscover great products."}
                         </p>
                       </div>
                     </div>
@@ -784,15 +831,21 @@ const ClientProbabilistic = () => {
                 <div className="behavioral-patterns">
                   <h3>Shopping Behavior Analysis</h3>
                   <div className="patterns-grid">
-                    {bayesianData.behavioral_insights && bayesianData.behavioral_insights.map((insight, idx) => (
-                      <div key={idx} className="pattern-card">
-                        <h4>{insight.pattern_name}</h4>
-                        <p className="pattern-description">{insight.description}</p>
-                        <div className="pattern-confidence">
-                          <span>Confidence: {Math.round(insight.confidence * 100)}%</span>
+                    {bayesianData.behavioral_insights &&
+                      bayesianData.behavioral_insights.map((insight, idx) => (
+                        <div key={idx} className="pattern-card">
+                          <h4>{insight.pattern_name}</h4>
+                          <p className="pattern-description">
+                            {insight.description}
+                          </p>
+                          <div className="pattern-confidence">
+                            <span>
+                              Confidence: {Math.round(insight.confidence * 100)}
+                              %
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
 
@@ -806,7 +859,9 @@ const ClientProbabilistic = () => {
                           <div className="suggestion-content">
                             <h4>{rec.title}</h4>
                             <p>{rec.description}</p>
-                            <span className="suggestion-confidence">Confidence: {Math.round(rec.confidence * 100)}%</span>
+                            <span className="suggestion-confidence">
+                              Confidence: {Math.round(rec.confidence * 100)}%
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -816,7 +871,10 @@ const ClientProbabilistic = () => {
               </>
             ) : (
               <div className="no-data">
-                <p>Not enough behavioral data to generate insights. Continue shopping to see personalized behavioral analysis!</p>
+                <p>
+                  Not enough behavioral data to generate insights. Continue
+                  shopping to see personalized behavioral analysis!
+                </p>
               </div>
             )}
           </div>

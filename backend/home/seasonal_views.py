@@ -31,7 +31,6 @@ class SeasonalTrendsView(APIView):
                     }
                 })
 
-            # Seasonal analysis by month
             seasonal_patterns = {}
             monthly_spending = defaultdict(list)
             
@@ -54,7 +53,6 @@ class SeasonalTrendsView(APIView):
                 seasonal_patterns[season]['order_count'] += 1
                 monthly_spending[month].append(order_value)
             
-            # Calculate averages
             for season in seasonal_patterns:
                 if seasonal_patterns[season]['order_count'] > 0:
                     seasonal_patterns[season]['avg_order_value'] = (
@@ -62,7 +60,6 @@ class SeasonalTrendsView(APIView):
                         seasonal_patterns[season]['order_count']
                     )
             
-            # Monthly spending summary
             monthly_summary = []
             month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -82,7 +79,6 @@ class SeasonalTrendsView(APIView):
                         'total_orders': 0
                     })
             
-            # Best months and recommendations
             best_months = sorted(
                 monthly_summary, 
                 key=lambda x: x['avg_spending'], 
@@ -125,15 +121,12 @@ class SeasonalTrendsView(APIView):
         if not seasonal_patterns:
             return ["Start shopping to get seasonal recommendations!"]
         
-        # Find best season
         best_season = max(seasonal_patterns.items(), key=lambda x: x[1]['total_spent'])
         tips.append(f"Your peak shopping season is {best_season[0]} - great time for major purchases!")
         
-        # Best months tip
         if best_months:
             tips.append(f"You tend to shop most in {', '.join([m['month'] for m in best_months[:2]])} - plan your budget accordingly!")
         
-        # Spending pattern tip
         total_seasonal_spending = sum(season['total_spent'] for season in seasonal_patterns.values())
         if total_seasonal_spending > 0:
             winter_pct = (seasonal_patterns.get('Winter', {}).get('total_spent', 0) / total_seasonal_spending) * 100
@@ -142,4 +135,4 @@ class SeasonalTrendsView(APIView):
             elif seasonal_patterns.get('Summer', {}).get('total_spent', 0) / total_seasonal_spending * 100 > 40:
                 tips.append("Summer is your big spending season - perfect for vacation gear and outdoor equipment!")
         
-        return tips[:3]  # Return top 3 tips
+        return tips[:3]

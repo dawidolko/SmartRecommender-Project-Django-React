@@ -86,7 +86,6 @@ class ProcessRecommendationsView(APIView):
             )
 
     def process_collaborative_filtering(self):
-        # Sprawdź cache
         cache_key = "collaborative_similarity_matrix"
         cached_result = cache.get(cache_key)
         
@@ -99,7 +98,6 @@ class ProcessRecommendationsView(APIView):
         
         print(f"Processing collaborative filtering for {users.count()} users and {products.count()} products")
 
-        # Budowanie macierzy użytkownik-produkt
         user_product_matrix = defaultdict(dict)
         for order in OrderProduct.objects.select_related("order", "product").all():
             user_product_matrix[order.order.user_id][order.product_id] = order.quantity
@@ -111,7 +109,6 @@ class ProcessRecommendationsView(APIView):
             print("Insufficient data for collaborative filtering")
             return 0
 
-        # Tworzenie macierzy numerycznej
         matrix = []
         for user_id in user_ids:
             row = []
@@ -121,31 +118,26 @@ class ProcessRecommendationsView(APIView):
 
         matrix = np.array(matrix, dtype=np.float32)
         
-        # NOWE: Normalizacja macierzy (Min-Max Scaling)
         print("Applying MinMax normalization to user-product matrix")
         scaler = MinMaxScaler()
         
-        # Normalizacja dla każdego użytkownika osobno (po wierszach)
         normalized_matrix = np.zeros_like(matrix)
         for i, user_row in enumerate(matrix):
-            if np.sum(user_row) > 0:  # Tylko jeśli użytkownik ma jakieś zakupy
+            if np.sum(user_row) > 0:
                 user_row_reshaped = user_row.reshape(-1, 1)
                 normalized_row = scaler.fit_transform(user_row_reshaped).flatten()
                 normalized_matrix[i] = normalized_row
             else:
                 normalized_matrix[i] = user_row
 
-        # Obliczanie podobieństwa produktów na znormalizowanej macierzy
         if normalized_matrix.shape[0] > 1 and normalized_matrix.shape[1] > 1:
             product_similarity = cosine_similarity(normalized_matrix.T)
             
-            # Usuwanie starych podobieństw
             ProductSimilarity.objects.filter(similarity_type="collaborative").delete()
             
             similarities_to_create = []
             similarity_count = 0
             
-            # ZMIENIONY: Próg zwiększony z 0.1 do 0.3
             similarity_threshold = 0.3
             
             for i, product1_id in enumerate(product_ids):
@@ -161,18 +153,15 @@ class ProcessRecommendationsView(APIView):
                         )
                         similarity_count += 1
                         
-                        # Bulk create co 1000 rekordów
                         if len(similarities_to_create) >= 1000:
                             ProductSimilarity.objects.bulk_create(similarities_to_create)
                             similarities_to_create = []
                             
-            # Utworzenie pozostałych podobieństw
             if similarities_to_create:
                 ProductSimilarity.objects.bulk_create(similarities_to_create)
             
             print(f"Created {similarity_count} collaborative similarities with threshold {similarity_threshold}")
             
-            # Cache wyników na 2 godziny
             cache.set(cache_key, similarity_count, timeout=getattr(settings, 'CACHE_TIMEOUT_LONG', 7200))
             
             return similarity_count
@@ -221,7 +210,6 @@ class GenerateUserRecommendationsView(APIView):
     def post(self, request):
         algorithm = request.data.get("algorithm", "collaborative")
         
-        # Cache key specific for user and algorithm
         cache_key = f"user_recommendations_{request.user.id}_{algorithm}"
         cached_result = cache.get(cache_key)
         
@@ -260,7 +248,6 @@ class GenerateUserRecommendationsView(APIView):
                     similarity.similarity_score
                 )
 
-        # Bulk update recommendations
         recommendations_to_update = []
         for product_id, score in recommendations.items():
             recommendation, created = UserProductRecommendation.objects.get_or_create(
@@ -276,7 +263,6 @@ class GenerateUserRecommendationsView(APIView):
         if recommendations_to_update:
             UserProductRecommendation.objects.bulk_update(recommendations_to_update, ['score'])
 
-        # Cache the result for 30 minutes
         cache.set(cache_key, len(recommendations), timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 1800))
 
         return Response(

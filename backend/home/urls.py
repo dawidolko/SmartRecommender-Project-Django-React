@@ -220,7 +220,6 @@ urlpatterns = [
         AssociationRulesAnalysisAPI.as_view(),
         name="association-rules-analysis",
     ),
-    # NOWE: Probabilistic Models Endpoints
     path(
         "api/markov-recommendations/",
         MarkovRecommendationsAPI.as_view(),
@@ -236,7 +235,6 @@ urlpatterns = [
         ProbabilisticAnalysisAdminAPI.as_view(),
         name="probabilistic-admin-analysis",
     ),
-    # Analytics endpoints
     path(
         "api/risk-dashboard/",
         RiskDashboardView.as_view(),

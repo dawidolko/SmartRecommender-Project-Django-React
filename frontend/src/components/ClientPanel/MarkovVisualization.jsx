@@ -40,22 +40,23 @@ const MarkovVisualization = ({
   const [activeView, setActiveView] = useState("network");
   const chartRef = useRef(null);
 
-  // Default data if none provided
   useEffect(() => {
     if (states.length === 0) {
-      // Example states for demonstration
-      const defaultStates = ["Electronics", "Books", "Clothing", "Home & Garden"];
+      const defaultStates = [
+        "Electronics",
+        "Books",
+        "Clothing",
+        "Home & Garden",
+      ];
       const defaultMatrix = [
         [0.4, 0.2, 0.3, 0.1],
         [0.15, 0.5, 0.25, 0.1],
         [0.2, 0.1, 0.6, 0.1],
         [0.25, 0.15, 0.2, 0.4],
       ];
-      // Set default data if component is used without props
     }
   }, [states]);
 
-  // Process transition matrix data for visualization
   const processTransitionData = () => {
     if (!transitionMatrix.length || !states.length) return null;
 
@@ -64,7 +65,7 @@ const MarkovVisualization = ({
 
     transitionMatrix.forEach((row, fromIndex) => {
       row.forEach((probability, toIndex) => {
-        if (probability > 0.05) { // Only show significant transitions
+        if (probability > 0.05) {
           transitions.push({
             from: fromIndex,
             to: toIndex,
@@ -81,7 +82,6 @@ const MarkovVisualization = ({
     return { transitions, nodePositions };
   };
 
-  // Generate circular positions for network nodes
   const generateNodePositions = (nodeCount) => {
     const positions = [];
     const centerX = 50;
@@ -99,14 +99,12 @@ const MarkovVisualization = ({
     return positions;
   };
 
-  // Create network diagram data
   const createNetworkData = () => {
     const data = processTransitionData();
     if (!data) return null;
 
     const { transitions, nodePositions } = data;
 
-    // Create datasets for nodes and edges
     const nodeDataset = {
       label: "States",
       data: nodePositions.map((pos, index) => ({
@@ -118,9 +116,9 @@ const MarkovVisualization = ({
         isCurrent: currentState === index,
       })),
       backgroundColor: nodePositions.map((_, index) => {
-        if (currentState === index) return "#dc3545"; // Current state - red
-        if (selectedState === index) return "#007bff"; // Selected state - blue
-        return "#28a745"; // Default - green
+        if (currentState === index) return "#dc3545";
+        if (selectedState === index) return "#007bff";
+        return "#28a745";
       }),
       borderColor: nodePositions.map((_, index) => {
         if (currentState === index) return "#a71e2a";
@@ -141,12 +139,11 @@ const MarkovVisualization = ({
     };
   };
 
-  // Create transition probability chart
   const createTransitionChart = () => {
     if (!transitionMatrix.length || selectedState === null) return null;
 
     const selectedRow = transitionMatrix[selectedState];
-    
+
     return {
       labels: states,
       datasets: [
@@ -155,13 +152,13 @@ const MarkovVisualization = ({
           data: selectedRow,
           backgroundColor: [
             "#007bff",
-            "#28a745", 
+            "#28a745",
             "#ffc107",
             "#dc3545",
             "#6f42c1",
             "#17a2b8",
             "#fd7e14",
-            "#e83e8c"
+            "#e83e8c",
           ],
           borderColor: [
             "#0056b3",
@@ -171,7 +168,7 @@ const MarkovVisualization = ({
             "#59359a",
             "#0f5257",
             "#d76100",
-            "#b8306f"
+            "#b8306f",
           ],
           borderWidth: 2,
           hoverOffset: 10,
@@ -180,7 +177,6 @@ const MarkovVisualization = ({
     };
   };
 
-  // Chart options
   const networkOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -245,9 +241,10 @@ const MarkovVisualization = ({
       },
       title: {
         display: true,
-        text: selectedState !== null ? 
-          `Transition Probabilities from ${states[selectedState]}` : 
-          "Select a state to view transitions",
+        text:
+          selectedState !== null
+            ? `Transition Probabilities from ${states[selectedState]}`
+            : "Select a state to view transitions",
         font: { size: 14, weight: "bold" },
         color: "#333",
       },
@@ -265,7 +262,6 @@ const MarkovVisualization = ({
   const networkData = createNetworkData();
   const transitionData = createTransitionChart();
 
-  // Custom SVG overlay for drawing transition arrows
   const renderTransitionArrows = () => {
     const data = processTransitionData();
     if (!data || activeView !== "network") return null;
@@ -278,9 +274,9 @@ const MarkovVisualization = ({
           {transitions.map((transition, index) => {
             const opacity = hoveredTransition === transition.from ? 1 : 0.6;
             const strokeWidth = selectedState === transition.from ? 3 : 2;
-            const color = selectedState === transition.from ? "#007bff" : "#666";
+            const color =
+              selectedState === transition.from ? "#007bff" : "#666";
 
-            // Calculate arrow position
             const x1 = `${transition.fromPos.x}%`;
             const y1 = `${transition.fromPos.y}%`;
             const x2 = `${transition.toPos.x}%`;
@@ -306,8 +302,7 @@ const MarkovVisualization = ({
                   textAnchor="middle"
                   dy="0.3em"
                   opacity={opacity}
-                  className="transition-probability-label"
-                >
+                  className="transition-probability-label">
                   {transition.probability.toFixed(2)}
                 </text>
               </g>
@@ -320,12 +315,8 @@ const MarkovVisualization = ({
               markerHeight="7"
               refX="9"
               refY="3.5"
-              orient="auto"
-            >
-              <polygon
-                points="0 0, 10 3.5, 0 7"
-                fill="#666"
-              />
+              orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
             </marker>
           </defs>
         </svg>
@@ -340,20 +331,22 @@ const MarkovVisualization = ({
           <GitBranch className="markov-icon" />
           {title}
         </h2>
-        
+
         <div className="markov-controls">
           <button
-            className={`control-btn ${activeView === "network" ? "active" : ""}`}
-            onClick={() => setActiveView("network")}
-          >
+            className={`control-btn ${
+              activeView === "network" ? "active" : ""
+            }`}
+            onClick={() => setActiveView("network")}>
             <Target size={16} />
             Network View
           </button>
           <button
-            className={`control-btn ${activeView === "transitions" ? "active" : ""}`}
+            className={`control-btn ${
+              activeView === "transitions" ? "active" : ""
+            }`}
             onClick={() => setActiveView("transitions")}
-            disabled={selectedState === null}
-          >
+            disabled={selectedState === null}>
             <Activity size={16} />
             Transitions
           </button>
@@ -375,7 +368,7 @@ const MarkovVisualization = ({
                 </>
               )}
             </div>
-            
+
             <div className="state-legend">
               <h4>State Legend</h4>
               <div className="legend-items">
@@ -385,14 +378,16 @@ const MarkovVisualization = ({
                     className={`legend-item ${
                       selectedState === index ? "selected" : ""
                     } ${currentState === index ? "current" : ""}`}
-                    onClick={() => setSelectedState(index)}
-                  >
+                    onClick={() => setSelectedState(index)}>
                     <div
                       className="legend-color"
                       style={{
-                        backgroundColor: 
-                          currentState === index ? "#dc3545" :
-                          selectedState === index ? "#007bff" : "#28a745"
+                        backgroundColor:
+                          currentState === index
+                            ? "#dc3545"
+                            : selectedState === index
+                            ? "#007bff"
+                            : "#28a745",
                       }}
                     />
                     <span className="legend-text">{state}</span>
@@ -414,7 +409,10 @@ const MarkovVisualization = ({
               ) : (
                 <div className="no-data-message">
                   <Target size={48} />
-                  <p>Select a state from the network view to see transition probabilities</p>
+                  <p>
+                    Select a state from the network view to see transition
+                    probabilities
+                  </p>
                 </div>
               )}
             </div>
@@ -433,7 +431,7 @@ const MarkovVisualization = ({
               <span className="stat-value">{states.length}</span>
             </div>
           </div>
-          
+
           {selectedState !== null && (
             <div className="stat-item">
               <Target className="stat-icon" />
@@ -443,7 +441,7 @@ const MarkovVisualization = ({
               </div>
             </div>
           )}
-          
+
           {currentState !== null && (
             <div className="stat-item">
               <Activity className="stat-icon" />

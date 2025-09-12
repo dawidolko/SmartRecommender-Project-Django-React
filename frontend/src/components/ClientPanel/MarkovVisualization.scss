@@ -298,7 +298,6 @@
     }
   }
 
-  // Responsive design
   @media (max-width: 768px) {
     padding: 1rem;
 
@@ -330,7 +329,7 @@
           .legend-items {
             .legend-item {
               padding: 0.5rem;
-              
+
               .legend-text {
                 font-size: 0.9rem;
               }
@@ -397,7 +396,7 @@
 
             .legend-item {
               gap: 0.5rem;
-              
+
               .legend-color {
                 width: 14px;
                 height: 14px;
@@ -409,7 +408,6 @@
     }
   }
 
-  // Animation for state transitions
   .legend-item {
     animation: fadeIn 0.3s ease-in-out;
   }
@@ -425,11 +423,10 @@
     }
   }
 
-  // Loading state
   &.loading {
     .chart-container {
       @include flexCenter(column);
-      
+
       &::after {
         content: "";
         width: 50px;
@@ -442,7 +439,6 @@
     }
   }
 
-  // Custom scrollbar for overflow content
   .legend-items,
   .stats-grid {
     &::-webkit-scrollbar {
@@ -465,7 +461,6 @@
   }
 }
 
-// Dark theme support (optional)
 @media (prefers-color-scheme: dark) {
   .markov-visualization {
     background: #1a1a1a;

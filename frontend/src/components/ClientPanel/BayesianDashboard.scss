@@ -5,7 +5,6 @@
   min-height: 100vh;
   background: #f8f9fa;
 
-  // Dashboard Header
   .dashboard-header {
     margin-bottom: 30px;
     background: white;
@@ -85,7 +84,6 @@
     }
   }
 
-  // Tabs
   .dashboard-tabs {
     display: flex;
     margin-bottom: 30px;
@@ -140,7 +138,6 @@
     }
   }
 
-  // Tab Content
   .tab-content {
     background: white;
     border-radius: 12px;
@@ -150,7 +147,6 @@
     min-height: 500px;
   }
 
-  // Section Headers
   .section-header {
     margin-bottom: 32px;
     text-align: center;
@@ -170,7 +166,6 @@
     }
   }
 
-  // Chart Containers
   .chart-container {
     height: 400px;
     margin: 20px 0;
@@ -214,7 +209,6 @@
     }
   }
 
-  // Overview Section
   .overview-section {
     .overview-grid {
       display: grid;
@@ -408,7 +402,6 @@
     }
   }
 
-  // Preferences Section
   .preferences-section {
     .preferences-content {
       display: grid;
@@ -532,7 +525,6 @@
     }
   }
 
-  // Risk Section
   .risk-section {
     .risk-content {
       display: grid;
@@ -673,7 +665,6 @@
     }
   }
 
-  // Behavior Section
   .behavior-section {
     .behavior-content {
       display: grid;
@@ -715,10 +706,18 @@
               font-size: 20px;
               line-height: 1;
 
-              &.increasing { filter: hue-rotate(120deg); }
-              &.decreasing { filter: hue-rotate(0deg); }
-              &.stable { filter: hue-rotate(60deg); }
-              &.seasonal { filter: hue-rotate(180deg); }
+              &.increasing {
+                filter: hue-rotate(120deg);
+              }
+              &.decreasing {
+                filter: hue-rotate(0deg);
+              }
+              &.stable {
+                filter: hue-rotate(60deg);
+              }
+              &.seasonal {
+                filter: hue-rotate(180deg);
+              }
             }
           }
 
@@ -775,7 +774,6 @@
     }
   }
 
-  // Confidence Section
   .confidence-section {
     .confidence-content {
       display: grid;
@@ -826,7 +824,11 @@
                   .range-fill {
                     position: absolute;
                     height: 100%;
-                    background: linear-gradient(90deg, rgba(0, 102, 204, 0.3), rgba(0, 102, 204, 0.6));
+                    background: linear-gradient(
+                      90deg,
+                      rgba(0, 102, 204, 0.3),
+                      rgba(0, 102, 204, 0.6)
+                    );
                     border-radius: 10px;
                   }
 
@@ -845,9 +847,16 @@
                 justify-content: space-between;
                 font-size: 12px;
 
-                .lower { color: #6c757d; }
-                .mean { color: $blue; font-weight: 600; }
-                .upper { color: #6c757d; }
+                .lower {
+                  color: #6c757d;
+                }
+                .mean {
+                  color: $blue;
+                  font-weight: 600;
+                }
+                .upper {
+                  color: #6c757d;
+                }
               }
             }
 
@@ -900,7 +909,6 @@
     }
   }
 
-  // Responsive Design
   @media (max-width: 1200px) {
     .preferences-content,
     .risk-content,
@@ -1014,7 +1022,6 @@
     }
   }
 
-  // Animation Classes
   .fade-in {
     animation: fadeIn 0.6s ease-in-out;
   }
@@ -1045,7 +1052,6 @@
     }
   }
 
-  // Loading States
   .loading-skeleton {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
@@ -1061,7 +1067,6 @@
     }
   }
 
-  // Accessibility
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -1072,7 +1077,6 @@
     }
   }
 
-  // High contrast mode
   @media (prefers-contrast: high) {
     .overview-card,
     .insight-card,
@@ -1086,13 +1090,6 @@
     }
   }
 
-  // Dark mode support (if implemented in the future)
-  @media (prefers-color-scheme: dark) {
-    // Dark mode styles would go here
-    // Currently maintaining light theme for consistency
-  }
-
-  // Print styles
   @media print {
     .dashboard-tabs,
     .header-controls {
@@ -1112,15 +1109,34 @@
   }
 }
 
-// Utility classes
-.text-primary { color: $blue !important; }
-.text-success { color: #4caf50 !important; }
-.text-warning { color: #ff9800 !important; }
-.text-danger { color: #f44336 !important; }
-.text-muted { color: #6c757d !important; }
+.text-primary {
+  color: $blue !important;
+}
+.text-success {
+  color: #4caf50 !important;
+}
+.text-warning {
+  color: #ff9800 !important;
+}
+.text-danger {
+  color: #f44336 !important;
+}
+.text-muted {
+  color: #6c757d !important;
+}
 
-.bg-primary { background-color: $blue !important; }
-.bg-success { background-color: #4caf50 !important; }
-.bg-warning { background-color: #ff9800 !important; }
-.bg-danger { background-color: #f44336 !important; }
-.bg-light { background-color: #f8f9fa !important; }
+.bg-primary {
+  background-color: $blue !important;
+}
+.bg-success {
+  background-color: #4caf50 !important;
+}
+.bg-warning {
+  background-color: #ff9800 !important;
+}
+.bg-danger {
+  background-color: #f44336 !important;
+}
+.bg-light {
+  background-color: #f8f9fa !important;
+}

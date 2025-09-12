@@ -16647,7 +16647,6 @@ def seed_opinions():
         ("Not the best, but good enough for the price.", 3),
     ]
 
-    # Pobierz już istniejące pary (user, product) z bazy danych  
     existing_pairs = set(Opinion.objects.values_list('user_id', 'product_id'))
     created_pairs = existing_pairs.copy()
     opinions_added = 0
@@ -16668,9 +16667,7 @@ def seed_opinions():
                 content, rating = random.choice(opinion_contents_with_ratings)
                 
                 try:
-                    # Sprawdź ponownie w bazie czy para nie istnieje (race condition)
                     if not Opinion.objects.filter(user=user, product=product).exists():
-                        # Tymczasowo wyłączamy sentiment analysis podczas seedowania
                         opinion = Opinion(
                             product=product,
                             user=user,
@@ -16682,17 +16679,14 @@ def seed_opinions():
                         created_pairs.add(pair_key)
                         opinions_added += 1
                         opinions_for_product += 1
-                        # Usunięto print, żeby nie spamować
                     else:
-                        created_pairs.add(pair_key)  # Dodaj do pamięci, że para istnieje
+                        created_pairs.add(pair_key)
                 except Exception as e:
                     print(Fore.RED + f"Error adding opinion for Product ID {product.id}: {e}")
-                    # Dodaj parę do pamięci, żeby nie próbować ponownie
                     created_pairs.add(pair_key)
 
     print(Fore.BLUE + f"Opinions successfully seeded. Total added: {opinions_added}")
     
-    # Teraz ręcznie tworzymy sentiment analysis dla wszystkich opinii
     print(Fore.YELLOW + "Creating sentiment analysis for seeded opinions...")
     create_sentiment_summaries_after_seeding()
 
@@ -16723,7 +16717,6 @@ def create_sentiment_summaries_after_seeding():
         except Exception as e:
             print(f"Error creating sentiment for opinion {opinion.id}: {e}")
     
-    # Teraz tworzymy podsumowania dla produktów
     print("Creating product sentiment summaries...")
     products_with_opinions = Product.objects.filter(opinion__isnull=False).distinct()
     
@@ -17271,8 +17264,3 @@ def generate_product_similarities():
     similarity_count = content_filter.generate_similarities_for_all_products()
     
     print(Fore.BLUE + f"Generated {similarity_count} product similarities using custom content-based filtering")
-
-    
-    # similarity_count = seed_update_content_based_similarity()
-    
-    # print(Fore.BLUE + f"Generated {similarity_count} product similarities")
