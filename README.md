@@ -2,17 +2,81 @@
 
 > **Project Description:** A comprehensive full-stack platform that delivers personalized product recommendations by combining machine learning, uncertainty modeling, and user behavior analysis. This system enhances user experience through dynamic, intelligent suggestions based on real-world data.
 
-> **Tech Stack:** `Python`, `Django`, `PostgreSQL`, `React`, `scikit-learn`
+> **Tech Stack:** `Python`, `Django`, `PostgreSQL`, `React`, `scikit-learn`, `Docker`
 
 ---
 
 ## 🚀 Usage
 
-### Running the Application
+### Option 1: Docker Setup (Recommended)
+
+The easiest way to run the project is using Docker. This ensures consistent environment across all platforms.
+
+#### Prerequisites
+
+- **Docker Desktop** installed on your system
+- **Hardware virtualization** enabled (Intel VT-x or AMD-V)
+
+#### Quick Start with Docker
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone <your-repo-url>
+   cd SmartRecommender-Project-Django-React
+   ```
+
+2. **Create environment file:**
+
+   ```bash
+   # Create .env file in the root directory
+   DB_NAME=product_recommendation
+   DB_USER=postgres
+   DB_PASSWORD=admin
+   DB_HOST=db
+   DB_PORT=5432
+   SECRET_KEY=django-insecure-default-key
+   DEBUG=True
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   ```
+
+3. **Build and run with Docker:**
+
+   ```bash
+   docker compose -f .tools/docker/docker-compose.yml up --build
+   ```
+
+4. **Access the application:**
+   - **Frontend (React)** → [http://localhost:3000](http://localhost:3000)
+   - **Backend (Django)** → [http://localhost:8000](http://localhost:8000)
+   - **Database (PostgreSQL)** → port `5432`
+
+#### Docker Management Commands
+
+```bash
+# Run in background
+docker compose -f .tools/docker/docker-compose.yml up -d --build
+
+# Stop containers
+docker compose -f .tools/docker/docker-compose.yml down
+
+# View logs
+docker compose -f .tools/docker/docker-compose.yml logs -f
+
+# Enter backend container
+docker exec -it SmartRecommender-Django bash
+
+# Enter database
+docker exec -it SmartRecommender-PostgreSQL psql -U postgres -d product_recommendation
+```
+
+### Option 2: Manual Setup
+
+#### Running with Startup Scripts
 
 We provide ready-to-use startup scripts for both Windows and Linux:
 
-#### Windows
+##### Windows
 
 ```bash
 # Start backend
@@ -24,7 +88,7 @@ cd frontend
 start.bat
 ```
 
-#### Linux/macOS
+##### Linux/macOS
 
 ```bash
 # Start backend
@@ -38,9 +102,9 @@ chmod +x start.sh
 ./start.sh
 ```
 
-### Manual Setup
+#### Manual Installation
 
-#### Backend (Django)
+##### Backend (Django)
 
 1. Create and activate a virtual environment:
 
@@ -73,7 +137,7 @@ python manage.py runserver
 
 Backend will be available at [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
-#### Frontend (React)
+##### Frontend (React)
 
 1. Navigate to the frontend directory:
 
@@ -145,6 +209,12 @@ SmartRecommender-Project-Django-React/
 │   ├── fuzzy_search.md         # Fuzzy search implementation
 │   ├── probabilistic_methods.md  # Probabilistic methods
 │   └── sentiment_analysis.md   # Sentiment analysis details
+│
+├── .tools/                     # Development tools
+│   └── docker/                 # Docker configuration
+│       ├── docker-compose.yml  # Docker Compose setup
+│       ├── Dockerfile.backend  # Backend container
+│       └── Dockerfile.frontend # Frontend container
 │
 ├── backend/                    # Django backend
 │   ├── core/                   # Core application

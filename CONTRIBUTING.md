@@ -22,6 +22,7 @@ There are many ways you can help SmartRecommender evolve and grow. Below are gui
    - Include detailed steps to reproduce the behavior and any relevant information (e.g., environment, logs, screenshots).
    - For backend issues, specify which part of the system is affected (database, API, recommendation algorithm).
    - For frontend issues, include browser information and screenshots when possible.
+   - For Docker-related issues, include container logs and Docker version information.
 
 Following these guidelines helps maintainers and the community understand, reproduce, and fix the problem faster.
 
@@ -33,6 +34,7 @@ Following these guidelines helps maintainers and the community understand, repro
 - Clearly describe the proposed feature, providing as much context and reasoning as possible.
 - For algorithm improvements, explain the expected benefit to recommendation quality.
 - For UI/UX enhancements, describe how they will improve user experience.
+- For Docker/deployment improvements, explain how they will simplify setup or improve reliability.
 
 If the idea is a good fit, maintainers or contributors can help refine and discuss how best to implement it.
 
@@ -50,6 +52,7 @@ If the idea is a good fit, maintainers or contributors can help refine and discu
      - **feature/your-feature** if you're adding a feature
      - **bugfix/your-fix** if you're fixing a bug
      - **algo/your-algorithm** if you're modifying a recommendation algorithm
+     - **docker/your-improvement** if you're improving Docker configuration
 
 3. **Coding Conventions**
 
@@ -60,6 +63,10 @@ If the idea is a good fit, maintainers or contributors can help refine and discu
    - For React/JavaScript code:
      - Use consistent component structure
      - Follow the project's ESLint configuration
+   - For Docker configurations:
+     - Use multi-stage builds where appropriate
+     - Follow Docker best practices for layer caching
+     - Document any new environment variables
 
 4. **Tests and CI**
 
@@ -67,12 +74,14 @@ If the idea is a good fit, maintainers or contributors can help refine and discu
    - For backend changes, include Django tests that verify your changes.
    - For algorithm modifications, include tests that verify recommendation quality.
    - For frontend changes, ensure components render correctly.
+   - For Docker changes, verify containers build and run successfully.
 
 5. **Pull Request Template**
 
    - Fill out the pull request template to provide an overview of your changes.
    - Include screenshots, GIFs, or any visual aids that clarify your modifications.
    - For algorithm changes, include before/after metrics if possible.
+   - For Docker changes, include build logs and performance comparisons if relevant.
 
 6. **No Issue Numbers in Title**
    - Avoid referencing the issue number in the PR title. Instead, mention the issue number in the pull request description (e.g., "Resolves #123").
@@ -115,6 +124,50 @@ SmartRecommender uses several recommendation algorithms:
 
 ## Development Setup
 
+### Option 1: Docker Setup (Recommended)
+
+The fastest way to get started with development:
+
+1. **Prerequisites**
+
+   - Docker Desktop installed
+   - Hardware virtualization enabled
+
+2. **Quick Start**
+
+   ```bash
+   git clone <repository-url>
+   cd SmartRecommender-Project-Django-React
+
+   # Create .env file with database settings
+   echo "DB_NAME=product_recommendation
+   DB_USER=postgres
+   DB_PASSWORD=admin
+   DB_HOST=db
+   DB_PORT=5432" > .env
+
+   # Start all services
+   docker compose -f .tools/docker/docker-compose.yml up --build
+   ```
+
+3. **Development Commands**
+
+   ```bash
+   # View logs
+   docker compose -f .tools/docker/docker-compose.yml logs -f
+
+   # Enter backend container for debugging
+   docker exec -it SmartRecommender-Django bash
+
+   # Run tests in backend container
+   docker exec -it SmartRecommender-Django python manage.py test
+
+   # Access database
+   docker exec -it SmartRecommender-PostgreSQL psql -U postgres -d product_recommendation
+   ```
+
+### Option 2: Manual Setup
+
 1. **Backend Setup**
 
    - Set up a PostgreSQL database
@@ -128,8 +181,45 @@ SmartRecommender uses several recommendation algorithms:
    - Start the development server with `npm start`
 
 3. **Testing Environment**
-   - Run backend tests with `python manage.py runserver`
+   - Run backend tests with `python manage.py test`
    - Run frontend tests with `npm test`
+
+---
+
+## Docker Development Guidelines
+
+When contributing Docker-related changes:
+
+1. **Performance Considerations**
+
+   - Use `.dockerignore` files to exclude unnecessary files
+   - Leverage Docker layer caching for faster builds
+   - Use multi-stage builds when appropriate
+
+2. **Environment Variables**
+
+   - Document new environment variables in both `.env.example` and README
+   - Use secure defaults where possible
+   - Never commit actual credentials
+
+3. **Container Health**
+
+   - Include health checks for services that need them
+   - Use proper wait conditions for service dependencies
+   - Ensure graceful shutdown handling
+
+4. **Testing Docker Changes**
+
+   ```bash
+   # Clean build to test from scratch
+   docker compose -f .tools/docker/docker-compose.yml down -v
+   docker system prune -a -f
+   docker compose -f .tools/docker/docker-compose.yml up --build
+
+   # Test individual services
+   docker compose -f .tools/docker/docker-compose.yml up db
+   docker compose -f .tools/docker/docker-compose.yml up backend
+   ```
 
 ---
 
