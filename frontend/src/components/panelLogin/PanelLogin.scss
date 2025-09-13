@@ -34,7 +34,7 @@
   h2 {
     font-size: 4rem;
     font-weight: 600;
-    color: #000;
+    color: $blackmain;
     margin-bottom: 0;
   }
 
@@ -74,8 +74,8 @@
   }
 
   button {
-    background-color: #007bff;
-    border: 1px solid #007bff;
+    background-color: $btn-primary-blue;
+    border: 1px solid $btn-primary-blue;
     padding: 0.6rem 0.8rem;
     font-size: 2rem;
     color: white;
@@ -86,8 +86,8 @@
 
   button:hover {
     background-color: $realwhite;
-    color: #007bff;
-    border: 1px solid #007bff;
+    color: $btn-primary-blue;
+    border: 1px solid $btn-primary-blue;
   }
 
   &__or {

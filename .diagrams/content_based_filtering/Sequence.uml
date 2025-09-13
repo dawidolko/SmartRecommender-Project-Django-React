@@ -1,0 +1,38 @@
+@startuml
+participant "Admin Panel" as Admin
+participant "UpdateProductSimilarityView" as API
+participant "CustomContentBasedFilter" as CBF
+participant "Cache" as Cache
+participant "Database" as DB
+
+Admin -> API: POST /api/admin/update-product-similarity/
+API -> CBF: CustomContentBasedFilter()
+CBF -> Cache: cache.get("content_based_similarity_matrix")
+Cache --> CBF: None (cache miss)
+
+CBF -> DB: Product.objects.prefetch_related()[:500]
+DB --> CBF: products_list
+
+loop dla każdego product1
+  loop dla każdego product2 (limited)
+    CBF -> CBF: calculate_product_similarity(p1, p2)
+    CBF -> CBF: _extract_weighted_features(p1)
+    CBF -> CBF: _extract_weighted_features(p2)
+    CBF -> CBF: cosine_similarity(features1, features2)
+    
+    alt similarity > 0.2
+      CBF -> CBF: Dodaj do similarities_to_create
+    end
+  end
+  
+  alt len(similarities_to_create) >= 1000
+    CBF -> DB: ProductSimilarity.objects.bulk_create()
+    CBF -> CBF: similarities_to_create = []
+  end
+end
+
+CBF -> DB: ProductSimilarity.objects.bulk_create() (remaining)
+CBF -> Cache: cache.set(cache_key, similarity_count, 7200s)
+CBF --> API: similarity_count
+API --> Admin: {"status": "success", "similarity_records_created": count}
+@enduml

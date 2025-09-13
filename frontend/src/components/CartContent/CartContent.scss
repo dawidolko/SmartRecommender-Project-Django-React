@@ -7,13 +7,13 @@
   &__remove-btn {
     background-color: transparent;
     border: none;
-    color: red;
+    color: $modal-close-red;
     font-size: 1.5rem;
     cursor: pointer;
     transition: color 0.3s ease;
 
     &:hover {
-      color: rgb(107, 14, 14) !important;
+      color: $remove-hover !important;
       background-color: transparent !important;
     }
   }
@@ -23,17 +23,17 @@
     bottom: 1rem;
     right: 1rem;
     padding: 1rem 2rem;
-    background-color: rgba(255, 0, 0, 0.8);
-    color: white;
+    background-color: $notification-bg;
+    color: $realwhite;
     border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 5px $notification-shadow;
     font-size: 1rem;
     z-index: 1000;
   }
 
   &__name {
     &:hover {
-      color: #007bff !important;
+      color: $btn-primary-blue !important;
       text-decoration: underline;
     }
   }
@@ -49,7 +49,7 @@
   }
 
   &__thead {
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.185);
+    box-shadow: 0 0 6px $thead-shadow;
   }
 
   &__row > * {
@@ -60,7 +60,7 @@
   &__tr > * {
     padding: 0.3em;
     font-size: 1.2rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $table-border;
   }
 
   &__img {
@@ -75,20 +75,20 @@
   &__action {
     &-btn {
       padding: 0.15em;
-      background-color: #00b60f;
-      border: 1px solid #00b60f;
+      background-color: $action-btn-bg;
+      border: 1px solid $action-btn-bg;
       border-radius: 3px;
 
       &:hover {
-        background: #08630f;
-        border: 1px solid #08630f;
+        background: $action-btn-hover;
+        border: 1px solid $action-btn-hover;
       }
     }
 
     &-icon {
       @include flexCenter(row);
       font-size: 1rem;
-      color: white;
+      color: $realwhite;
     }
 
     &-quantity {
@@ -99,13 +99,13 @@
 
   &__total {
     font-weight: bold;
-    color: rgb(239, 68, 68);
+    color: $error-red;
   }
 
   &__info {
     padding: 2em;
     max-width: 500px;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.24);
+    box-shadow: 0 0 6px $info-shadow;
 
     &-title {
       margin-bottom: 1em;
@@ -117,7 +117,7 @@
   &__total-amount {
     margin-bottom: 1em;
     font-size: 1.6rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.144);
+    border-bottom: 1px solid $total-border;
   }
 
   &__buttons {
@@ -168,7 +168,7 @@
     background-color: $dark;
     color: $white;
     border-radius: 5px;
-    box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 7px $modal-bg-shadow;
 
     &-overlay {
       position: fixed;
@@ -176,7 +176,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background: $modal-overlay;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -204,19 +204,19 @@
   &__recommendations {
     margin: 2rem 0;
     padding: 1.5rem;
-    background: #f8f9fa;
+    background: $recommendations-bg;
     border-radius: 8px;
 
     &-title {
       font-size: 1.5rem;
       margin-bottom: 1rem;
-      color: #333;
+      color: $recommendations-title;
     }
 
     &-loading {
       text-align: center;
       padding: 1rem;
-      color: #666;
+      color: $recommendations-loading;
     }
 
     &-grid {
@@ -229,17 +229,17 @@
   &__recommendation {
     &-item {
       display: flex;
-      background: white;
+      background: $realwhite;
       border-radius: 8px;
       padding: 1rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px $recommendation-shadow;
       text-align: center;
       max-width: 400px;
       flex-direction: column;
       align-items: center;
 
       &:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 8px $recommendation-hover-shadow;
         transform: translateY(-5px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
@@ -268,7 +268,7 @@
     &-name {
       font-size: 1.8rem;
       margin-bottom: 0.5rem;
-      color: #333;
+      color: $recommendations-title;
       cursor: pointer;
       text-decoration: none;
 
@@ -280,20 +280,20 @@
 
     &-price {
       font-weight: bold;
-      color: #c41200;
+      color: $recommendation-price;
       margin-bottom: 0.5rem;
     }
 
     &-stats {
       font-size: 0.85rem;
-      color: #666;
+      color: $recommendations-loading;
       margin-bottom: 0.5rem;
     }
 
     &-button {
-      background: #007bff;
-      border: 1px solid #007bff;
-      color: white;
+      background: $btn-primary-blue;
+      border: 1px solid $btn-primary-blue;
+      color: $realwhite;
       border: none;
       padding: 0.5rem 1rem;
       border-radius: 4px;
@@ -301,9 +301,9 @@
       transition: background 0.3s ease;
 
       &:hover {
-        background: #ffffff00;
-        border: 1px solid #007bff;
-        color: #007bff;
+        background: $transparent-bg;
+        border: 1px solid $btn-primary-blue;
+        color: $btn-primary-blue;
       }
     }
   }
@@ -314,7 +314,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: $image-overlay-bg;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -331,9 +331,9 @@
       position: absolute;
       right: -40px;
       top: -40px;
-      background-color: red;
-      border: 1px solid red;
-      color: white;
+      background-color: $modal-close-red;
+      border: 1px solid $modal-close-red;
+      color: $realwhite;
       font-size: 2rem;
       border: none;
       cursor: pointer;
@@ -341,8 +341,8 @@
 
       &:hover {
         background-color: rgba(255, 255, 255, 0);
-        border: 1px solid red;
-        color: red;
+        border: 1px solid $modal-close-red;
+        color: $modal-close-red;
       }
     }
 
@@ -423,7 +423,7 @@
       transition: border 0.3s ease, background-color 0.3s ease;
 
       &:hover {
-        border: 1px solid white;
+        border: 1px solid $realwhite;
         background-color: inherit;
       }
     }
@@ -436,7 +436,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: $modal-overlay;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -444,18 +444,18 @@
 }
 
 .cart__loading-spinner {
-  background-color: white;
+  background-color: $realwhite;
   padding: 30px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px $spinner-shadow;
 }
 
 .cart__spinner {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #3498db;
+  border: 5px solid $spinner-border;
+  border-top: 5px solid $tab-active;
   border-radius: 50%;
   width: 50px;
   height: 50px;

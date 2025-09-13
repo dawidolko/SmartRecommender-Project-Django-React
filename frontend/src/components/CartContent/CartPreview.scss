@@ -3,13 +3,13 @@
 .cart-preview {
   position: relative;
   display: inline-block;
-  color: black;
+  color: $text-black;
 
   .cart-icon {
     cursor: pointer;
     position: relative;
     font-size: 24px;
-    color: white;
+    color: $realwhite;
 
     .cart-count {
       display: flex;
@@ -23,7 +23,7 @@
       left: 10px;
       border-radius: 50%;
       font-size: 1.2rem;
-      background-color: #fd266e;
+      background-color: $cart-count-bg;
     }
   }
 
@@ -31,20 +31,20 @@
     position: absolute;
     top: 40px;
     right: 0;
-    background-color: #111;
-    color: #e6dbdb;
+    background-color: $cart-dropdown-bg;
+    color: $cart-dropdown-text;
     width: 300px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px $stats-shadow;
     padding: 15px;
     z-index: 1000;
 
     h4 {
-      color: #e6dbdb;
+      color: $cart-dropdown-text;
     }
 
     p {
-      color: #e6dbdb !important;
+      color: $cart-dropdown-text !important;
     }
 
     .cart-item {
@@ -65,13 +65,13 @@
 
         p {
           &:hover {
-            color: #007bff !important;
+            color: $btn-primary-blue !important;
             text-decoration: underline;
           }
         }
 
         span {
-          color: rgb(239, 68, 68);
+          color: $error-red;
         }
       }
 
@@ -80,29 +80,29 @@
         align-items: center;
 
         span {
-          color: white;
+          color: $realwhite;
         }
 
         button {
-          background: #00b60f;
-          border: 1px solid #00b60f;
+          background: $action-btn-bg;
+          border: 1px solid $action-btn-bg;
           padding: 0.4rem 0.9rem;
           margin: 0 10px;
           cursor: pointer;
 
           &:hover {
-            background: #08630f;
-            border: 1px solid #08630f;
+            background: $action-btn-hover;
+            border: 1px solid $action-btn-hover;
           }
         }
       }
 
       &__remove {
         cursor: pointer;
-        color: red;
+        color: $modal-close-red;
 
         &:hover {
-          color: #8f0202;
+          color: $cart-remove-hover;
         }
       }
     }
@@ -110,17 +110,17 @@
     .cart-btn {
       display: block;
       text-align: center;
-      background: #007bff;
-      border: 1px solid #007bff;
-      color: white;
+      background: $btn-primary-blue;
+      border: 1px solid $btn-primary-blue;
+      color: $realwhite;
       padding: 10px;
       border-radius: 5px;
       text-decoration: none;
 
       &:hover {
         background: $darkblack;
-        border: 1px solid #007bff;
-        color: #007bff;
+        border: 1px solid $btn-primary-blue;
+        color: $btn-primary-blue;
       }
     }
   }

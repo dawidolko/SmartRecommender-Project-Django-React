@@ -1,0 +1,32 @@
+@startuml
+[*] --> SearchIdle : Brak zapytania
+
+SearchIdle --> QueryInput : Użytkownik wpisuje
+QueryInput --> Debouncing : Query length >= 2
+
+state Debouncing {
+  [*] --> Waiting300ms
+  Waiting300ms --> Ready : Timer expired
+  Waiting300ms --> Cancelled : New input
+  Cancelled --> Waiting300ms : Reset timer
+}
+
+Debouncing --> Processing : Ready
+
+state Processing {
+  [*] --> CacheCheck
+  CacheCheck --> DatabaseQuery : Cache miss
+  CacheCheck --> ReturnCached : Cache hit
+  DatabaseQuery --> FuzzyCalculation
+  FuzzyCalculation --> Filtering
+  Filtering --> Sorting
+  Sorting --> CacheStore
+  CacheStore --> ReturnResults
+  ReturnCached --> [*]
+  ReturnResults --> [*]
+}
+
+Processing --> DisplayResults : Results ready
+DisplayResults --> SearchIdle : Clear search
+DisplayResults --> QueryInput : New search
+@enduml

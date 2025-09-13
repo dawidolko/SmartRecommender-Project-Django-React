@@ -36,7 +36,7 @@
     padding: 2em;
     height: 100%;
     position: relative;
-    background: #1c1b1b;
+    background: $darkblack;
     border-radius: 15px;
     min-height: 350px;
     max-height: 350px;
@@ -79,7 +79,7 @@
     text-align: center;
 
     &:hover {
-      color: #007bff;
+      color: $btn-primary-blue;
       text-decoration: underline;
     }
   }

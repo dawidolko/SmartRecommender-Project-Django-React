@@ -6,7 +6,7 @@
   width: 100%;
   z-index: 1000;
   color: $white;
-  background-color: #0a0a0a;
+  background-color: $top-header-bg;
   transition: background-color 0.3s ease;
 
   &__section {
@@ -39,9 +39,9 @@
       position: absolute;
       top: 100%;
       left: 0;
-      background-color: #111;
-      color: #333;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: $cart-dropdown-bg;
+      color: $account-title;
+      box-shadow: 0px 4px 6px $stats-shadow;
       border-radius: 4px;
       padding: 0.5rem 1rem;
       z-index: 1000;
@@ -62,14 +62,14 @@
 
         .navbar__main-category-name {
           font-size: 1.4rem;
-          color: #e6dbdb;
+          color: $cart-dropdown-text;
           cursor: pointer;
           text-transform: uppercase;
           padding: 2px;
         }
 
         .navbar__main-category-name:hover {
-          color: #007bff;
+          color: $btn-primary-blue;
         }
 
         .navbar__subcategories {
@@ -77,9 +77,9 @@
           position: absolute;
           top: 0;
           left: 100%;
-          background-color: #111;
-          color: white;
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+          background-color: $cart-dropdown-bg;
+          color: $realwhite;
+          box-shadow: 0px 4px 6px $stats-shadow;
           border-radius: 4px;
           padding: 0.5rem 1rem;
           z-index: 1001;
@@ -88,12 +88,12 @@
 
           .navbar__dropdown-item {
             text-decoration: none;
-            color: white;
+            color: $realwhite;
             padding: 0.2rem 0;
             text-transform: uppercase;
 
             &:hover {
-              color: #007bff;
+              color: $btn-primary-blue;
             }
           }
         }
@@ -138,7 +138,7 @@
     height: 45vh;
     width: 50%;
     left: -100%;
-    background-color: #111;
+    background-color: $cart-dropdown-bg;
     transition: 0.3s ease;
     z-index: 2;
     max-height: 300px;
@@ -194,7 +194,7 @@
 
   &__heart:hover,
   &__basket:hover {
-    color: #007bff;
+    color: $btn-primary-blue;
   }
 
   &__user {
@@ -205,7 +205,7 @@
       font-size: 2.4rem;
       transition: color 0.3s ease;
       &:hover {
-        color: #007bff;
+        color: $btn-primary-blue;
       }
     }
 
@@ -215,9 +215,9 @@
       top: 100%;
       left: 0;
       min-width: 150px;
-      background-color: #111;
-      color: #e6dbdb;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: $cart-dropdown-bg;
+      color: $cart-dropdown-text;
+      box-shadow: 0px 4px 6px $stats-shadow;
       border-radius: 4px;
       padding: 0.5rem 1rem;
       z-index: 1000;
@@ -228,19 +228,19 @@
 
       .navbar__dropdown-link {
         text-decoration: none;
-        color: #e6dbdb;
+        color: $cart-dropdown-text;
         text-transform: uppercase;
         padding: 0.2rem 0;
 
         &:hover {
-          color: #007bff;
+          color: $btn-primary-blue;
         }
       }
 
       .navbar__logoutBtn {
         background: none;
         border: none;
-        color: #e6dbdb;
+        color: $cart-dropdown-text;
         text-transform: uppercase;
         padding: 0.2rem 0;
         cursor: pointer;
@@ -250,7 +250,7 @@
         text-align: left;
 
         &:hover {
-          color: #007bff;
+          color: $btn-primary-blue;
         }
       }
     }
@@ -264,11 +264,11 @@
     position: absolute;
     top: 50px;
     right: 0;
-    background-color: #111;
-    color: #e6dbdb;
+    background-color: $cart-dropdown-bg;
+    color: $cart-dropdown-text;
     padding: 0.6rem 1rem;
     border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px $navbar-shadow;
     z-index: 999;
     display: flex;
     flex-direction: column;
@@ -287,7 +287,7 @@
       padding: 0.5rem 1rem;
       border-radius: 4px;
       &:hover {
-        color: #007bff;
+        color: $btn-primary-blue;
       }
     }
   }
@@ -360,7 +360,7 @@
   }
 
   .cart-icon:hover {
-    color: #007bff;
+    color: $btn-primary-blue;
   }
 
   .header {
@@ -372,7 +372,7 @@
       background-size: contain;
       transition: box-shadow 0.3s ease;
       &:hover {
-        box-shadow: 0 0 10px 2px #fd266e;
+        box-shadow: 0 0 10px 2px $cart-count-bg;
       }
     }
 
@@ -407,11 +407,11 @@
     left: 0;
     width: 100%;
     height: 55px;
-    background-color: #064283;
+    background-color: $navbar-modal-bg;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: white;
+    color: $realwhite;
     padding: 0 20px;
     z-index: 2000;
     transition: opacity 0.5s ease, transform 0.5s ease;
@@ -430,7 +430,7 @@
     &__button {
       padding: 10px 20px;
       border: 1px solid $realwhite;
-      background-color: rgb(255 255 255 / 0%);
+      background-color: $navbar-modal-btn-bg;
       color: $realwhite;
       cursor: pointer;
       font-size: 1rem;
@@ -438,7 +438,7 @@
       margin-right: 10px;
       &:hover {
         background-color: $realwhite;
-        color: #0061cc;
+        color: $navbar-modal-btn-hover;
       }
     }
 
@@ -446,7 +446,7 @@
       font-size: 2rem;
       cursor: pointer;
       &:hover {
-        color: red;
+        color: $modal-close-red;
       }
     }
 
@@ -461,10 +461,10 @@
   }
 
   .search-icon {
-    background-color: #00000000 !important;
+    background-color: $navbar-search-bg !important;
     font-size: 22px;
     &:hover {
-      color: #007bff;
+      color: $btn-primary-blue;
     }
   }
 
@@ -473,10 +473,10 @@
     align-items: center;
     flex-direction: row;
     max-width: 300px;
-    background: #525252;
+    background: $search-bar-bg;
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid #ddd;
+    border: 1px solid $dashboard-summary-border;
     gap: 0;
     position: absolute;
 
@@ -494,8 +494,8 @@
     }
 
     .search-btn {
-      background: #2762f3;
-      color: white;
+      background: $search-btn-bg;
+      color: $realwhite;
       border: none;
       padding: 10px 15px;
       cursor: pointer;
@@ -503,7 +503,7 @@
       transition: background 0.3s ease;
 
       &:hover {
-        background: #0c48db;
+        background: $search-btn-hover;
       }
     }
   }

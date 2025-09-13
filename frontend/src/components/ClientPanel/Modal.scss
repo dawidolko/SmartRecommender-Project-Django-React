@@ -41,19 +41,19 @@
     }
 
     .close-button {
-      background: red;
+      background: $modal-close-danger;
       border: none;
       font-size: 2.2rem;
       cursor: pointer;
       color: black;
       font-weight: bold;
       transition: color 0.2s;
-      border: 1px solid red;
+      border: 1px solid $modal-close-danger;
 
       &:hover {
         background: rgba(255, 255, 255, 0);
-        color: red;
-        border: 1px solid red;
+        color: $modal-close-danger;
+        border: 1px solid $modal-close-danger;
       }
     }
   }

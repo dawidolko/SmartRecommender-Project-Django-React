@@ -282,7 +282,7 @@ class CustomFuzzySearch:
     def _generate_trigrams(self, text):
         """Generate character-level trigrams"""
         trigrams = set()
-        text = f"###{text}###"  # Padding for better boundary detection
+        text = f"###{text}###" 
         for i in range(len(text) - 2):
             trigrams.add(text[i:i+3])
         return trigrams
@@ -296,7 +296,6 @@ class CustomFuzzySearch:
         text_len = len(text)
         start = 0
         
-        # Create overlapping chunks
         while start < text_len:
             end = min(start + self.chunk_size, text_len)
             chunk = text[start:end]
@@ -307,7 +306,6 @@ class CustomFuzzySearch:
                 
             start += self.chunk_size - self.chunk_overlap
         
-        # Process each chunk and take the best score
         best_score = 0.0
         for chunk in chunks:
             chunk_score = self._calculate_character_similarity(query, chunk)
@@ -320,17 +318,14 @@ class CustomFuzzySearch:
         if not s1 or not s2:
             return 0.0
 
-        # Truncate for performance
         s1 = s1[:self.max_distance_calc_length]
         s2 = s2[:self.max_distance_calc_length]
 
         len1, len2 = len(s1), len(s2)
         
-        # Quick exit for very different lengths
         if abs(len1 - len2) > max(len1, len2) * 0.5:
             return 0.0
-
-        # Optimized Levenshtein with early termination
+        
         prev_row = list(range(len2 + 1))
         curr_row = [0] * (len2 + 1)
 
@@ -343,9 +338,9 @@ class CustomFuzzySearch:
                     cost = 1
 
                 curr_row[j] = min(
-                    prev_row[j] + 1,        # deletion
-                    curr_row[j - 1] + 1,    # insertion
-                    prev_row[j - 1] + cost, # substitution
+                    prev_row[j] + 1,       
+                    curr_row[j - 1] + 1,  
+                    prev_row[j - 1] + cost, 
                 )
             prev_row, curr_row = curr_row, prev_row
 
@@ -363,7 +358,6 @@ class CustomFuzzySearch:
         if threshold is None:
             threshold = self.default_threshold
 
-        # Cache check dla search results
         cache_key = f"fuzzy_search_{hash(query)}_{threshold}_{len(products)}"
         cached_result = cache.get(cache_key)
         if cached_result:
@@ -372,20 +366,17 @@ class CustomFuzzySearch:
         results = []
 
         for product in products:
-            # POPRAWIONE WAGI: używamy nowego systemu wag
             name_score = self.calculate_fuzzy_score(query, product.name)
             desc_score = self.calculate_fuzzy_score(query, product.description or "")
 
-            # ULEPSZONE: lepsze fuzzy matching dla kategorii
             category_scores = [
                 self.calculate_fuzzy_score(query, cat.name)
                 for cat in product.categories.all()
             ]
             category_score = max(category_scores) if category_scores else 0
 
-            # ULEPSZONE: fuzzy matching dla specyfikacji (zwiększony limit)
             spec_scores = []
-            for spec in product.specification_set.all()[:8]:  # Zwiększone z 5 do 8
+            for spec in product.specification_set.all()[:8]:
                 if spec.specification:
                     spec_scores.append(self.calculate_fuzzy_score(query, spec.specification))
                 if spec.parameter_name:
@@ -393,21 +384,18 @@ class CustomFuzzySearch:
             
             spec_score = max(spec_scores) if spec_scores else 0
 
-            # NOWE: Dodatkowe dopasowania
-            # Tags matching
             tag_scores = [
                 self.calculate_fuzzy_score(query, tag.name)
                 for tag in product.tags.all()
             ]
             tag_score = max(tag_scores) if tag_scores else 0
 
-            # POPRAWIONE WAGI: użycie nowego systemu
             total_score = (
                 name_score * self.field_weights['name'] +
                 desc_score * self.field_weights['description'] +
                 category_score * self.field_weights['category'] +
                 spec_score * self.field_weights['specification'] +
-                tag_score * 0.05  # Dodatkowy bonus za tagi
+                tag_score * 0.05 
             )
 
             if total_score >= threshold:
@@ -425,7 +413,6 @@ class CustomFuzzySearch:
 
         results.sort(key=lambda x: x["score"], reverse=True)
         
-        # Cache wyników na 10 minut
         cache.set(cache_key, results, timeout=600)
         
         return results
@@ -435,15 +422,12 @@ class CustomAssociationRules:
     def __init__(self, min_support=0.01, min_confidence=0.1):
         self.min_support = min_support
         self.min_confidence = min_confidence
-        # ZWIĘKSZONE: z 2000 do 3000 transactions
         self.max_transactions = 3000
-        # ZWIĘKSZONE: z 15 do 20 items per transaction
         self.max_items_per_transaction = 20
 
     def generate_association_rules(self, transactions):
         """Generates association rules with bitmap pruning optimization"""
         
-        # Sprawdź cache
         cache_key = f"association_rules_{len(transactions)}_{self.min_support}_{self.min_confidence}"
         cached_result = cache.get(cache_key)
         
@@ -451,7 +435,6 @@ class CustomAssociationRules:
             print("Using cached association rules")
             return cached_result
 
-        # EARLY PRUNING: Filtrowanie transakcji
         filtered_transactions = []
         for transaction in transactions[:self.max_transactions]:
             limited_transaction = transaction[:self.max_items_per_transaction]
@@ -463,11 +446,9 @@ class CustomAssociationRules:
 
         print(f"Processing {len(filtered_transactions)} transactions for enhanced association rules")
 
-        # Znajdowanie częstych itemsets z bitmap pruning
         frequent_itemsets = self._find_frequent_itemsets_with_bitmap(filtered_transactions)
         rules = self._generate_optimized_rules_from_itemsets(frequent_itemsets, filtered_transactions)
 
-        # Cache wyników na 1 godzinę
         cache.set(cache_key, rules, timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 1800))
         print(f"Cached {len(rules)} association rules for 30 minutes")
         
@@ -480,15 +461,13 @@ class CustomAssociationRules:
         
         print(f"Minimum count threshold: {min_count_threshold}")
 
-        # ETAP 1: Znajdowanie częstych 1-itemsets z early pruning
         item_counts = defaultdict(int)
         for transaction in transactions:
             for item in transaction:
                 item_counts[item] += 1
 
-        # EARLY PRUNING: Usuwanie rzadkich itemów od razu
         frequent_items = {}
-        item_to_id = {}  # Mapowanie itemów na numeryczne ID dla bitmap
+        item_to_id = {} 
         frequent_item_list = []
         
         item_id = 0
@@ -505,7 +484,6 @@ class CustomAssociationRules:
         if len(frequent_item_list) < 2:
             return frequent_items
 
-        # ETAP 2: Tworzenie bitmap dla transakcji
         transaction_bitmaps = []
         for transaction in transactions:
             bitmap = 0
@@ -513,19 +491,17 @@ class CustomAssociationRules:
                 if item in item_to_id:
                     bitmap |= (1 << item_to_id[item])
             
-            if bitmap:  # Tylko transakcje z częstymi itemami
+            if bitmap: 
                 transaction_bitmaps.append(bitmap)
 
         print(f"Created {len(transaction_bitmaps)} transaction bitmaps")
 
-        # ETAP 3: Znajdowanie częstych 2-itemsets z bitmap operations
         frequent_2_itemsets = self._generate_2_itemsets_with_bitmap(
             transaction_bitmaps, frequent_item_list, item_to_id, min_count_threshold, total_transactions
         )
 
         print(f"Found {len(frequent_2_itemsets)} frequent 2-itemsets (with bitmap pruning)")
 
-        # Łączenie wyników
         all_frequent = {}
         all_frequent.update(frequent_items)
         all_frequent.update(frequent_2_itemsets)
@@ -536,7 +512,6 @@ class CustomAssociationRules:
         """Generate 2-itemsets using bitmap operations for efficiency"""
         frequent_2_itemsets = {}
         
-        # Generowanie par z frequent items (znacznie zoptymalizowane)
         for i in range(len(frequent_items)):
             item1 = frequent_items[i]
             item1_bit = 1 << item_to_id[item1]
@@ -545,17 +520,13 @@ class CustomAssociationRules:
                 item2 = frequent_items[j]
                 item2_bit = 1 << item_to_id[item2]
                 
-                # Bitmap dla pary itemów
                 pair_bitmap = item1_bit | item2_bit
                 
-                # Liczenie wsparcia używając bitmap operations
                 count = 0
                 for transaction_bitmap in transaction_bitmaps:
-                    # Sprawdzenie czy transakcja zawiera oba itemy
                     if (transaction_bitmap & pair_bitmap) == pair_bitmap:
                         count += 1
                 
-                # BITMAP PRUNING: Sprawdzanie progu
                 if count >= min_count_threshold:
                     support = count / total_transactions
                     pair = frozenset([item1, item2])
@@ -568,7 +539,6 @@ class CustomAssociationRules:
         rules = []
         total_transactions = len(transactions)
         
-        # Pre-compute item counts for efficiency
         item_support_cache = {}
         for itemset, support in frequent_itemsets.items():
             if len(itemset) == 1:
@@ -580,18 +550,14 @@ class CustomAssociationRules:
                 items = list(itemset)
                 item1, item2 = items[0], items[1]
 
-                # Używanie cache zamiast ponownego liczenia
                 support_1 = item_support_cache.get(item1, 0)
                 support_2 = item_support_cache.get(item2, 0)
                 
-                # Obliczanie confidence
                 confidence_1_to_2 = support / support_1 if support_1 > 0 else 0
                 confidence_2_to_1 = support / support_2 if support_2 > 0 else 0
                 
-                # Obliczanie lift
                 lift = support / (support_1 * support_2) if (support_1 * support_2) > 0 else 0
 
-                # Generowanie reguł jeśli spełniają próg confidence
                 if confidence_1_to_2 >= self.min_confidence:
                     rules.append({
                         "product_1": item1,
@@ -610,7 +576,6 @@ class CustomAssociationRules:
                         "lift": lift,
                     })
 
-        # Sortowanie reguł według lift (najlepsze pierwsze)
         rules.sort(key=lambda x: (x["lift"], x["confidence"]), reverse=True)
         
         print(f"Generated {len(rules)} association rules")
@@ -620,15 +585,12 @@ class CustomAssociationRules:
 
 class CustomSentimentAnalysis:
     def __init__(self):
-        # ROZSZERZONY: Słownik pozytywnych słów (~120 słów)
         self.positive_words = {
-            # Podstawowe pozytywne
             "excellent", "great", "amazing", "wonderful", "fantastic", "awesome", 
             "good", "nice", "perfect", "outstanding", "brilliant", "superb",
             "love", "like", "enjoy", "recommend", "satisfied", "happy", 
             "pleased", "delighted", "quality", "fast", "beautiful", "comfortable",
             
-            # NOWE: Dodatkowe pozytywne słowa
             "incredible", "marvelous", "spectacular", "impressive", "magnificent",
             "extraordinary", "remarkable", "phenomenal", "exceptional", "stellar",
             "flawless", "divine", "sublime", "gorgeous", "stunning", "breathtaking",
@@ -646,15 +608,12 @@ class CustomSentimentAnalysis:
             "quick", "speedy", "prompt", "instant", "immediate", "responsive"
         }
 
-        # ROZSZERZONY: Słownik negatywnych słów (~120 słów)
         self.negative_words = {
-            # Podstawowe negatywne
             "terrible", "awful", "horrible", "bad", "worst", "disappointing",
             "poor", "useless", "hate", "dislike", "regret", "waste",
             "expensive", "slow", "broken", "defective", "uncomfortable", "ugly",
             "problem", "issue", "error", "fail", "complaint",
             
-            # NOWE: Dodatkowe negatywne słowa
             "disgusting", "revolting", "repulsive", "appalling", "dreadful", "ghastly",
             "atrocious", "abysmal", "pathetic", "miserable", "wretched", "deplorable",
             "inferior", "substandard", "mediocre", "inadequate", "insufficient", "lacking",
@@ -671,7 +630,6 @@ class CustomSentimentAnalysis:
             "limited", "restricted", "constrained", "cramped", "tight", "narrow"
         }
 
-        # ROZSZERZONY: Intensyfikatory
         self.intensifiers = {
             "very", "extremely", "really", "quite", "totally", "absolutely", 
             "completely", "entirely", "thoroughly", "utterly", "highly", "incredibly",
@@ -679,14 +637,12 @@ class CustomSentimentAnalysis:
             "super", "ultra", "mega", "tremendously", "enormously", "immensely"
         }
         
-        # ROZSZERZONY: Negacje z kontekstem
         self.negations = {
             "not", "no", "never", "nothing", "neither", "nor", "none", "nobody",
             "nowhere", "hardly", "barely", "scarcely", "seldom", "rarely",
             "without", "lacking", "missing", "absent", "void", "devoid"
         }
         
-        # NOWE: Słownik bigramów (dwu-słownych wyrażeń)
         self.positive_bigrams = {
             "highly recommend", "love it", "great quality", "excellent service",
             "perfect condition", "amazing product", "outstanding performance", 
@@ -705,29 +661,24 @@ class CustomSentimentAnalysis:
             "serious problems", "major issues", "absolutely horrible", "worst ever"
         }
         
-        # NOWE: Konfiguracja dla przesuwnego okna
-        self.window_size = 300  # Rozmiar okna dla długich tekstów
-        self.window_overlap = 50  # Nakładanie się okien
+        self.window_size = 300 
+        self.window_overlap = 50 
 
     def analyze_sentiment(self, text):
         """Enhanced sentiment analysis with context awareness and sliding window"""
         if not text:
             return 0.0, "neutral"
             
-        # Cache dla analizy sentymentu
         cache_key = f"sentiment_{hash(text[:100])}"
         cached_result = cache.get(cache_key)
         if cached_result:
             return cached_result
 
-        # PRZESUWNE OKNO dla długich tekstów
         if len(text) > self.window_size:
             return self._analyze_long_text_with_sliding_window(text, None)
         
-        # Normalna analiza dla krótkich tekstów
         result = self._analyze_text_segment(text)
         
-        # Zapisz do cache
         cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 3600))
         
         return result
@@ -737,7 +688,6 @@ class CustomSentimentAnalysis:
         segments = []
         text_len = len(text)
         
-        # Tworzenie segmentów z nakładaniem
         start = 0
         while start < text_len:
             end = min(start + self.window_size, text_len)
@@ -749,7 +699,6 @@ class CustomSentimentAnalysis:
                 
             start += self.window_size - self.window_overlap
         
-        # Analiza każdego segmentu
         segment_scores = []
         segment_categories = []
         
@@ -758,14 +707,12 @@ class CustomSentimentAnalysis:
             segment_scores.append(score)
             segment_categories.append(category)
         
-        # Agregacja wyników (średnia ważona - dłuższe segmenty mają większą wagę)
         if segment_scores:
             weights = [len(seg) for seg in segments]
             total_weight = sum(weights)
             
             weighted_score = sum(score * weight for score, weight in zip(segment_scores, weights)) / total_weight
             
-            # Kategoryzacja na podstawie agregowanego score
             if weighted_score > 0.05:
                 final_category = "positive"
             elif weighted_score < -0.05:
@@ -777,7 +724,6 @@ class CustomSentimentAnalysis:
         else:
             result = (0.0, "neutral")
         
-        # Zapisz do cache jeśli klucz istnieje
         if cache_key:
             cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 3600))
         
@@ -795,52 +741,45 @@ class CustomSentimentAnalysis:
         negative_score = 0.0
         total_words = len(words)
         
-        # ETAP 1: Analiza bigramów (wyższy priorytet)
         bigram_score = self._analyze_bigrams(words)
         positive_score += bigram_score["positive"]
         negative_score += bigram_score["negative"]
 
-        # ETAP 2: Analiza pojedynczych słów z kontekstem
         i = 0
         while i < len(words):
             word = words[i]
             
-            # ULEPSZONA NEGACJA: Sprawdzanie 2-3 słów wcześniej
             negation_context = self._check_negation_context(words, i)
             
-            # ULEPSZONE INTENSYFIKATORY: Sprawdzanie szerszego kontekstu
             intensity_multiplier = self._calculate_intensity_multiplier(words, i)
             
             if word in self.positive_words:
                 score = 1.0 * intensity_multiplier
                 if negation_context:
-                    negative_score += score * 0.8  # Zmniejszona kara za negację
+                    negative_score += score * 0.8 
                 else:
                     positive_score += score
                     
             elif word in self.negative_words:
                 score = 1.0 * intensity_multiplier
                 if negation_context:
-                    positive_score += score * 0.8  # Negacja słowa negatywnego = pozytywne
+                    positive_score += score * 0.8 
                 else:
                     negative_score += score
             
             i += 1
 
-        # Obliczanie końcowego wyniku z normalizacją
         if total_words == 0:
             sentiment_score = 0.0
         else:
-            # Normalizacja względem długości tekstu
-            positive_ratio = positive_score / (total_words * 0.5)  # Łagodniejsza normalizacja
+            positive_ratio = positive_score / (total_words * 0.5) 
             negative_ratio = negative_score / (total_words * 0.5)
             sentiment_score = positive_ratio - negative_ratio
             sentiment_score = max(-1.0, min(1.0, sentiment_score))
 
-        # Kategoryzacja z progami
-        if sentiment_score > 0.08:  # Nieco wyższy próg dla pozytywnych
+        if sentiment_score > 0.08: 
             category = "positive"
-        elif sentiment_score < -0.08:  # Nieco wyższy próg dla negatywnych  
+        elif sentiment_score < -0.08:
             category = "negative"
         else:
             category = "neutral"
@@ -849,7 +788,6 @@ class CustomSentimentAnalysis:
 
     def _check_negation_context(self, words, current_index):
         """Check for negation in 2-3 words context"""
-        # Sprawdzaj 3 słowa wcześniej (nie tylko 1)
         for i in range(max(0, current_index - 3), current_index):
             if words[i] in self.negations:
                 return True
@@ -859,10 +797,9 @@ class CustomSentimentAnalysis:
         """Calculate intensity multiplier from broader context"""
         multiplier = 1.0
         
-        # Sprawdzaj intensyfikatory w szerszym kontekście (2 słowa w każdą stronę)
         for i in range(max(0, current_index - 2), min(len(words), current_index + 3)):
             if i != current_index and words[i] in self.intensifiers:
-                multiplier = max(multiplier, 1.8)  # Zwiększony multiplier
+                multiplier = max(multiplier, 1.8)
                 
         return multiplier
 
@@ -870,12 +807,11 @@ class CustomSentimentAnalysis:
         """Analyze sentiment using bigrams for better context"""
         bigram_scores = {"positive": 0.0, "negative": 0.0}
         
-        # Tworzenie bigramów
         for i in range(len(words) - 1):
             bigram = f"{words[i]} {words[i + 1]}"
             
             if bigram in self.positive_bigrams:
-                bigram_scores["positive"] += 2.0  # Bigramy mają wyższą wagę
+                bigram_scores["positive"] += 2.0 
             elif bigram in self.negative_bigrams:
                 bigram_scores["negative"] += 2.0
                 
@@ -890,7 +826,6 @@ class CustomSentimentAnalysis:
         """Enhanced product sentiment analysis with caching"""
         from home.models import Opinion
         
-        # Cache dla analizy sentymentu produktu
         cache_key = f"product_sentiment_{product.id}_{product.updated_at if hasattr(product, 'updated_at') else 'static'}"
         cached_result = cache.get(cache_key)
         
@@ -907,7 +842,6 @@ class CustomSentimentAnalysis:
                 "negative_count": 0,
                 "total_opinions": 0,
             }
-            # Zapisz do cache dla produktów bez opinii
             cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_SHORT', 900))
             return result
 
@@ -916,7 +850,6 @@ class CustomSentimentAnalysis:
         neutral_count = 0
         negative_count = 0
         
-        # OPTYMALIZACJA: Batch processing opinii
         opinion_contents = [opinion.content for opinion in opinions if opinion.content]
         
         for content in opinion_contents:
@@ -930,10 +863,8 @@ class CustomSentimentAnalysis:
             else:
                 neutral_count += 1
 
-        # Obliczanie średniej z lepszą dokładnością
         average_score = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0.0
         
-        # NOWE: Dodatkowe metryki
         sentiment_variance = 0.0
         if len(sentiment_scores) > 1:
             mean = average_score
@@ -947,7 +878,6 @@ class CustomSentimentAnalysis:
             "total_opinions": len(sentiment_scores),
         }
         
-        # Zapisz do cache
         cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_LONG', 7200))
         
         return result
@@ -962,7 +892,7 @@ class CustomMarkovChain:
     """Implementation of Markov Chain for purchase sequence prediction"""
     
     def __init__(self, order=1):
-        self.order = order  # Order of Markov chain (1st order = current depends on previous)
+        self.order = order  
         self.transitions = defaultdict(lambda: defaultdict(int))
         self.states = set()
         self.total_sequences = 0
@@ -975,18 +905,15 @@ class CustomMarkovChain:
             if len(sequence) < 2:
                 continue
                 
-            # Add all states
             for state in sequence:
                 self.states.add(state)
             
-            # Build transition matrix
             for i in range(len(sequence) - 1):
                 current_state = sequence[i]
                 next_state = sequence[i + 1]
                 
                 self.transitions[current_state][next_state] += 1
         
-        # Normalize to probabilities
         for current_state in self.transitions:
             total_transitions = sum(self.transitions[current_state].values())
             if total_transitions > 0:
@@ -1007,7 +934,6 @@ class CustomMarkovChain:
                 'probability': probability
             })
         
-        # Sort by probability and return top K
         predictions.sort(key=lambda x: x['probability'], reverse=True)
         return predictions[:top_k]
     
@@ -1028,7 +954,6 @@ class CustomMarkovChain:
             sequence.append(next_state)
             current_state = next_state
             
-            # Avoid cycles
             if sequence.count(current_state) > 2:
                 break
         
@@ -1044,12 +969,10 @@ class CustomMarkovChain:
         """Calculate stationary distribution of the Markov chain"""
         state_counts = defaultdict(int)
         
-        # Count occurrences of each state
         for current_state in self.transitions:
             for next_state, count in self.transitions[current_state].items():
                 state_counts[next_state] += count
         
-        # Normalize
         total = sum(state_counts.values())
         if total == 0:
             return {}
@@ -1079,29 +1002,24 @@ class CustomNaiveBayes:
         
         n_samples = len(labels)
         
-        # Count class occurrences
         class_counts = defaultdict(int)
         for label in labels:
             self.classes.add(label)
             class_counts[label] += 1
         
-        # Calculate class priors
         for class_label in self.classes:
             self.class_priors[class_label] = class_counts[class_label] / n_samples
         
-        # Count feature occurrences per class
         for features, label in zip(features_list, labels):
             for feature, value in features.items():
                 self.feature_likelihoods[feature][label][value] += 1
                 self.feature_counts[feature][label] += 1
         
-        # Convert counts to probabilities with Laplace smoothing
         for feature in self.feature_likelihoods:
             for class_label in self.classes:
                 total_count = self.feature_counts[feature][class_label]
                 unique_values = len(self.feature_likelihoods[feature][class_label])
                 
-                # Laplace smoothing
                 for value in self.feature_likelihoods[feature][class_label]:
                     self.feature_likelihoods[feature][class_label][value] = (
                         (self.feature_likelihoods[feature][class_label][value] + 1) /
@@ -1119,16 +1037,13 @@ class CustomNaiveBayes:
         probabilities = {}
         
         for class_label in self.classes:
-            # Start with class prior
             prob = math.log(self.class_priors[class_label])
             
-            # Multiply by feature likelihoods
             for feature, value in features.items():
                 if feature in self.feature_likelihoods:
                     if value in self.feature_likelihoods[feature][class_label]:
                         likelihood = self.feature_likelihoods[feature][class_label][value]
                     else:
-                        # Laplace smoothing for unseen feature values
                         total_count = self.feature_counts[feature][class_label]
                         unique_values = len(self.feature_likelihoods[feature][class_label])
                         likelihood = 1 / (total_count + unique_values + 1)
@@ -1137,12 +1052,10 @@ class CustomNaiveBayes:
             
             probabilities[class_label] = prob
         
-        # Convert log probabilities to regular probabilities
         max_log_prob = max(probabilities.values())
         for class_label in probabilities:
             probabilities[class_label] = math.exp(probabilities[class_label] - max_log_prob)
         
-        # Normalize
         total_prob = sum(probabilities.values())
         if total_prob > 0:
             for class_label in probabilities:
@@ -1160,7 +1073,6 @@ class CustomNaiveBayes:
         feature_importance = {}
         
         for feature in self.feature_likelihoods:
-            # Calculate entropy for this feature
             total_entropy = 0
             total_samples = sum(self.feature_counts[feature].values())
             
@@ -1190,7 +1102,6 @@ class ProbabilisticRecommendationEngine:
     
     def train_markov_model(self, user_purchase_sequences):
         """Train Markov chain on user purchase sequences"""
-        # Convert product sequences to category sequences
         category_sequences = []
         
         for sequence in user_purchase_sequences:

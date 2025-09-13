@@ -3,15 +3,15 @@
 .bayesian-dashboard {
   padding: 20px;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: $dashboard-bg;
 
   .dashboard-header {
     margin-bottom: 30px;
-    background: white;
+    background: $realwhite;
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px $dashboard-shadow;
+    border: 1px solid $dashboard-border;
 
     .header-content {
       display: flex;
@@ -28,8 +28,8 @@
           margin: 0;
           font-size: 28px;
           font-weight: 700;
-          color: #212529;
-          background: linear-gradient(135deg, $blue, #4d94ff);
+          color: $dashboard-text;
+          background: linear-gradient(135deg, $blue, $dashboard-gradient);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -49,23 +49,23 @@
           align-items: center;
           gap: 8px;
           padding: 8px 16px;
-          background: #f8f9fa;
-          border: 1px solid #dee2e6;
+          background: $dashboard-bg;
+          border: 1px solid $control-border;
           border-radius: 8px;
-          color: #6c757d;
+          color: $control-text;
           font-size: 14px;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s ease;
 
           &:hover {
-            background: #e9ecef;
-            color: #495057;
+            background: $control-hover-bg;
+            color: $control-hover-text;
           }
 
           &.active {
             background: $blue;
-            color: white;
+            color: $realwhite;
             border-color: $blue;
           }
 
@@ -77,7 +77,7 @@
     }
 
     .dashboard-description {
-      color: #6c757d;
+      color: $control-text;
       font-size: 16px;
       line-height: 1.5;
       margin: 0;
@@ -87,11 +87,11 @@
   .dashboard-tabs {
     display: flex;
     margin-bottom: 30px;
-    background: white;
+    background: $realwhite;
     border-radius: 12px;
     padding: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px $dashboard-shadow;
+    border: 1px solid $dashboard-border;
     overflow-x: auto;
 
     .tab-button {
@@ -102,7 +102,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: #6c757d;
+      color: $control-text;
       font-weight: 500;
       font-size: 14px;
       border-radius: 8px;
@@ -111,18 +111,18 @@
       position: relative;
 
       &:hover:not(.active) {
-        background: #f8f9fa;
-        color: #495057;
+        background: $dashboard-bg;
+        color: $control-hover-text;
       }
 
       &.active {
         background: $blue;
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 102, 204, 0.3);
+        color: $realwhite;
+        box-shadow: 0 2px 4px $tab-active-shadow;
       }
 
       .tab-count {
-        background: rgba(255, 255, 255, 0.2);
+        background: $tab-count-bg;
         color: inherit;
         border-radius: 12px;
         padding: 2px 8px;
@@ -133,17 +133,17 @@
       }
 
       .active & .tab-count {
-        background: rgba(255, 255, 255, 0.3);
+        background: $tab-count-active;
       }
     }
   }
 
   .tab-content {
-    background: white;
+    background: $realwhite;
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px $dashboard-shadow;
+    border: 1px solid $dashboard-border;
     min-height: 500px;
   }
 
@@ -154,12 +154,12 @@
     h2 {
       font-size: 24px;
       font-weight: 700;
-      color: #212529;
+      color: $dashboard-text;
       margin-bottom: 8px;
     }
 
     p {
-      color: #6c757d;
+      color: $control-text;
       font-size: 16px;
       line-height: 1.5;
       margin: 0;
@@ -203,7 +203,7 @@
 
       .gauge-label {
         font-size: 14px;
-        color: #6c757d;
+        color: $control-text;
         margin-top: 4px;
       }
     }
@@ -217,15 +217,15 @@
       margin-bottom: 32px;
 
       .overview-card {
-        border: 1px solid #e9ecef;
+        border: 1px solid $dashboard-border;
         border-radius: 12px;
         overflow: hidden;
-        background: white;
+        background: $realwhite;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
 
         &:hover {
           transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 8px 24px $card-hover-shadow;
         }
 
         .card-header {
@@ -233,14 +233,14 @@
           align-items: center;
           gap: 12px;
           padding: 20px;
-          background: #f8f9fa;
-          border-bottom: 1px solid #e9ecef;
+          background: $dashboard-bg;
+          border-bottom: 1px solid $dashboard-border;
 
           h3 {
             margin: 0;
             font-size: 18px;
             font-weight: 600;
-            color: #212529;
+            color: $dashboard-text;
           }
 
           svg {
@@ -250,21 +250,21 @@
 
         .card-footer {
           padding: 16px 20px;
-          background: #f8f9fa;
-          border-top: 1px solid #e9ecef;
+          background: $dashboard-bg;
+          border-top: 1px solid $dashboard-border;
           display: flex;
           justify-content: space-between;
           align-items: center;
 
           span {
             font-size: 14px;
-            color: #6c757d;
+            color: $control-text;
           }
 
           button {
             padding: 6px 16px;
             background: $blue;
-            color: white;
+            color: $realwhite;
             border: none;
             border-radius: 6px;
             font-size: 14px;
@@ -293,7 +293,7 @@
 
           .gauge-label {
             font-size: 16px;
-            color: #6c757d;
+            color: $control-text;
             font-weight: 500;
           }
         }
@@ -316,14 +316,14 @@
             .insight-name {
               flex: 0 0 120px;
               font-size: 14px;
-              color: #495057;
+              color: $control-hover-text;
               font-weight: 500;
             }
 
             .insight-bar {
               flex: 1;
               height: 8px;
-              background: #e9ecef;
+              background: $dashboard-border;
               border-radius: 4px;
               position: relative;
               overflow: hidden;
@@ -340,7 +340,7 @@
                 top: -2px;
                 font-size: 12px;
                 font-weight: 600;
-                color: #495057;
+                color: $control-hover-text;
               }
             }
           }
@@ -358,8 +358,8 @@
         align-items: center;
         gap: 16px;
         padding: 20px;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background: $dashboard-bg;
+        border: 1px solid $dashboard-border;
         border-radius: 12px;
         transition: transform 0.2s ease;
 
@@ -381,20 +381,20 @@
           h4 {
             font-size: 14px;
             font-weight: 500;
-            color: #6c757d;
+            color: $control-text;
             margin: 0 0 4px 0;
           }
 
           .summary-value {
             font-size: 24px;
             font-weight: 700;
-            color: #212529;
+            color: $dashboard-text;
             line-height: 1;
           }
 
           p {
             font-size: 12px;
-            color: #6c757d;
+            color: $control-text;
             margin: 4px 0 0 0;
           }
         }
@@ -413,28 +413,28 @@
         h3 {
           font-size: 20px;
           font-weight: 600;
-          color: #212529;
+          color: $dashboard-text;
           margin-bottom: 20px;
         }
 
         .category-list {
           .category-item {
             padding: 16px;
-            border: 1px solid #e9ecef;
+            border: 1px solid $dashboard-border;
             border-radius: 8px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
-            background: white;
+            background: $realwhite;
 
             &:hover {
               border-color: $blue;
-              box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+              box-shadow: 0 2px 8px $category-hover-shadow;
             }
 
             &.selected {
               border-color: $blue;
-              background: rgba(0, 102, 204, 0.02);
+              background: $category-selected-bg;
             }
 
             .category-info {
@@ -445,12 +445,12 @@
 
               .category-name {
                 font-weight: 500;
-                color: #212529;
+                color: $dashboard-text;
               }
 
               .category-rank {
-                background: #e9ecef;
-                color: #6c757d;
+                background: $dashboard-border;
+                color: $control-text;
                 border-radius: 12px;
                 padding: 2px 8px;
                 font-size: 12px;
@@ -466,7 +466,7 @@
               .probability-bar {
                 flex: 1;
                 height: 8px;
-                background: #e9ecef;
+                background: $dashboard-border;
                 border-radius: 4px;
                 overflow: hidden;
 
@@ -479,7 +479,7 @@
 
               .probability-value {
                 font-weight: 600;
-                color: #212529;
+                color: $dashboard-text;
                 min-width: 45px;
                 text-align: right;
               }
@@ -490,12 +490,12 @@
         .category-details {
           margin-top: 20px;
           padding: 16px;
-          background: #f8f9fa;
+          background: $dashboard-bg;
           border-radius: 8px;
-          border: 1px solid #e9ecef;
+          border: 1px solid $dashboard-border;
 
           h4 {
-            color: #212529;
+            color: $dashboard-text;
             margin-bottom: 12px;
           }
 
@@ -510,13 +510,13 @@
 
               .stat-label {
                 font-size: 12px;
-                color: #6c757d;
+                color: $control-text;
                 font-weight: 500;
               }
 
               .stat-value {
                 font-weight: 600;
-                color: #212529;
+                color: $dashboard-text;
               }
             }
           }
@@ -541,10 +541,10 @@
         .risk-info-card {
           padding: 20px;
           border-radius: 8px;
-          border: 1px solid #e9ecef;
+          border: 1px solid $dashboard-border;
           border-left: 4px solid;
           margin-bottom: 20px;
-          background: white;
+          background: $realwhite;
 
           .risk-header {
             display: flex;
@@ -560,7 +560,7 @@
           }
 
           .risk-message {
-            color: #6c757d;
+            color: $control-text;
             line-height: 1.5;
             margin: 0;
           }
@@ -568,13 +568,13 @@
 
         .recommendations-card {
           padding: 20px;
-          background: #f8f9fa;
-          border: 1px solid #e9ecef;
+          background: $dashboard-bg;
+          border: 1px solid $dashboard-border;
           border-radius: 8px;
           margin-bottom: 20px;
 
           h4 {
-            color: #212529;
+            color: $dashboard-text;
             margin-bottom: 16px;
             font-size: 16px;
             font-weight: 600;
@@ -590,7 +590,7 @@
               align-items: flex-start;
               gap: 12px;
               padding: 8px 0;
-              border-bottom: 1px solid #e9ecef;
+              border-bottom: 1px solid $dashboard-border;
 
               &:last-child {
                 border-bottom: none;
@@ -603,7 +603,7 @@
               }
 
               span {
-                color: #495057;
+                color: $control-hover-text;
                 line-height: 1.4;
               }
             }
@@ -612,7 +612,7 @@
 
         .risk-factors {
           h4 {
-            color: #212529;
+            color: $dashboard-text;
             margin-bottom: 16px;
             font-size: 16px;
             font-weight: 600;
@@ -627,13 +627,13 @@
               justify-content: space-between;
               align-items: center;
               padding: 12px 16px;
-              background: white;
-              border: 1px solid #e9ecef;
+              background: $realwhite;
+              border: 1px solid $dashboard-border;
               border-radius: 6px;
 
               .factor-label {
                 font-weight: 500;
-                color: #212529;
+                color: $dashboard-text;
               }
 
               .factor-impact {
@@ -644,18 +644,18 @@
                 text-transform: uppercase;
 
                 &.low {
-                  background: #d4edda;
-                  color: #155724;
+                  background: $factor-low-bg;
+                  color: $factor-low-text;
                 }
 
                 &.medium {
-                  background: #fff3cd;
-                  color: #856404;
+                  background: $factor-medium-bg;
+                  color: $factor-medium-text;
                 }
 
                 &.high {
-                  background: #f8d7da;
-                  color: #721c24;
+                  background: $factor-high-bg;
+                  color: $factor-high-text;
                 }
               }
             }
@@ -678,15 +678,15 @@
         margin-top: 20px;
 
         .insight-card {
-          border: 1px solid #e9ecef;
+          border: 1px solid $dashboard-border;
           border-radius: 12px;
           padding: 20px;
-          background: white;
+          background: $realwhite;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
 
           &:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px $stats-shadow;
           }
 
           .insight-header {
@@ -698,7 +698,7 @@
             h4 {
               font-size: 16px;
               font-weight: 600;
-              color: #212529;
+              color: $dashboard-text;
               margin: 0;
             }
 
@@ -733,20 +733,20 @@
 
               .metric-label {
                 font-size: 12px;
-                color: #6c757d;
+                color: $control-text;
                 font-weight: 500;
               }
 
               .metric-value {
                 font-size: 18px;
                 font-weight: 700;
-                color: #212529;
+                color: $dashboard-text;
               }
             }
           }
 
           .insight-description {
-            color: #6c757d;
+            color: $control-text;
             font-size: 14px;
             line-height: 1.4;
             margin-bottom: 16px;
@@ -756,7 +756,7 @@
             .mini-bar,
             .confidence-indicator {
               height: 6px;
-              background: #e9ecef;
+              background: $dashboard-border;
               border-radius: 3px;
               margin-bottom: 8px;
               overflow: hidden;
@@ -785,7 +785,7 @@
         h3 {
           font-size: 20px;
           font-weight: 600;
-          color: #212529;
+          color: $dashboard-text;
           margin-bottom: 20px;
         }
 
@@ -795,22 +795,22 @@
           margin-bottom: 32px;
 
           .confidence-card {
-            border: 1px solid #e9ecef;
+            border: 1px solid $dashboard-border;
             border-radius: 8px;
             padding: 16px;
-            background: white;
+            background: $realwhite;
 
             h4 {
               font-size: 14px;
               font-weight: 600;
-              color: #212529;
+              color: $dashboard-text;
               margin-bottom: 12px;
             }
 
             .interval-display {
               .interval-bar {
                 height: 20px;
-                background: #e9ecef;
+                background: $dashboard-border;
                 border-radius: 10px;
                 position: relative;
                 margin-bottom: 8px;
@@ -826,8 +826,8 @@
                     height: 100%;
                     background: linear-gradient(
                       90deg,
-                      rgba(0, 102, 204, 0.3),
-                      rgba(0, 102, 204, 0.6)
+                      $interval-gradient-start,
+                      $interval-gradient-end
                     );
                     border-radius: 10px;
                   }
@@ -848,21 +848,21 @@
                 font-size: 12px;
 
                 .lower {
-                  color: #6c757d;
+                  color: $control-text;
                 }
                 .mean {
                   color: $blue;
                   font-weight: 600;
                 }
                 .upper {
-                  color: #6c757d;
+                  color: $control-text;
                 }
               }
             }
 
             .confidence-width {
               font-size: 12px;
-              color: #6c757d;
+              color: $control-text;
               text-align: center;
               margin-top: 8px;
             }
@@ -873,7 +873,7 @@
           h4 {
             font-size: 16px;
             font-weight: 600;
-            color: #212529;
+            color: $dashboard-text;
             margin-bottom: 16px;
           }
 
@@ -887,20 +887,20 @@
               flex-direction: column;
               gap: 4px;
               padding: 12px;
-              background: #f8f9fa;
+              background: $dashboard-bg;
               border-radius: 6px;
               text-align: center;
 
               .stat-label {
                 font-size: 12px;
-                color: #6c757d;
+                color: $control-text;
                 font-weight: 500;
               }
 
               .stat-value {
                 font-size: 18px;
                 font-weight: 700;
-                color: #212529;
+                color: $dashboard-text;
               }
             }
           }
@@ -1053,7 +1053,12 @@
   }
 
   .loading-skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(
+      90deg,
+      $skeleton-light 25%,
+      $skeleton-dark 50%,
+      $skeleton-light 75%
+    );
     background-size: 200% 100%;
     animation: loading 1.5s infinite;
   }
@@ -1113,30 +1118,30 @@
   color: $blue !important;
 }
 .text-success {
-  color: #4caf50 !important;
+  color: $text-success !important;
 }
 .text-warning {
-  color: #ff9800 !important;
+  color: $text-warning !important;
 }
 .text-danger {
-  color: #f44336 !important;
+  color: $text-danger !important;
 }
 .text-muted {
-  color: #6c757d !important;
+  color: $control-text !important;
 }
 
 .bg-primary {
   background-color: $blue !important;
 }
 .bg-success {
-  background-color: #4caf50 !important;
+  background-color: $text-success !important;
 }
 .bg-warning {
-  background-color: #ff9800 !important;
+  background-color: $text-warning !important;
 }
 .bg-danger {
-  background-color: #f44336 !important;
+  background-color: $text-danger !important;
 }
 .bg-light {
-  background-color: #f8f9fa !important;
+  background-color: $dashboard-bg !important;
 }

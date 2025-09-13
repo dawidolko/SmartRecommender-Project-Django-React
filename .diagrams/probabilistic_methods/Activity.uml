@@ -1,0 +1,68 @@
+@startuml
+start
+:Nowe zamówienie złożone;
+:run_all_analytics_after_order(order);
+
+fork
+  :generate_purchase_probabilities_for_user();
+  :user_orders = Order.objects.filter(user);
+  :products = Product.objects.all();
+  :purchased_categories = extract categories;
+  
+  if (product in user purchases?) then (yes)
+    :base_probability = 0.7 + random(0.0, 0.2);
+  elseif (product category matches?) then (yes)
+    :base_probability = 0.4 + random(0.0, 0.2);
+  else (no)
+    :base_probability = 0.1 + random(0.0, 0.1);
+  endif
+  
+  if (recent_orders exists?) then (yes)
+    :base_probability += 0.1;
+  endif
+  
+  :PurchaseProbability.objects.update_or_create();
+  
+fork again
+  :generate_user_purchase_patterns_for_user();
+  :category_stats = OrderProduct aggregation;
+  :purchase_frequency = orders/months_active;
+  :preferred_time = analyze_preferred_time();
+  :seasonality = analyze_seasonality();
+  :UserPurchasePattern.objects.update_or_create();
+  
+fork again
+  :generate_risk_assessment_for_user();
+  if (recent_orders < 30 days?) then (no)
+    :risk_score = 0.7 + random();
+    :mitigation = "Send personalized offer";
+  else (yes)
+    :risk_score = 0.2 + random();
+    :mitigation = "Maintain inventory";
+  endif
+  :RiskAssessment.objects.create();
+  
+fork again
+  :generate_sales_forecasts_for_products();
+  :avg_per_order = OrderProduct.aggregate();
+  repeat
+    :seasonal = get_seasonal_factor(month);
+    :trend = 1 + (days_ahead/365) * random();
+    :predicted = avg * trend * seasonal;
+    :SalesForecast.objects.update_or_create();
+  repeat while (days < 30)
+  
+fork again
+  :generate_product_demand_forecasts_for_products();
+  repeat
+    :expected = avg_quantity * days * random_factor;
+    :reorder_point = expected * 0.2;
+    :suggested_stock = expected * 1.5;
+    :ProductDemandForecast.objects.update_or_create();
+  repeat while (more periods)
+  
+end fork
+
+:Wszystkie analizy probabilistyczne zakończone;
+stop
+@enduml

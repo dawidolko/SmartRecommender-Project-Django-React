@@ -1,0 +1,19 @@
+@startuml
+left to right direction
+actor "Klient" as Customer
+
+rectangle "Wyszukiwanie Fuzzy" {
+  usecase "Wyszukaj produkty\nz tolerancją błędów" as UC1
+  usecase "Ustaw próg fuzzy (0.3-1.0)" as UC2
+  usecase "Filtruj według ceny\n(cheap/medium/expensive)" as UC3
+  usecase "Zobacz % dopasowania" as UC4
+}
+
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC4
+
+UC2 ..> UC1 : <<configure>>
+UC3 ..> UC1 : <<filter>>
+@enduml

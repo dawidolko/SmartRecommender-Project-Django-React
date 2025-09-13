@@ -1,0 +1,62 @@
+@startuml
+class PurchaseProbability {
+  +id: Integer
+  +user: ForeignKey(User)
+  +product: ForeignKey(Product)
+  +probability: DecimalField(0.000-1.000)
+  +confidence_level: DecimalField
+  +last_updated: DateTimeField
+}
+
+class SalesForecast {
+  +id: Integer
+  +product: ForeignKey(Product)
+  +forecast_date: DateField
+  +predicted_quantity: PositiveIntegerField
+  +confidence_interval_lower: PositiveIntegerField
+  +confidence_interval_upper: PositiveIntegerField
+  +historical_accuracy: DecimalField
+  +created_at: DateTimeField
+}
+
+class UserPurchasePattern {
+  +id: Integer
+  +user: ForeignKey(User)
+  +category: ForeignKey(Category)
+  +purchase_frequency: DecimalField
+  +average_order_value: DecimalField
+  +preferred_time_of_day: CharField[morning|afternoon|evening|night]
+  +seasonality_factor: JSONField
+  +last_computed: DateTimeField
+}
+
+class ProductDemandForecast {
+  +id: Integer
+  +product: ForeignKey(Product)
+  +forecast_period: CharField[week|month|quarter]
+  +period_start: DateField
+  +expected_demand: DecimalField
+  +demand_variance: DecimalField
+  +reorder_point: PositiveIntegerField
+  +suggested_stock_level: PositiveIntegerField
+  +created_at: DateTimeField
+}
+
+class RiskAssessment {
+  +id: Integer
+  +risk_type: CharField[customer_churn|inventory_excess|price_sensitivity|demand_fluctuation]
+  +entity_type: CharField[user|product]
+  +entity_id: PositiveIntegerField
+  +risk_score: DecimalField(0.000-1.000)
+  +confidence: DecimalField
+  +mitigation_suggestion: TextField
+  +assessment_date: DateTimeField
+}
+
+PurchaseProbability ||--|| User
+PurchaseProbability ||--|| Product
+SalesForecast ||--|| Product
+UserPurchasePattern ||--|| User
+UserPurchasePattern ||--|| Category
+ProductDemandForecast ||--|| Product
+@enduml

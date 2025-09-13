@@ -4,15 +4,15 @@
   max-width: 600px;
   margin: 2rem auto;
   padding: 1rem;
-  background: linear-gradient(135deg, #eaeef1, #dfe1e3);
+  background: linear-gradient(135deg, $card-gradient-start, $card-gradient-end);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px $stats-shadow;
 
   h1 {
     text-align: center;
     margin-bottom: 2rem;
     font-size: 3rem;
-    color: #333;
+    color: $account-title;
   }
 
   .account-form {
@@ -27,28 +27,32 @@
       label {
         margin-bottom: 0.5rem;
         font-weight: bold;
-        color: #555;
+        color: $account-label;
         font-size: 1.8rem;
       }
 
       input {
         padding: 0.5rem;
         font-size: 1.6rem;
-        border: 1px solid #737272;
+        border: 1px solid $account-input-border;
         border-radius: 4px;
         margin-bottom: 1rem;
         transition: border-color 0.2s;
-        background: linear-gradient(135deg, #ebe7e7, #e2e9ef);
+        background: linear-gradient(
+          135deg,
+          $account-input-start,
+          $account-input-end
+        );
 
         &:focus {
           outline: none;
-          border-color: #007bff;
+          border-color: $btn-primary-blue;
         }
       }
     }
 
     .error-message {
-      color: red;
+      color: $modal-close-red;
       font-size: 1.9rem;
       text-align: left;
     }
@@ -57,7 +61,7 @@
       padding: 1rem 2rem;
       font-size: 1.7rem;
       border: none;
-      background-color: #007bff;
+      background-color: $btn-primary-blue;
       color: $realwhite;
       border-radius: 4px;
       cursor: pointer;
@@ -65,7 +69,7 @@
       margin-top: 1rem;
 
       &:hover {
-        background-color: #218838;
+        background-color: $submit-hover;
       }
     }
   }

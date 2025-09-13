@@ -35,11 +35,11 @@
     display: flex;
     gap: 0.3em;
     margin-bottom: 0.5em;
-    color: #383737;
+    color: $graymain;
   }
 
   &__mark {
-    color: #000;
+    color: $blackmain;
   }
 }
 

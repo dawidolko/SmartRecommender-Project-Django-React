@@ -1,0 +1,37 @@
+@startuml
+[*] --> Idle : System ready
+
+Idle --> ManualTrigger : Admin clicks update
+Idle --> AutoTrigger : CartItem added
+
+state Processing {
+  [*] --> LoadingProducts
+  LoadingProducts --> ExtractingFeatures
+  ExtractingFeatures --> CalculatingSimilarity
+  CalculatingSimilarity --> FilteringResults
+  FilteringResults --> BulkCreating
+  BulkCreating --> [*]
+}
+
+ManualTrigger --> Processing : Start CBF
+AutoTrigger --> Processing : Start CBF (limited)
+
+Processing --> Caching : Results ready
+
+state Caching {
+  [*] --> StoringInCache
+  StoringInCache --> InvalidatingOldCache
+  InvalidatingOldCache --> [*]
+}
+
+Caching --> Complete : Cache updated
+Complete --> Idle : Ready for next update
+
+note right of Processing
+  Features extracted:
+  - Categories (40% weight)
+  - Tags (30% weight)  
+  - Price category (20% weight)
+  - Keywords (10% weight)
+end note
+@enduml

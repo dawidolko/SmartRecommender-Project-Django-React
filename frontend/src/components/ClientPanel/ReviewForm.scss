@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .review-form-container {
   padding: 1.5rem;
   max-width: 600px;
@@ -6,19 +8,19 @@
   h3 {
     margin-bottom: 1.5rem;
     text-align: center;
-    color: #333;
+    color: $account-title;
   }
 
   &-form-error {
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: #fff0f0;
-    color: #d32f2f;
+    background-color: $review-error-bg;
+    color: $review-error-text;
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 1rem;
-    border-left: 3px solid #d32f2f;
+    border-left: 3px solid $review-error-text;
 
     svg {
       min-width: 18px;
@@ -60,15 +62,15 @@
     textarea {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid $dashboard-summary-border;
       border-radius: 4px;
       font-family: inherit;
       font-size: 0.95rem;
 
       &:focus {
         outline: none;
-        border-color: #4a90e2;
-        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        border-color: $review-focus;
+        box-shadow: 0 0 0 2px $review-shadow;
       }
     }
   }
@@ -92,26 +94,26 @@
     }
 
     .btn-secondary {
-      background-color: #808080;
-      border: 1px solid #808080;
-      color: #ffffff;
+      background-color: $review-btn-secondary;
+      border: 1px solid $review-btn-secondary;
+      color: $realwhite;
 
       &:hover:not(:disabled) {
-        background-color: #ffffff00;
-        border: 1px solid #808080;
-        color: #808080;
+        background-color: $transparent-bg;
+        border: 1px solid $review-btn-secondary;
+        color: $review-btn-secondary;
       }
     }
 
     .btn-primary {
-      background-color: #007bff;
-      border: 1px solid #007bff;
-      color: white;
+      background-color: $btn-primary-blue;
+      border: 1px solid $btn-primary-blue;
+      color: $realwhite;
 
       &:hover:not(:disabled) {
-        background-color: #ffffff00;
-        border: 1px solid #007bff;
-        color: #007bff;
+        background-color: $transparent-bg;
+        border: 1px solid $btn-primary-blue;
+        color: $btn-primary-blue;
       }
     }
   }
@@ -122,25 +124,25 @@
   padding: 2rem;
 
   h3 {
-    color: #2e7d32;
+    color: $review-success;
     margin-bottom: 0.5rem;
   }
 
   p {
-    color: #333;
+    color: $account-title;
   }
 }
 
 .review {
   &-btn2 {
-    background-color: #007bff !important;
-    border: 1px solid #007bff !important;
-    color: white !important;
+    background-color: $btn-primary-blue !important;
+    border: 1px solid $btn-primary-blue !important;
+    color: $realwhite !important;
 
     &:hover {
-      background-color: #ffffff00 !important;
-      border: 1px solid #007bff !important;
-      color: #007bff !important;
+      background-color: $transparent-bg !important;
+      border: 1px solid $btn-primary-blue !important;
+      color: $btn-primary-blue !important;
     }
   }
 }

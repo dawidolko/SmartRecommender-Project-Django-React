@@ -14,19 +14,19 @@
     margin-left: 50px;
     background-color: transparent;
     border: none;
-    color: red;
+    color: $modal-close-red;
     font-size: 1.5rem;
     cursor: pointer;
     transition: color 0.3s ease;
 
     &:hover {
-      color: rgb(107, 14, 14) !important;
+      color: $remove-hover !important;
       background-color: transparent !important;
     }
   }
 
   &__thead {
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.185);
+    box-shadow: 0 0 6px $thead-shadow;
   }
 
   &__row > * {
@@ -37,7 +37,7 @@
   &__tr > * {
     padding: 0.3em;
     font-size: 1.2rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $table-border;
   }
 
   &__td {
@@ -59,26 +59,26 @@
     display: block;
     font-size: 1.2rem;
     text-decoration: none;
-    color: #333;
+    color: $account-title;
     &:hover {
-      color: #007bff !important;
+      color: $btn-primary-blue !important;
       text-decoration: underline;
     }
   }
 
   &__action-btn {
     padding: 0.15em;
-    background-color: #007bff;
-    border: 1px solid #007bff;
+    background-color: $btn-primary-blue;
+    border: 1px solid $btn-primary-blue;
     border-radius: 3px;
-    color: white;
+    color: $realwhite;
     font-size: 1rem;
     transition: background-color 0.3s ease;
 
     &:hover {
       background-color: $darkblack;
-      border: 1px solid #007bff;
-      color: #007bff;
+      border: 1px solid $btn-primary-blue;
+      color: $btn-primary-blue;
     }
   }
 
@@ -125,7 +125,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: $modal-overlay;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -140,7 +140,7 @@
     background-color: $dark;
     color: $white;
     border-radius: 5px;
-    box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 7px $modal-bg-shadow;
   }
 
   &__modal-title {
@@ -161,7 +161,7 @@
     transition: border 0.3s ease, background-color 0.3s ease;
 
     &:hover {
-      border: 1px solid white;
+      border: 1px solid $realwhite;
       background-color: inherit;
     }
   }
@@ -228,7 +228,7 @@
       transition: border 0.3s ease, background-color 0.3s ease;
 
       &:hover {
-        border: 1px solid white;
+        border: 1px solid $realwhite;
         background-color: inherit;
       }
     }

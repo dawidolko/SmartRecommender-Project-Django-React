@@ -1,0 +1,20 @@
+@startuml
+left to right direction
+actor "Klient" as Customer
+actor "Administrator" as Admin
+
+rectangle "Content-Based Filtering" {
+  usecase "Otrzymuj rekomendacje\noparte na cechach produktów" as UC1
+  usecase "Aktualizuj podobieństwa produktów\n(manual trigger)" as UC2
+  usecase "Przeglądaj status algorytmów" as UC3
+  usecase "Automatyczne podobieństwa\npo dodaniu do koszyka" as UC4
+}
+
+Customer --> UC1
+Admin --> UC2
+Admin --> UC3
+Customer --> UC4
+
+UC4 ..> UC1 : <<update>>
+UC2 ..> UC1 : <<refresh>>
+@enduml

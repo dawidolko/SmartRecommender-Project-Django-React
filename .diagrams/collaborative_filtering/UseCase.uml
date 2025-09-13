@@ -1,0 +1,22 @@
+@startuml
+left to right direction
+actor "Klient" as Customer
+actor "Administrator" as Admin
+
+rectangle "Collaborative Filtering" {
+  usecase "Otrzymuj rekomendacje\noparte na podobnych użytkownikach" as UC1
+  usecase "Ustaw algorytm rekomendacji\n(collaborative/content_based)" as UC2
+  usecase "Przeglądaj preview rekomendacji" as UC3
+  usecase "Przetwórz rekomendacje\ncolaborative filtering" as UC4
+  usecase "Generuj rekomendacje użytkownika" as UC5
+}
+
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Admin --> UC4
+Admin --> UC5
+
+UC2 ..> UC1 : <<configure>>
+UC4 ..> UC1 : <<update>>
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+left to right direction
+actor "Klient" as Customer
+actor "Administrator" as Admin
+
+rectangle "Metody Probabilistyczne" {
+  usecase "Przeglądaj prognozy zakupów\n(Purchase Prediction)" as UC1
+  usecase "Sprawdź ryzyko churn\n(Risk Dashboard)" as UC2
+  usecase "Analizuj wzorce zakupów\n(Purchase Patterns)" as UC3
+  usecase "Zobacz prognozy sprzedaży\n(Sales Forecast)" as UC4
+  usecase "Sprawdź popyt na produkty\n(Product Demand)" as UC5
+  usecase "Analizy Markov Chain" as UC6
+  usecase "Analizy Bayesian" as UC7
+  usecase "Dashboard probabilistyczny" as UC8
+  usecase "Sezonowe trendy" as UC9
+}
+
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC4
+Customer --> UC5
+Customer --> UC9
+
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+
+UC8 ..> UC6 : <<include>>
+UC8 ..> UC7 : <<include>>
+@enduml

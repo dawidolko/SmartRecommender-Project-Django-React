@@ -1,0 +1,38 @@
+@startuml
+participant "SearchModal.jsx" as UI
+participant "FuzzySearchAPIView" as API
+participant "CustomFuzzySearch" as Fuzzy
+participant "Cache" as Cache
+participant "Database" as DB
+
+UI -> UI: Debounce input (300ms)
+UI -> API: GET /api/fuzzy-search/?q=labtop&threshold=0.6
+
+API -> Cache: get(cache_key)
+Cache --> API: None (cache miss)
+
+API -> DB: Product.objects.prefetch_related()
+DB --> API: products[:1000]
+
+API -> Fuzzy: _simple_fuzzy_search(query, products, threshold)
+
+loop dla każdego produktu
+  Fuzzy -> Fuzzy: calculate_fuzzy_score(query, product.name) * 0.4
+  Fuzzy -> Fuzzy: calculate_fuzzy_score(query, product.description) * 0.3
+  Fuzzy -> Fuzzy: calculate_fuzzy_score(query, categories) * 0.2
+  Fuzzy -> Fuzzy: calculate_fuzzy_score(query, specifications) * 0.05
+  Fuzzy -> Fuzzy: calculate_fuzzy_score(query, tags) * 0.05
+  
+  alt total_score >= threshold
+    Fuzzy -> Fuzzy: Dodaj do wyników
+  end
+end
+
+Fuzzy -> Fuzzy: Sort by score (descending)
+Fuzzy --> API: sorted results
+
+API -> Cache: set(cache_key, results, 900s)
+API --> UI: JSON z fuzzy_score, name_score, desc_score
+
+UI -> UI: Wyświetl z % dopasowania
+@enduml

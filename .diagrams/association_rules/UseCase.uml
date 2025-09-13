@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+actor "Klient" as Customer
+actor "Administrator" as Admin
+
+rectangle "Reguły Asocjacji" {
+  usecase "Przeglądaj \"Frequently Bought Together\"" as UC1
+  usecase "Dodaj produkty do koszyka" as UC2
+  usecase "Złóż zamówienie" as UC3
+  usecase "Zarządzaj regułami asocjacji" as UC4
+  usecase "Aktualizuj reguły manualnie" as UC5
+  usecase "Przeglądaj analizy reguł" as UC6
+}
+
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+
+UC3 ..> UC1 : <<trigger>>
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+class ProductAssociation {
+  +id: Integer
+  +product_1: ForeignKey(Product)
+  +product_2: ForeignKey(Product)
+  +support: FloatField
+  +confidence: FloatField
+  +lift: FloatField
+  +created_at: DateTimeField
+  +updated_at: DateTimeField
+}
+
+class CustomAssociationRules {
+  -min_support: float
+  -min_confidence: float
+  -max_transactions: int
+  +generate_association_rules(transactions)
+  +_find_frequent_itemsets_with_bitmap()
+  +_generate_2_itemsets_with_bitmap()
+  +_generate_optimized_rules_from_itemsets()
+}
+
+class FrequentlyBoughtTogetherAPI {
+  +get(request)
+  +filter_by_cart_products()
+  +order_by_lift_confidence()
+}
+
+ProductAssociation ||--|| Product : product_1
+ProductAssociation ||--|| Product : product_2
+CustomAssociationRules ..> ProductAssociation : creates
+@enduml

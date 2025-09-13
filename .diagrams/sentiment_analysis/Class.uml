@@ -1,0 +1,40 @@
+@startuml
+class SentimentAnalysis {
+  +id: Integer
+  +product: ForeignKey(Product)
+  +opinion: OneToOneField(Opinion)
+  +sentiment_score: DecimalField(-1 to +1)
+  +sentiment_category: CharField[positive|neutral|negative]
+  +analyzed_at: DateTimeField
+}
+
+class ProductSentimentSummary {
+  +id: Integer
+  +product: OneToOneField(Product)
+  +average_sentiment_score: DecimalField
+  +positive_count: PositiveIntegerField
+  +neutral_count: PositiveIntegerField
+  +negative_count: PositiveIntegerField
+  +total_opinions: PositiveIntegerField
+  +updated_at: DateTimeField
+}
+
+class CustomSentimentAnalysis {
+  -positive_words: set
+  -negative_words: set
+  -intensifiers: set
+  -negations: set
+  -positive_bigrams: set
+  -negative_bigrams: set
+  +analyze_sentiment(text)
+  +analyze_product_sentiment(product)
+  +_analyze_text_segment(text)
+  +_check_negation_context()
+  +_calculate_intensity_multiplier()
+}
+
+SentimentAnalysis ||--|| Opinion
+ProductSentimentSummary ||--|| Product
+CustomSentimentAnalysis ..> SentimentAnalysis : creates
+CustomSentimentAnalysis ..> ProductSentimentSummary : updates
+@enduml

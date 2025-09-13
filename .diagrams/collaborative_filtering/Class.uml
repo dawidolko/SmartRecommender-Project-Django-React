@@ -1,0 +1,38 @@
+@startuml
+class ProductSimilarity {
+  +id: Integer
+  +product1: ForeignKey(Product)
+  +product2: ForeignKey(Product) 
+  +similarity_type: CharField[collaborative|content_based]
+  +similarity_score: DecimalField(0.0-1.0)
+  +updated_at: DateTimeField
+}
+
+class UserProductRecommendation {
+  +id: Integer
+  +user: ForeignKey(User)
+  +product: ForeignKey(Product)
+  +recommendation_type: CharField[collaborative|content_based]
+  +score: DecimalField
+  +created_at: DateTimeField
+}
+
+class RecommendationSettings {
+  +id: Integer
+  +user: ForeignKey(User)
+  +active_algorithm: CharField[collaborative|content_based]
+  +updated_at: DateTimeField
+}
+
+class ProcessRecommendationsView {
+  +post(request)
+  +process_collaborative_filtering()
+  +process_content_based_filtering()
+}
+
+ProductSimilarity ||--|| Product : product1
+ProductSimilarity ||--|| Product : product2
+UserProductRecommendation ||--|| User
+UserProductRecommendation ||--|| Product
+RecommendationSettings ||--|| User
+@enduml

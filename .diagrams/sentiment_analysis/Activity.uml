@@ -1,0 +1,44 @@
+@startuml
+|Signals|
+start
+:Nowa opinia zapisana (Opinion);
+:handle_sentiment_analysis signal;
+
+if (skip_sentiment_update?) then (yes)
+  stop
+else (no)
+  :CustomSentimentAnalysis();
+endif
+
+|Sentiment Engine|
+:analyze_sentiment(opinion.content);
+
+if (text długość > window_size?) then (yes)
+  :_analyze_long_text_with_sliding_window();
+  partition "Sliding Window" {
+    :Podziel na segmenty (300 znaków);
+    :50 znaków overlap;
+    :Analizuj każdy segment;
+    :Weighted average wyników;
+  }
+else (no)
+  :_analyze_text_segment();
+endif
+
+partition "Text Analysis" {
+  :_tokenize_text();
+  :_analyze_bigrams();
+  :_check_negation_context();
+  :_calculate_intensity_multiplier();
+  :positive_score - negative_score;
+}
+
+:Określ kategorię (positive/neutral/negative);
+
+|Database|
+:SentimentAnalysis.objects.update_or_create();
+:ProductSentimentSummary.objects.update_or_create();
+:Cache invalidation;
+
+stop
+@enduml

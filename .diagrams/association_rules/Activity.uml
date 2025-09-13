@@ -1,0 +1,33 @@
+@startuml
+start
+:Klient składa zamówienie;
+:Django signals wykrywa OrderProduct;
+:run_all_analytics_after_order();
+:generate_association_rules_after_order();
+
+:Pobierz ostatnie 1000 zamówień;
+:Utwórz transakcje (product_ids);
+
+:CustomAssociationRules(min_support=0.01, min_confidence=0.1);
+:generate_association_rules();
+
+partition "Apriori Algorithm" {
+  :find_frequent_itemsets_with_bitmap();
+  :item_counts dla pojedynczych produktów;
+  :Filtruj według min_support;
+  :generate_2_itemsets_with_bitmap();
+  :Oblicz support dla par produktów;
+}
+
+partition "Rules Generation" {
+  :generate_optimized_rules_from_itemsets();
+  :Dla każdej pary oblicz confidence;
+  :Oblicz lift = support / (support_1 * support_2);
+  :Filtruj według min_confidence;
+}
+
+:ProductAssociation.objects.bulk_create();
+:Cache invalidation;
+:Zapisz do 500 najlepszych reguł;
+stop
+@enduml

@@ -66,6 +66,7 @@ from .probabilistic_views import (
 )
 
 from .analytics_views import (
+    PurchasePredictionView,
     RiskDashboardView,
     SalesForecastView,
     ProductDemandView,
@@ -144,6 +145,7 @@ urlpatterns = [
     path("cart/update/<int:item_id>/", CartPreviewView.as_view(), name="cart_update"),
     path("cart/remove/<int:item_id>/", CartPreviewView.as_view(), name="cart_remove"),
     path("api/client-stats/", ClientStatsView.as_view(), name="client-stats"),
+    path("api/purchase-prediction/", PurchasePredictionView.as_view(), name="purchase-prediction"),
     path(
         "api/recommended-products/",
         RecommendedProductsAPIView.as_view(),

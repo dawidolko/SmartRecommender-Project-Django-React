@@ -1,0 +1,44 @@
+@startuml
+|Admin Panel|
+start
+:Admin wybiera "collaborative" algorithm;
+:ProcessRecommendationsView.post();
+:process_collaborative_filtering();
+
+|Cache Check|
+if (cache.get("collaborative_similarity_matrix")?) then (hit)
+  :Zwróć cached result;
+  stop
+else (miss)
+  :Kontynuuj przetwarzanie;
+endif
+
+|Data Preparation|
+:User.objects.all();
+:Product.objects.all();
+:OrderProduct.objects.select_related();
+
+:Buduj user_product_matrix;
+partition "Matrix Building" {
+  :user_product_matrix[user_id][product_id] = quantity;
+  :user_ids = list(user_product_matrix.keys());
+  :product_ids = list(products.values_list("id"));
+}
+
+|Similarity Calculation|
+:numpy.array(matrix, dtype=float32);
+:MinMaxScaler normalization;
+:cosine_similarity(normalized_matrix.T);
+
+|Database Update|
+:ProductSimilarity.objects.filter(collaborative).delete();
+:Bulk create similarities (threshold > 0.3);
+partition "Bulk Operations" {
+  :batch_size = 1000;
+  :similarities_to_create = [];
+  :ProductSimilarity.objects.bulk_create();
+}
+
+:cache.set(cache_key, similarity_count, 7200s);
+stop
+@enduml

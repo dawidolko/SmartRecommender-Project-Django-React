@@ -9,7 +9,7 @@
 
   .client-aside {
     width: 320px;
-    background-color: #eaeef1;
+    background-color: $admin-aside-bg;
     padding: 20px;
     transition: width 0.3s ease;
     overflow-x: hidden;
@@ -46,7 +46,7 @@
         border: none;
         font-size: 1.3rem;
         cursor: pointer;
-        color: black;
+        color: $text-black;
         margin-right: 10px;
       }
     }
@@ -56,15 +56,15 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #34495e;
+      background: $scroll-track;
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: #7f8c8d;
+      background-color: $scroll-thumb-gray;
       border-radius: 4px;
 
       &:hover {
-        background-color: #95a5a6;
+        background-color: $scroll-thumb-hover;
       }
     }
 
@@ -72,8 +72,8 @@
       font-size: 20px;
       font-weight: 700;
       margin-bottom: 0.5rem;
-      background-color: #d9d9d9;
-      color: black;
+      background-color: $admin-title-bg;
+      color: $text-black;
       padding: 10px;
       border-radius: 5px;
 
@@ -87,11 +87,11 @@
       margin-bottom: 20px;
       font-weight: 700;
       text-align: center;
-      color: black;
+      color: $text-black;
     }
 
     &__nav {
-      background-color: #dfe1e3;
+      background-color: $card-gradient-end;
       border-radius: 5px;
       padding: 10px;
       min-width: 70px;
@@ -110,13 +110,13 @@
 
     &__link {
       text-decoration: none;
-      color: black;
+      color: $text-black;
       display: flex;
       align-items: center;
       margin-bottom: 10px;
       padding: 12px;
       border-radius: 8px;
-      background-color: #ffffff00;
+      background-color: $transparent-bg;
       transition: all 0.2s ease;
 
       &--back {
@@ -124,7 +124,7 @@
         font-size: 1.6rem;
 
         &:hover {
-          background-color: #3498db;
+          background-color: $link-hover-blue;
           color: $realwhite;
           transform: translateX(5px);
         }
@@ -137,38 +137,38 @@
 
       .icon {
         &-dashboard {
-          color: #83ff00;
+          color: $client-icon-dashboard;
         }
 
         &-orders {
-          color: #e74c3c;
+          color: $table-delete-btn;
         }
 
         &-complaints {
-          color: #f39c12;
+          color: $client-icon-complaints;
         }
 
         &-probabilistic {
-          color: #8e44ad;
+          color: $client-icon-probabilistic;
         }
 
         &-account {
-          color: #2ecc71;
+          color: $client-icon-account;
         }
       }
 
       &:hover {
-        background-color: #3498db;
+        background-color: $link-hover-blue;
         color: $realwhite;
         transform: translateX(5px);
       }
 
       &--active {
-        color: black;
-        background-color: #2b7fb8;
+        color: $text-black;
+        background-color: $link-active-blue;
         font-weight: 700;
         border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 5px $stats-shadow;
       }
 
       &--logout {
@@ -176,14 +176,14 @@
         margin-left: 10px;
         padding: 1rem 2rem;
         font-size: 1.5rem;
-        background-color: #dc3545;
-        border: 1px solid #dc3545;
+        background-color: $logout-red;
+        border: 1px solid $logout-red;
         color: $realwhite;
 
         &:hover {
-          background-color: black;
-          border: 1px solid #dc3545;
-          color: #dc3545;
+          background-color: $text-black;
+          border: 1px solid $logout-red;
+          color: $logout-red;
         }
       }
     }
@@ -193,7 +193,7 @@
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    background: whitesmoke;
+    background: $wrapper-bg;
     padding: 30px;
 
     &::-webkit-scrollbar {
@@ -201,15 +201,15 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #eff3f4;
+      background: $client-wrapper-scroll-track;
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: #c0c0c0;
+      background-color: $client-wrapper-scroll-thumb;
       border-radius: 4px;
 
       &:hover {
-        background-color: #a0a0a0;
+        background-color: $client-wrapper-scroll-hover;
       }
     }
 
@@ -217,12 +217,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #eff3f4;
+      border-bottom: 2px solid $client-wrapper-scroll-track;
       padding: 0 50px;
       margin-top: 100px;
 
       &__title {
-        color: black;
+        color: $text-black;
       }
 
       &__user {
@@ -237,7 +237,7 @@
 
         &-hello {
           margin-left: 10px;
-          color: #6f7d83;
+          color: $client-user-hello;
         }
       }
     }
@@ -272,13 +272,13 @@
         select {
           width: 100%;
           padding: 10px;
-          border: 1px solid #ccc;
+          border: 1px solid $select-border;
           border-radius: 4px;
           font-size: 1rem;
         }
 
         button {
-          background-color: #198754;
+          background-color: $client-form-btn;
           color: $realwhite;
           padding: 10px 20px;
           border: none;
@@ -288,7 +288,7 @@
           transition: background-color 0.3s;
 
           &:hover {
-            background-color: #157347;
+            background-color: $client-form-btn-hover;
           }
         }
       }
@@ -302,11 +302,11 @@
       text-align: center;
 
       &.bg-primary {
-        background-color: #0d6efd;
+        background-color: $client-small-box-primary;
       }
 
       &.bg-danger {
-        background-color: #dc3545;
+        background-color: $logout-red;
       }
 
       .inner {
@@ -324,96 +324,96 @@
 }
 
 .table {
-  border: 1px solid #ccc;
+  border: 1px solid $select-border;
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 1.5rem;
 
   th,
   td {
-    border: 1px solid #ccc;
+    border: 1px solid $select-border;
     padding: 12px;
     text-align: left;
   }
 
   th {
-    background-color: #d9e7f0;
+    background-color: $table-client-header;
     font-weight: bold;
   }
 
   tbody tr:hover {
-    background-color: #f2f2f2;
+    background-color: $table-hover;
   }
 }
 
 .status {
   &-pending {
-    color: rgb(116, 116, 35);
+    color: $client-status-pending;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #f9e4b7;
+      background-color: $client-status-badge-bg;
+      color: $alert-warning-bg;
     }
   }
 
   &-resolved {
-    color: green;
+    color: $client-status-resolved;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #00ff40;
+      background-color: $client-status-badge-bg;
+      color: $client-status-resolved-badge;
     }
   }
 
   &-rejected {
-    color: red;
+    color: $modal-close-red;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #ff0000;
+      background-color: $client-status-badge-bg;
+      color: $client-status-rejected-badge;
     }
   }
 
   &-processing {
-    color: blue;
+    color: $blue;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #fef5db;
+      background-color: $client-status-badge-bg;
+      color: $select-processing-bg;
     }
   }
 
   &-shipped {
-    color: orange;
+    color: $client-status-shipped;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #d1f7d1;
+      background-color: $client-status-badge-bg;
+      color: $select-resolved-bg;
     }
   }
 
   &-delivered {
-    color: green;
+    color: $client-status-resolved;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #c2f0c2;
+      background-color: $client-status-badge-bg;
+      color: $select-delivered-bg;
     }
   }
 
   &-cancelled {
-    color: red;
+    color: $modal-close-red;
     font-weight: bold !important;
 
     &-badge {
-      background-color: rgba(119, 0, 255, 0.2);
-      color: #f5d0b5;
+      background-color: $client-status-badge-bg;
+      color: $select-rejected-bg;
     }
   }
 }
@@ -425,7 +425,7 @@
 .status-shipped,
 .status-delivered,
 .status-cancelled {
-  background-color: rgba(119, 0, 255, 0.2);
+  background-color: $client-status-badge-bg;
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -436,13 +436,13 @@
 }
 
 .btn-main-client {
-  border: 1px solid #007bff !important;
-  background-color: #007bff;
+  border: 1px solid $btn-primary-blue !important;
+  background-color: $btn-primary-blue;
   color: $realwhite;
 
   &:hover {
-    color: #007bff !important;
-    background-color: #fff !important;
+    color: $btn-primary-blue !important;
+    background-color: $client-btn-hover !important;
   }
 }
 
@@ -461,7 +461,7 @@ form {
   gap: 1.5rem;
 
   button {
-    background-color: #198754;
+    background-color: $client-form-btn;
     color: $realwhite;
     padding: 10px 20px;
     border: none;
@@ -472,19 +472,23 @@ form {
     max-width: 150px;
 
     &:hover {
-      background-color: #157347;
+      background-color: $client-form-btn-hover;
     }
   }
 }
 
 .product-table {
   &-container2 {
-    background: linear-gradient(135deg, #eaeef1, #dfe1e3);
+    background: linear-gradient(
+      135deg,
+      $card-gradient-start,
+      $card-gradient-end
+    );
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 20px $card-shadow;
+    border: 1px solid $card-border;
     backdrop-filter: blur(10px);
   }
 
@@ -494,12 +498,12 @@ form {
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid $card-border;
 
     h2 {
       font-size: 2rem;
       font-weight: 600;
-      color: black;
+      color: $text-black;
     }
 
     @media (max-width: 640px) {
@@ -521,17 +525,17 @@ form {
     }
 
     thead {
-      background-color: rgb(206 208 211 / 60%);
-      color: black;
+      background-color: $table-header-bg;
+      color: $text-black;
     }
 
     th {
       font-weight: 600;
-      color: black;
+      color: $text-black;
       text-transform: uppercase;
       font-size: 1.5rem;
       letter-spacing: 0.05em;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid $card-border;
       position: sticky;
       top: 0;
       z-index: 10;
@@ -541,7 +545,7 @@ form {
       cursor: pointer;
 
       &:hover {
-        background-color: rgba(75, 85, 101, 0.6);
+        background-color: $pagination-btn-hover;
       }
     }
 
@@ -553,15 +557,15 @@ form {
     }
 
     tbody {
-      background-color: rgb(207, 207, 207);
-      color: black;
+      background-color: $table-body-bg;
+      color: $text-black;
 
       tr {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid $table-row-border;
         transition: background-color 0.2s ease;
 
         &:hover {
-          background-color: rgba(55, 65, 81, 0.3);
+          background-color: $table-row-hover;
         }
 
         &:last-child {
@@ -570,7 +574,7 @@ form {
       }
 
       td {
-        color: black;
+        color: $text-black;
         font-size: 1.5rem;
       }
     }
@@ -586,9 +590,9 @@ form {
     }
 
     .btn-primary {
-      background-color: #007bff;
-      border: 1px solid #007bff;
-      color: white;
+      background-color: $btn-primary-blue;
+      border: 1px solid $btn-primary-blue;
+      color: $realwhite;
       font-weight: 500;
       padding: 0.6rem 1rem;
       border-radius: 8px;
@@ -598,14 +602,14 @@ form {
 
       &:hover {
         background-color: transparent;
-        color: #007bff;
+        color: $btn-primary-blue;
       }
     }
 
     .no-results {
       text-align: center;
       padding: 20px;
-      color: black;
+      color: $text-black;
       font-size: 1.4rem;
     }
   }
@@ -617,21 +621,21 @@ form {
   input {
     padding: 1rem 1.2rem 1rem 2.5rem;
     border-radius: 8px;
-    background-color: rgb(197 197 197 / 70%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: black;
+    background-color: $input-bg;
+    border: 1px solid $card-border;
+    color: $text-black;
     font-size: 1.4rem;
     transition: all 0.3s ease;
     min-width: 250px;
 
     &:focus {
       outline: none;
-      border-color: #6366f1;
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+      border-color: $search-focus;
+      box-shadow: 0 0 0 2px $search-shadow;
     }
 
     &::placeholder {
-      color: rgba(0, 0, 0, 1);
+      color: $client-placeholder;
     }
   }
 
@@ -640,13 +644,13 @@ form {
     left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(209, 213, 219, 0.5);
+    color: $search-icon;
   }
 }
 
 .table-wrapper {
   overflow-x: auto;
-  background-color: rgba(31, 41, 55, 0.4);
+  background-color: $table-bg;
   border-radius: 8px;
 }
 
@@ -657,7 +661,7 @@ form {
     align-items: center;
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid $card-border;
 
     @media (max-width: 640px) {
       flex-direction: column;
@@ -666,7 +670,7 @@ form {
   }
 
   &-text {
-    color: black;
+    color: $text-black;
     font-size: 1.3rem;
   }
 
@@ -685,15 +689,15 @@ form {
     width: 2rem;
     height: 2rem;
     border-radius: 6px;
-    background-color: rgba(55, 65, 81, 0.6);
+    background-color: $pagination-btn-bg;
     border: none;
-    color: #e5e7eb;
+    color: $pagination-btn-text;
     cursor: pointer;
     transition: all 0.2s ease;
     padding: 1.2rem;
 
     &:hover:not(.disabled) {
-      background-color: rgba(75, 85, 101, 0.6);
+      background-color: $pagination-btn-hover;
     }
 
     &.disabled {
@@ -709,20 +713,20 @@ form {
     width: 2rem;
     height: 2rem;
     border-radius: 6px;
-    background-color: rgba(55, 65, 81, 0.6);
+    background-color: $pagination-btn-bg;
     border: none;
-    color: #e5e7eb;
+    color: $pagination-btn-text;
     cursor: pointer;
     transition: all 0.2s ease;
     padding: 1.2rem;
 
     &:hover {
-      background-color: rgba(75, 85, 101, 0.6);
+      background-color: $pagination-btn-hover;
     }
 
     &.active {
-      background-color: #6366f1;
-      color: white;
+      background-color: $pagination-active;
+      color: $realwhite;
     }
   }
 }
@@ -730,9 +734,9 @@ form {
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid rgba(0, 0, 0, 0.1);
+  border: 5px solid $spinner-track;
   border-radius: 50%;
-  border-top-color: #6366f1;
+  border-top-color: $search-focus;
   animation: spin 1s ease-in-out infinite;
   position: absolute;
   top: 50%;
@@ -824,7 +828,7 @@ form {
     align-items: center;
     justify-content: space-around;
     padding: 0.5rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px $stats-shadow;
 
     &__nav {
       width: 100%;
@@ -870,7 +874,7 @@ form {
     .dashboard-charts {
       h2 {
         font-size: 2.8rem;
-        color: black;
+        color: $text-black;
       }
     }
   }

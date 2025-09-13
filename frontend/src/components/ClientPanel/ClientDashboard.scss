@@ -8,7 +8,7 @@
 h1 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: $account-title;
 }
 
 .client-dashboard {
@@ -38,30 +38,30 @@ h1 {
 
 .small-box {
   border-radius: 0.5rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px $stats-shadow;
   transition: transform 0.2s ease;
   margin-bottom: 1.5rem;
   padding: 1.5rem;
   height: 100%;
 
   &.bg-primary {
-    background-color: #007bff;
-    color: white;
+    background-color: $btn-primary-blue;
+    color: $realwhite;
   }
 
   &.bg-danger {
-    background-color: #dc3545;
-    color: white;
+    background-color: $logout-red;
+    color: $realwhite;
   }
 
   &.bg-success {
-    background-color: #3bdc35;
-    color: white;
+    background-color: $stat-green;
+    color: $realwhite;
   }
 
   &.bg-info {
-    background-color: #dca235;
-    color: white;
+    background-color: $stat-orange;
+    color: $realwhite;
   }
 
   &:hover {
@@ -124,8 +124,8 @@ h1 {
   }
 
   .summary-box {
-    background: #f8f9fa;
-    border: 1px solid #ddd;
+    background: $dashboard-bg;
+    border: 1px solid $dashboard-summary-border;
     border-radius: 0.5rem;
     padding: 1rem;
     text-align: center;
@@ -134,7 +134,7 @@ h1 {
 
     h3 {
       font-size: 2rem;
-      color: #333;
+      color: $account-title;
     }
   }
 }
@@ -169,7 +169,7 @@ h1 {
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1.5em;
-    background-color: #f1f1f1;
+    background-color: $recommendations-grid-bg;
     border-radius: 10px;
     overflow-x: auto;
 
@@ -180,7 +180,7 @@ h1 {
 
     .recommendation-card {
       background: $realwhite;
-      border: 1px solid #ddd;
+      border: 1px solid $dashboard-summary-border;
       border-radius: 0.5rem;
       padding: 0.5rem;
       text-align: center;
@@ -188,7 +188,7 @@ h1 {
       flex: 1;
       min-width: 200px;
       max-width: 250px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 8px $stats-shadow;
 
       &:hover {
         transform: translateY(-5px);
@@ -210,10 +210,10 @@ h1 {
       p {
         margin-top: 0.5rem;
         font-size: 1.2rem;
-        color: #333;
+        color: $account-title;
 
         &:hover {
-          color: #007bff;
+          color: $btn-primary-blue;
           text-decoration: underline;
         }
       }
@@ -258,9 +258,9 @@ h1 {
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid rgba(0, 0, 0, 0.1);
+  border: 5px solid $spinner-track;
   border-radius: 50%;
-  border-top-color: #6366f1;
+  border-top-color: $search-focus;
   animation: spin 1s ease-in-out infinite;
   position: absolute;
   top: 50%;
@@ -290,11 +290,11 @@ h1 {
     border: none;
     font-size: 2rem;
     cursor: pointer;
-    color: #444;
+    color: $product-arrow;
     padding: 0.5em;
 
     &:hover {
-      color: #ff5733;
+      color: $product-arrow-hover;
     }
   }
 }

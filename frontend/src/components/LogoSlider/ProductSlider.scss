@@ -20,7 +20,7 @@
     border-radius: 8px;
     margin: 0 10px;
     max-height: 200px;
-    box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 7px $slider-shadow;
 
     &:hover {
       transform: translateY(-5px);
@@ -40,7 +40,7 @@
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #f3f3f3;
+    background-color: $slider-hover;
   }
 
   &__img {
@@ -57,20 +57,20 @@
   &__name {
     font-size: 1.4rem;
     font-weight: 500;
-    color: #333;
+    color: $account-title;
     text-align: center;
     transition: color 0.3s ease;
 
     &:hover {
       text-decoration: underline;
-      color: #007bff;
+      color: $btn-primary-blue;
     }
   }
 
   &__price {
     font-size: 1.5rem;
     font-weight: bolder;
-    color: rgb(239 68 68);
+    color: $error-red;
     margin-bottom: 0.5em;
     @media (max-width: 768px) {
       font-size: 1em;
@@ -78,11 +78,11 @@
   }
 
   &__btn-fav {
-    background-color: #ddd;
+    background-color: $slider-btn-bg;
     padding: 5px 8px 5px 8px;
     border: none;
     cursor: pointer;
-    color: red;
+    color: $modal-close-red;
   }
 
   @media (max-width: 596px) {

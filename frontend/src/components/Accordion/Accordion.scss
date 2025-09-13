@@ -26,7 +26,7 @@
     max-width: 500px;
     height: 70vh;
     object-fit: cover;
-    border: 1px solid #ddd;
+    border: 1px solid $borderGray;
     border-radius: 6px;
   }
 
@@ -50,7 +50,7 @@
     align-items: center;
     padding: 1em;
     cursor: pointer;
-    background-color: #d8d8d8cc;
+    background-color: rgba(216, 216, 216, 0.8);
   }
 
   &__question {

@@ -1,0 +1,20 @@
+@startuml
+left to right direction
+actor "Klient" as Customer
+actor "System" as System
+
+rectangle "Analiza Sentymentu" {
+  usecase "Wyszukaj według sentymentu" as UC1
+  usecase "Dodaj opinię o produkcie" as UC2
+  usecase "Automatyczna analiza opinii" as UC3
+  usecase "Ranking produktów według satysfakcji" as UC4
+}
+
+Customer --> UC1
+Customer --> UC2
+System --> UC3
+Customer --> UC4
+
+UC2 ..> UC3 : <<trigger>>
+UC3 ..> UC4 : <<update>>
+@enduml

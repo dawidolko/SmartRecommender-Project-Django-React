@@ -4,7 +4,7 @@
   padding: 1.5rem;
   background: $realwhite;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px $stats-shadow;
   margin-bottom: 2rem;
   min-height: 600px;
 
@@ -19,7 +19,7 @@
     .markov-title {
       @include flexCenter(row);
       gap: 0.75rem;
-      color: #333;
+      color: $markov-title;
       font-size: 1.75rem;
       font-weight: bold;
       margin: 0;
@@ -34,10 +34,10 @@
     .markov-controls {
       display: flex;
       gap: 0.5rem;
-      background: #f8f9fa;
+      background: $dashboard-bg;
       padding: 0.25rem;
       border-radius: 8px;
-      border: 1px solid #e9ecef;
+      border: 1px solid $markov-border;
 
       .control-btn {
         @include flexCenter(row);
@@ -45,7 +45,7 @@
         padding: 0.75rem 1rem;
         border: none;
         background: transparent;
-        color: #666;
+        color: $markov-inactive;
         border-radius: 6px;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -53,14 +53,14 @@
         font-weight: 500;
 
         &:hover {
-          background: rgba($main, 0.1);
+          background: $markov-hover-bg;
           color: $main;
         }
 
         &.active {
           background: $main;
           color: $realwhite;
-          box-shadow: 0 2px 4px rgba($main, 0.3);
+          box-shadow: 0 2px 4px $markov-active-shadow;
         }
 
         &:disabled {
@@ -69,7 +69,7 @@
 
           &:hover {
             background: transparent;
-            color: #666;
+            color: $markov-inactive;
           }
         }
       }
@@ -92,10 +92,10 @@
 
       .chart-container {
         position: relative;
-        background: #f8f9fa;
+        background: $dashboard-bg;
         border-radius: 8px;
         padding: 1rem;
-        border: 2px solid #e9ecef;
+        border: 2px solid $markov-border;
         min-height: 400px;
 
         canvas {
@@ -129,15 +129,15 @@
       }
 
       .state-legend {
-        background: #f8f9fa;
+        background: $dashboard-bg;
         border-radius: 8px;
         padding: 1.5rem;
-        border: 2px solid #e9ecef;
+        border: 2px solid $markov-border;
         height: fit-content;
 
         h4 {
           margin: 0 0 1rem 0;
-          color: #333;
+          color: $markov-title;
           font-size: 1.1rem;
           font-weight: 600;
         }
@@ -159,36 +159,36 @@
             position: relative;
 
             &:hover {
-              background: rgba($main, 0.05);
-              border-color: rgba($main, 0.2);
+              background: $markov-hover-bg;
+              border-color: $markov-hover-border;
             }
 
             &.selected {
-              background: rgba($blue, 0.1);
+              background: $blue-hover;
               border-color: $blue;
             }
 
             &.current {
-              background: rgba(#dc3545, 0.1);
-              border-color: #dc3545;
+              background: $current-bg;
+              border-color: $logout-red;
             }
 
             .legend-color {
               width: 16px;
               height: 16px;
               border-radius: 50%;
-              border: 2px solid rgba(0, 0, 0, 0.2);
+              border: 2px solid $legend-border;
               flex-shrink: 0;
             }
 
             .legend-text {
               font-weight: 500;
-              color: #333;
+              color: $markov-title;
               flex: 1;
             }
 
             .current-badge {
-              background: #dc3545;
+              background: $logout-red;
               color: $realwhite;
               padding: 0.25rem 0.5rem;
               border-radius: 12px;
@@ -203,10 +203,10 @@
     .markov-transitions-container {
       .chart-container {
         position: relative;
-        background: #f8f9fa;
+        background: $dashboard-bg;
         border-radius: 8px;
         padding: 2rem;
-        border: 2px solid #e9ecef;
+        border: 2px solid $markov-border;
         min-height: 400px;
         @include flexCenter(column);
       }
@@ -214,12 +214,12 @@
       .no-data-message {
         @include flexCenter(column);
         gap: 1rem;
-        color: #666;
+        color: $markov-inactive;
         text-align: center;
         height: 300px;
 
         svg {
-          color: #ccc;
+          color: $no-data-icon;
         }
 
         p {
@@ -232,14 +232,14 @@
   }
 
   .markov-stats {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, $dashboard-bg 0%, $markov-border 100%);
     border-radius: 8px;
     padding: 1.5rem;
-    border: 1px solid #dee2e6;
+    border: 1px solid $stats-border;
 
     h4 {
       margin: 0 0 1rem 0;
-      color: #333;
+      color: $markov-title;
       font-size: 1.2rem;
       font-weight: 600;
       @include flexCenter(row);
@@ -256,7 +256,7 @@
         background: $realwhite;
         padding: 1rem;
         border-radius: 8px;
-        border: 1px solid #e9ecef;
+        border: 1px solid $markov-border;
         @include flexCenter(row);
         justify-content: flex-start;
         gap: 1rem;
@@ -264,12 +264,12 @@
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 8px $stats-shadow;
         }
 
         .stat-icon {
           color: $main;
-          background: rgba($main, 0.1);
+          background: $markov-hover-bg;
           padding: 0.5rem;
           border-radius: 50%;
           width: 40px;
@@ -284,14 +284,14 @@
 
           .stat-label {
             font-size: 0.85rem;
-            color: #666;
+            color: $markov-inactive;
             font-weight: 500;
           }
 
           .stat-value {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #333;
+            color: $markov-title;
           }
         }
       }
@@ -431,7 +431,7 @@
         content: "";
         width: 50px;
         height: 50px;
-        border: 5px solid rgba(0, 0, 0, 0.1);
+        border: 5px solid $spinner-track;
         border-radius: 50%;
         border-top-color: $main;
         animation: spin 1s ease-in-out infinite;
@@ -446,16 +446,16 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: $scroll-light;
       border-radius: 3px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
+      background: $scroll-medium;
       border-radius: 3px;
 
       &:hover {
-        background: #a8a8a8;
+        background: $scroll-dark;
       }
     }
   }
@@ -463,27 +463,27 @@
 
 @media (prefers-color-scheme: dark) {
   .markov-visualization {
-    background: #1a1a1a;
-    color: #e0e0e0;
+    background: $dark-bg;
+    color: $dark-text;
 
     .markov-header .markov-title {
-      color: #e0e0e0;
+      color: $dark-text;
     }
 
     .chart-container {
-      background: #2d2d2d;
-      border-color: #404040;
+      background: $dark-chart-bg;
+      border-color: $dark-border;
     }
 
     .state-legend,
     .markov-stats {
-      background: #2d2d2d;
-      border-color: #404040;
+      background: $dark-chart-bg;
+      border-color: $dark-border;
     }
 
     .stat-item {
-      background: #1a1a1a;
-      border-color: #404040;
+      background: $dark-bg;
+      border-color: $dark-border;
     }
   }
 }

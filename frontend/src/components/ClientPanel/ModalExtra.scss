@@ -1,3 +1,5 @@
+@import "../../global.scss";
+
 .order-detail-modal,
 .complaint-detail-modal {
   p {
@@ -5,7 +7,7 @@
     margin-bottom: 1.2rem;
 
     strong {
-      color: black;
+      color: $text-black;
     }
   }
 
@@ -28,11 +30,11 @@
     th,
     td {
       padding: 1rem;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid $border-light;
     }
 
     th {
-      background-color: #f9f9f9;
+      background-color: $modal-table-header;
       font-weight: 600;
       text-align: center;
       font-size: 1.6rem;
@@ -59,7 +61,7 @@
     &-shipped,
     &-delivered,
     &-cancelled {
-      background-color: rgba(119, 0, 255, 0.2);
+      background-color: $client-status-badge-bg;
       display: inline-block;
       padding: 0.25rem 0.75rem;
       border-radius: 9999px;
@@ -70,31 +72,31 @@
     }
 
     &-pending {
-      color: #f9e4b7;
+      color: $alert-warning-bg;
     }
 
     &-rejected {
-      color: #ff0000;
+      color: $client-status-rejected-badge;
     }
 
     &-resolved {
-      color: #00ff40;
+      color: $client-status-resolved-badge;
     }
 
     &-processing {
-      color: blue;
+      color: $blue;
     }
 
     &-shipped {
-      color: orange;
+      color: $client-status-shipped;
     }
 
     &-delivered {
-      color: green;
+      color: $client-status-resolved;
     }
 
     &-cancelled {
-      color: red;
+      color: $modal-close-red;
     }
   }
 }
