@@ -22,7 +22,7 @@ The easiest way to run the project is using Docker. This ensures consistent envi
 1. **Clone the repository:**
 
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/dawidolko/SmartRecommender-Project-Django-React
    cd SmartRecommender-Project-Django-React
    ```
 
