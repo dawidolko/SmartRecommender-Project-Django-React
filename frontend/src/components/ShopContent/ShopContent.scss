@@ -1,4 +1,5 @@
-@import "../../global.scss";
+@use "../../global.scss" as *;
+@use "sass:color";
 
 .shop {
   @include flexCenter(column);
@@ -30,7 +31,7 @@
       vertical-align: middle;
       appearance: none;
       text-align: center;
-      color: rgba(0, 0, 0, 0.54);
+      color: $favorite-icon-color;
       font-size: 1.125rem;
       outline: 0px;
       border-width: 0px;
@@ -42,17 +43,17 @@
       flex: 0 0 auto;
       border-radius: 50%;
       overflow: visible;
-      background-color: #ddd;
+      background-color: $favorite-btn-bg;
       padding: 5px 8px 5px 8px;
     }
 
     &-icon {
       font-size: 24px;
-      color: #333;
+      color: $favorite-icon-default;
       transition: color 0.3s ease;
 
       &--active {
-        color: red;
+        color: $favorite-icon-active;
       }
     }
   }
@@ -68,24 +69,24 @@
       font-size: 1.2rem;
       margin: 0.5em;
       text-transform: uppercase;
-      background-color: #f2f2f2;
-      border: 2px solid #ddd;
+      background-color: $button-default-bg;
+      border: 2px solid $button-border;
       border-radius: 25px;
       cursor: pointer;
       transition: background-color 0.3s, transform 0.3s;
-      color: #333;
+      color: $button-text;
       font-weight: 500;
 
       &.shop__active {
-        background-color: #ff5733;
-        color: white;
+        background-color: $button-active-bg;
+        color: $button-active-text;
         transform: scale(1.05);
         transition: transform 0.5s ease;
       }
 
       &:hover {
-        background-color: #ff5733;
-        color: white;
+        background-color: $button-active-bg;
+        color: $button-active-text;
         transform: scale(1.05);
         transition: transform 0.5s ease;
       }
@@ -140,7 +141,7 @@
     max-height: 450px;
     padding: 1.5em;
     overflow: hidden;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 8px $product-shadow;
     margin-bottom: 2em;
     text-align: center;
     background-color: $realwhite;
@@ -155,10 +156,10 @@
   }
 
   &__navigate {
-    background-color: #fd266e !important;
+    background-color: $navigate-bg !important;
     border: 1px solid $main !important;
     &:hover {
-      background-color: #ffffff00 !important;
+      background-color: $navigate-hover-bg !important;
       color: $main;
       border: 1px solid $main !important;
     }
@@ -176,7 +177,7 @@
   }
 
   &__details_btn {
-    background-color: gray;
+    background-color: $details-btn-bg;
   }
 
   &__image {
@@ -191,8 +192,8 @@
 
     &-enlarge {
       &-btn {
-        background-color: rgba(255, 255, 255, 0.001);
-        color: black;
+        background-color: $enlarge-btn-bg;
+        color: $enlarge-btn-text;
         border: none;
         padding: 0.5em 1em;
         border-radius: 12px;
@@ -207,7 +208,7 @@
         vertical-align: middle;
         appearance: none;
         text-align: center;
-        color: rgb(0, 0, 0);
+        color: $enlarge-btn-text;
         font-size: 1.125rem;
         outline: 0px;
         border-width: 0px;
@@ -219,7 +220,7 @@
         flex: 0 0 auto;
         border-radius: 50%;
         overflow: visible;
-        background-color: #ddd;
+        background-color: $favorite-btn-bg;
         padding: 5px 8px 5px 8px;
       }
 
@@ -257,16 +258,16 @@
 
     &:hover {
       text-decoration: underline;
-      color: #007bff;
+      color: $name-hover-color;
     }
   }
 
   &__btn {
-    border: 1px solid #007bff;
+    border: 1px solid $name-hover-color;
     &:hover {
-      border: 1px solid #007bff;
+      border: 1px solid $name-hover-color;
       background-color: $realwhite;
-      color: #007bff;
+      color: $name-hover-color;
     }
   }
 
@@ -279,7 +280,7 @@
 
     .shop__price--discounted {
       text-decoration: line-through;
-      color: rgb(107 114 128 / var(--tw-text-opacity));
+      color: $price-discounted-color;
       text-decoration-line: line-through;
       font-weight: bold;
       font-size: 2rem;
@@ -291,7 +292,7 @@
 
   &__price {
     font-weight: bolder;
-    color: rgb(239 68 68);
+    color: $price-color;
     margin-bottom: 0.5em;
     font-size: 3.5rem;
     @media (max-width: 1024px) {
@@ -312,9 +313,9 @@
     &__main {
       border-radius: 5px;
       font-size: 1.2rem;
-      color: black;
+      color: $category-text;
       margin-bottom: 0.5em;
-      border: 1px solid black;
+      border: 1px solid $category-text;
       padding: 0.5em;
       border-radius: 3px;
       min-width: 100%;
@@ -333,7 +334,7 @@
     &-tag {
       display: flex;
       align-items: center;
-      background-color: #f0f7ff;
+      background-color: $filter-tag-bg;
       padding: 6px 12px;
       border-radius: 20px;
       font-size: 0.8rem;
@@ -355,7 +356,7 @@
         padding: 0;
 
         &:hover {
-          color: #004999;
+          color: $filter-tag-hover;
         }
       }
     }
@@ -364,7 +365,7 @@
   &__sidebar {
     width: 240px;
     background-color: $realwhite;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 15px $sidebar-shadow;
     border-radius: 8px;
     overflow-y: auto;
     position: sticky;
@@ -383,7 +384,7 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #f6f6f6;
+      background: $scrollbar-track;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -392,7 +393,7 @@
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background: #004999;
+      background: $filter-tag-hover;
     }
 
     @media (max-width: 868px) {
@@ -431,18 +432,18 @@
       border-radius: 6px;
       text-align: left;
       font-size: 0.9rem;
-      color: #333;
+      color: $button-text;
       cursor: pointer;
       transition: all 0.2s ease;
 
       &:hover {
-        background-color: rgba(0, 102, 204, 0.08);
+        background-color: $sidebar-button-hover;
         color: $blue;
       }
 
       &.active {
         background-color: $main;
-        color: white;
+        color: $button-active-text;
         font-weight: 500;
       }
     }
@@ -462,7 +463,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #666;
+      color: $toggle-color;
       cursor: pointer;
       border-radius: 4px;
       transition: all 0.2s ease;
@@ -474,7 +475,7 @@
       }
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: $toggle-hover-bg;
         color: $blue;
       }
 
@@ -502,7 +503,7 @@
       padding-left: 18px;
       margin-top: 2px;
       margin-bottom: 5px;
-      border-left: 2px solid #e8e8e8;
+      border-left: 2px solid $subcategory-border;
     }
 
     &-subbutton {
@@ -515,17 +516,17 @@
       background: transparent;
       text-align: left;
       font-size: 0.8rem;
-      color: #666;
+      color: $toggle-color;
       cursor: pointer;
       transition: all 0.2s ease;
 
       &:hover {
-        background-color: rgba(0, 102, 204, 0.05);
+        background-color: $subbutton-hover;
         color: $blue;
       }
 
       &.active {
-        background-color: rgba(0, 102, 204, 0.1);
+        background-color: $subbutton-active;
         color: $blue;
         font-weight: 500;
       }
@@ -547,7 +548,7 @@
     width: 40px;
     height: 40px;
     margin: 20px auto;
-    border: 3px solid #f0f0f0;
+    border: 3px solid $spinner-bg;
     border-top: 3px solid $blue;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -556,9 +557,9 @@
   &__no-products {
     text-align: center;
     padding: 40px;
-    background-color: #f9f9f9;
+    background-color: $no-products-bg;
     border-radius: 8px;
-    color: #666;
+    color: $toggle-color;
     font-size: 1rem;
     width: 100%;
   }
@@ -566,7 +567,7 @@
   .image-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: $image-overlay-bg;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -583,16 +584,16 @@
       max-width: 100%;
       max-height: 100%;
       border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px $overlay-shadow;
     }
 
     .close-btn {
       position: absolute;
       top: -35px;
       right: -35px;
-      background-color: red;
-      border: 1px solid red;
-      color: rgb(0, 0, 0);
+      background-color: $close-btn-bg;
+      border: 1px solid $close-btn-bg;
+      color: $close-btn-text;
       border: none;
       font-size: 1.6rem;
       font-weight: bold;
@@ -602,12 +603,12 @@
       align-items: center;
       justify-content: center;
       z-index: 10000;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 10px $close-btn-shadow;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0);
-        border: 1px solid red;
-        color: red;
+        background-color: $close-hover-bg;
+        border: 1px solid $close-btn-bg;
+        color: $close-btn-bg;
       }
     }
   }
@@ -621,7 +622,7 @@
     height: 42px;
     border-radius: 50%;
     background-color: $blue;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 10px $hamburger-shadow;
     border: none;
     cursor: pointer;
     z-index: 1000;
@@ -639,14 +640,14 @@
       display: block;
       width: 20px;
       height: 2px;
-      background-color: white;
+      background-color: $button-active-text;
       margin: 2px 0;
       transition: all 0.3s ease;
     }
 
     &.active {
       left: 255px;
-      background-color: #e62f2f;
+      background-color: $hamburger-active-bg;
 
       span:nth-child(1) {
         transform: rotate(45deg) translate(3px, 3px);
@@ -738,16 +739,16 @@
   margin: 10px 0;
   padding: 16px;
   border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px $toast-shadow;
 
   &--success {
-    background-color: #4caf50;
-    color: white;
+    background-color: $toast-success;
+    color: $button-active-text;
   }
 
   &--error {
-    background-color: #f44336;
-    color: white;
+    background-color: $toast-error;
+    color: $button-active-text;
   }
 
   &-body {
@@ -756,5 +757,5 @@
 }
 
 .Toastify__close-button {
-  color: white;
+  color: $button-active-text;
 }

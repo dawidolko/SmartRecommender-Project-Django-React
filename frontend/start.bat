@@ -26,6 +26,7 @@ IF %ERRORLEVEL% NEQ 0 (
 echo.
 echo Installing dependencies...
 call npm install
+call npm install --save-dev @craco/craco
 
 echo.
 echo Installing additional packages...

@@ -8,6 +8,8 @@ RUN npm install
 
 RUN npm install react-toastify react-countup jwt-decode axios react-router-dom framer-motion lucide-react
 
+RUN npm install --save-dev @craco/craco
+
 COPY . .
 
 EXPOSE 3000

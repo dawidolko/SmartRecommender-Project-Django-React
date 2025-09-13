@@ -1,4 +1,5 @@
-@import "../../global.scss";
+@use "../../global.scss" as *;
+@use "sass:color";
 
 .notFound {
   height: 100vh;

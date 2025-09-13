@@ -1,4 +1,5 @@
-@import "../../global.scss";
+@use "../../global.scss" as *;
+@use "sass:color";
 
 .client-account {
   max-width: 600px;

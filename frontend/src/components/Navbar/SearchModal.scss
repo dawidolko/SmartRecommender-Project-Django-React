@@ -1,4 +1,5 @@
-@import "../../global.scss";
+@use "../../global.scss" as *;
+@use "sass:color";
 
 .search-modal-overlay {
   position: fixed;
@@ -6,7 +7,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: $modal-overlay;
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
@@ -25,7 +26,7 @@
 }
 
 .search-modal-content {
-  background: white;
+  background: $modal-background;
   border-radius: 12px;
   padding: 24px;
   width: 90%;
@@ -79,7 +80,7 @@
   transition: color 0.3s ease;
 
   svg {
-    color: black;
+    color: $close-icon-color;
 
     &:hover {
       color: $client-status-rejected-badge;
@@ -92,7 +93,7 @@
 
   &:hover {
     color: $client-status-rejected-badge;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $close-hover-bg;
     border: 1px solid $client-status-rejected-badge;
   }
 }
@@ -114,7 +115,7 @@
 .search-modal-toggle {
   background: $btn-primary-blue;
   border: 1px solid $btn-primary-blue;
-  color: white;
+  color: $toggle-text-color;
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
@@ -145,24 +146,24 @@
   width: 100%;
   padding: 16px 16px 16px 48px;
   font-size: 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid $input-border;
   border-radius: 8px;
   background: $modal-table-header;
   transition: border-color 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #4a90e2;
-    background: white;
+    border-color: $input-focus-border;
+    background: $modal-background;
   }
 
   &::placeholder {
-    color: #999;
+    color: $input-placeholder;
   }
 }
 
 .search-modal-advanced-options {
-  background: #f8f8f8;
+  background: $advanced-options-bg;
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -175,22 +176,22 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #333;
+    color: $label-color;
   }
 }
 
 .search-modal-select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid $select-border;
   border-radius: 6px;
-  background: white;
+  background: $modal-background;
   font-size: 14px;
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #4a90e2;
+    border-color: $input-focus-border;
   }
 }
 
@@ -199,7 +200,7 @@
   padding: 14px;
   background: $btn-primary-blue;
   border: 1px solid $btn-primary-blue;
-  color: white;
+  color: $toggle-text-color;
   border: none;
   border-radius: 6px;
   font-size: 16px;
@@ -214,7 +215,7 @@
   }
 
   &:disabled {
-    background: #ccc;
+    background: $btn-disabled;
     cursor: not-allowed;
   }
 }
@@ -227,8 +228,8 @@
 }
 
 .search-modal-error {
-  background: #fee2e2;
-  color: #dc2626;
+  background: $error-bg;
+  color: $error-color;
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 20px;
@@ -263,7 +264,7 @@
   display: flex;
   gap: 16px;
   padding: 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid $input-border;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -286,16 +287,16 @@
   h3 {
     font-size: 16px;
     margin: 0 0 4px 0;
-    color: #333;
+    color: $label-color;
     &:hover {
-      color: #4a90e2;
+      color: $input-focus-border;
       text-decoration: underline;
     }
   }
 
   .search-modal-result-price {
     font-size: 14px;
-    color: rgb(239, 68, 68);
+    color: $price-color;
     font-weight: 600;
     margin: 4px 0;
   }

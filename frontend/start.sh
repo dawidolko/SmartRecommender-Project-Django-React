@@ -19,6 +19,7 @@ npm install
 echo "Installing axios..."
 npm install axios
 npm install jwt-decode
+npm install --save-dev @craco/craco
 
 # Instalacja react-router-dom
 echo "Installing react-router-dom..."

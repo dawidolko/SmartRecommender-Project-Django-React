@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --body-bg: #f9f9f9;
+  --body-text: #333;
+  --scrollbar-border: #ddd;
+  --scrollbar-thumb: #ccc;
+  --scrollbar-thumb-hover: #999;
+  --has-scrollbar-thumb: #bbb;
+  --has-scrollbar-border: #fff;
+  --has-scrollbar-thumb-hover: #777;
+  --heading-color: #111;
+  --link-hover: #007bff;
+  --button-bg: #007bff;
+  --button-text: #fff;
+  --button-hover: #0056b3;
+}
+
 *,
 *::after,
 *::before {
@@ -18,8 +34,8 @@ body {
   font-size: 1.6rem;
   font-family: "Instrument Sans", sans-serif !important;
   line-height: 1.6;
-  background-color: #f9f9f9;
-  color: #333;
+  background-color: var(--body-bg);
+  color: var(--body-text);
   overflow-x: hidden;
 }
 
@@ -29,18 +45,18 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-  background: #f9f9f9;
-  border-left: 1px solid #ddd;
+  background: var(--body-bg);
+  border-left: 1px solid var(--scrollbar-border);
 }
 
 body::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: var(--scrollbar-thumb);
   border-radius: 8px;
-  border: 2px solid #f9f9f9;
+  border: 2px solid var(--body-bg);
 }
 
 body::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: var(--scrollbar-thumb-hover);
 }
 
 .has-scrollbar {
@@ -53,13 +69,13 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 .has-scrollbar::-webkit-scrollbar-thumb {
-  background: #bbb;
+  background: var(--has-scrollbar-thumb);
   border-radius: 10px;
-  border: 3px solid #fff;
+  border: 3px solid var(--has-scrollbar-border);
 }
 
 .has-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: #777;
+  background: var(--has-scrollbar-thumb-hover);
 }
 
 h1,
@@ -67,7 +83,7 @@ h2,
 h3,
 h4 {
   font-family: "Instrument Sans", sans-serif !important;
-  color: #111;
+  color: var(--heading-color);
   line-height: 1.4;
   margin-bottom: 1rem;
 }
@@ -79,7 +95,7 @@ a {
 }
 
 a:hover {
-  color: #007bff;
+  color: var(--link-hover);
 }
 
 img {
@@ -100,15 +116,15 @@ select {
 button {
   border: none;
   cursor: pointer;
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--button-bg);
+  color: var(--button-text);
   padding: 0.8rem 1.6rem;
   border-radius: 0.4rem;
   transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: var(--button-hover);
 }
 
 ul {

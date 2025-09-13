@@ -1,18 +1,19 @@
-@import "../../global.scss";
+@use "../../global.scss" as *;
+@use "sass:color";
 
 .registerPanel {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #f3f2f2;
+  background: $login-bg;
   width: 100%;
 
   &__container {
     display: flex;
     background: $realwhite;
     border-radius: 4px;
-    box-shadow: 0px 2px 6px -1px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 2px 6px -1px $login-shadow;
     max-width: 1000px;
     width: 100%;
   }
@@ -60,7 +61,7 @@
       width: 100%;
       padding: 12px;
       border: none;
-      border-bottom: 2px solid #aaa;
+      border-bottom: 2px solid $login-input-border;
       outline: none;
       font-size: 16px;
     }
@@ -69,7 +70,7 @@
     input:not(:placeholder-shown) + label {
       top: -10px;
       font-size: 12px;
-      color: #333;
+      color: $account-title;
     }
   }
 
@@ -85,7 +86,7 @@
     border: 1px solid $btn-primary-blue;
     padding: 0.6rem 0.8rem;
     font-size: 2rem;
-    color: white;
+    color: $realwhite;
     cursor: pointer;
     border-radius: 5px;
     transition: 0.3s;
@@ -105,19 +106,19 @@
   }
 
   &__googleBtn {
-    background-color: #6d8aff;
+    background-color: $login-signup-btn;
   }
 
   &__googleBtn:hover {
-    background-color: darken(#6d8aff, 30%);
+    background-color: color.adjust($login-signup-btn, $lightness: -30%);
   }
 
   &__submitBtn {
-    background-color: #b69de6;
+    background-color: $register-submit-btn;
     border: none;
     padding: 1.2rem 3.5rem;
     font-size: 2rem;
-    color: white;
+    color: $realwhite;
     cursor: pointer;
     border-radius: 20px;
     transition: 0.3s;
@@ -125,7 +126,7 @@
   }
 
   &__submitBtn:hover {
-    background-color: darken(#b69de6, 30%);
+    background-color: color.adjust($register-submit-btn, $lightness: -30%);
   }
 
   &__footer {
@@ -134,7 +135,7 @@
   }
 
   &__link {
-    color: #6d8aff;
+    color: $login-signup-btn;
     text-decoration: none;
   }
 

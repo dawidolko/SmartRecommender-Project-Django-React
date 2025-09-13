@@ -14,7 +14,6 @@ import {
   Link2,
   RefreshCw,
   Code,
-  Info,
 } from "lucide-react";
 import StatCard from "./StatCard";
 import config from "../../config/config";
@@ -332,31 +331,49 @@ const AdminStatistics = () => {
                 Overview of recommendation algorithm implementations:
               </p>
               <div className="algorithms-grid">
-                {Object.entries(algorithmStatus.algorithms).map(([key, algo]) => (
-                  <div key={key} className="algorithm-item">
-                    <h4 className="algorithm-name">
-                      {key === 'content_based' ? 'Content-Based Filtering' : 'Collaborative Filtering'}
-                    </h4>
-                    <div className="algorithm-details">
-                      <p><strong>Implementation:</strong> {algo.implementation}</p>
-                      <p><strong>Similarities:</strong> {algo.similarity_count}</p>
-                      <p><strong>Description:</strong> {algo.description}</p>
+                {Object.entries(algorithmStatus.algorithms).map(
+                  ([key, algo]) => (
+                    <div key={key} className="algorithm-item">
+                      <h4 className="algorithm-name">
+                        {key === "content_based"
+                          ? "Content-Based Filtering"
+                          : "Collaborative Filtering"}
+                      </h4>
+                      <div className="algorithm-details">
+                        <p>
+                          <strong>Implementation:</strong> {algo.implementation}
+                        </p>
+                        <p>
+                          <strong>Similarities:</strong> {algo.similarity_count}
+                        </p>
+                        <p>
+                          <strong>Description:</strong> {algo.description}
+                        </p>
+                      </div>
+                      <div
+                        className={`implementation-badge ${
+                          algo.implementation.includes("Custom")
+                            ? "custom"
+                            : "library"
+                        }`}>
+                        {algo.implementation.includes("Custom")
+                          ? "Manual Implementation"
+                          : "Library Implementation"}
+                      </div>
                     </div>
-                    <div className={`implementation-badge ${algo.implementation.includes('Custom') ? 'custom' : 'library'
-                      }`}>
-                      {algo.implementation.includes('Custom') ? 'Manual Implementation' : 'Library Implementation'}
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
               <div className="custom-implementations">
                 <h4>Custom Manual Implementations:</h4>
                 <div className="custom-methods">
-                  {algorithmStatus.custom_implementations.map((method, index) => (
-                    <span key={index} className="custom-method-badge">
-                      {method.replace('_', ' ').toUpperCase()}
-                    </span>
-                  ))}
+                  {algorithmStatus.custom_implementations.map(
+                    (method, index) => (
+                      <span key={index} className="custom-method-badge">
+                        {method.replace("_", " ").toUpperCase()}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -374,7 +391,9 @@ const AdminStatistics = () => {
             <h2 className="association-rules-title">
               <Link2 className="association-rules-icon" />
               Association Rules Management
-              <span className="custom-implementation-badge">Custom Apriori</span>
+              <span className="custom-implementation-badge">
+                Custom Apriori
+              </span>
             </h2>
             <button
               className="update-rules-btn"
@@ -391,7 +410,10 @@ const AdminStatistics = () => {
             <p className="association-rules-description">
               Association rules help identify products frequently bought
               together. These rules power the "Frequently Bought Together"
-              recommendations in the shopping cart. <strong>Using custom manual Apriori algorithm implementation.</strong>
+              recommendations in the shopping cart.{" "}
+              <strong>
+                Using custom manual Apriori algorithm implementation.
+              </strong>
             </p>
 
             {associationLoading ? (
@@ -463,7 +485,8 @@ const AdminStatistics = () => {
                       onChange={() => handleAlgorithmChange("content_based")}
                       disabled={isProcessing}
                     />
-                    Content-Based Filtering (CBF) - <strong>Custom Manual Implementation</strong>
+                    Content-Based Filtering (CBF) -{" "}
+                    <strong>Custom Manual Implementation</strong>
                   </label>
                 </div>
               </div>

@@ -1,11 +1,12 @@
-@import "../../global.scss";
+@use "../../global.scss" as *;
+@use "sass:color";
 
 .productPage {
   margin-top: 50px;
   padding: 4em 1em;
   display: flex;
   justify-content: center;
-  background-color: #f9f9f9;
+  background-color: $product-page-bg;
 
   &__container {
     position: relative;
@@ -23,12 +24,12 @@
     gap: 0.2rem;
 
     &__star {
-      color: #ccc;
+      color: $no-data-icon;
       font-size: 2rem;
     }
 
     &__star--active {
-      color: #ffcc00;
+      color: $review-star-active;
       font-size: 2rem;
     }
   }
@@ -39,7 +40,7 @@
 
     td {
       padding: 8px;
-      border: 1px solid #ddd;
+      border: 1px solid $dashboard-summary-border;
       text-align: left;
     }
 
@@ -54,14 +55,14 @@
     h1 {
       margin-bottom: 0.5em;
       font-size: 2.1rem;
-      color: black;
+      color: $text-black;
       text-align: left;
       text-decoration: underline;
     }
 
     h3 {
       font-size: 1.8rem;
-      color: #444;
+      color: $product-arrow;
       margin-bottom: 1rem;
     }
   }
@@ -71,18 +72,18 @@
     h1 {
       margin-bottom: 0.5em;
       font-size: 2.1rem;
-      color: black;
+      color: $text-black;
       text-align: left;
       text-decoration: underline;
     }
   }
 
   &__review {
-    border: 1px solid #ddd;
+    border: 1px solid $dashboard-summary-border;
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 5px;
-    background-color: #fafafa;
+    background-color: $review-bg;
   }
 
   &__review-header {
@@ -98,7 +99,7 @@
 
     span {
       font-weight: bold;
-      color: #333;
+      color: $account-title;
     }
 
     &__stars {
@@ -106,11 +107,11 @@
       gap: 0.2rem;
 
       &__star {
-        color: #ccc;
+        color: $no-data-icon;
       }
 
       &__star--active {
-        color: #ffcc00;
+        color: $review-star-active;
       }
     }
   }
@@ -139,12 +140,12 @@
     border: none;
     font-size: 2.5rem;
     cursor: pointer;
-    color: #444;
+    color: $product-arrow;
     transition: color 0.3s ease;
     padding: 0.4rem 0.8rem;
 
     &:hover {
-      color: #ff5733;
+      color: $product-arrow-hover;
     }
 
     @media (max-width: 850px) {
@@ -157,7 +158,7 @@
   &__main-img {
     width: 100%;
     height: 300px;
-    border: 1px solid #ddd;
+    border: 1px solid $dashboard-summary-border;
     border-radius: 5px;
     cursor: pointer;
     object-fit: cover;
@@ -180,9 +181,9 @@
     max-width: 100%;
     overflow-x: auto;
     padding: 0.5em;
-    background-color: #e6e6e6;
+    background-color: $thumbnails-bg;
     border-radius: 10px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 2px 4px $stats-shadow;
     max-width: 500px;
 
     @media screen and (max-width: 768px) {
@@ -199,13 +200,13 @@
       transition: border-color 0.3s ease, transform 0.3s ease;
 
       &:hover {
-        border-color: #ff5733;
+        border-color: $product-arrow-hover;
         transform: scale(1.05);
         transition: transform 0.5s ease;
       }
 
       &.active {
-        border-color: #ff5733;
+        border-color: $product-arrow-hover;
       }
 
       @media (max-width: 850px) {
@@ -240,7 +241,7 @@
   &__title {
     font-size: 2.8rem;
     font-weight: bold;
-    color: #222;
+    color: $product-title;
     text-align: center;
     @media (max-width: 640px) {
       font-size: 2rem;
@@ -249,9 +250,9 @@
 
   &__category {
     font-size: 1.8rem;
-    color: black;
+    color: $text-black;
     margin-bottom: 0.5em;
-    border: 1px solid black;
+    border: 1px solid $text-black;
     padding: 0.5em;
     border-radius: 3px;
     text-transform: uppercase;
@@ -290,7 +291,7 @@
   &__old-price {
     font-size: 2.5rem;
     text-decoration: line-through;
-    color: rgb(107 114 128 / var(--tw-text-opacity));
+    color: $product-old-price;
     text-decoration-line: line-through;
     font-weight: bold;
     @media (max-width: 768px) {
@@ -301,7 +302,7 @@
   &__current-price {
     font-size: 3.5rem;
     font-weight: bolder;
-    color: rgb(239 68 68);
+    color: $error-red;
     margin-bottom: 0.5em;
     @media (max-width: 768px) {
       font-size: 1.5em;
@@ -312,7 +313,7 @@
     h1 {
       margin-bottom: 0.5em;
       font-size: 2.1rem;
-      color: black;
+      color: $text-black;
       text-align: left;
       text-decoration: underline;
     }
@@ -320,21 +321,21 @@
     h2 {
       margin-bottom: 0.5em;
       font-size: 1.6rem;
-      color: black;
+      color: $text-black;
       text-align: left;
     }
 
     h3 {
       margin-bottom: 0.5em;
       font-size: 2.2rem;
-      color: black;
+      color: $text-black;
     }
 
     p {
       line-height: 1.6;
       margin-bottom: 0.8em;
       font-size: 1.6rem;
-      color: #555;
+      color: $product-desc;
     }
 
     @media (max-width: 768px) {
@@ -375,11 +376,11 @@
       flex: 0 0 auto;
       border-radius: 50%;
       overflow: visible;
-      background-color: #ddd;
+      background-color: $slider-btn-bg;
       padding: 5px 8px 5px 8px;
 
       &:hover {
-        background-color: #007bff;
+        background-color: $btn-primary-blue;
         transform: scale(1.1);
         transition: transform 0.5s ease;
       }
@@ -397,10 +398,10 @@
     }
 
     .productPage__fav-btn {
-      color: red;
+      color: $modal-close-red;
 
       &:hover {
-        background-color: #007bff;
+        background-color: $btn-primary-blue;
       }
     }
   }
@@ -409,11 +410,11 @@
     &__cart-btn {
       font-size: 3rem;
       max-width: 200px;
-      border: 1px solid #007bff;
+      border: 1px solid $btn-primary-blue;
       &:hover {
-        border: 1px solid #007bff;
+        border: 1px solid $btn-primary-blue;
         background-color: $realwhite;
-        color: #007bff;
+        color: $btn-primary-blue;
       }
 
       &:active {
@@ -468,15 +469,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.7);
+    background: $product-overlay;
     z-index: 100000;
 
     .productPage__overlay-close {
       position: absolute;
       top: 120px;
       right: 20px;
-      background-color: red;
-      border: 1px solid red;
+      background-color: $modal-close-red;
+      border: 1px solid $modal-close-red;
       color: $realwhite;
       border: none;
       padding: 0.5em 1em;
@@ -489,8 +490,8 @@
 
       &:hover {
         background-color: rgba(255, 255, 255, 0);
-        border: 1px solid red;
-        color: red;
+        border: 1px solid $modal-close-red;
+        color: $modal-close-red;
       }
     }
   }
@@ -499,7 +500,7 @@
     max-width: 80%;
     max-height: 80%;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px $overlay-shadow;
   }
 }
 
@@ -521,14 +522,14 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1rem;
-  color: #6a6a6a;
+  color: $tags-color;
   @media (max-width: 480px) {
     font-size: 0.8rem;
   }
 
   .tagsHeader {
     font-weight: bold;
-    color: #333;
+    color: $account-title;
     font-size: 1.8rem;
     @media (max-width: 480px) {
       font-size: 0.8rem;
@@ -544,7 +545,7 @@
   .tag {
     display: inline-block;
     padding: 0.3em 0.85em;
-    border: 2px solid #28242f;
+    border: 2px solid $tag-border;
     border-radius: 2em;
     text-transform: uppercase;
     transition: transform 0.2s ease-in-out;
@@ -556,7 +557,11 @@
     &:hover {
       transform: scale(1.05);
       transition: transform 0.5s ease;
-      background: linear-gradient(to right, #ff8a00, #da1b60);
+      background: linear-gradient(
+        to right,
+        $tag-gradient-start,
+        $tag-gradient-end
+      );
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       cursor: default;
@@ -602,13 +607,13 @@
 .productPage__similar-products {
   margin-top: 4rem;
   padding: 2rem 0;
-  background-color: #f8f9fa;
+  background-color: $dashboard-bg;
 
   .productPage__similar-products-title {
     text-align: center;
     font-size: 2rem;
     margin-bottom: 2rem;
-    color: #333;
+    color: $account-title;
   }
 
   .productPage__similar-product {
@@ -616,10 +621,10 @@
     cursor: pointer;
 
     .productPage__similar-product-inner {
-      background: white;
+      background: $realwhite;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px $stats-shadow;
       transition: transform 0.3s ease;
 
       &:hover {
@@ -643,7 +648,7 @@
       text-overflow: ellipsis;
       &:hover {
         text-decoration: underline;
-        color: #007bff;
+        color: $btn-primary-blue;
       }
     }
 
@@ -652,13 +657,13 @@
 
       .productPage__similar-product-old-price {
         text-decoration: line-through;
-        color: #999;
+        color: $similar-old-price;
         margin-right: 0.5rem;
       }
 
       .productPage__similar-product-current-price {
         font-weight: bold;
-        color: #fd266e;
+        color: $cart-count-bg;
       }
     }
   }
@@ -666,12 +671,12 @@
     bottom: -30px;
 
     li button:before {
-      color: #999;
+      color: $similar-old-price;
       font-size: 10px;
     }
 
     li.slick-active button:before {
-      color: #fd266e;
+      color: $cart-count-bg;
     }
   }
 
@@ -682,14 +687,14 @@
 
     &:before {
       font-size: 40px;
-      color: #fd266e;
+      color: $cart-count-bg;
 
       &:hover {
-        color: #fd266e;
+        color: $cart-count-bg;
       }
 
       &:active {
-        color: #fd266e;
+        color: $cart-count-bg;
       }
     }
   }
@@ -698,11 +703,11 @@
     left: -50px;
 
     &:hover {
-      color: #fd266e;
+      color: $cart-count-bg;
     }
 
     &:active {
-      color: #fd266e;
+      color: $cart-count-bg;
     }
   }
 
@@ -710,11 +715,11 @@
     right: -50px;
 
     &:hover {
-      color: #fd266e;
+      color: $cart-count-bg;
     }
 
     &:active {
-      color: #fd266e;
+      color: $cart-count-bg;
     }
   }
 }
