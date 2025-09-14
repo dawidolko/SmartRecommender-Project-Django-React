@@ -106,7 +106,7 @@ Before running the project, make sure you have:
 ### Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/dawidolko/SmartRecommender-Project-Django-React
 cd SmartRecommender-Project-Django-React
 ```
 

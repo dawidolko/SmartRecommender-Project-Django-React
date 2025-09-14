@@ -1,40 +1,182 @@
-@startuml
-class SentimentAnalysis {
-  +id: Integer
-  +product: ForeignKey(Product)
-  +opinion: OneToOneField(Opinion)
-  +sentiment_score: DecimalField(-1 to +1)
-  +sentiment_category: CharField[positive|neutral|negative]
-  +analyzed_at: DateTimeField
+@startuml Sentiment_Analysis_Class
+!theme plain
+
+package "Django Models - models.py" {
+  
+  class SentimentAnalysis {
+    +id: BigAutoField
+    +product: ForeignKey(Product)
+    +opinion: OneToOneField(Opinion)
+    +sentiment_score: DecimalField(max_digits=5, decimal_places=3)
+    +sentiment_category: CharField[positive|neutral|negative]
+    +analyzed_at: DateTimeField(auto_now_add=True)
+    --
+    +SENTIMENT_CHOICES: list
+    +Meta: db_table = 'method_sentiment_analysis'
+    +Meta: indexes = ['product', 'sentiment_category']
+  }
+
+  class ProductSentimentSummary {
+    +id: BigAutoField
+    +product: OneToOneField(Product, related_name='sentiment_summary')
+    +average_sentiment_score: DecimalField(max_digits=5, decimal_places=3)
+    +positive_count: PositiveIntegerField(default=0)
+    +neutral_count: PositiveIntegerField(default=0)
+    +negative_count: PositiveIntegerField(default=0)
+    +total_opinions: PositiveIntegerField(default=0)
+    +updated_at: DateTimeField(auto_now=True)
+    --
+    +Meta: db_table = 'method_product_sentiment_summary'
+  }
+  
+  class Opinion {
+    +id: BigAutoField
+    +product: ForeignKey(Product)
+    +user: ForeignKey(User)
+    +content: TextField
+    +rating: PositiveIntegerField
+    --
+    +Meta: constraints = [CheckConstraint(rating 1-5)]
+    +Meta: unique_together = ('user', 'product')
+  }
+  
+  class Product {
+    +id: AutoField
+    +name: CharField(100)
+    +price: DecimalField
+    +description: TextField
+    +categories: ManyToManyField
+    +tags: ManyToManyField
+  }
 }
 
-class ProductSentimentSummary {
-  +id: Integer
-  +product: OneToOneField(Product)
-  +average_sentiment_score: DecimalField
-  +positive_count: PositiveIntegerField
-  +neutral_count: PositiveIntegerField
-  +negative_count: PositiveIntegerField
-  +total_opinions: PositiveIntegerField
-  +updated_at: DateTimeField
+package "Custom Algorithm - custom_recommendation_engine.py" {
+  
+  class CustomSentimentAnalysis {
+    -positive_words: set (200+ words)
+    -negative_words: set (200+ words)
+    -intensifiers: set
+    -negations: set
+    -positive_bigrams: set
+    -negative_bigrams: set
+    -window_size: int = 300
+    -window_overlap: int = 50
+    --
+    +analyze_sentiment(text): tuple[float, str]
+    +analyze_product_sentiment(product): dict
+    +_analyze_long_text_with_sliding_window(): tuple
+    +_analyze_text_segment(text): tuple
+    +_analyze_bigrams(words): dict
+    +_check_negation_context(words, index): bool
+    +_calculate_intensity_multiplier(words, index): float
+    +_tokenize_text(text): list
+    --
+    Implementuje prawdziwy wzór SentiWordNet:
+    score = (positive - negative) / total_words
+  }
 }
 
-class CustomSentimentAnalysis {
-  -positive_words: set
-  -negative_words: set
-  -intensifiers: set
-  -negations: set
-  -positive_bigrams: set
-  -negative_bigrams: set
-  +analyze_sentiment(text)
-  +analyze_product_sentiment(product)
-  +_analyze_text_segment(text)
-  +_check_negation_context()
-  +_calculate_intensity_multiplier()
+package "API Views - sentiment_views.py" {
+  
+  class SentimentSearchAPIView {
+    +permission_classes: [AllowAny]
+    --
+    +get(request): Response
+    -filter_products_by_query()
+    -order_by_sentiment_score()
+    -attach_sentiment_data()
+  }
+  
+  class FuzzySearchAPIView {
+    +permission_classes: [AllowAny]
+    --
+    +get(request): Response
+    +_simple_fuzzy_search(): list
+    -match_price_range()
+    -calculate_fuzzy_scores()
+  }
 }
 
-SentimentAnalysis ||--|| Opinion
-ProductSentimentSummary ||--|| Product
+package "Django Signals - signals.py" {
+  
+  class SentimentSignalHandlers {
+    --
+    +handle_sentiment_analysis(sender, instance, created, **kwargs)
+    -update_product_sentiment_summary()
+    -invalidate_sentiment_cache()
+    --
+    @receiver(post_save, sender=Opinion)
+  }
+}
+
+package "Frontend Components" {
+  
+  class SearchModal_jsx {
+    -searchTerm: string
+    -searchResults: Array
+    -isAdvanced: boolean
+    -priceRange: string
+    -fuzzyThreshold: number
+    --
+    +performSentimentSearch()
+    +performFuzzySearch()
+    +useEffect([searchTerm, isAdvanced])
+    +handleProductClick()
+    --
+    Toggle między Sentiment/Fuzzy search
+  }
+  
+  class ProductReviewAPIView {
+    +permission_classes: [IsAuthenticated]
+    --
+    +post(request, product_id): Response
+    -validate_user_purchased()
+    -check_existing_review()
+    -create_opinion_with_sentiment()
+  }
+}
+
+package "Database Migration" {
+  
+  class Migration_0001_initial {
+    +operations: CreateModel[]
+    --
+    Tworzy SentimentAnalysis
+    i ProductSentimentSummary tables
+    z indeksami i constraints
+  }
+}
+
+package "Seeder - seed_db.py" {
+  
+  class Command {
+    --
+    +seed_sentiment_data()
+    +seed_opinions()
+    +create_sentiment_summaries_after_seeding()
+    -process_opinions_for_sentiment()
+  }
+}
+
+' Relationships
+SentimentAnalysis ||--|| Opinion : opinion
+SentimentAnalysis ||--|| Product : product
+ProductSentimentSummary ||--|| Product : product (sentiment_summary)
+Opinion ||--|| Product : product
+Opinion ||--|| User : user
+
 CustomSentimentAnalysis ..> SentimentAnalysis : creates
 CustomSentimentAnalysis ..> ProductSentimentSummary : updates
+SentimentSearchAPIView ..> ProductSentimentSummary : queries
+SentimentSignalHandlers ..> CustomSentimentAnalysis : uses
+
+SearchModal_jsx ..> SentimentSearchAPIView : calls API
+SearchModal_jsx ..> FuzzySearchAPIView : calls API
+ProductReviewAPIView ..> Opinion : creates
+ProductReviewAPIView ..> SentimentSignalHandlers : triggers
+
+Migration_0001_initial ..> SentimentAnalysis : creates table
+Migration_0001_initial ..> ProductSentimentSummary : creates table
+Command ..> CustomSentimentAnalysis : seeds data
+
 @enduml

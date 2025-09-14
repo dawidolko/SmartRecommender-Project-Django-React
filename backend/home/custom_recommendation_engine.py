@@ -665,23 +665,37 @@ class CustomSentimentAnalysis:
         self.window_overlap = 50 
 
     def analyze_sentiment(self, text):
-        """Enhanced sentiment analysis with context awareness and sliding window"""
-        if not text:
+        positive_score = 0.0
+        negative_score = 0.0
+        neutral_score = 0.0
+        total_words = 0
+        
+        words = self._tokenize_text(text.lower())
+        
+        for word in words:
+            if word in self.positive_words:
+                positive_score += 1.0
+            elif word in self.negative_words:
+                negative_score += 1.0
+            else:
+                neutral_score += 1.0
+            total_words += 1
+        
+        if total_words == 0:
             return 0.0, "neutral"
-            
-        cache_key = f"sentiment_{hash(text[:100])}"
-        cached_result = cache.get(cache_key)
-        if cached_result:
-            return cached_result
-
-        if len(text) > self.window_size:
-            return self._analyze_long_text_with_sliding_window(text, None)
         
-        result = self._analyze_text_segment(text)
+        sentiment_score = (positive_score - negative_score) / total_words
         
-        cache.set(cache_key, result, timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 3600))
+        sentiment_score = max(-1.0, min(1.0, sentiment_score))
         
-        return result
+        if sentiment_score > 0.1:
+            category = "positive"
+        elif sentiment_score < -0.1:
+            category = "negative"
+        else:
+            category = "neutral"
+        
+        return sentiment_score, category
 
     def _analyze_long_text_with_sliding_window(self, text, cache_key):
         """Analyze long texts using sliding window approach"""
@@ -785,6 +799,32 @@ class CustomSentimentAnalysis:
             category = "neutral"
 
         return sentiment_score, category
+    
+    def _calculate_polarity_score(self, words):
+        """
+        Implementacja wzoru z pracy: Liu, Bing. "Sentiment Analysis and Opinion Mining" (2012)
+        Polarity Score = Σ(positive_words) - Σ(negative_words) / |total_words|
+        """
+        positive_count = sum(1 for word in words if word in self.positive_words)
+        negative_count = sum(1 for word in words if word in self.negative_words)
+        
+        if len(words) == 0:
+            return 0.0
+        
+        polarity = (positive_count - negative_count) / len(words)
+        return polarity
+
+    def _calculate_subjectivity_score(self, words):
+        """
+        Wzór z TextBlob: Subjectivity = (subjective_words) / (total_words)
+        """
+        subjective_words = sum(1 for word in words 
+                            if word in self.positive_words or word in self.negative_words)
+        
+        if len(words) == 0:
+            return 0.0
+        
+        return subjective_words / len(words)    
 
     def _check_negation_context(self, words, current_index):
         """Check for negation in 2-3 words context"""

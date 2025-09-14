@@ -136,7 +136,7 @@ The fastest way to get started with development:
 2. **Quick Start**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/dawidolko/SmartRecommender-Project-Django-React
    cd SmartRecommender-Project-Django-React
 
    # Create .env file with database settings

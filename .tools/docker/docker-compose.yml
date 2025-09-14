@@ -3,8 +3,8 @@ name: smartrecommender-project
 services:
   db:
     image: postgres:16
-    container_name: SmartRecommender-PostgreSQL
-    restart: always
+    container_name: SmartRecommender-PostgreSQL-DB
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
@@ -15,35 +15,17 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d product_recommendation"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
+      start_period: 30s
 
   backend:
     build:
       context: ../../backend
       dockerfile: ../.tools/docker/Dockerfile.backend
-    container_name: SmartRecommender-Django
-    command: >
-      sh -c "
-      echo 'Waiting for database...' &&
-      while ! pg_isready -h db -p 5432 -U postgres; do
-        echo 'Waiting for postgres...'
-        sleep 2
-      done &&
-      echo 'Database is ready!' &&
-      pip install -r requirements.txt &&
-      pip install psycopg2-binary djangorestframework-simplejwt Pillow colorama &&
-      pip install textblob tqdm pandas numpy scikit-learn matplotlib seaborn nltk &&
-      python -m textblob.download_corpora &&
-      python manage.py makemigrations &&
-      python manage.py migrate &&
-      python manage.py createcachetable &&
-      python manage.py seed &&
-      python manage.py createcachetable recommendation_cache_table &&
-      if [ -f check_media.py ]; then python check_media.py; fi &&
-      python manage.py runserver 0.0.0.0:8000
-      "
+    container_name: SmartRecommender-Django-BACKEND
+    restart: unless-stopped
     volumes:
       - ../../backend:/app
     ports:
@@ -57,12 +39,37 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    entrypoint: >
+      sh -c "
+      echo 'Waiting for database...' &&
+      until pg_isready -h db -p 5432 -U postgres; do
+        echo 'Waiting for postgres...'
+        sleep 2
+      done &&
+      echo 'Database is ready!' &&
+      if [ ! -f /app/.db_initialized ]; then
+        echo 'First run - initializing database...' &&
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py createcachetable &&
+        python manage.py seed &&
+        python manage.py createcachetable recommendation_cache_table &&
+        if [ -f check_media.py ]; then python check_media.py; fi &&
+        touch /app/.db_initialized &&
+        echo 'Database initialized!'
+      else
+        echo 'Database already initialized, skipping setup...'
+      fi &&
+      echo 'Starting Django server...' &&
+      python manage.py runserver 0.0.0.0:8000
+      "
 
   frontend:
     build:
       context: ../../frontend
       dockerfile: ../.tools/docker/Dockerfile.frontend
-    container_name: SmartRecommender-React
+    container_name: SmartRecommender-React-FRONTEND
+    restart: unless-stopped
     command: npm start
     volumes:
       - ../../frontend:/app

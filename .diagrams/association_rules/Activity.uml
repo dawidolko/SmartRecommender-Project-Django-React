@@ -1,33 +1,119 @@
-@startuml
+@startuml Association_Rules_Activity
+!theme plain
+
 start
-:Klient składa zamówienie;
-:Django signals wykrywa OrderProduct;
-:run_all_analytics_after_order();
-:generate_association_rules_after_order();
 
-:Pobierz ostatnie 1000 zamówień;
-:Utwórz transakcje (product_ids);
-
-:CustomAssociationRules(min_support=0.01, min_confidence=0.1);
-:generate_association_rules();
-
-partition "Apriori Algorithm" {
-  :find_frequent_itemsets_with_bitmap();
-  :item_counts dla pojedynczych produktów;
-  :Filtruj według min_support;
-  :generate_2_itemsets_with_bitmap();
-  :Oblicz support dla par produktów;
+partition "Frontend - CartContent.jsx" {
+  :Klient dodaje produkty do koszyka;
+  :useEffect wykrywa zmiany w items;
+  :fetchRecommendations();
+  :GET /api/frequently-bought-together/;
 }
 
-partition "Rules Generation" {
-  :generate_optimized_rules_from_itemsets();
-  :Dla każdej pary oblicz confidence;
-  :Oblicz lift = support / (support_1 * support_2);
-  :Filtruj według min_confidence;
+partition "Backend - association_views.py" {
+  :FrequentlyBoughtTogetherAPI.get();
+  :Pobierz cart_product_ids[];
+  :ProductAssociation.objects.filter();
+  :Zwróć top 5 rekomendacji;
 }
 
-:ProductAssociation.objects.bulk_create();
-:Cache invalidation;
-:Zapisz do 500 najlepszych reguł;
+:Wyświetl "Frequently Bought Together";
+
+note right
+  Wyświetla confidence %, 
+  lift, product details
+end note
+
+:Klient może dodać rekomendowany produkt;
+
+if (Klient finalizuje zamówienie?) then (TAK)
+  
+  partition "Django Signals - signals.py" {
+    :@receiver(post_save, sender=Order);
+    :handle_new_order_and_analytics();
+    :transaction.on_commit();
+    :run_all_analytics_after_order();
+  }
+
+  partition "Association Rules Generation" {
+    :generate_association_rules_after_order();
+    :Pobierz ostatnie 1000 zamówień;
+    :Order.objects.prefetch_related();
+    
+    :Utwórz transactions[];
+    note right
+      transactions = [
+        ["product_1", "product_2"],
+        ["product_1", "product_3", "product_4"]
+      ]
+    end note
+    
+    if (len(transactions) >= 2?) then (TAK)
+      :CustomAssociationRules(min_support=0.01);
+      :generate_association_rules();
+      
+      partition "Apriori Algorithm Implementation" {
+        :_find_frequent_itemsets_with_bitmap();
+        :item_counts dla pojedynczych produktów;
+        :Filtruj według min_support threshold;
+        
+        :_generate_2_itemsets_with_bitmap();
+        note right
+          Używa bitmap operations:
+          bitmap |= (1 << item_to_id[item])
+        end note
+        
+        :Oblicz support dla par produktów;
+        :frequent_2_itemsets = {};
+      }
+      
+      partition "Rules Generation" {
+        :_generate_optimized_rules_from_itemsets();
+        
+        :Dla każdej pary (item1, item2):;
+        :support_1 = item_support_cache[item1];
+        :support_2 = item_support_cache[item2];
+        :confidence = support / support_1;
+        :lift = support / (support_1 * support_2);
+        
+        if (confidence >= min_confidence?) then (TAK)
+          :Dodaj do rules[];
+        endif
+      }
+      
+      :Sortuj rules według (lift, confidence);
+      :ProductAssociation.objects.all().delete();
+      :bulk_create(associations_to_create);
+      :Cache invalidation (association_rules_list);
+      
+      note right
+        Zapisuje do 500 
+        najlepszych reguł
+      end note
+      
+    else (NIE)
+      :Brak wystarczających transakcji;
+    endif
+  }
+  
+else (NIE)
+  :Kontynuuj przeglądanie;
+endif
+
+partition "Admin Panel - AdminStatistics.jsx" {
+  if (Admin klika "Update Rules"?) then (TAK)
+    :updateAssociationRules();
+    :POST /api/update-association-rules/;
+    :UpdateAssociationRulesAPI.post();
+    :Manualne przeliczenie reguł;
+    :toast.success() notification;
+  endif
+  
+  :fetchAssociationRules();
+  :GET /api/association-rules/;
+  :AssociationRulesListAPI.get();
+  :Wyświetl tabelę z metrykami;
+}
+
 stop
 @enduml

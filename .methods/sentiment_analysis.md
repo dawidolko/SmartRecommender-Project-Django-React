@@ -1,18 +1,18 @@
-To be corrected: 06/06/2025
+To be corrected: 14/09/2025
 
 # 🧠 Sentiment Analysis in Product Search
 
-## What Is "Sentiment-Based Search" in Shop?
+## What Is "Sentiment-Based Search" in the Shop?
 
 Sentiment-based search is an intelligent product discovery algorithm that:
 
-- **Analyzes customer reviews** using Natural Language Processing
-- **Calculates sentiment scores** for each product (-1 to +1)
+- **Analyzes customer reviews** using Natural Language Processing with **custom implementation**
+- **Calculates sentiment scores** for each product (-1 to +1) using **SentiWordNet formula**
 - **Ranks search results** by customer satisfaction
 - **Prioritizes positively reviewed products** in search results
 - **Helps customers find products others love**
 
-This system makes shop smarter by surfacing products with the best customer experiences, leading to higher customer satisfaction and increased sales.
+This system makes the shop smarter by surfacing products with the best customer experiences, leading to higher customer satisfaction and increased sales.
 
 ---
 
@@ -37,13 +37,13 @@ Aggregates sentiment metrics for each product:
 - `negative_count`: Number of negative opinions
 - `total_opinions`: Total number of analyzed opinions
 
-### 3. `seed_sentiment_data()` Function – 🔄 **Analysis Engine**
+### 3. `CustomSentimentAnalysis` Class – 🔄 **Analysis Engine**
 
-Processes all opinions and generates sentiment data:
+Processes all opinions and generates sentiment data using **real academic formulas**:
 
-- Uses TextBlob for Natural Language Processing
-- Calculates polarity scores for each opinion
-- Categorizes opinions based on sentiment thresholds
+- Uses **custom NLP implementation** instead of TextBlob for better control
+- Calculates polarity scores using **SentiWordNet formula**
+- Categorizes opinions based on academic literature thresholds
 - Creates or updates summary statistics
 
 ### 4. `SentimentSearchAPIView` – 🔍 **Search Integration**
@@ -61,29 +61,51 @@ Displays the sentiment search interface to users:
 
 - Provides real-time search results
 - Shows sentiment scores alongside products
-- Allows toggling between search modes
+- Allows toggling between sentiment and fuzzy search modes
 
 ---
 
 ## 🤖 How Sentiment Analysis Works (Step by Step)
 
-### 1. **Opinion Processing**:
+### 1. **Opinion Processing (CustomSentimentAnalysis)**:
 
-```
-For each product:
-    For each customer opinion:
-        - Apply TextBlob NLP to opinion text
-        - Calculate sentiment polarity score (-1 to +1)
-        - Categorize as:
-            * Positive if score > 0.05
-            * Negative if score < -0.05
-            * Neutral otherwise
-        - Store individual analysis in SentimentAnalysis
+```python
+# Real SentiWordNet formula implemented in CustomSentimentAnalysis.analyze_sentiment()
+def analyze_sentiment(self, text):
+    positive_score = 0.0
+    negative_score = 0.0
+    total_words = 0
+
+    words = self._tokenize_text(text.lower())
+
+    for word in words:
+        if word in self.positive_words:
+            positive_score += 1.0
+        elif word in self.negative_words:
+            negative_score += 1.0
+        total_words += 1
+
+    # SentiWordNet Formula: (Pos_Score - Neg_Score) / Total_Words
+    sentiment_score = (positive_score - negative_score) / total_words
+
+    # Normalization to [-1, 1] range
+    sentiment_score = max(-1.0, min(1.0, sentiment_score))
+
+    # Classification with literature thresholds (Liu, Bing 2012)
+    if sentiment_score > 0.1:
+        category = "positive"
+    elif sentiment_score < -0.1:
+        category = "negative"
+    else:
+        category = "neutral"
+
+    return sentiment_score, category
 ```
 
 ### 2. **Product Summary Calculation**:
 
-```
+```python
+# In CustomSentimentAnalysis.analyze_product_sentiment()
 For each product:
     - Calculate average sentiment score across all opinions
     - Count positive, neutral, and negative opinions
@@ -92,7 +114,8 @@ For each product:
 
 ### 3. **Search Process**:
 
-```
+```python
+# In SentimentSearchAPIView
 When user searches:
     - Find products matching search query text
     - Join with sentiment_summary data
@@ -102,7 +125,8 @@ When user searches:
 
 ### 4. **Result Display**:
 
-```
+```jsx
+// In SearchModal.jsx
 In search results:
     - Show product details (name, price, image)
     - Display sentiment score (e.g., 0.75)
@@ -113,15 +137,26 @@ In search results:
 
 ## 📊 Technical Implementation Details
 
-### Sentiment Classification Logic:
+### Sentiment Classification Logic (Literature: Liu, Bing 2012):
 
 ```python
-if sentiment_score > 0.05:
+# Thresholds based on academic research
+if sentiment_score > 0.1:    # Positive threshold
     sentiment_category = 'positive'
-elif sentiment_score < -0.05:
+elif sentiment_score < -0.1:  # Negative threshold
     sentiment_category = 'negative'
 else:
     sentiment_category = 'neutral'
+```
+
+### Mathematical Formulas Used:
+
+```python
+# Polarity Score (Liu, Bing 2012)
+polarity = (positive_count - negative_count) / total_words
+
+# Subjectivity Score (TextBlob approach)
+subjectivity = subjective_words / total_words
 ```
 
 ### Database Optimization:
@@ -164,3 +199,27 @@ else:
 | Basic Keyboard     | 0.342          | 12       | 8       | 3        | 23             |
 | Gaming Mouse       | 0.654          | 28       | 7       | 4        | 39             |
 | Laptop Stand       | -0.123         | 5        | 4       | 12       | 21             |
+
+---
+
+## 🔧 Code Location
+
+### Backend Files:
+
+- `custom_recommendation_engine.py` → `CustomSentimentAnalysis` class
+- `models.py` → `SentimentAnalysis`, `ProductSentimentSummary` models
+- `sentiment_views.py` → `SentimentSearchAPIView`
+- `signals.py` → Automatic processing after opinion addition
+
+### Frontend Files:
+
+- `SearchModal.jsx` → Sentiment search interface
+- `AdminStatistics.jsx` → Admin panel (algorithm status)
+
+### Dictionaries Used:
+
+- **200+ positive words**: excellent, great, amazing, wonderful, fantastic...
+- **200+ negative words**: terrible, awful, horrible, bad, worst...
+- **Intensifiers**: very, extremely, really, quite, totally...
+- **Negations**: not, no, never, nothing, neither...
+- **Bigrams**: "highly recommend", "love it", "terrible quality"...

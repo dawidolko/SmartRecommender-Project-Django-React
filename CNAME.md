@@ -2,7 +2,7 @@
 
 1. Go to **Settings** → **Pages** in your repository.
 
-2. In the **Custom domain** section, click **Remove** (if it's still set to "smartrecommender.dawidolko.pl").
+2. In the **Custom domain** section, click **Remove** (if it's still set to "project.dawidolko.pl").
 
 3. Save your changes.
 
@@ -38,10 +38,10 @@ In the `frontend/package.json` file you probably have an entry like:
 You can **delete** it or replace it with the default GitHub Pages address, e.g.:
 
 ```json
-"homepage": "https://dawidolko.github.io/repo-name"
+"homepage": "https://dawidolko.github.io/SmartRecommender-Project-Django-React"
 ```
 
-(_Use the correct `repo-name`._)
+(_Use the correct `SmartRecommender-Project-Django-React`._)
 
 If you prefer not to set anything, you can simply delete this line.
 

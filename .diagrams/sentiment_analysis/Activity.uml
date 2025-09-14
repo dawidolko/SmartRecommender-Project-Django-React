@@ -1,44 +1,159 @@
 @startuml
-|Signals|
 start
-:Nowa opinia zapisana (Opinion);
-:handle_sentiment_analysis signal;
 
-if (skip_sentiment_update?) then (yes)
-  stop
-else (no)
-  :CustomSentimentAnalysis();
-endif
-
-|Sentiment Engine|
-:analyze_sentiment(opinion.content);
-
-if (text długość > window_size?) then (yes)
-  :_analyze_long_text_with_sliding_window();
-  partition "Sliding Window" {
-    :Podziel na segmenty (300 znaków);
-    :50 znaków overlap;
-    :Analizuj każdy segment;
-    :Weighted average wyników;
-  }
-else (no)
-  :_analyze_text_segment();
-endif
-
-partition "Text Analysis" {
-  :_tokenize_text();
-  :_analyze_bigrams();
-  :_check_negation_context();
-  :_calculate_intensity_multiplier();
-  :positive_score - negative_score;
+partition "Frontend - SearchModal.jsx" {
+  :Klient wpisuje zapytanie w pasku wyszukiwania;
+  :useEffect wykrywa zmiany searchTerm;
+  
+  if (isAdvanced mode?) then (Fuzzy Search)
+    :performFuzzySearch();
+    :GET /api/fuzzy-search/;
+  else (Sentiment Search)
+    :performSentimentSearch();
+    :GET /api/sentiment-search/;
+  endif
 }
 
-:Określ kategorię (positive/neutral/negative);
+partition "Backend - sentiment_views.py" {
+  :SentimentSearchAPIView.get();
+  :Wyszukaj produkty według query;
+  :select_related("sentiment_summary");
+  :order_by sentiment_score DESC;
+  :Zwróć produkty z metrykami sentymentu;
+}
 
-|Database|
-:SentimentAnalysis.objects.update_or_create();
-:ProductSentimentSummary.objects.update_or_create();
-:Cache invalidation;
+:Wyświetl wyniki z sentiment score;
+
+note right
+  Produkty posortowane według
+  average_sentiment_score
+end note
+
+partition "Dodawanie Opinii" {
+  :Klient dodaje opinię o produkcie;
+  :ProductReviewAPIView.post();
+  :OpinionSerializer validation;
+  :Opinion.objects.create();
+}
+
+partition "Django Signals - signals.py" {
+  :@receiver(post_save, sender=Opinion);
+  :handle_sentiment_analysis();
+  
+  if (skip_sentiment_update?) then (yes)
+    stop
+  else (no)
+    :CustomSentimentAnalysis();
+  endif
+}
+
+partition "CustomSentimentAnalysis Class" {
+  :analyze_sentiment(opinion.content);
+  
+  if (text długość > window_size=300?) then (yes)
+    :_analyze_long_text_with_sliding_window();
+    
+    partition "Sliding Window Processing" {
+      :segments = [];
+      :start = 0;
+      
+      repeat
+        :end = min(start + window_size, text_len);
+        :segment = text[start:end];
+        :segments.append(segment);
+        :start += window_size - window_overlap;
+      repeat while (start < text_len)
+      
+      :segment_scores = [];
+      
+      repeat
+        :score, category = _analyze_text_segment();
+        :segment_scores.append(score);
+      repeat while (more segments)
+      
+      :weights = [len(seg) for seg in segments];
+      :weighted_score = sum(score * weight) / total_weight;
+    }
+  else (no)
+    :_analyze_text_segment();
+  endif
+
+  partition "Text Analysis Core" {
+    :words = _tokenize_text(text.lower());
+    
+    :bigram_score = _analyze_bigrams(words);
+    note right
+      Sprawdza bigramy jak:
+      "highly recommend" = +2.0
+      "terrible quality" = +2.0 (negative)
+    end note
+    
+    :positive_score = 0.0;
+    :negative_score = 0.0;
+    
+    repeat
+      :negation_context = _check_negation_context();
+      :intensity_multiplier = _calculate_intensity_multiplier();
+      
+      if (word in positive_words?) then (yes)
+        :score = 1.0 * intensity_multiplier;
+        if (negation_context?) then (yes)
+          :negative_score += score * 0.8;
+        else (no)
+          :positive_score += score;
+        endif
+      elseif (word in negative_words?) then (yes)
+        :score = 1.0 * intensity_multiplier;
+        if (negation_context?) then (yes)
+          :positive_score += score * 0.8;
+        else (no)
+          :negative_score += score;
+        endif
+      endif
+    repeat while (more words)
+    
+    :sentiment_score = (positive_score - negative_score) / total_words;
+    :sentiment_score = max(-1.0, min(1.0, sentiment_score));
+    
+    if (sentiment_score > 0.1?) then (positive)
+      :category = "positive";
+    elseif (sentiment_score < -0.1?) then (negative)
+      :category = "negative"; 
+    else (neutral)
+      :category = "neutral";
+    endif
+  }
+}
+
+partition "Database Updates" {
+  :SentimentAnalysis.objects.update_or_create();
+  
+  :analyze_product_sentiment(product);
+  :ProductSentimentSummary.objects.update_or_create();
+  
+  :cache.delete(f"product_sentiment_{product.id}_*");
+  note right
+    Cache invalidation dla
+    konkretnego produktu
+  end note
+}
+
+partition "Seeder - seed_db.py" {
+  if (Database seeding?) then (yes)
+    :seed_opinions();
+    :create_sentiment_summaries_after_seeding();
+    
+    repeat
+      :sentiment_score, category = analyze_sentiment();
+      :SentimentAnalysis.objects.create();
+    repeat while (more opinions)
+    
+    repeat
+      :sentiment_data = analyze_product_sentiment();
+      :ProductSentimentSummary.objects.update_or_create();
+    repeat while (more products)
+  endif
+}
 
 stop
 @enduml

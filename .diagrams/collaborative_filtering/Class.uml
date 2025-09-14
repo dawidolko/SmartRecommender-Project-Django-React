@@ -1,38 +1,218 @@
-@startuml
-class ProductSimilarity {
-  +id: Integer
-  +product1: ForeignKey(Product)
-  +product2: ForeignKey(Product) 
-  +similarity_type: CharField[collaborative|content_based]
-  +similarity_score: DecimalField(0.0-1.0)
-  +updated_at: DateTimeField
+@startuml Collaborative_Filtering_Class
+
+package "Django Models - models.py" {
+  
+  class ProductSimilarity {
+    +id: BigAutoField
+    +product1: ForeignKey(Product, related_name='similarity_from')
+    +product2: ForeignKey(Product, related_name='similarity_to') 
+    +similarity_type: CharField[collaborative|content_based]
+    +similarity_score: DecimalField(max_digits=5, decimal_places=3)
+    +updated_at: DateTimeField(auto_now=True)
+    --
+    +SIMILARITY_TYPES: list
+    +Meta: db_table = 'method_product_similarity'
+    +Meta: unique_together = ('product1', 'product2', 'similarity_type')
+  }
+
+  class UserProductRecommendation {
+    +id: BigAutoField
+    +user: ForeignKey(User)
+    +product: ForeignKey(Product)
+    +recommendation_type: CharField[collaborative|content_based]
+    +score: DecimalField(max_digits=5, decimal_places=3)
+    +created_at: DateTimeField(auto_now_add=True)
+    --
+    +Meta: db_table = 'method_user_product_recommendation'
+    +Meta: unique_together = ('user', 'product', 'recommendation_type')
+    +Meta: ordering = ['-score']
+  }
+
+  class RecommendationSettings {
+    +id: BigAutoField
+    +user: ForeignKey(User)
+    +active_algorithm: CharField[collaborative|content_based]
+    +updated_at: DateTimeField(auto_now=True)
+    --
+    +ALGORITHM_CHOICES: list
+    +Meta: db_table = 'method_recommendation_settings'
+    +Meta: unique_together = ('user', 'active_algorithm')
+  }
+  
+  class OrderProduct {
+    +id: BigAutoField
+    +order: ForeignKey(Order)
+    +product: ForeignKey(Product)
+    +quantity: PositiveIntegerField
+  }
+  
+  class CartItem {
+    +id: BigAutoField
+    +user: ForeignKey(User)
+    +product: ForeignKey(Product)
+    +quantity: PositiveIntegerField(default=1)
+  }
 }
 
-class UserProductRecommendation {
-  +id: Integer
-  +user: ForeignKey(User)
-  +product: ForeignKey(Product)
-  +recommendation_type: CharField[collaborative|content_based]
-  +score: DecimalField
-  +created_at: DateTimeField
+package "API Views - recommendation_views.py" {
+  
+  class ProcessRecommendationsView {
+    +permission_classes: [IsAuthenticated]
+    --
+    +post(request): Response
+    +process_collaborative_filtering(): int
+    +process_content_based_filtering(): int
+    --
+    Główna logika przetwarzania CF
+  }
+  
+  class RecommendationSettingsView {
+    +permission_classes: [IsAuthenticated]
+    --
+    +get(request): Response
+    +post(request): Response
+    --
+    Zarządza ustawieniami algorytmu
+  }
+  
+  class RecommendationPreviewView {
+    +permission_classes: [IsAuthenticated]
+    --
+    +get(request): Response
+    --
+    Podgląd rekomendacji dla admina
+  }
+  
+  class GenerateUserRecommendationsView {
+    +permission_classes: [IsAuthenticated]
+    --
+    +post(request): Response
+    --
+    Generuje rekomendacje dla użytkownika
+  }
+  
+  class RecommendedProductsAPIView {
+    +permission_classes: [IsAuthenticated]
+    --
+    +get(request): Response
+    +get_fallback_recommendations(): QuerySet
+    --
+    API dla klientów do odbierania rekomendacji
+  }
 }
 
-class RecommendationSettings {
-  +id: Integer
-  +user: ForeignKey(User)
-  +active_algorithm: CharField[collaborative|content_based]
-  +updated_at: DateTimeField
+package "Machine Learning Components" {
+  
+  class CollaborativeFilteringEngine {
+    -cache_key: string = "collaborative_similarity_matrix"
+    -similarity_threshold: float = 0.3
+    -batch_size: int = 1000
+    --
+    +build_user_product_matrix(): defaultdict
+    +normalize_matrix_minmax(): np.array
+    +calculate_cosine_similarity(): np.array
+    +bulk_create_similarities(): int
+    --
+    Item-Based Collaborative Filtering
+    używa cosine similarity między produktami
+  }
+  
+  class UserRecommendationGenerator {
+    --
+    +extract_user_products(): list
+    +calculate_weighted_scores(): defaultdict
+    +update_user_recommendations(): int
+    --
+    Generuje finalne rekomendacje
+    na podstawie podobieństwa produktów
+  }
 }
 
-class ProcessRecommendationsView {
-  +post(request)
-  +process_collaborative_filtering()
-  +process_content_based_filtering()
+package "Frontend Components" {
+  
+  class AdminStatistics_jsx {
+    -currentAlgorithm: string
+    -selectedAlgorithm: string
+    -recommendationPreview: Array
+    -isProcessing: boolean
+    --
+    +fetchRecommendationSettings()
+    +handleAlgorithmChange(algorithm)
+    +handleApplyAlgorithm()
+    +fetchRecommendationPreview()
+    --
+    Panel kontrolny CF/CBF
+  }
+  
+  class RecommendedProductsDisplay {
+    --
+    +fetchRecommendedProducts()
+    +renderProductCards()
+    +handleProductClick()
+    --
+    Wyświetla rekomendacje klientom
+  }
 }
 
+package "Django Signals - signals.py" {
+  
+  class RecommendationSignalHandlers {
+    --
+    +log_interaction_on_purchase()
+    +log_interaction_on_cart_add()
+    +generate_user_recommendations_after_order()
+    +cache_invalidation()
+    --
+    @receiver(post_save, sender=OrderProduct)
+    @receiver(post_save, sender=CartItem)
+  }
+}
+
+package "Database Migration" {
+  
+  class Migration_0001_initial {
+    +operations: CreateModel[]
+    --
+    Tworzy ProductSimilarity,
+    UserProductRecommendation,
+    RecommendationSettings tables
+  }
+}
+
+package "Seeder - seed_db.py" {
+  
+  class Command {
+    --
+    +generate_product_similarities()
+    +seed_orders()
+    +seed_users()
+    --
+    Generuje początkowe dane CF
+  }
+}
+
+' Relationships
 ProductSimilarity ||--|| Product : product1
 ProductSimilarity ||--|| Product : product2
-UserProductRecommendation ||--|| User
-UserProductRecommendation ||--|| Product
-RecommendationSettings ||--|| User
+UserProductRecommendation ||--|| User : user
+UserProductRecommendation ||--|| Product : product
+RecommendationSettings ||--|| User : user
+
+ProcessRecommendationsView ..> CollaborativeFilteringEngine : uses
+CollaborativeFilteringEngine ..> ProductSimilarity : creates
+GenerateUserRecommendationsView ..> UserRecommendationGenerator : uses
+UserRecommendationGenerator ..> UserProductRecommendation : creates
+
+AdminStatistics_jsx ..> ProcessRecommendationsView : calls API
+AdminStatistics_jsx ..> RecommendationSettingsView : calls API
+AdminStatistics_jsx ..> RecommendationPreviewView : calls API
+
+RecommendationSignalHandlers ..> UserRecommendationGenerator : triggers
+CollaborativeFilteringEngine ..> OrderProduct : queries
+CollaborativeFilteringEngine ..> CartItem : queries
+
+Migration_0001_initial ..> ProductSimilarity : creates table
+Migration_0001_initial ..> UserProductRecommendation : creates table
+Command ..> CollaborativeFilteringEngine : seeds data
+
 @enduml

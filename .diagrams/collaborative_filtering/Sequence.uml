@@ -1,0 +1,166 @@
+@startuml Collaborative_Filtering_Sequence
+
+actor "Admin" as A
+participant "AdminStatistics.jsx" as Admin
+participant "ProcessRecommendationsView" as PRV
+participant "CollaborativeFilteringEngine" as CFE
+participant "ProductSimilarity Model" as PSM
+participant "Cache System" as Cache
+actor "Klient" as C
+participant "RecommendedProductsAPIView" as RPA
+participant "UserProductRecommendation" as UPR
+
+== Admin Konfiguruje Collaborative Filtering ==
+
+A -> Admin: Otwiera panel administracyjny
+activate Admin
+
+Admin -> Admin: fetchRecommendationSettings()
+Admin -> Admin: Wyświetla aktualny algorytm
+
+A -> Admin: Wybiera "collaborative" algorithm
+Admin -> Admin: handleAlgorithmChange("collaborative")
+Admin -> Admin: setSelectedAlgorithm("collaborative")
+
+A -> Admin: Klika "Apply Algorithm"
+Admin -> Admin: handleApplyAlgorithm()
+
+Admin -> PRV: POST /api/process-recommendations/ {algorithm: "collaborative"}
+activate PRV
+
+PRV -> PRV: algorithm = "collaborative"
+PRV -> PRV: process_collaborative_filtering()
+
+== Cache Check ==
+
+PRV -> Cache: cache.get("collaborative_similarity_matrix")
+activate Cache
+
+alt Cache Hit
+  Cache --> PRV: cached_result
+  PRV --> Admin: success response (cached)
+else Cache Miss
+  Cache --> PRV: None
+  deactivate Cache
+  
+  == Data Preparation ==
+  
+  PRV -> CFE: Start collaborative filtering process
+  activate CFE
+  
+  CFE -> CFE: users = User.objects.all()
+  CFE -> CFE: products = Product.objects.all()
+  CFE -> CFE: print(f"Processing for {users.count()} users and {products.count()} products")
+  
+  CFE -> PSM: OrderProduct.objects.select_related("order", "product").all()
+  activate PSM
+  PSM --> CFE: All order-product relationships
+  deactivate PSM
+  
+  CFE -> CFE: Build user_product_matrix[user_id][product_id] = quantity
+  CFE -> CFE: user_ids = list(user_product_matrix.keys())
+  CFE -> CFE: product_ids = list(products.values_list("id", flat=True))
+  
+  alt Insufficient Data
+    CFE -> CFE: len(user_ids) < 2 OR len(product_ids) < 2
+    CFE -> CFE: print("Insufficient data for collaborative filtering")
+    CFE --> PRV: return 0
+  else Sufficient Data
+    
+    == Matrix Building & Normalization ==
+    
+    CFE -> CFE: matrix = np.array(matrix, dtype=np.float32)
+    CFE -> CFE: scaler = MinMaxScaler()
+    CFE -> CFE: print("Applying MinMax normalization to user-product matrix")
+    
+    loop For each user row
+      CFE -> CFE: if np.sum(user_row) > 0:
+      CFE -> CFE: normalized_row = scaler.fit_transform(user_row)
+      CFE -> CFE: normalized_matrix[i] = normalized_row
+    end
+    
+    == Similarity Calculation ==
+    
+    CFE -> CFE: product_similarity = cosine_similarity(normalized_matrix.T)
+    
+    note right of CFE
+      .T = transpozycja
+      Oblicza podobieństwo między produktami
+      na podstawie wzorców zakupów użytkowników
+    end note
+    
+    == Database Update ==
+    
+    CFE -> PSM: ProductSimilarity.objects.filter(similarity_type="collaborative").delete()
+    activate PSM
+    deactivate PSM
+    
+    CFE -> CFE: similarities_to_create = []
+    CFE -> CFE: similarity_threshold = 0.3
+    
+    loop For each product pair
+      CFE -> CFE: if product_similarity[i][j] > 0.3:
+      CFE -> CFE: similarities_to_create.append(ProductSimilarity(...))
+      
+      alt Batch Full (1000 items)
+        CFE -> PSM: ProductSimilarity.objects.bulk_create(similarities_to_create)
+        activate PSM
+        deactivate PSM
+        CFE -> CFE: similarities_to_create = []
+      end
+    end
+    
+    CFE -> PSM: Final bulk_create(remaining similarities)
+    activate PSM
+    deactivate PSM
+    
+    CFE -> CFE: print(f"Created {similarity_count} collaborative similarities")
+    
+    == Cache Update ==
+    
+    CFE -> Cache: cache.set("collaborative_similarity_matrix", similarity_count, 7200)
+    activate Cache
+    deactivate Cache
+    
+    CFE --> PRV: similarity_count
+    deactivate CFE
+  end
+end
+
+PRV --> Admin: {success: true, similarity_count: X, implementation: "Library"}
+deactivate PRV
+
+Admin -> Admin: toast.success("Collaborative algorithm applied successfully!")
+Admin -> Admin: fetchRecommendationPreview("collaborative")
+
+deactivate Admin
+
+== Klient Otrzymuje Rekomendacje ==
+
+C -> RPA: GET /api/recommended-products/
+activate RPA
+
+RPA -> RPA: user = request.user
+RPA -> RPA: settings = RecommendationSettings.objects.filter(user=user).first()
+RPA -> RPA: algorithm = "collaborative" (from settings)
+
+RPA -> UPR: UserProductRecommendation.objects.filter(user=user, recommendation_type="collaborative")
+activate UPR
+
+alt User Has Recommendations
+  UPR --> RPA: Existing recommendations ordered by score
+  deactivate UPR
+  RPA -> RPA: recommended_products = [rec.product for rec in recommendations]
+else No Recommendations
+  RPA -> RPA: get_fallback_recommendations(user)
+  RPA -> UPR: Based on user's purchase history categories
+  activate UPR
+  UPR --> RPA: Fallback products
+  deactivate UPR
+end
+
+RPA -> RPA: ProductSerializer(recommended_products, many=True)
+RPA --> C: Personalized product recommendations
+deactivate RPA
+
+@enduml

@@ -1,23 +1,116 @@
-@startuml
+@startuml Association_Rules_UseCase
+!theme plain
+
 left to right direction
+
 actor "Klient" as Customer
 actor "Administrator" as Admin
+actor "Django System" as System
 
-rectangle "Reguły Asocjacji" {
-  usecase "Przeglądaj \"Frequently Bought Together\"" as UC1
-  usecase "Dodaj produkty do koszyka" as UC2
-  usecase "Złóż zamówienie" as UC3
-  usecase "Zarządzaj regułami asocjacji" as UC4
-  usecase "Aktualizuj reguły manualnie" as UC5
-  usecase "Przeglądaj analizy reguł" as UC6
+package "System Reguł Asocjacyjnych" {
+  
+  package "Frontend - Klient" {
+    usecase "Przeglądaj produkty w sklepie" as UC1
+    usecase "Dodaj produkty do koszyka" as UC2
+    usecase "Zobacz \"Frequently Bought Together\"" as UC3
+    usecase "Dodaj rekomendowany produkt" as UC4
+    usecase "Finalizuj zamówienie" as UC5
+  }
+  
+  package "Backend - Automatyczne" {
+    usecase "Wykryj nowe zamówienie (Signal)" as UC6
+    usecase "Pobierz historię transakcji" as UC7
+    usecase "Wykonaj algorytm Apriori" as UC8
+    usecase "Oblicz Support/Confidence/Lift" as UC9
+    usecase "Zapisz reguły do bazy" as UC10
+    usecase "Invaliduj cache" as UC11
+  }
+  
+  package "Frontend - Admin Panel" {
+    usecase "Przeglądaj dashboard reguł" as UC12
+    usecase "Zobacz tabelę wszystkich reguł" as UC13
+    usecase "Sprawdź metryki (Support/Confidence/Lift)" as UC14
+    usecase "Kliknij \"Update Rules\"" as UC15
+    usecase "Wymuś przeliczenie reguł" as UC16
+    usecase "Zobacz status implementacji" as UC17
+  }
+  
+  package "API Endpoints" {
+    usecase "GET /api/frequently-bought-together/" as UC18
+    usecase "POST /api/update-association-rules/" as UC19
+    usecase "GET /api/association-rules/" as UC20
+  }
+  
+  package "Seeder/Migration" {
+    usecase "Uruchom migrację bazy danych" as UC21
+    usecase "Wykonaj seed_db command" as UC22
+    usecase "Wygeneruj początkowe reguły" as UC23
+  }
 }
 
+' Customer relationships
 Customer --> UC1
 Customer --> UC2
 Customer --> UC3
-Admin --> UC4
-Admin --> UC5
-Admin --> UC6
+Customer --> UC4
+Customer --> UC5
 
-UC3 ..> UC1 : <<trigger>>
+' Admin relationships  
+Admin --> UC12
+Admin --> UC13
+Admin --> UC14
+Admin --> UC15
+Admin --> UC16
+Admin --> UC17
+
+' System relationships
+System --> UC6
+System --> UC7
+System --> UC8
+System --> UC9
+System --> UC10
+System --> UC11
+
+' Dependencies and flows
+UC2 ..> UC3 : <<trigger>>
+UC3 ..> UC18 : <<calls>>
+UC4 ..> UC2 : <<updates>>
+UC5 ..> UC6 : <<trigger>>
+
+UC6 ..> UC7 : <<includes>>
+UC7 ..> UC8 : <<includes>>
+UC8 ..> UC9 : <<includes>>
+UC9 ..> UC10 : <<includes>>
+UC10 ..> UC11 : <<includes>>
+
+UC12 ..> UC20 : <<calls>>
+UC13 ..> UC20 : <<calls>>
+UC15 ..> UC19 : <<calls>>
+UC16 ..> UC8 : <<trigger>>
+
+UC21 ..> UC22 : <<precedes>>
+UC22 ..> UC23 : <<includes>>
+UC23 ..> UC8 : <<uses>>
+
+' Notes
+note top of UC8
+  CustomAssociationRules
+  - Bitmap optimization
+  - Real Apriori formulas
+  - Bulk database operations
+end note
+
+note top of UC18
+  FrequentlyBoughtTogetherAPI
+  - Filters by cart products
+  - Returns top 5 by confidence
+  - Includes lift metrics
+end note
+
+note right of UC6
+  @receiver(post_save, sender=Order)
+  Automatyczne wykrywanie
+  nowych zamówień
+end note
+
 @enduml

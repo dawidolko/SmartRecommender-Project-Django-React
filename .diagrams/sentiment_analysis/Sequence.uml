@@ -1,0 +1,124 @@
+@startuml Sentiment_Analysis_Sequence
+!theme plain
+
+actor "Klient" as C
+participant "SearchModal.jsx" as Search
+participant "SentimentSearchAPIView" as API1
+participant "ProductSentimentSummary" as PSS
+participant "ProductReviewAPIView" as API2
+participant "Opinion Model" as OM
+participant "Django Signals" as Signals
+participant "CustomSentimentAnalysis" as CSA
+participant "SentimentAnalysis Model" as SA
+
+== Wyszukiwanie Oparte na Sentymencie ==
+
+C -> Search: Otwiera modal wyszukiwania
+activate Search
+
+C -> Search: Wpisuje zapytanie "excellent laptop"
+Search -> Search: useEffect wykrywa zmiany searchTerm
+Search -> Search: !isAdvanced (sentiment mode)
+
+Search -> API1: GET /api/sentiment-search/?q=excellent laptop
+activate API1
+
+API1 -> API1: Filtruj produkty według query
+API1 -> PSS: Products.filter(Q(name__icontains=query)).select_related('sentiment_summary')
+activate PSS
+PSS --> API1: QuerySet produktów z sentiment data
+deactivate PSS
+
+API1 -> API1: order_by(F('sentiment_summary__average_sentiment_score').desc())
+API1 -> API1: Serialize products with sentiment scores
+
+API1 --> Search: Response z produktami sortowanymi według sentymentu
+deactivate API1
+
+Search -> Search: Renderuj wyniki z sentiment scores
+Search --> C: Wyświetla produkty z metrykami sentymentu
+deactivate Search
+
+== Dodawanie Opinii i Automatyczna Analiza ==
+
+C -> API2: POST /api/products/123/reviews/ {"content": "This laptop is absolutely amazing!", "rating": 5}
+activate API2
+
+API2 -> API2: Sprawdź czy użytkownik kupił produkt
+API2 -> API2: OpinionSerializer validation
+
+API2 -> OM: Opinion.objects.create(user=user, product=product, content=content, rating=5)
+activate OM
+OM --> API2: Nowa opinia utworzona
+deactivate OM
+
+OM -> Signals: @receiver(post_save, sender=Opinion) triggers
+activate Signals
+
+Signals -> Signals: handle_sentiment_analysis()
+Signals -> Signals: Check if _skip_sentiment_update flag
+
+Signals -> CSA: CustomSentimentAnalysis().analyze_sentiment(opinion.content)
+activate CSA
+
+CSA -> CSA: Check text length > window_size (300)?
+CSA -> CSA: _analyze_text_segment("This laptop is absolutely amazing!")
+
+CSA -> CSA: _tokenize_text() → ["this", "laptop", "is", "absolutely", "amazing"]
+CSA -> CSA: _analyze_bigrams() → No bigrams found
+CSA -> CSA: positive_score = 0.0, negative_score = 0.0
+
+loop For each word
+  CSA -> CSA: word = "absolutely" → intensifier found
+  CSA -> CSA: _calculate_intensity_multiplier() → 1.8
+  CSA -> CSA: word = "amazing" → positive_words match
+  CSA -> CSA: _check_negation_context() → False
+  CSA -> CSA: positive_score += 1.0 * 1.8 = 1.8
+end
+
+CSA -> CSA: sentiment_score = (1.8 - 0.0) / 5 = 0.36
+CSA -> CSA: max(-1.0, min(1.0, 0.36)) = 0.36
+CSA -> CSA: 0.36 > 0.1 → category = "positive"
+
+CSA --> Signals: (0.36, "positive")
+deactivate CSA
+
+Signals -> SA: SentimentAnalysis.objects.update_or_create(opinion=opinion, defaults={score: 0.36, category: "positive"})
+activate SA
+SA --> Signals: SentimentAnalysis record created/updated
+deactivate SA
+
+Signals -> CSA: analyze_product_sentiment(product)
+activate CSA
+
+CSA -> SA: Opinion.objects.filter(product=product)
+activate SA
+SA --> CSA: All opinions for this product
+deactivate SA
+
+CSA -> CSA: Calculate average sentiment across all opinions
+CSA -> CSA: Count positive/neutral/negative opinions
+CSA --> Signals: sentiment_data = {average_score: 0.65, positive_count: 12, ...}
+deactivate CSA
+
+Signals -> PSS: ProductSentimentSummary.objects.update_or_create(product=product, defaults=sentiment_data)
+activate PSS
+PSS --> Signals: Summary updated
+deactivate PSS
+
+Signals -> Signals: cache.delete(f"product_sentiment_{product.id}_*")
+Signals --> API2: Sentiment analysis completed
+deactivate Signals
+
+API2 --> C: Opinion created successfully with sentiment analysis
+deactivate API2
+
+== Seeder - Bulk Sentiment Processing ==
+
+note over CSA
+  During database seeding:
+  seed_sentiment_data() processes
+  all existing opinions in bulk
+end note
+
+@enduml

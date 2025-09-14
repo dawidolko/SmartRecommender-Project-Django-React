@@ -5,6 +5,26 @@ import ShopProduct from "./ShopProduct";
 import config from "../../config/config";
 import { IoHomeOutline } from "react-icons/io5";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
+import {
+  FaBox,
+  FaTshirt,
+  FaLaptop,
+  FaGamepad,
+  FaTools,
+  FaCamera,
+  FaBrush,
+  FaClock,
+  FaBatteryFull,
+  FaHdd,
+  FaMouse,
+  FaDesktop,
+  FaPlane,
+  FaMicrochip,
+  FaSitemap,
+  FaCouch,
+  FaTv,
+} from "react-icons/fa";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const ShopContent = () => {
   const { category } = useParams();
@@ -18,6 +38,9 @@ const ShopContent = () => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(30);
 
   useEffect(() => {
     if (category) {
@@ -69,6 +92,10 @@ const ShopContent = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMainCategory, selectedSubCategory]);
+
   const mainCategories = Array.from(
     new Set(categories.map((cat) => cat.split(".")[0]))
   );
@@ -94,6 +121,42 @@ const ShopContent = () => {
     return matchesCategory;
   });
 
+  const totalProducts = filteredProducts.length;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const getCategoryIcon = (categoryName) => {
+    const name = categoryName.toLowerCase();
+
+    if (name === "accessories") return <FaTshirt />;
+    if (name === "camera" || name === "cameras") return <FaCamera />;
+    if (name === "cleaning") return <FaBrush />;
+    if (name === "components") return <FaMicrochip />;
+    if (name === "computers") return <FaDesktop />;
+    if (name === "drones") return <FaPlane />;
+    if (name === "electronics") return <FaTv />;
+    if (name === "furniture") return <FaCouch />;
+    if (name === "gadgets") return <FaTools />;
+    if (name === "gaming") return <FaGamepad />;
+    if (name === "laptop" || name === "laptops") return <FaLaptop />;
+    if (name === "monitoring") return <FaTv />;
+    if (name === "mounts") return <FaTools />;
+    if (name === "networking") return <FaSitemap />;
+    if (name === "office") return <FaDesktop />;
+    if (name === "peripherals") return <FaMouse />;
+    if (name === "power") return <FaBatteryFull />;
+    if (name === "storage") return <FaHdd />;
+    if (name === "vacuum") return <FaBrush />;
+    if (name === "wearables") return <FaClock />;
+
+    return <FaBox />;
+  };
+
   const toggleSubCategories = (category) => {
     setExpandedCategories((prev) =>
       prev.includes(category)
@@ -104,6 +167,36 @@ const ShopContent = () => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          className={`pagination-number ${currentPage === i ? "active" : ""}`}
+          onClick={() => handlePageChange(i)}>
+          {i}
+        </button>
+      );
+    }
+
+    return buttons;
   };
 
   return (
@@ -163,7 +256,9 @@ const ShopContent = () => {
                         className={`shop__sidebar-button ${
                           selectedMainCategory === mainCat ? "active" : ""
                         }`}>
-                        <span className="shop__sidebar-dot"></span>
+                        <span className="shop__sidebar-category-icon">
+                          {getCategoryIcon(mainCat)}
+                        </span>
                         <span className="shop__sidebar-name">
                           {mainCat.toUpperCase()}
                         </span>
@@ -244,8 +339,8 @@ const ShopContent = () => {
           <div className="shop__products">
             {isLoadingProducts ? (
               <div className="shop__loading-spinner"></div>
-            ) : filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+            ) : currentProducts.length > 0 ? (
+              currentProducts.map((product) => (
                 <ShopProduct
                   key={product.id}
                   id={product.id}
@@ -264,6 +359,41 @@ const ShopContent = () => {
               </p>
             )}
           </div>
+
+          {totalPages > 1 && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                <p className="pagination-text">
+                  Wyświetlanie {indexOfFirstProduct + 1} do{" "}
+                  {Math.min(indexOfLastProduct, totalProducts)} z{" "}
+                  {totalProducts} produktów
+                </p>
+              </div>
+              <div className="pagination-controls">
+                <button
+                  className={`pagination-button ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}>
+                  <ChevronLeft size={16} />
+                  <span>&lt;</span>
+                </button>
+
+                {renderPaginationButtons()}
+
+                <button
+                  className={`pagination-button ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}>
+                  <ChevronRight size={16} />
+                  <span>&gt;</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

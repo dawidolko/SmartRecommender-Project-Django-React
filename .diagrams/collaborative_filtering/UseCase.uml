@@ -1,22 +1,129 @@
-@startuml
+@startuml Collaborative_Filtering_UseCase
+
 left to right direction
+
 actor "Klient" as Customer
 actor "Administrator" as Admin
+actor "Django System" as System
 
-rectangle "Collaborative Filtering" {
-  usecase "Otrzymuj rekomendacje\noparte na podobnych użytkownikach" as UC1
-  usecase "Ustaw algorytm rekomendacji\n(collaborative/content_based)" as UC2
-  usecase "Przeglądaj preview rekomendacji" as UC3
-  usecase "Przetwórz rekomendacje\ncolaborative filtering" as UC4
-  usecase "Generuj rekomendacje użytkownika" as UC5
+package "System Collaborative Filtering" {
+  
+  package "Frontend - Klient" {
+    usecase "Przeglądaj rekomendowane produkty" as UC1
+    usecase "Dodaj produkty do koszyka" as UC2
+    usecase "Finalizuj zamówienie" as UC3
+    usecase "Otrzymuj personalizowane sugestie" as UC4
+  }
+  
+  package "Backend - Automatyczne" {
+    usecase "Loguj interakcje użytkownika" as UC5
+    usecase "Wykryj nowe zamówienie (Signal)" as UC6
+    usecase "Generuj rekomendacje po zamówieniu" as UC7
+    usecase "Aktualizuj UserProductRecommendation" as UC8
+    usecase "Invaliduj cache rekomendacji" as UC9
+  }
+  
+  package "Frontend - Admin Panel" {
+    usecase "Otwórz panel rekomendacji" as UC10
+    usecase "Przełącz algorytm (CF/CBF)" as UC11
+    usecase "Zobacz podgląd rekomendacji" as UC12
+    usecase "Kliknij \"Apply Algorithm\"" as UC13
+    usecase "Monitoruj status implementacji" as UC14
+    usecase "Sprawdź similarity count" as UC15
+  }
+  
+  package "Backend - Collaborative Filtering" {
+    usecase "Przetwórz CF algorithm" as UC16
+    usecase "Buduj macierz user-product" as UC17
+    usecase "Zastosuj MinMax normalizację" as UC18
+    usecase "Oblicz cosine similarity produktów" as UC19
+    usecase "Zapisz ProductSimilarity do bazy" as UC20
+    usecase "Bulk create z threshold 0.3" as UC21
+    usecase "Cache wyniki na 7200s" as UC22
+  }
+  
+  package "API Endpoints" {
+    usecase "POST /api/process-recommendations/" as UC23
+    usecase "POST /api/recommendation-settings/" as UC24
+    usecase "GET /api/recommendation-preview/" as UC25
+    usecase "GET /api/recommended-products/" as UC26
+    usecase "POST /api/generate-user-recommendations/" as UC27
+  }
+  
+  package "Seeder/Migration" {
+    usecase "Uruchom migrację recommendation tables" as UC28
+    usecase "Wykonaj generate_product_similarities()" as UC29
+    usecase "Seed initial CF data" as UC30
+  }
 }
 
+' Customer relationships
 Customer --> UC1
 Customer --> UC2
 Customer --> UC3
-Admin --> UC4
-Admin --> UC5
+Customer --> UC4
 
-UC2 ..> UC1 : <<configure>>
-UC4 ..> UC1 : <<update>>
+' Admin relationships  
+Admin --> UC10
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+Admin --> UC14
+Admin --> UC15
+
+' System relationships
+System --> UC5
+System --> UC6
+System --> UC7
+System --> UC8
+System --> UC9
+
+' Dependencies and flows
+UC2 ..> UC5 : <<logs>>
+UC3 ..> UC6 : <<triggers>>
+UC6 ..> UC7 : <<includes>>
+UC7 ..> UC8 : <<includes>>
+UC8 ..> UC9 : <<includes>>
+
+UC11 ..> UC24 : <<calls>>
+UC12 ..> UC25 : <<calls>>
+UC13 ..> UC23 : <<calls>>
+UC13 ..> UC16 : <<triggers>>
+
+UC16 ..> UC17 : <<includes>>
+UC17 ..> UC18 : <<includes>>
+UC18 ..> UC19 : <<includes>>
+UC19 ..> UC20 : <<includes>>
+UC20 ..> UC21 : <<includes>>
+UC21 ..> UC22 : <<includes>>
+
+UC1 ..> UC26 : <<calls>>
+UC4 ..> UC27 : <<calls>>
+
+UC28 ..> UC29 : <<precedes>>
+UC29 ..> UC30 : <<includes>>
+
+' Notes
+note top of UC16
+  Item-Based Collaborative Filtering
+  - MinMax normalization per user
+  - Cosine similarity między produktami
+  - Threshold filtering (0.3)
+  - Bulk operations (1000 batch)
+end note
+
+note right of UC19
+  product_similarity = 
+  cosine_similarity(normalized_matrix.T)
+  
+  .T = transpozycja
+  produkty vs produkty
+end note
+
+note left of UC6
+  @receiver(post_save, sender=OrderProduct)
+  Automatyczne wykrywanie
+  nowych zakupów
+end note
+
 @enduml

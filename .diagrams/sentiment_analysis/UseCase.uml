@@ -1,20 +1,136 @@
-@startuml
-left to right direction
-actor "Klient" as Customer
-actor "System" as System
+@startuml Sentiment_Analysis_UseCase
+!theme plain
 
-rectangle "Analiza Sentymentu" {
-  usecase "Wyszukaj według sentymentu" as UC1
-  usecase "Dodaj opinię o produkcie" as UC2
-  usecase "Automatyczna analiza opinii" as UC3
-  usecase "Ranking produktów według satysfakcji" as UC4
+left to right direction
+
+actor "Klient" as Customer
+actor "Administrator" as Admin
+actor "Django System" as System
+
+package "System Analizy Sentymentu" {
+  
+  package "Frontend - Wyszukiwanie" {
+    usecase "Otwórz modal wyszukiwania" as UC1
+    usecase "Wpisz zapytanie wyszukiwania" as UC2
+    usecase "Przełącz tryb Sentiment/Fuzzy" as UC3
+    usecase "Zobacz wyniki z sentiment score" as UC4
+    usecase "Kliknij produkt z wyników" as UC5
+  }
+  
+  package "Frontend - Opinie" {
+    usecase "Przejdź do strony produktu" as UC6
+    usecase "Dodaj opinię o produkcie" as UC7
+    usecase "Sprawdź czy użytkownik kupił produkt" as UC8
+    usecase "Waliduj treść opinii" as UC9
+  }
+  
+  package "Backend - Automatyczna Analiza" {
+    usecase "Wykryj nową opinię (Signal)" as UC10
+    usecase "Analizuj sentiment opinii" as UC11
+    usecase "Oblicz sentiment score (-1 to +1)" as UC12
+    usecase "Klasyfikuj jako positive/neutral/negative" as UC13
+    usecase "Zapisz SentimentAnalysis" as UC14
+    usecase "Aktualizuj ProductSentimentSummary" as UC15
+    usecase "Invaliduj cache sentymentu" as UC16
+  }
+  
+  package "Wyszukiwanie Oparte na Sentymencie" {
+    usecase "Wyszukaj produkty według query" as UC17
+    usecase "Połącz z sentiment_summary" as UC18
+    usecase "Sortuj według average_sentiment_score" as UC19
+    usecase "Zwróć produkty z metrykami" as UC20
+  }
+  
+  package "Admin Panel" {
+    usecase "Zobacz status algorytmów" as UC21
+    usecase "Sprawdź implementację Custom vs Library" as UC22
+    usecase "Monitoruj sentiment metrics" as UC23
+  }
+  
+  package "API Endpoints" {
+    usecase "GET /api/sentiment-search/" as UC24
+    usecase "GET /api/fuzzy-search/" as UC25
+    usecase "POST /api/products/{id}/reviews/" as UC26
+  }
+  
+  package "Seeder/Migration" {
+    usecase "Uruchom migrację sentiment tables" as UC27
+    usecase "Wykonaj seed_sentiment_data()" as UC28
+    usecase "Przetwórz istniejące opinie" as UC29
+    usecase "Wygeneruj sentiment summaries" as UC30
+  }
 }
 
+' Customer relationships
 Customer --> UC1
 Customer --> UC2
-System --> UC3
+Customer --> UC3
 Customer --> UC4
+Customer --> UC5
+Customer --> UC6
+Customer --> UC7
 
-UC2 ..> UC3 : <<trigger>>
-UC3 ..> UC4 : <<update>>
+' Admin relationships
+Admin --> UC21
+Admin --> UC22
+Admin --> UC23
+
+' System relationships
+System --> UC10
+System --> UC11
+System --> UC12
+System --> UC13
+System --> UC14
+System --> UC15
+System --> UC16
+
+' Dependencies and flows
+UC2 ..> UC24 : <<calls>> (sentiment mode)
+UC2 ..> UC25 : <<calls>> (fuzzy mode)
+UC3 ..> UC4 : <<updates>>
+UC4 ..> UC20 : <<displays>>
+UC5 ..> UC6 : <<navigates>>
+
+UC7 ..> UC26 : <<calls>>
+UC26 ..> UC8 : <<includes>>
+UC26 ..> UC9 : <<includes>>
+UC7 ..> UC10 : <<triggers>>
+
+UC10 ..> UC11 : <<includes>>
+UC11 ..> UC12 : <<includes>>
+UC12 ..> UC13 : <<includes>>
+UC13 ..> UC14 : <<includes>>
+UC14 ..> UC15 : <<includes>>
+UC15 ..> UC16 : <<includes>>
+
+UC17 ..> UC18 : <<includes>>
+UC18 ..> UC19 : <<includes>>
+UC19 ..> UC20 : <<includes>>
+
+UC27 ..> UC28 : <<precedes>>
+UC28 ..> UC29 : <<includes>>
+UC29 ..> UC30 : <<includes>>
+
+' Notes
+note top of UC11
+  CustomSentimentAnalysis
+  - SentiWordNet formula
+  - 200+ word dictionaries
+  - Sliding window for long text
+  - Negation & intensifier handling
+end note
+
+note right of UC24
+  SentimentSearchAPIView
+  - Sorts by average_sentiment_score
+  - Includes sentiment metrics
+  - Real-time search results
+end note
+
+note left of UC10
+  @receiver(post_save, sender=Opinion)
+  Automatyczne wykrywanie
+  nowych opinii
+end note
+
 @enduml

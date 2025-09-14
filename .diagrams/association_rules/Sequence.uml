@@ -1,0 +1,134 @@
+@startuml Association_Rules_Sequence
+!theme plain
+
+actor "Klient" as C
+participant "CartContent.jsx" as Cart
+participant "FrequentlyBoughtTogetherAPI" as API1
+participant "ProductAssociation Model" as PA
+participant "Django Signals" as Signals
+participant "CustomAssociationRules" as CAR
+participant "AdminStatistics.jsx" as Admin
+participant "UpdateAssociationRulesAPI" as API2
+
+== Przeglądanie Rekomendacji ==
+
+C -> Cart: Dodaje produkty do koszyka
+activate Cart
+
+Cart -> Cart: useEffect wykrywa zmiany w items
+Cart -> API1: GET /api/frequently-bought-together/?product_ids[]=1&product_ids[]=2
+activate API1
+
+API1 -> PA: ProductAssociation.objects.filter(product_1_id__in=product_ids)
+activate PA
+PA --> API1: QuerySet z regułami asocjacji
+deactivate PA
+
+API1 -> API1: order_by("-lift", "-confidence")[:5]
+API1 --> Cart: Response z top 5 rekomendacjami
+deactivate API1
+
+Cart -> Cart: Renderuj "Frequently Bought Together"
+Cart --> C: Wyświetla rekomendacje z confidence %
+deactivate Cart
+
+== Automatyczne Generowanie Reguł ==
+
+C -> C: Finalizuje zamówienie
+C -> Signals: Order.save() triggers @receiver(post_save)
+activate Signals
+
+Signals -> Signals: handle_new_order_and_analytics()
+Signals -> Signals: transaction.on_commit()
+Signals -> Signals: run_all_analytics_after_order()
+Signals -> Signals: generate_association_rules_after_order()
+
+Signals -> PA: Order.objects.prefetch_related()[:1000]
+activate PA
+PA --> Signals: Ostatnie 1000 zamówień
+deactivate PA
+
+Signals -> Signals: Buduj transactions[] z OrderProduct
+
+Signals -> CAR: CustomAssociationRules(min_support=0.01, min_confidence=0.1)
+activate CAR
+
+CAR -> CAR: generate_association_rules(transactions)
+CAR -> CAR: _find_frequent_itemsets_with_bitmap()
+
+note right of CAR
+  Bitmap optimization:
+  for item in transaction:
+    bitmap |= (1 << item_to_id[item])
+end note
+
+CAR -> CAR: _generate_2_itemsets_with_bitmap()
+CAR -> CAR: _generate_optimized_rules_from_itemsets()
+
+loop Dla każdej pary produktów
+  CAR -> CAR: support = count / total_transactions
+  CAR -> CAR: confidence = support / support_1
+  CAR -> CAR: lift = support / (support_1 * support_2)
+  
+  alt confidence >= min_confidence
+    CAR -> CAR: Dodaj do rules[]
+  end
+end
+
+CAR --> Signals: Lista reguł z metrykami
+deactivate CAR
+
+Signals -> PA: ProductAssociation.objects.all().delete()
+activate PA
+Signals -> PA: bulk_create(associations_to_create[:500])
+PA --> Signals: Utworzono reguły w bazie
+deactivate PA
+
+Signals -> Signals: cache.delete("association_rules_list")
+Signals --> C: Reguły zaktualizowane
+deactivate Signals
+
+== Admin - Manualne Zarządzanie ==
+
+Admin -> Admin: Otwiera panel administracyjny
+activate Admin
+
+Admin -> API2: GET /api/association-rules/
+activate API2
+
+API2 -> PA: ProductAssociation.objects.select_related()[:20]
+activate PA
+PA --> API2: Top 20 reguł z produktami
+deactivate PA
+
+API2 --> Admin: Serializowane reguły z metrykami
+deactivate API2
+
+Admin -> Admin: Renderuj tabelę (Support %, Confidence %, Lift)
+
+alt Admin klika "Update Rules"
+  Admin -> API2: POST /api/update-association-rules/
+  activate API2
+  
+  API2 -> PA: ProductAssociation.objects.all().delete()
+  activate PA
+  deactivate PA
+  
+  API2 -> CAR: Uruchom ponownie algorytm Apriori
+  activate CAR
+  CAR --> API2: Nowe reguły
+  deactivate CAR
+  
+  API2 -> PA: bulk_create(new_associations)
+  activate PA
+  deactivate PA
+  
+  API2 --> Admin: Success response z liczbą nowych reguł
+  deactivate API2
+  
+  Admin -> Admin: toast.success("Rules updated!")
+end
+
+deactivate Admin
+
+@enduml

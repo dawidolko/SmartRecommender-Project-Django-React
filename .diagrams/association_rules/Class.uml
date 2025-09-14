@@ -1,32 +1,163 @@
 @startuml
-class ProductAssociation {
-  +id: Integer
-  +product_1: ForeignKey(Product)
-  +product_2: ForeignKey(Product)
-  +support: FloatField
-  +confidence: FloatField
-  +lift: FloatField
-  +created_at: DateTimeField
-  +updated_at: DateTimeField
+!theme plain
+
+package "Django Models - models.py" {
+  
+  class ProductAssociation {
+    +id: BigAutoField
+    +product_1: ForeignKey(Product)
+    +product_2: ForeignKey(Product) 
+    +support: FloatField
+    +confidence: FloatField
+    +lift: FloatField
+    +created_at: DateTimeField
+    +updated_at: DateTimeField
+    --
+    +Meta: unique_together = ('product_1', 'product_2')
+    +Meta: db_table = 'method_productassociation'
+  }
+  
+  class Product {
+    +id: AutoField
+    +name: CharField(100)
+    +price: DecimalField
+    +description: TextField
+    +categories: ManyToManyField
+    +tags: ManyToManyField
+  }
+  
+  class Order {
+    +id: BigAutoField
+    +user: ForeignKey(User)
+    +date_order: DateTimeField
+    +status: CharField(20)
+  }
+  
+  class OrderProduct {
+    +id: BigAutoField
+    +order: ForeignKey(Order)
+    +product: ForeignKey(Product)
+    +quantity: PositiveIntegerField
+  }
 }
 
-class CustomAssociationRules {
-  -min_support: float
-  -min_confidence: float
-  -max_transactions: int
-  +generate_association_rules(transactions)
-  +_find_frequent_itemsets_with_bitmap()
-  +_generate_2_itemsets_with_bitmap()
-  +_generate_optimized_rules_from_itemsets()
+package "Custom Algorithm - custom_recommendation_engine.py" {
+  
+  class CustomAssociationRules {
+    -min_support: float = 0.01
+    -min_confidence: float = 0.1
+    -max_transactions: int = 3000
+    -max_items_per_transaction: int = 20
+    --
+    +generate_association_rules(transactions): list
+    +_find_frequent_itemsets_with_bitmap(transactions): dict
+    +_generate_2_itemsets_with_bitmap(): dict
+    +_generate_optimized_rules_from_itemsets(): list
+    --
+    Implementuje prawdziwy algorytm Apriori
+    z optymalizacją bitmap
+  }
 }
 
-class FrequentlyBoughtTogetherAPI {
-  +get(request)
-  +filter_by_cart_products()
-  +order_by_lift_confidence()
+package "API Views - association_views.py" {
+  
+  class FrequentlyBoughtTogetherAPI {
+    +permission_classes: [AllowAny]
+    --
+    +get(request): Response
+    -filter_by_cart_products()
+    -order_by_lift_confidence()
+    -serialize_recommendations()
+  }
+  
+  class UpdateAssociationRulesAPI {
+    +permission_classes: [IsAuthenticated]
+    --
+    +post(request): Response
+    -process_transactions()
+    -bulk_create_associations()
+    -invalidate_cache()
+  }
+  
+  class AssociationRulesListAPI {
+    +permission_classes: [AllowAny]
+    --
+    +get(request): Response
+    -get_cached_rules()
+    -serialize_rules_with_metrics()
+  }
 }
 
+package "Django Signals - signals.py" {
+  
+  class SignalHandlers {
+    --
+    +handle_new_order_and_analytics()
+    +run_all_analytics_after_order()
+    +generate_association_rules_after_order()
+    +cache_invalidation()
+  }
+}
+
+package "Frontend Components" {
+  
+  class CartContent_jsx {
+    -items: Object
+    -recommendations: Array
+    --
+    +fetchRecommendations()
+    +handleAddToCart()
+    +useEffect([items])
+    --
+    Wyświetla "Frequently Bought Together"
+  }
+  
+  class AdminStatistics_jsx {
+    -associationRules: Array
+    -isUpdatingRules: boolean
+    --
+    +fetchAssociationRules()
+    +updateAssociationRules()
+    +renderRulesTable()
+  }
+}
+
+package "Database Migration" {
+  
+  class Migration_0001_initial {
+    +operations: CreateModel[]
+    --
+    Tworzy ProductAssociation table
+    z unique_together constraint
+  }
+}
+
+package "Seeder - seed_db.py" {
+  
+  class Command {
+    --
+    +generate_initial_association_rules()
+    +seed_orders()
+    +seed_products()
+    -calculate_association_rules()
+  }
+}
+
+' Relationships
 ProductAssociation ||--|| Product : product_1
 ProductAssociation ||--|| Product : product_2
+OrderProduct ||--|| Order : order
+OrderProduct ||--|| Product : product
+
 CustomAssociationRules ..> ProductAssociation : creates
+FrequentlyBoughtTogetherAPI ..> ProductAssociation : queries
+UpdateAssociationRulesAPI ..> CustomAssociationRules : uses
+SignalHandlers ..> CustomAssociationRules : triggers
+
+CartContent_jsx ..> FrequentlyBoughtTogetherAPI : calls API
+AdminStatistics_jsx ..> UpdateAssociationRulesAPI : calls API
+AdminStatistics_jsx ..> AssociationRulesListAPI : calls API
+
+Migration_0001_initial ..> ProductAssociation : creates table
+Command ..> CustomAssociationRules : seeds data
 @enduml

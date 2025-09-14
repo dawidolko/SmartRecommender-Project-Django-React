@@ -1,44 +1,180 @@
 @startuml
-|Admin Panel|
 start
-:Admin wybiera "collaborative" algorithm;
-:ProcessRecommendationsView.post();
-:process_collaborative_filtering();
 
-|Cache Check|
-if (cache.get("collaborative_similarity_matrix")?) then (hit)
-  :Zwróć cached result;
-  stop
-else (miss)
-  :Kontynuuj przetwarzanie;
-endif
+partition "Frontend - AdminStatistics.jsx" {
+  :Admin otwiera panel administracyjny;
+  :fetchRecommendationSettings();
+  :Wyświetl aktualny algorytm (collaborative/content_based);
+  
+  if (Admin zmienia algorytm?) then (yes)
+    :handleAlgorithmChange("collaborative");
+    :setSelectedAlgorithm("collaborative");
+    
+    :handleApplyAlgorithm();
+    :POST /api/recommendation-settings/;
+    :POST /api/process-recommendations/;
+  endif
+}
 
-|Data Preparation|
-:User.objects.all();
-:Product.objects.all();
-:OrderProduct.objects.select_related();
+partition "Backend - RecommendationSettingsView" {
+  :POST recommendation-settings/;
+  :RecommendationSettings.objects.get_or_create();
+  :settings.active_algorithm = "collaborative";
+  :settings.save();
+}
 
-:Buduj user_product_matrix;
-partition "Matrix Building" {
-  :user_product_matrix[user_id][product_id] = quantity;
+partition "Backend - ProcessRecommendationsView" {
+  :ProcessRecommendationsView.post();
+  :algorithm = request.data.get("algorithm");
+  
+  if (algorithm == "collaborative"?) then (yes)
+    :process_collaborative_filtering();
+  else (no)
+    :process_content_based_filtering();
+  endif
+}
+
+partition "Cache Check" {
+  :cache_key = "collaborative_similarity_matrix";
+  
+  if (cache.get(cache_key)?) then (hit)
+    :return cached_result;
+    stop
+  else (miss)
+    :print("Processing collaborative filtering...");
+  endif
+}
+
+partition "Data Preparation" {
+  :users = User.objects.all();
+  :products = Product.objects.all();
+  :print(f"Processing for {users.count()} users and {products.count()} products");
+  
+  :user_product_matrix = defaultdict(dict);
+  
+  repeat
+    :order = OrderProduct.objects.select_related("order", "product");
+    :user_product_matrix[order.order.user_id][order.product_id] = order.quantity;
+  repeat while (more orders)
+  
   :user_ids = list(user_product_matrix.keys());
-  :product_ids = list(products.values_list("id"));
+  :product_ids = list(products.values_list("id", flat=True));
+  
+  if (len(user_ids) < 2 OR len(product_ids) < 2?) then (yes)
+    :print("Insufficient data for collaborative filtering");
+    :return 0;
+    stop
+  endif
 }
 
-|Similarity Calculation|
-:numpy.array(matrix, dtype=float32);
-:MinMaxScaler normalization;
-:cosine_similarity(normalized_matrix.T);
+partition "Matrix Building" {
+  :matrix = [];
+  
+  repeat
+    :row = [];
+    repeat
+      :value = user_product_matrix[user_id].get(product_id, 0);
+      :row.append(value);
+    repeat while (more products)
+    :matrix.append(row);
+  repeat while (more users)
+  
+  :matrix = np.array(matrix, dtype=np.float32);
+}
 
-|Database Update|
-:ProductSimilarity.objects.filter(collaborative).delete();
-:Bulk create similarities (threshold > 0.3);
-partition "Bulk Operations" {
-  :batch_size = 1000;
+partition "MinMax Normalization" {
+  :scaler = MinMaxScaler();
+  :normalized_matrix = np.zeros_like(matrix);
+  :print("Applying MinMax normalization to user-product matrix");
+  
+  repeat
+    if (np.sum(user_row) > 0?) then (yes)
+      :user_row_reshaped = user_row.reshape(-1, 1);
+      :normalized_row = scaler.fit_transform(user_row_reshaped).flatten();
+      :normalized_matrix[i] = normalized_row;
+    else (no)
+      :normalized_matrix[i] = user_row;
+    endif
+  repeat while (more user rows)
+}
+
+partition "Similarity Calculation" {
+  if (normalized_matrix.shape valid?) then (yes)
+    :product_similarity = cosine_similarity(normalized_matrix.T);
+    note right
+      .T oznacza transpozycję -
+      oblicza podobieństwo między produktami
+    end note
+  else (no)
+    :return 0;
+    stop
+  endif
+}
+
+partition "Database Update" {
+  :ProductSimilarity.objects.filter(similarity_type="collaborative").delete();
+  
   :similarities_to_create = [];
-  :ProductSimilarity.objects.bulk_create();
+  :similarity_count = 0;
+  :similarity_threshold = 0.3;
+  
+  repeat
+    repeat
+      if (i != j AND product_similarity[i][j] > similarity_threshold?) then (yes)
+        :create ProductSimilarity object;
+        :similarities_to_create.append(similarity);
+        :similarity_count += 1;
+        
+        if (len(similarities_to_create) >= 1000?) then (yes)
+          :ProductSimilarity.objects.bulk_create(similarities_to_create);
+          :similarities_to_create = [];
+        endif
+      endif
+    repeat while (more product2)
+  repeat while (more product1)
+  
+  if (similarities_to_create?) then (yes)
+    :ProductSimilarity.objects.bulk_create(similarities_to_create);
+  endif
+  
+  :print(f"Created {similarity_count} collaborative similarities");
 }
 
-:cache.set(cache_key, similarity_count, 7200s);
+partition "Cache & Response" {
+  :cache.set(cache_key, similarity_count, timeout=7200);
+  :return similarity_count;
+}
+
+partition "User Recommendations Generation" {
+  :GenerateUserRecommendationsView.post();
+  :user_orders = Order.objects.filter(user=request.user);
+  :cart_items = CartItem.objects.filter(user=request.user);
+  
+  :user_products = [extract product_ids from orders and cart];
+  :recommendations = defaultdict(float);
+  
+  repeat
+    :similarities = ProductSimilarity.objects.filter(
+      product1_id=product_id, 
+      similarity_type="collaborative"
+    ).order_by("-similarity_score")[:5];
+    
+    repeat
+      :recommendations[similarity.product2_id] += float(similarity.similarity_score);
+    repeat while (more similarities)
+  repeat while (more user products)
+  
+  repeat
+    :UserProductRecommendation.objects.update_or_create();
+  repeat while (more recommendations)
+}
+
+partition "Frontend Display" {
+  :fetchRecommendationPreview("collaborative");
+  :GET /api/recommendation-preview/;
+  :Wyświetl podgląd rekomendowanych produktów;
+  :toast.success("Collaborative algorithm applied successfully!");
+}
+
 stop
 @enduml

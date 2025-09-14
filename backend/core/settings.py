@@ -1,3 +1,11 @@
+"""
+Django settings for product recommendation system.
+
+This module contains all configuration settings for the Django application
+including database configuration, authentication, caching, and API setup.
+For development and production environments.
+"""
+
 from pathlib import Path
 import os
 import environ
@@ -25,6 +33,12 @@ INSTALLED_APPS = [
     "corsheaders",
 ]
 
+"""
+Django REST Framework configuration.
+
+Configures JWT authentication as the default authentication method
+and sets permissive access permissions for API endpoints.
+"""
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -32,6 +46,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
 }
 
+"""
+JWT (JSON Web Token) authentication settings.
+
+Defines token lifetimes, rotation policies, and security parameters
+for user authentication tokens used in the API.
+"""
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -72,6 +92,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
+"""
+Database configuration.
+
+Sets up PostgreSQL as the primary database with connection parameters
+loaded from environment variables for security and flexibility
+across different deployment environments.
+"""
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -116,6 +143,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+"""
+Caching configuration.
+
+Configures database-based caching for recommendation system with
+performance optimization settings including maximum entries limit
+and cache culling frequency for memory management.
+"""
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
@@ -127,6 +161,15 @@ CACHES = {
     }
 }
 
+"""
+Cache timeout constants.
+
+Defines different timeout periods for various types of cached data
+to optimize performance and data freshness across the application.
+- SHORT: For frequently changing data (5 minutes)
+- MEDIUM: For moderately stable data (30 minutes)  
+- LONG: For stable data that rarely changes (2 hours)
+"""
 CACHE_TIMEOUT_SHORT = 300 
 CACHE_TIMEOUT_MEDIUM = 1800 
-CACHE_TIMEOUT_LONG = 7200 
+CACHE_TIMEOUT_LONG = 7200
