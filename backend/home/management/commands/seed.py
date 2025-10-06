@@ -354,7 +354,25 @@ def seed_tags():
 
 
 def seed_products():
+    print(Fore.YELLOW + "Clearing old product data...")
+    
+    SalesForecast.objects.all().delete()
+    ProductDemandForecast.objects.all().delete()
+    PurchaseProbability.objects.all().delete()
+    RiskAssessment.objects.all().delete()
+    ProductSimilarity.objects.all().delete()
+    ProductAssociation.objects.all().delete()
+    ProductSentimentSummary.objects.all().delete()
+    SentimentAnalysis.objects.all().delete()
+    OrderProduct.objects.all().delete()
+    Opinion.objects.all().delete()
+    Complaint.objects.all().delete()
+    PhotoProduct.objects.all().delete()
+    Specification.objects.all().delete()
+    
     Product.objects.all().delete()
+    
+    print(Fore.GREEN + "Old data cleared successfully!")
 
     products = [
         {

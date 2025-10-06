@@ -51,9 +51,9 @@ services:
         echo 'First run - initializing database...' &&
         python manage.py makemigrations &&
         python manage.py migrate &&
-        python manage.py createcachetable &&
-        python manage.py seed &&
         python manage.py createcachetable recommendation_cache_table &&
+        echo 'Running seed command...' &&
+        python manage.py seed || echo 'Seed failed, but continuing...' &&
         if [ -f check_media.py ]; then python check_media.py; fi &&
         touch /app/.db_initialized &&
         echo 'Database initialized!'
