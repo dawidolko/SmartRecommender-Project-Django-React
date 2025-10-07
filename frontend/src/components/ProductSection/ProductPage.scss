@@ -35,7 +35,6 @@
     }
   }
 
-  // Favorite button - floating
   &__fav-btn {
     position: fixed;
     top: 120px;
@@ -75,7 +74,6 @@
     }
   }
 
-  // Top section - Gallery + Info
   &__top-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -109,7 +107,6 @@
     }
   }
 
-  // Gallery section
   &__gallery {
     display: flex;
     flex-direction: column;
@@ -244,7 +241,6 @@
     max-width: 100%;
     overflow: hidden;
 
-    // Slider customization for thumbnails
     .slick-slider {
       position: relative;
       padding: 0 40px;
@@ -287,7 +283,6 @@
       align-items: center;
     }
 
-    // Thumbnail slider arrows
     .slick-arrow {
       position: absolute;
       top: 50%;
@@ -342,7 +337,6 @@
       }
     }
 
-    // Custom arrow icons
     .slick-prev::after {
       content: "‹";
       font-size: 24px;
@@ -410,7 +404,7 @@
     height: 80px;
     object-fit: cover;
     border-radius: 8px;
-    border: 3px solid transparent;
+    border: 3px solid lighten($product-page-bg, 10%);
     cursor: pointer;
     transition: all 0.3s ease;
     display: block !important;
@@ -419,7 +413,6 @@
 
     &:hover {
       border-color: $btn-primary-blue;
-      transform: translateY(-3px);
     }
 
     &--active {
@@ -444,7 +437,6 @@
     }
   }
 
-  // Product Info section
   &__info {
     display: flex;
     flex-direction: column;
@@ -678,14 +670,13 @@
     }
   }
 
-  // Quick recommendations in info section
   &__quick-recommendations {
     margin-top: 30px;
     padding-top: 30px;
     border-top: 2px solid lighten($product-page-bg, 5%);
 
     @media (max-width: 768px) {
-      display: none; // Hide on mobile to save space
+      display: none;
     }
   }
 
@@ -710,12 +701,11 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 1px solid transparent;
+    border: 2px solid lighten($product-page-bg, 8%);
 
     &:hover {
       background: $realwhite;
       border-color: $btn-primary-blue;
-      transform: translateX(4px);
       box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
     }
   }
@@ -759,7 +749,6 @@
     margin: 0;
   }
 
-  // Details section with tabs
   &__details {
     background: $realwhite;
     border-radius: 16px;
@@ -920,7 +909,6 @@
     padding: 40px;
   }
 
-  // Reviews
   &__review {
     padding: 24px;
     border: 1px solid lighten($dashboard-summary-border, 10%);
@@ -979,7 +967,6 @@
     margin: 0;
   }
 
-  // Similar products
   &__similar-products {
     margin-top: 60px;
     padding: 50px 40px;
@@ -1019,11 +1006,10 @@
     background: $realwhite;
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid lighten($dashboard-summary-border, 10%);
+    border: 2px solid lighten($dashboard-summary-border, 10%);
     transition: all 0.3s ease;
 
     &:hover {
-      transform: translateY(-8px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       border-color: $btn-primary-blue;
     }
@@ -1081,7 +1067,6 @@
     padding: 40px;
   }
 
-  // Image overlay
   &__overlay {
     position: fixed;
     top: 0;
@@ -1139,7 +1124,6 @@
     cursor: default;
   }
 
-  // Slider customization
   .slick-dots {
     bottom: -40px;
 
@@ -1195,23 +1179,24 @@
   }
 }
 
-// Loading spinner
 .loading-spinner {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh;
   font-size: 2rem;
   color: $btn-primary-blue;
+  width: 100%;
 
   &::after {
     content: "";
+    display: block;
     width: 50px;
     height: 50px;
     border: 5px solid lighten($btn-primary-blue, 30%);
     border-top-color: $btn-primary-blue;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
   }
 }
 

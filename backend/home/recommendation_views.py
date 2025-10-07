@@ -121,15 +121,12 @@ class ProcessRecommendationsView(APIView):
         normalized_matrix = np.zeros_like(matrix, dtype=np.float32)
         
         for i, user_row in enumerate(matrix):
-            # Calculate mean only from purchased items (non-zero values)
             purchased_items = user_row[user_row > 0]
             
             if len(purchased_items) > 0:
                 user_mean = np.mean(purchased_items)
-                # Subtract user mean from all values (mean-centering)
                 normalized_matrix[i] = user_row - user_mean
             else:
-                # User has no purchases, keep zeros
                 normalized_matrix[i] = user_row
 
         if normalized_matrix.shape[0] > 1 and normalized_matrix.shape[1] > 1:

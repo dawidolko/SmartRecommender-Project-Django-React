@@ -22,49 +22,33 @@ const CartProduct = ({ id, name, price, photos, removeItemFromCart }) => {
 
   return (
     <tr className="cart__tr" key={id}>
-      <td
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          paddingBottom: "50px",
-        }}>
+      <td className="cart__img-cell">
         <img className="cart__img" src={img} alt={name} />
       </td>
-      <td style={{ textAlign: "center" }} className="cart__name">
+      <td className="cart__name">
         <Link to={`/product/${id}`} className="cart__product-name">
           {name}
         </Link>
       </td>
-      <td
-        className="cart__action"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingBottom: "44px",
-        }}>
+      <td className="cart__action">
         <button
           className="cart__action-btn"
           onClick={() => removeFromCart(id)}
-          aria-label={`Decrease quantity of ${name}`}
-          style={{ margin: "0 5px" }}>
+          aria-label={`Decrease quantity of ${name}`}>
           <AiOutlineMinus className="cart__action-icon" />
         </button>
-        <span className="cart__action-quantity" style={{ margin: "0 10px" }}>
-          {itemQuantity}
-        </span>
+        <span className="cart__action-quantity">{itemQuantity}</span>
         <button
           className="cart__action-btn"
           onClick={() => addToCart(id)}
-          aria-label={`Increase quantity of ${name}`}
-          style={{ margin: "0 5px" }}>
+          aria-label={`Increase quantity of ${name}`}>
           <AiOutlinePlus className="cart__action-icon" />
         </button>
       </td>
-      <td style={{ textAlign: "center" }} className="cart__total">
+      <td className="cart__total">
         ${totalProductAmount ? totalProductAmount.toFixed(2) : "0.00"}
       </td>
-      <td style={{ textAlign: "center" }} className="cart__remove">
+      <td className="cart__remove">
         <button className="cart__remove-btn" onClick={handleRemoveItem}>
           <AiOutlineClose />
         </button>

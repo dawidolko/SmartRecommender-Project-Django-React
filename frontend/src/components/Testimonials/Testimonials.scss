@@ -41,11 +41,10 @@
     background-color: rgb(235, 233, 233);
     text-align: center;
     padding: 1.5em;
-    height: 420px;
+    height: 390px;
     box-sizing: border-box;
     transition: box-shadow 0.3s ease, background-color 0.3s ease;
 
-    // Flexbox layout for consistent alignment
     display: flex;
     flex-direction: column;
 
@@ -74,12 +73,12 @@
   &__img {
     width: 100%;
     max-width: 250px;
-    height: 180px; // Fixed height for all images
+    height: 180px;
     margin-bottom: 0.5em;
     object-fit: cover;
     border-radius: 4px;
     transition: transform 0.3s ease;
-    flex-shrink: 0; // Don't shrink image
+    flex-shrink: 0;
 
     &:hover {
       transform: scale(1.02);
@@ -97,7 +96,7 @@
     min-width: 100%;
     text-transform: uppercase;
     font-weight: bold;
-    flex-shrink: 0; // Don't shrink category
+    flex-shrink: 0;
   }
 
   &__name {
@@ -105,18 +104,17 @@
     font-weight: 500;
     margin-bottom: 0.3em;
     transition: color 0.3s ease;
-    
-    // Limit to 2 lines with ellipsis
+
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    line-clamp: 2; // Standard property
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.3em;
-    max-height: 2.6em; // 2 lines * 1.3em line-height
-    min-height: 2.6em; // Always reserve space for 2 lines
-    flex-shrink: 0; // Don't shrink name
+    max-height: 2.6em;
+    min-height: 2.6em;
+    flex-shrink: 0;
 
     &:hover {
       text-decoration: underline;
@@ -128,8 +126,8 @@
   &__price {
     font-weight: 500;
     font-size: 1.6rem;
-    margin-top: auto; // Push price to bottom of flex container
-    padding-top: 0.5em; // Small spacing from name
+    margin-top: auto;
+    padding-top: 0.5em;
   }
 
   &__old-price {

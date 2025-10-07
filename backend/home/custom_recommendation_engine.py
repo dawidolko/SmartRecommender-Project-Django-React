@@ -407,7 +407,7 @@ class CustomFuzzySearch:
                         "desc_score": round(desc_score, 3),
                         "category_score": round(category_score, 3),
                         "spec_score": round(spec_score, 3),
-                        "tag_score": round(tag_score, 3),  # NOWE
+                        "tag_score": round(tag_score, 3), 
                     }
                 )
 
@@ -470,8 +470,8 @@ class CustomAssociationRules:
         """
         self.min_support = min_support
         self.min_confidence = min_confidence
-        self.max_transactions = 3000  # Optimization: limit dataset size
-        self.max_items_per_transaction = 20  # Optimization: limit item count
+        self.max_transactions = 3000 
+        self.max_items_per_transaction = 20 
 
     def generate_association_rules(self, transactions):
         """Generates association rules with bitmap pruning optimization"""

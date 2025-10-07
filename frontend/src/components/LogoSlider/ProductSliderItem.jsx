@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
+import { toast } from "react-toastify";
 import config from "../../config/config";
 
 const ProductSliderItem = ({ id, photos, name, price }) => {
@@ -18,6 +19,11 @@ const ProductSliderItem = ({ id, photos, name, price }) => {
     e.stopPropagation();
     if (favorite) {
       removeFromFavorites(id);
+      toast.success("Removed from Favorites", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "colored",
+      });
     } else {
       addToFavorites({
         id,
@@ -26,6 +32,11 @@ const ProductSliderItem = ({ id, photos, name, price }) => {
           : "https://via.placeholder.com/150",
         name,
         price,
+      });
+      toast.success("Added to Favorites", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "colored",
       });
     }
   };

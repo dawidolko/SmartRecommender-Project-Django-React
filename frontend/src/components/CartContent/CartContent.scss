@@ -58,10 +58,16 @@
     font-size: 1.2rem;
   }
 
-  &__tr > * {
-    padding: 0.3em;
-    font-size: 1.2rem;
-    border-bottom: 1px solid $table-border;
+  &__tr {
+    min-height: 134px;
+
+    > * {
+      padding: 0.3em;
+      font-size: 1.2rem;
+      border-bottom: 1px solid $table-border;
+      vertical-align: middle;
+      min-height: 134px;
+    }
   }
 
   &__img {
@@ -73,12 +79,40 @@
     }
   }
 
+  &__img-cell {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__name {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__total {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__remove {
+    text-align: center;
+    vertical-align: middle;
+  }
+
   &__action {
+    text-align: center;
+    vertical-align: middle;
+
+    @media screen and (max-width: 768px) {
+      min-width: 90px;
+    }
+
     &-btn {
       padding: 0.15em;
       background-color: $action-btn-bg;
       border: 1px solid $action-btn-bg;
       border-radius: 3px;
+      margin: 0 5px;
 
       &:hover {
         background: $action-btn-hover;
@@ -93,8 +127,9 @@
     }
 
     &-quantity {
-      margin: 0 0.5em;
+      margin: 0 10px;
       font-weight: bold;
+      display: inline-block;
     }
   }
 
@@ -238,6 +273,7 @@
       max-width: 400px;
       flex-direction: column;
       align-items: center;
+      height: 100%;
 
       &:hover {
         box-shadow: 0 4px 8px $recommendation-hover-shadow;
@@ -248,11 +284,13 @@
 
     &-image {
       width: 50%;
+      height: 150px;
       object-fit: cover;
       border-radius: 4px;
       margin-bottom: 0.5rem;
       cursor: pointer;
       transition: transform 0.2s ease;
+      flex-shrink: 0;
 
       &:hover {
         transform: scale(1.05);
@@ -264,6 +302,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
+      flex: 1;
     }
 
     &-name {
@@ -272,6 +312,16 @@
       color: $recommendations-title;
       cursor: pointer;
       text-decoration: none;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-height: 2.6em;
+      max-height: 2.6em;
+      line-height: 1.3em;
+      flex-shrink: 0;
 
       &:hover {
         color: $blue;
@@ -283,12 +333,14 @@
       font-weight: bold;
       color: $recommendation-price;
       margin-bottom: 0.5rem;
+      flex-shrink: 0;
     }
 
     &-stats {
       font-size: 0.85rem;
       color: $recommendations-loading;
       margin-bottom: 0.5rem;
+      flex-shrink: 0;
     }
 
     &-button {
@@ -300,6 +352,8 @@
       border-radius: 4px;
       cursor: pointer;
       transition: background 0.3s ease;
+      margin-top: auto;
+      flex-shrink: 0;
 
       &:hover {
         background: $transparent-bg;
@@ -355,7 +409,7 @@
   }
 }
 
-@media (min-width: 520px) {
+@media (min-width: 768px) {
   .cart {
     &__row > * {
       padding: 1em;
@@ -363,9 +417,15 @@
       text-align: left;
     }
 
-    &__tr > * {
-      padding: 0.8em;
-      font-size: 1.4rem;
+    &__tr {
+      min-height: 140px;
+
+      > * {
+        padding: 0.8em;
+        font-size: 1.4rem;
+        min-height: 140px;
+        min-width: 120px;
+      }
     }
 
     &__img {

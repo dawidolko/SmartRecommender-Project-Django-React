@@ -2,16 +2,28 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import "./CartPreview.scss";
 import { AiOutlineClose, AiOutlineShopping } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import config from "../../config/config";
 import { CartContext } from "../ShopContext/ShopContext";
 
 const BASE_URL = `${config.apiUrl}`;
 
 const CartPreview = () => {
-  const { items, totalCartItems } = useContext(CartContext);
+  const { items, totalCartItems, addToCart, removeFromCart } =
+    useContext(CartContext);
   const [showCart, setShowCart] = useState(false);
   const [products, setProducts] = useState({});
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (totalCartItems() === 0) return;
@@ -42,30 +54,48 @@ const CartPreview = () => {
 
   const changeQuantity = (itemId, action) => {
     if (action === "increase") {
-      items[itemId] = (items[itemId] || 0) + 1;
+      addToCart(itemId);
     } else if (action === "decrease") {
-      if (items[itemId] === 1) {
-        removeItem(itemId);
-      } else {
-        items[itemId] -= 1;
-      }
+      removeFromCart(itemId);
     }
   };
 
   const removeItem = (itemId) => {
-    delete items[itemId];
+    const quantity = items[itemId] || 0;
+    for (let i = 0; i < quantity; i++) {
+      removeFromCart(itemId);
+    }
+  };
+
+  const handleCartClick = () => {
+    if (isMobile) {
+      navigate("/cart");
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (!isMobile) {
+      setShowCart(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile) {
+      setShowCart(false);
+    }
   };
 
   return (
     <div
       className="cart-preview"
-      onMouseEnter={() => setShowCart(true)}
-      onMouseLeave={() => setShowCart(false)}>
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleCartClick}>
       <div className="cart-icon">
         <AiOutlineShopping />
         <span className="cart-count">{totalCartItems()}</span>
       </div>
-      {showCart && (
+      {!isMobile && showCart && (
         <div className="cart-dropdown">
           <h4>Cart ({totalCartItems()})</h4>
           {totalCartItems() > 0 ? (

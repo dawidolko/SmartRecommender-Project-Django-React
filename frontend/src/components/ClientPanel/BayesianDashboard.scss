@@ -172,6 +172,10 @@
     margin: 20px 0;
     position: relative;
 
+    @media screen and (max-width: 768px) {
+      height: unset;
+    }
+
     &.small {
       height: 200px;
     }

@@ -225,20 +225,25 @@ const Navbar = () => {
                       onMouseLeave={(e) => {
                         e.currentTarget.classList.remove("hover");
                       }}>
-                      <p className="navbar__main-category-name">
+                      <NavLink
+                        to={`/category/${mainCategory}`}
+                        className="navbar__main-category-name"
+                        onClick={closeNav}>
                         {mainCategory.toUpperCase()}
-                      </p>
-                      <div className="navbar__subcategories">
-                        {subCategories.map((subCategory) => (
-                          <NavLink
-                            key={subCategory}
-                            to={`/category/${mainCategory}.${subCategory}`}
-                            className="navbar__dropdown-item"
-                            onClick={closeNav}>
-                            {subCategory}
-                          </NavLink>
-                        ))}
-                      </div>
+                      </NavLink>
+                      {subCategories.length > 0 && (
+                        <div className="navbar__subcategories">
+                          {subCategories.map((subCategory) => (
+                            <NavLink
+                              key={subCategory}
+                              to={`/category/${mainCategory}.${subCategory}`}
+                              className="navbar__dropdown-item"
+                              onClick={closeNav}>
+                              {subCategory}
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

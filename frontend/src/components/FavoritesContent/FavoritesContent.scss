@@ -35,13 +35,34 @@
     font-size: 1.2rem;
   }
 
-  &__tr > * {
-    padding: 0.3em;
-    font-size: 1.2rem;
-    border-bottom: 1px solid $table-border;
+  &__tr {
+    min-height: 134px;
+
+    > * {
+      padding: 0.3em;
+      font-size: 1.2rem;
+      border-bottom: 1px solid $table-border;
+      vertical-align: middle;
+      min-height: 134px;
+    }
   }
 
   &__td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__img-cell {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__name-cell {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__actions-cell {
     text-align: center;
     vertical-align: middle;
   }
@@ -176,9 +197,14 @@
       text-align: left;
     }
 
-    &__tr > * {
-      padding: 0.8em;
-      font-size: 1.4rem;
+    &__tr {
+      min-height: 140px;
+
+      > * {
+        padding: 0.8em;
+        font-size: 1.4rem;
+        min-height: 140px;
+      }
     }
 
     &__img {

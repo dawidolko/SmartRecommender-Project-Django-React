@@ -53,7 +53,6 @@ class SentimentSearchAPIView(APIView):
         if not query:
             return Response([], status=200)
 
-        # Step 1: Filter products matching search query
         products = (
             Product.objects.filter(
                 Q(name__icontains=query)
@@ -67,37 +66,30 @@ class SentimentSearchAPIView(APIView):
             .distinct()
         )
 
-        # Step 2: Calculate comprehensive sentiment score for each product
         analyzer = CustomSentimentAnalysis()
         products_with_scores = []
         
         for product in products:
-            # Analyze opinions (40% weight)
             opinion_scores = []
-            opinions = product.opinion_set.all()[:20]  # Limit for performance
+            opinions = product.opinion_set.all()[:20] 
             for opinion in opinions:
                 score, _ = analyzer.analyze_sentiment(opinion.content)
                 opinion_scores.append(score)
             opinion_sentiment = sum(opinion_scores) / len(opinion_scores) if opinion_scores else 0.0
             
-            # Analyze product description (25% weight)
             desc_score, _ = analyzer.analyze_sentiment(product.description or "")
             
-            # Analyze product name (15% weight)
             name_score, _ = analyzer.analyze_sentiment(product.name)
             
-            # Analyze specifications (12% weight)
             spec_texts = []
             for spec in product.specification_set.all()[:10]:
                 spec_texts.append(f"{spec.parameter_name} {spec.specification}")
             spec_combined = " ".join(spec_texts)
             spec_score, _ = analyzer.analyze_sentiment(spec_combined) if spec_combined else (0.0, "neutral")
             
-            # Analyze categories (8% weight)
             category_names = " ".join([cat.name for cat in product.categories.all()])
             category_score, _ = analyzer.analyze_sentiment(category_names) if category_names else (0.0, "neutral")
             
-            # Calculate weighted final score
             final_score = (
                 opinion_sentiment * 0.40 +
                 desc_score * 0.25 +
@@ -117,17 +109,14 @@ class SentimentSearchAPIView(APIView):
                 'opinion_count': len(opinion_scores)
             })
         
-        # Step 3: Sort by final sentiment score (DESC)
         products_with_scores.sort(key=lambda x: x['final_score'], reverse=True)
         
-        # Step 4: Serialize and attach sentiment metrics
         serializer = ProductSerializer([item['product'] for item in products_with_scores], many=True)
         data = serializer.data
         
         for i, item in enumerate(products_with_scores):
             product = item['product']
-            
-            # Attach comprehensive sentiment breakdown
+
             data[i]["sentiment_score"] = round(item['final_score'], 3)
             data[i]["sentiment_breakdown"] = {
                 "opinion_score": round(item['opinion_score'], 3),
@@ -138,7 +127,6 @@ class SentimentSearchAPIView(APIView):
             }
             data[i]["total_opinions"] = item['opinion_count']
             
-            # Legacy fields for backwards compatibility
             if hasattr(product, "sentiment_summary") and product.sentiment_summary:
                 data[i]["positive_count"] = product.sentiment_summary.positive_count
                 data[i]["negative_count"] = product.sentiment_summary.negative_count
@@ -177,7 +165,6 @@ class SentimentAnalysisDebugAPI(APIView):
         
         analyzer = CustomSentimentAnalysis()
         
-        # === 1. ANALYZE OPINIONS (40% weight) ===
         opinions = Opinion.objects.filter(product=product)[:5]
         opinion_details = []
         opinion_scores = []
@@ -206,20 +193,17 @@ class SentimentAnalysisDebugAPI(APIView):
         
         opinion_avg = sum(opinion_scores) / len(opinion_scores) if opinion_scores else 0.0
         
-        # === 2. ANALYZE DESCRIPTION (25% weight) ===
         desc_text = product.description or ""
         desc_score, desc_category = analyzer.analyze_sentiment(desc_text)
         desc_words = desc_text.lower().split()
         desc_positive = sum(1 for word in desc_words if word in analyzer.positive_words)
         desc_negative = sum(1 for word in desc_words if word in analyzer.negative_words)
         
-        # === 3. ANALYZE NAME (15% weight) ===
         name_score, name_category = analyzer.analyze_sentiment(product.name)
         name_words = product.name.lower().split()
         name_positive = sum(1 for word in name_words if word in analyzer.positive_words)
         name_negative = sum(1 for word in name_words if word in analyzer.negative_words)
         
-        # === 4. ANALYZE SPECIFICATIONS (12% weight) ===
         spec_texts = []
         spec_details = []
         for spec in product.specification_set.all()[:10]:
@@ -243,14 +227,12 @@ class SentimentAnalysisDebugAPI(APIView):
         spec_combined = " ".join(spec_texts)
         spec_score, spec_category = analyzer.analyze_sentiment(spec_combined) if spec_combined else (0.0, "neutral")
         
-        # === 5. ANALYZE CATEGORIES (8% weight) ===
         category_names = " ".join([cat.name for cat in product.categories.all()])
         category_score, category_cat = analyzer.analyze_sentiment(category_names) if category_names else (0.0, "neutral")
         cat_words = category_names.lower().split()
         cat_positive = sum(1 for word in cat_words if word in analyzer.positive_words)
         cat_negative = sum(1 for word in cat_words if word in analyzer.negative_words)
         
-        # === 6. CALCULATE FINAL WEIGHTED SCORE ===
         final_score = (
             opinion_avg * 0.40 +
             desc_score * 0.25 +

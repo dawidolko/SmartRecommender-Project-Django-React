@@ -2,8 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import CartModal from "./CartModal";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import axios from "axios";
 import config from "../../config/config";
 
@@ -97,7 +96,6 @@ const TotalAmount = () => {
   return (
     <>
       <div className="cart__info">
-        <ToastContainer />
         <h3 className="cart__info-title">Cart Total</h3>
         <p className="cart__total-amount">
           Total Price: ${formattedTotalAmount}

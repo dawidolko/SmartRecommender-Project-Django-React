@@ -8,7 +8,7 @@ const teamData = [
     img: team2,
     alt: "Photo of Piotr Smoła - Co-creator of SmartRecommender.",
     name: "Piotr Smoła",
-    role: "Co-creator & Backend Developer",
+    role: "Co-creator & Frontend Developer",
     description:
       "One of the main creators of SmartRecommender, specializing in backend development, database design, and system architecture.",
     facebook: "https://www.facebook.com/profile.php?id=100008145638313",
@@ -32,7 +32,7 @@ const teamData = [
     img: team1,
     alt: "Photo of Dawid Olko - Co-creator of SmartRecommender.",
     name: "Dawid Olko",
-    role: "Co-creator & Data Scientist",
+    role: "Co-creator & Frontend Developer",
     description:
       "One of the main creators of SmartRecommender, focusing on machine learning algorithms, recommendation systems, and frontend development.",
     facebook: "https://www.facebook.com/olkodawid/",

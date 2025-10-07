@@ -10,17 +10,15 @@ const FavoritesProduct = ({ product, onMoveToCart, onRemoveFromFavorites }) => {
 
   return (
     <tr className="favorites__tr" key={id}>
-      <td
-        className="favorites__td"
-        style={{ display: "flex", justifyContent: "center" }}>
+      <td className="favorites__td favorites__img-cell">
         <img className="favorites__img" src={imageUrl} alt={name} />
       </td>
-      <td className="favorites__td">
+      <td className="favorites__td favorites__name-cell">
         <Link to={`/product/${id}`} className="favorites__product-name">
           {name}
         </Link>
       </td>
-      <td className="favorites__td">
+      <td className="favorites__td favorites__actions-cell">
         <button
           className="favorites__action-btn"
           onClick={() => onMoveToCart(id)}>

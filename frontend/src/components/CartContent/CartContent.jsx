@@ -6,6 +6,7 @@ import CartProduct from "./CartProduct";
 import TotalAmount from "./TotalAmount";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import config from "../../config/config";
 
 const CartContent = () => {
@@ -70,6 +71,11 @@ const CartContent = () => {
 
   const handleAddToCart = (productId) => {
     addToCart(productId);
+    toast.success("Added to Cart", {
+      position: "top-center",
+      autoClose: 3000,
+      theme: "colored",
+    });
   };
 
   const handleImageClick = (imageUrl, productName) => {

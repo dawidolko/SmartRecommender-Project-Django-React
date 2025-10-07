@@ -5,6 +5,7 @@ import { useFavorites } from "./FavoritesContext";
 import { CartContext } from "../ShopContext/ShopContext";
 import FavoritesProduct from "./FavoritesProduct";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import config from "../../config/config";
 
 const FavoritesContent = () => {
@@ -31,11 +32,21 @@ const FavoritesContent = () => {
     if (product) {
       addToCart(product.id);
       removeFromFavorites(product.id);
+      toast.success("Moved to Cart", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
   };
 
   const handleRemoveFromFavorites = (productId) => {
     removeFromFavorites(productId);
+    toast.success("Removed from Favorites", {
+      position: "top-center",
+      autoClose: 3000,
+      theme: "colored",
+    });
   };
 
   return (

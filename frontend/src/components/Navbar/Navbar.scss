@@ -66,11 +66,18 @@
           color: $cart-dropdown-text;
           cursor: pointer;
           text-transform: uppercase;
-          padding: 2px;
+          padding: 0.5rem 0.8rem;
+          text-decoration: none;
+          display: block;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+          font-weight: 500;
         }
 
         .navbar__main-category-name:hover {
           color: $btn-primary-blue;
+          background-color: rgba(66, 153, 225, 0.1);
+          transform: translateX(3px);
         }
 
         .navbar__subcategories {

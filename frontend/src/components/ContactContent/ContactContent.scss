@@ -108,12 +108,16 @@
     padding: 0.8em 1.8em;
     width: fit-content;
     background-color: $main;
+    border: 2px solid $main;
     color: $white;
-    transition: background-color 0.3s ease;
     margin-top: 0.5em;
+    font-size: 1.5rem;
+    max-width: unset;
 
     &:hover {
-      background-color: $dark;
+      background-color: transparent;
+      color: $main;
+      border: 2px solid $main;
     }
   }
 

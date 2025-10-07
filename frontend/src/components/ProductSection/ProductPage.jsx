@@ -3,8 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
 import { AuthContext } from "../../context/AuthContext";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import {
   AiOutlineHeart,
   AiFillHeart,
@@ -91,18 +90,21 @@ const ProductPage = () => {
 
       setSimilarProductsLoading(true);
       try {
-        const category = product.categories[0];
+        const fullCategory = product.categories[0];
+        const mainCategory = fullCategory.split(".")[0];
         const token = localStorage.getItem("access");
         const headers = {};
         if (token) headers.Authorization = `Bearer ${token}`;
 
         const response = await axios.get(`${config.apiUrl}/api/products/`, {
-          params: { category: category },
+          params: { category: mainCategory },
           headers: headers,
         });
 
         const filteredProducts = response.data.filter(
-          (p) => p.id !== product.id
+          (p) =>
+            p.id !== product.id &&
+            p.categories.some((cat) => cat.startsWith(mainCategory))
         );
         const sortedProducts = filteredProducts.sort(() => 0.5 - Math.random());
         setSimilarProducts(sortedProducts.slice(0, 10));
@@ -513,7 +515,6 @@ const ProductPage = () => {
           </div>
         )}
       </div>
-      <ToastContainer />
     </section>
   );
 };
