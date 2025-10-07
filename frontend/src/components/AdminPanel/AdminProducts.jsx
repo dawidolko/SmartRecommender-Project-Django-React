@@ -271,7 +271,7 @@ const AdminProducts = () => {
       }
 
       try {
-        const rulesRes = await axios.post(
+        await axios.post(
           `${config.apiUrl}/api/update-association-rules/`,
           {},
           {
@@ -379,7 +379,7 @@ const AdminProducts = () => {
       }
 
       try {
-        const rulesRes = await axios.post(
+        await axios.post(
           `${config.apiUrl}/api/update-association-rules/`,
           {},
           {
