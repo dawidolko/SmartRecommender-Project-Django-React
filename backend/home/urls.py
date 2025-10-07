@@ -57,6 +57,7 @@ from .association_views import (
     FrequentlyBoughtTogetherAPI,
     UpdateAssociationRulesAPI,
     AssociationRulesAnalysisAPI,
+    ProductAssociationDebugAPI,
 )
 
 from .probabilistic_views import (
@@ -221,6 +222,11 @@ urlpatterns = [
         "api/association-rules-analysis/",
         AssociationRulesAnalysisAPI.as_view(),
         name="association-rules-analysis",
+    ),
+    path(
+        "api/product-association-debug/",
+        ProductAssociationDebugAPI.as_view(),
+        name="product-association-debug",
     ),
     path(
         "api/markov-recommendations/",

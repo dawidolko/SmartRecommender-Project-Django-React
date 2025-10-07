@@ -49,13 +49,20 @@ package "Custom Algorithm - custom_recommendation_engine.py" {
     -max_transactions: int = 3000
     -max_items_per_transaction: int = 20
     --
+    +__init__(min_support, min_confidence)
     +generate_association_rules(transactions): list
-    +_find_frequent_itemsets_with_bitmap(transactions): dict
-    +_generate_2_itemsets_with_bitmap(): dict
-    +_generate_optimized_rules_from_itemsets(): list
+    -_find_frequent_itemsets_with_bitmap(transactions): dict
+    -_generate_2_itemsets_with_bitmap(transaction_bitmaps, frequent_items, item_to_id, min_count_threshold, total_transactions): dict
+    -_generate_optimized_rules_from_itemsets(frequent_itemsets, transactions): list
     --
-    Implementuje prawdziwy algorytm Apriori
-    z optymalizacją bitmap
+    **Wzory matematyczne (Agrawal & Srikant 1994):**
+    Support(X) = count(X) / |transactions|
+    Confidence(A→B) = Support(A,B) / Support(A)
+    Lift(A→B) = Support(A,B) / (Support(A) × Support(B))
+    --
+    **Optymalizacja bitmap (Zaki 2000):**
+    bitmap |= (1 << item_to_id[item])
+    (tb & pair_bitmap) == pair_bitmap
   }
 }
 

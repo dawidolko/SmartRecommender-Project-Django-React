@@ -1,0 +1,281 @@
+@startuml Association_Rules_Component
+!theme plain
+
+package "Frontend - React Application" {
+  
+  component "CartContent.jsx" as Cart {
+    port "API Calls" as CartAPI
+    [useEffect Hook]
+    [fetchRecommendations()]
+    [renderRecommendations()]
+    [handleAddToCart()]
+  }
+  
+  component "AdminStatistics.jsx" as Admin {
+    port "API Calls" as AdminAPI
+    [fetchAssociationRules()]
+    [updateAssociationRules()]
+    [renderRulesTable()]
+    [localStorage sync]
+  }
+  
+  note right of Cart
+    **Props/State:**
+    - items: CartContext
+    - recommendations: Array
+    - loading: boolean
+    
+    **Wyświetla:**
+    - Confidence %
+    - Lift value
+    - Product details
+  end note
+  
+  note right of Admin
+    **State:**
+    - associationRules: Array
+    - isUpdatingRules: boolean
+    - associationThresholds: Object
+    
+    **Features:**
+    - Rules table (Top 20)
+    - "Update Rules" button
+    - Cache-busting
+  end note
+}
+
+package "Backend - Django REST Framework" {
+  
+  component "association_views.py" as Views {
+    [FrequentlyBoughtTogetherAPI]
+    [UpdateAssociationRulesAPI]
+    [AssociationRulesListAPI]
+  }
+  
+  component "FrequentlyBoughtTogetherAPI" as FBT {
+    port "HTTP GET" as FBTHTTP
+    [get(request)]
+    [filter by cart products]
+    [order by lift, confidence]
+    [serialize top 5]
+  }
+  
+  component "UpdateAssociationRulesAPI" as Update {
+    port "HTTP POST" as UpdateHTTP
+    [post(request)]
+    [delete old rules]
+    [trigger generation]
+    [bulk_create new rules]
+    [invalidate cache]
+  }
+  
+  component "AssociationRulesListAPI" as List {
+    port "HTTP GET" as ListHTTP
+    [get(request)]
+    [check cache]
+    [query database]
+    [serialize with metrics]
+  }
+  
+  note right of FBT
+    **Endpoint:**
+    GET /api/frequently-bought-together/
+    ?product_ids[]=X&product_ids[]=Y
+    
+    **Query:**
+    ProductAssociation.objects.filter(
+      product_1_id__in=product_ids
+    ).select_related("product_2")
+    .order_by("-lift", "-confidence")[:5]
+  end note
+  
+  note right of Update
+    **Endpoint:**
+    POST /api/update-association-rules/
+    
+    **Permission:**
+    IsAuthenticated
+    
+    **Actions:**
+    1. Delete all rules
+    2. Fetch transactions
+    3. Run Apriori algorithm
+    4. Bulk insert [:500]
+    5. Cache invalidation
+  end note
+}
+
+package "Core Algorithm - custom_recommendation_engine.py" {
+  
+  component "CustomAssociationRules" as Algorithm {
+    port "Python API" as AlgoAPI
+    [__init__(min_support, min_confidence)]
+    [generate_association_rules(transactions)]
+    [_find_frequent_itemsets_with_bitmap()]
+    [_generate_2_itemsets_with_bitmap()]
+    [_generate_optimized_rules_from_itemsets()]
+  }
+  
+  note right of Algorithm
+    **Parametry:**
+    - min_support: float = 0.01
+    - min_confidence: float = 0.1
+    - max_transactions: int = 3000
+    - max_items_per_transaction: int = 20
+    
+    **Wzory matematyczne:**
+    Support(X) = count(X) / |transactions|
+    Confidence(A→B) = Support(A,B) / Support(A)
+    Lift(A→B) = Support(A,B) / (Support(A) × Support(B))
+    
+    **Źródła:**
+    - Agrawal & Srikant (1994)
+    - Brin, Motwani, Silverstein (1997)
+    - Zaki (2000) - bitmap optimization
+  end note
+  
+  component "Bitmap Optimization Module" as Bitmap {
+    [item_to_id mapping]
+    [transaction_bitmaps conversion]
+    [bitwise AND operations]
+    [count pair occurrences]
+  }
+  
+  Algorithm --> Bitmap : uses
+}
+
+package "Django ORM Models - models.py" {
+  
+  component "ProductAssociation Model" as PAModel {
+    database "PostgreSQL Table" as DB
+    [id: BigAutoField]
+    [product_1: ForeignKey]
+    [product_2: ForeignKey]
+    [support: FloatField]
+    [confidence: FloatField]
+    [lift: FloatField]
+    [created_at: DateTimeField]
+    [updated_at: DateTimeField]
+  }
+  
+  note right of PAModel
+    **Meta:**
+    unique_together = ('product_1', 'product_2')
+    db_table = 'method_productassociation'
+    indexes = [product_1_id, product_2_id]
+    
+    **Relations:**
+    Product (related_name='associations_from')
+    Product (related_name='associations_to')
+  end note
+  
+  component "Order Model" as OrderModel {
+    [id: BigAutoField]
+    [user: ForeignKey]
+    [date_order: DateTimeField]
+    [status: CharField]
+  }
+  
+  component "OrderProduct Model" as OPModel {
+    [id: BigAutoField]
+    [order: ForeignKey]
+    [product: ForeignKey]
+    [quantity: PositiveIntegerField]
+  }
+}
+
+package "Django Signals - signals.py" {
+  
+  component "Signal Handlers" as Signals {
+    port "Django Signals" as SigPort
+    [@receiver(post_save, sender=Order)]
+    [handle_new_order_and_analytics()]
+    [transaction.on_commit()]
+    [run_all_analytics_after_order()]
+    [generate_association_rules_after_order()]
+  }
+  
+  note right of Signals
+    **Trigger:**
+    Order.save() → post_save signal
+    
+    **Flow:**
+    1. Detect new order
+    2. Wait for transaction commit
+    3. Fetch last 1000 orders
+    4. Build transactions[]
+    5. Run CustomAssociationRules
+    6. Save to ProductAssociation
+    7. Invalidate cache
+  end note
+}
+
+package "Cache Layer - Django Cache Framework" {
+  
+  component "Cache Manager" as Cache {
+    database "Redis / Memcached" as CacheDB
+    [cache.get(cache_key)]
+    [cache.set(key, value, timeout)]
+    [cache.delete(cache_key)]
+  }
+  
+  note right of Cache
+    **Keys:**
+    - "association_rules_list"
+    - "association_rules_{len}_{support}_{confidence}"
+    
+    **Timeouts:**
+    - Rules list: 1800s (30 min)
+    - Algorithm results: 1800s
+    
+    **Invalidation triggers:**
+    - New order placed
+    - Manual update
+    - Timeout expiration
+  end note
+}
+
+package "Database - PostgreSQL" {
+  database "method_productassociation" as DBTable {
+    [Records: ~500 rules]
+    [Indexes: product_1_id, product_2_id]
+    [Unique constraint: (product_1, product_2)]
+  }
+}
+
+' Connections
+CartAPI --> FBTHTTP : HTTP GET
+AdminAPI --> UpdateHTTP : HTTP POST
+AdminAPI --> ListHTTP : HTTP GET
+
+FBT --> PAModel : Query
+Update --> Algorithm : Call
+Update --> PAModel : Bulk Create
+List --> Cache : Check
+List --> PAModel : Query
+
+Algorithm --> Bitmap : Uses
+
+Signals --> OrderModel : Listen
+Signals --> OPModel : Prefetch
+Signals --> Algorithm : Trigger
+Signals --> PAModel : Save
+
+PAModel --> DBTable : ORM
+Cache --> CacheDB : Store
+
+Update --> Cache : Invalidate
+List --> Cache : Read/Write
+
+note bottom of DBTable
+  **Sample Query:**
+  SELECT pa.*, p1.name, p2.name
+  FROM method_productassociation pa
+  JOIN product p1 ON pa.product_1_id = p1.id
+  JOIN product p2 ON pa.product_2_id = p2.id
+  WHERE pa.product_1_id IN (295, 341)
+  ORDER BY pa.lift DESC, pa.confidence DESC
+  LIMIT 5;
+end note
+
+@enduml

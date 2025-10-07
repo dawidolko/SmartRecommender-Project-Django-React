@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import "./CartPreview.scss";
@@ -39,7 +38,7 @@ const CartPreview = () => {
     };
 
     fetchProducts();
-  }, [items]);
+  }, [items, totalCartItems]);
 
   const changeQuantity = (itemId, action) => {
     if (action === "increase") {
@@ -81,11 +80,7 @@ const CartPreview = () => {
                       className="cart-item__img"
                     />
                     <div className="cart-item__details">
-                      <Link
-                        to={`/product/${product.id}`}
-                        className="cart-item__name">
-                        <p>{product.name}</p>
-                      </Link>
+                      <p className="cart-item__name">{product.name}</p>
                       <span>{product.price} $</span>
                       <div className="cart-item__actions">
                         <button

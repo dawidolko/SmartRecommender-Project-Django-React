@@ -94,10 +94,21 @@ UC23 ..> UC8 : <<uses>>
 
 ' Notes
 note top of UC8
-  CustomAssociationRules
-  - Bitmap optimization
-  - Real Apriori formulas
-  - Bulk database operations
+  **CustomAssociationRules**
+  Funkcje:
+  - generate_association_rules(transactions)
+  - _find_frequent_itemsets_with_bitmap()
+  - _generate_2_itemsets_with_bitmap()
+  - _generate_optimized_rules_from_itemsets()
+  
+  **Wzory (Agrawal & Srikant 1994):**
+  Support(X) = count(X) / |transactions|
+  Confidence(A→B) = Support(A,B) / Support(A)
+  Lift(A→B) = Support(A,B) / (Support(A) × Support(B))
+  
+  **Optymalizacja (Zaki 2000):**
+  Bitmap pruning: bitmap |= (1 << item_to_id[item])
+  Bulk operations: bulk_create([:500])
 end note
 
 note top of UC18

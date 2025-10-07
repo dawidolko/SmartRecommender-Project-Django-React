@@ -419,11 +419,59 @@ class CustomFuzzySearch:
 
 
 class CustomAssociationRules:
+    """
+    Custom implementation of Apriori algorithm for Market Basket Analysis.
+    
+    References:
+    - Agrawal, R., Srikant, R. (1994). "Fast algorithms for mining association rules in large databases". 
+      Proceedings of the 20th International Conference on Very Large Data Bases (VLDB), pp. 487-499.
+    - Brin, S., Motwani, R., Silverstein, C. (1997). "Beyond market baskets: Generalizing association rules to correlations". 
+      ACM SIGMOD Record, 26(2), pp. 265-276.
+    
+    Mathematical Formulas:
+    
+    1. Support(X):
+       Support(X) = |{t ∈ T : X ⊆ t}| / |T|
+       where:
+       - T = set of all transactions
+       - t = single transaction
+       - X = itemset (set of products)
+       - |T| = number of transactions
+    
+    2. Confidence(X→Y):
+       Confidence(X→Y) = Support(X∪Y) / Support(X)
+       where:
+       - X = antecedent (source product)
+       - Y = consequent (target product)
+       - Support(X∪Y) = support for pair (X,Y)
+    
+    3. Lift(X→Y):
+       Lift(X→Y) = Support(X∪Y) / (Support(X) × Support(Y))
+                 = Confidence(X→Y) / Support(Y)
+       Interpretation:
+       - Lift > 1: Positive correlation (products bought together more than random)
+       - Lift = 1: Independence (no relationship)
+       - Lift < 1: Negative correlation (products bought together less than random)
+    
+    Optimizations:
+    - Bitmap pruning: Using bitwise operations for efficient itemset counting (Zaki 2000)
+    - Early pruning: Removing infrequent items before pair generation
+    - Bulk operations: Batch database insertions
+    - Caching: Storing computed results
+    """
+    
     def __init__(self, min_support=0.01, min_confidence=0.1):
+        """
+        Initialize Apriori algorithm parameters.
+        
+        Args:
+            min_support (float): Minimum frequency threshold (default: 0.01 = 1%)
+            min_confidence (float): Minimum certainty threshold (default: 0.1 = 10%)
+        """
         self.min_support = min_support
         self.min_confidence = min_confidence
-        self.max_transactions = 3000
-        self.max_items_per_transaction = 20
+        self.max_transactions = 3000  # Optimization: limit dataset size
+        self.max_items_per_transaction = 20  # Optimization: limit item count
 
     def generate_association_rules(self, transactions):
         """Generates association rules with bitmap pruning optimization"""
@@ -535,7 +583,44 @@ class CustomAssociationRules:
         return frequent_2_itemsets
 
     def _generate_optimized_rules_from_itemsets(self, frequent_itemsets, transactions):
-        """Generate rules with pre-computed counts for better performance"""
+        """
+        Generate association rules from frequent itemsets.
+        
+        Formula implementation (Agrawal & Srikant 1994):
+        
+        STEP 1: Cache individual item supports
+            Support(A) = count(transactions containing A) / total_transactions
+        
+        STEP 2: For each 2-itemset (A,B):
+            Support(A,B) = already computed in frequent_itemsets
+            Support(A) = cached from step 1
+            Support(B) = cached from step 1
+        
+        STEP 3: Calculate Confidence(A→B):
+            Confidence(A→B) = Support(A,B) / Support(A)
+            
+            This answers: "If someone buys A, what's the probability they'll also buy B?"
+            Formula from Agrawal & Srikant (1994), Section 4.2
+        
+        STEP 4: Calculate Lift(A→B):
+            Lift(A→B) = Support(A,B) / (Support(A) × Support(B))
+            
+            This measures correlation strength:
+            - Lift > 1: Products bought together MORE than random chance (positive correlation)
+            - Lift = 1: No relationship (independence)
+            - Lift < 1: Products bought together LESS than random chance (negative correlation)
+            
+            Formula from Brin, Motwani, Silverstein (1997), Section 3.1
+        
+        STEP 5: Filter by min_confidence threshold and create bidirectional rules
+        
+        Args:
+            frequent_itemsets (dict): Dictionary of {frozenset: support_value}
+            transactions (list): List of transaction lists
+            
+        Returns:
+            list: List of rule dictionaries sorted by lift and confidence
+        """
         rules = []
         total_transactions = len(transactions)
         
@@ -545,18 +630,30 @@ class CustomAssociationRules:
                 item = list(itemset)[0]
                 item_support_cache[item] = support
 
+        print(f"Cached {len(item_support_cache)} individual item supports")
+
         for itemset, support in frequent_itemsets.items():
             if len(itemset) == 2:
                 items = list(itemset)
                 item1, item2 = items[0], items[1]
 
-                support_1 = item_support_cache.get(item1, 0)
-                support_2 = item_support_cache.get(item2, 0)
+                support_1 = item_support_cache.get(item1, 0) 
+                support_2 = item_support_cache.get(item2, 0) 
                 
-                confidence_1_to_2 = support / support_1 if support_1 > 0 else 0
-                confidence_2_to_1 = support / support_2 if support_2 > 0 else 0
+                if support_1 > 0:
+                    confidence_1_to_2 = support / support_1
+                else:
+                    confidence_1_to_2 = 0
                 
-                lift = support / (support_1 * support_2) if (support_1 * support_2) > 0 else 0
+                if support_2 > 0:
+                    confidence_2_to_1 = support / support_2
+                else:
+                    confidence_2_to_1 = 0
+                
+                if (support_1 * support_2) > 0:
+                    lift = support / (support_1 * support_2)
+                else:
+                    lift = 0
 
                 if confidence_1_to_2 >= self.min_confidence:
                     rules.append({
@@ -578,7 +675,7 @@ class CustomAssociationRules:
 
         rules.sort(key=lambda x: (x["lift"], x["confidence"]), reverse=True)
         
-        print(f"Generated {len(rules)} association rules")
+        print(f"Generated {len(rules)} association rules (after filtering by min_confidence={self.min_confidence})")
         
         return rules
 

@@ -50,12 +50,23 @@ const CartContent = () => {
       const params = new URLSearchParams();
       productIds.forEach((id) => params.append("product_ids[]", id));
 
+      console.log("🛒 Fetching cart recommendations for products:", productIds);
+
       const response = await axios.get(
         `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`
       );
+
+      console.log("🛒 Cart recommendations response:", response.data);
+
+      if (!response.data || response.data.length === 0) {
+        console.warn(
+          "⚠️ No recommendations found for these products. Association rules may not be generated yet."
+        );
+      }
+
       setRecommendations(response.data);
     } catch (error) {
-      console.error("Error fetching recommendations:", error);
+      console.error("❌ Error fetching cart recommendations:", error);
     } finally {
       setRecommendationsLoading(false);
     }
@@ -138,8 +149,14 @@ const CartContent = () => {
                             ${rec.product.price}
                           </p>
                           <div className="cart__recommendation-stats">
-                            <span>
+                            <span className="stat-confidence">
                               Confidence: {(rec.confidence * 100).toFixed(0)}%
+                            </span>
+                            <span className="stat-lift">
+                              Lift: {rec.lift.toFixed(2)}x
+                            </span>
+                            <span className="stat-support">
+                              Support: {(rec.support * 100).toFixed(1)}%
                             </span>
                           </div>
                           <button

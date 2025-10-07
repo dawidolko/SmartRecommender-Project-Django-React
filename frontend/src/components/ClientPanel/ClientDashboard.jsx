@@ -39,21 +39,6 @@ const ClientDashboard = () => {
     },
   };
 
-  const fetchPopularProducts = async (token) => {
-    try {
-      const response = await axios.get(
-        `${config.apiUrl}/api/popular-products/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("Error fetching popular products:", err);
-      return [];
-    }
-  };
-
   useEffect(() => {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
@@ -200,20 +185,16 @@ const ClientDashboard = () => {
         }
 
         if (products.length === 0) {
-          products = await fetchPopularProducts(token);
-
-          if (products.length === 0) {
-            try {
-              const fallbackResponse = await axios.get(
-                `${config.apiUrl}/api/recommended-products/`,
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              );
-              products = fallbackResponse.data.slice(0, 4);
-            } catch (err) {
-              console.error("Error fetching fallback recommendations:", err);
-            }
+          try {
+            const fallbackResponse = await axios.get(
+              `${config.apiUrl}/api/recommended-products/`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            products = fallbackResponse.data.slice(0, 4);
+          } catch (err) {
+            console.error("Error fetching fallback recommendations:", err);
           }
         }
 
@@ -273,9 +254,7 @@ const ClientDashboard = () => {
       }
 
       if (products.length === 0) {
-        products = await fetchPopularProducts(token);
-
-        if (products.length === 0) {
+        try {
           const fallbackResponse = await axios.get(
             `${config.apiUrl}/api/recommended-products/`,
             {
@@ -283,6 +262,8 @@ const ClientDashboard = () => {
             }
           );
           products = fallbackResponse.data.slice(0, 4);
+        } catch (err) {
+          console.error("Error fetching fallback recommendations:", err);
         }
       }
 
@@ -296,11 +277,7 @@ const ClientDashboard = () => {
     } catch (err) {
       console.error("Error fetching recommended products:", err);
 
-      const products = await fetchPopularProducts(token);
-
-      if (products.length > 0) {
-        setRecommendedProducts(products);
-      } else {
+      try {
         const fallbackResponse = await axios.get(
           `${config.apiUrl}/api/recommended-products/`,
           {
@@ -308,6 +285,9 @@ const ClientDashboard = () => {
           }
         );
         setRecommendedProducts(fallbackResponse.data.slice(0, 4));
+      } catch (fallbackErr) {
+        console.error("Error fetching fallback recommendations:", fallbackErr);
+        setRecommendedProducts([]);
       }
 
       setRecommendationTitle("Recommended For You");

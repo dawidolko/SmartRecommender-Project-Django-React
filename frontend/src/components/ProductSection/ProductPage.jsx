@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";
 import { useFavorites } from "../FavoritesContent/FavoritesContext";
@@ -34,19 +33,29 @@ const ProductPage = () => {
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [similarProductsLoading, setSimilarProductsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("description");
 
-  const sendInteraction = async (type) => {
-    try {
+  const sendInteraction = useCallback(
+    async (type) => {
       const token = localStorage.getItem("access");
-      await axios.post(
-        `${config.apiUrl}/api/interaction/`,
-        { product_id: id, interaction_type: type },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    } catch (error) {
-      console.error("Error sending interaction:", error);
-    }
-  };
+      if (!token) {
+        return;
+      }
+
+      try {
+        await axios.post(
+          `${config.apiUrl}/api/interaction/`,
+          { product_id: id, interaction_type: type },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (error) {
+        if (error.response?.status !== 401) {
+          console.error("Error sending interaction:", error);
+        }
+      }
+    },
+    [id]
+  );
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -73,7 +82,7 @@ const ProductPage = () => {
     };
 
     fetchProduct();
-  }, [id, isFavorite, logout, navigate]);
+  }, [id, isFavorite, logout, navigate, sendInteraction]);
 
   useEffect(() => {
     const fetchSimilarProducts = async () => {
@@ -169,202 +178,340 @@ const ProductPage = () => {
     ],
   };
 
+  const thumbnailSliderSettings = {
+    dots: false,
+    infinite: product?.photos?.length > 5,
+    speed: 300,
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    focusOnSelect: true,
+    arrows: true,
+    swipeToSlide: true,
+    responsive: [
+      {
+        breakpoint: 1500,
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 1,
+          infinite: product?.photos?.length > 4,
+          arrows: true,
+        },
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 1,
+          infinite: product?.photos?.length > 4,
+          arrows: true,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          infinite: product?.photos?.length > 3,
+          arrows: true,
+          swipeToSlide: true,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          infinite: product?.photos?.length > 3,
+          arrows: true,
+          swipeToSlide: true,
+        },
+      },
+    ],
+  };
+
   const getSimpleCategory = (category) => category.split(".")[0];
   const getCurrentCategory = () =>
     product?.categories?.[0] ? getSimpleCategory(product.categories[0]) : "";
 
-  return (
-    <section className="productPage">
-      <div className="productPage__container">
-        <div className="productPage__buttons-top">
-          <button
-            className="productPage__fav-btn"
-            onClick={handleToggleFavorite}>
-            {favorite ? <AiFillHeart /> : <AiOutlineHeart />}
-          </button>
-        </div>
-        <div className="productPage__main__section">
-          <div className="productPage__main__subsection">
-            <div className="productPage__images">
-              <div className="productPage__slider">
-                <button
-                  onClick={handlePrevImage}
-                  aria-label="Previous Image"
-                  className="productPage__arrow">
-                  <AiOutlineLeft />
-                </button>
-                <img
-                  src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
-                  alt={product.name}
-                  className="productPage__main-img"
-                  onClick={handleImageEnlarge}
-                />
-                <button
-                  onClick={handleNextImage}
-                  aria-label="Next Image"
-                  className="productPage__arrow">
-                  <AiOutlineRight />
-                </button>
-              </div>
-              <div className="productPage__thumbnails">
-                {product.photos.map((photo, idx) => (
-                  <img
-                    key={photo.id || photo.path || idx}
-                    src={`${config.apiUrl}/media/${photo.path}`}
-                    alt={`Thumbnail ${idx + 1}`}
-                    className={`productPage__thumbnail ${
-                      idx === currentIndex ? "active" : ""
-                    }`}
-                    onClick={() => setCurrentIndex(idx)}
-                  />
-                ))}
-              </div>
-            </div>
-            {isImageEnlarged && (
-              <div className="productPage__overlay" onClick={closeImageOverlay}>
-                <button
-                  className="productPage__overlay-close"
-                  onClick={() => setIsImageEnlarged(false)}>
-                  X
-                </button>
-                <img
-                  className="productPage__overlay-image"
-                  src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
-                  alt={product.name}
-                />
-              </div>
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "description":
+        return (
+          <div className="productPage__tab-content">
+            <div dangerouslySetInnerHTML={{ __html: product.description }} />
+          </div>
+        );
+      case "specifications":
+        return (
+          <div className="productPage__tab-content">
+            {product.specifications.length > 0 ? (
+              <table className="productPage__specs-table">
+                <tbody>
+                  {product.specifications.map((spec, index) => (
+                    <tr
+                      key={`spec-${spec?.parameter_name ?? "param"}-${
+                        spec?.specification ?? "value"
+                      }-${index}`}>
+                      <td className="productPage__specs-param">
+                        {spec.parameter_name}
+                      </td>
+                      <td className="productPage__specs-value">
+                        {spec.specification}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No specifications available for this product.</p>
             )}
-            <div className="productPage__info__main">
-              <p className="productPage__category">
-                Category:{" "}
-                {product.categories
-                  .map((category) => category.replace(/\./g, " > "))
-                  .join(", ")
-                  .toUpperCase()}
-              </p>
-              <h2 className="productPage__title">{product.name}</h2>
-              <div className="productPage__tags">
-                <p className="tags">
-                  <span className="tagsHeader">Tags: </span>
-                  {product.tags.length > 0 ? (
-                    product.tags.map((tag, index) => (
-                      <span key={tag || `tag-${index}`} className="tag">
-                        {tag}
-                      </span>
-                    ))
-                  ) : (
-                    <p>No tags available for this product.</p>
-                  )}
-                </p>
-              </div>
-              <div className="productPage__prices">
-                {product.old_price && !isNaN(product.old_price) && (
-                  <span className="productPage__old-price">
-                    ${parseFloat(product.old_price).toFixed(2)}
-                  </span>
-                )}
-                <span className="productPage__current-price">
-                  ${parseFloat(product.price).toFixed(2)}
-                </span>
-              </div>
-              <div className="productPage__btn_price">
-                <button
-                  className="productPage__cart-btn"
-                  onClick={handleAddToCart}>
-                  Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
-                </button>
-              </div>
-            </div>
           </div>
-          <div className="productPage__description">
-            <div className="productPage__desc">
-              <h1>Description:</h1>
-              <div dangerouslySetInnerHTML={{ __html: product.description }} />
-            </div>
-          </div>
-          <div className="productPage__specs">
-            <h1>Specifications:</h1>
-            <table>
-              <tbody>
-                {product.specifications.map((spec, index) => (
-                  <tr key={spec.parameter_name || index}>
-                    <td>{spec.parameter_name}</td>
-                    <td>{spec.specification}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="productPage__reviews">
-            <h1>Customer Reviews</h1>
+        );
+      case "reviews":
+        return (
+          <div className="productPage__tab-content">
             {product.opinions.length > 0 ? (
               product.opinions.map((review) => (
                 <div key={review.id} className="productPage__review">
                   <div className="productPage__review-header">
-                    <span>{review.user_email}</span>
+                    <span className="productPage__review-email">
+                      {review.user_email}
+                    </span>
                     <div className="productPage__review-stars">
                       {Array.from({ length: 5 }, (_, starIndex) => (
                         <FaStar
-                          key={`${review.id}-star-${starIndex}`}
+                          key={`star-${review.id}-${starIndex}`}
                           className={
                             starIndex < review.rating
-                              ? "productPage__review-stars__star--active"
-                              : "productPage__review-stars__star"
+                              ? "productPage__review-star--active"
+                              : "productPage__review-star"
                           }
                         />
                       ))}
                     </div>
                   </div>
-                  <p>{review.content}</p>
+                  <p className="productPage__review-content">
+                    {review.content}
+                  </p>
                 </div>
               ))
             ) : (
-              <p>No reviews yet for this product.</p>
+              <p className="productPage__no-data">
+                No reviews yet for this product.
+              </p>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <section className="productPage">
+      <div className="productPage__container">
+        <button
+          className="productPage__fav-btn"
+          onClick={handleToggleFavorite}
+          aria-label={favorite ? "Remove from favorites" : "Add to favorites"}>
+          {favorite ? <AiFillHeart /> : <AiOutlineHeart />}
+        </button>
+
+        <div className="productPage__top-section">
+          <div className="productPage__gallery">
+            <div className="productPage__main-image-wrapper">
+              <button
+                onClick={handlePrevImage}
+                aria-label="Previous Image"
+                className="productPage__arrow productPage__arrow--prev">
+                <AiOutlineLeft />
+              </button>
+              <img
+                src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                alt={product.name}
+                className="productPage__main-img productPage__main-img--clickable"
+                onClick={handleImageEnlarge}
+              />
+              <button
+                onClick={handleNextImage}
+                aria-label="Next Image"
+                className="productPage__arrow productPage__arrow--next">
+                <AiOutlineRight />
+              </button>
+            </div>
+            <div className="productPage__thumbnails">
+              <Slider {...thumbnailSliderSettings}>
+                {product.photos.map((photo, idx) => (
+                  <div key={`thumb-${photo?.id ?? photo?.path ?? idx}`}>
+                    <img
+                      src={`${config.apiUrl}/media/${photo.path}`}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className={`productPage__thumbnail ${
+                        idx === currentIndex
+                          ? "productPage__thumbnail--active"
+                          : ""
+                      }`}
+                      onClick={() => setCurrentIndex(idx)}
+                    />
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          </div>
+
+          {isImageEnlarged && (
+            <div className="productPage__overlay" onClick={closeImageOverlay}>
+              <button
+                className="productPage__overlay-close"
+                onClick={() => setIsImageEnlarged(false)}
+                aria-label="Close image">
+                ×
+              </button>
+              <img
+                className="productPage__overlay-image"
+                src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                alt={product.name}
+              />
+            </div>
+          )}
+
+          <div className="productPage__info">
+            <div className="productPage__category">
+              {product.categories
+                .map((category) => category.replace(/\./g, " › "))
+                .join(", ")}
+            </div>
+            <h1 className="productPage__title">{product.name}</h1>
+
+            {product.tags.length > 0 && (
+              <div className="productPage__tags">
+                {product.tags.map((tag, index) => (
+                  <span
+                    key={`tag-${tag}-${index}`}
+                    className="productPage__tag">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="productPage__price-section">
+              {product.old_price && !isNaN(product.old_price) && (
+                <span className="productPage__old-price">
+                  ${parseFloat(product.old_price).toFixed(2)}
+                </span>
+              )}
+              <span className="productPage__current-price">
+                ${parseFloat(product.price).toFixed(2)}
+              </span>
+            </div>
+
+            <button className="productPage__cart-btn" onClick={handleAddToCart}>
+              Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
+            </button>
+
+            {/* Quick recommendations - Desktop only */}
+            {similarProducts.length > 0 && (
+              <div className="productPage__quick-recommendations">
+                <h3 className="productPage__quick-recommendations-title">
+                  You May Also Like
+                </h3>
+                <div className="productPage__quick-recommendations-grid">
+                  {similarProducts.slice(0, 3).map((recProduct) => (
+                    <div
+                      key={`quick-rec-${recProduct.id}`}
+                      className="productPage__quick-rec-card"
+                      onClick={() => navigate(`/product/${recProduct.id}`)}>
+                      <img
+                        src={`${config.apiUrl}/media/${recProduct.photos[0]?.path}`}
+                        alt={recProduct.name}
+                        className="productPage__quick-rec-img"
+                      />
+                      <div className="productPage__quick-rec-info">
+                        <p className="productPage__quick-rec-name">
+                          {recProduct.name}
+                        </p>
+                        <p className="productPage__quick-rec-price">
+                          ${parseFloat(recProduct.price).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
-        <div className="productPage__similar-products">
-          <h2 className="productPage__similar-products-title">
-            Similar Products{" "}
-            {getCurrentCategory() && `in ${getCurrentCategory().toUpperCase()}`}
-          </h2>
-          {similarProductsLoading ? (
-            <div style={{ textAlign: "center" }}>Loading products...</div>
-          ) : similarProducts.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {similarProducts.map((similarProduct) => (
-                <div
-                  key={similarProduct.id}
-                  className="productPage__similar-product"
-                  onClick={() => navigate(`/product/${similarProduct.id}`)}>
-                  <div className="productPage__similar-product-inner">
-                    <img
-                      src={`${config.apiUrl}/media/${similarProduct.photos[0]?.path}`}
-                      alt={similarProduct.name}
-                      className="productPage__similar-product-img"
-                    />
-                    <h3 className="productPage__similar-product-name">
-                      {similarProduct.name}
-                    </h3>
-                    <div className="productPage__similar-product-prices">
-                      {similarProduct.old_price &&
-                        !isNaN(similarProduct.old_price) && (
-                          <span className="productPage__similar-product-old-price">
-                            ${parseFloat(similarProduct.old_price).toFixed(2)}
-                          </span>
-                        )}
-                      <span className="productPage__similar-product-current-price">
-                        ${parseFloat(similarProduct.price).toFixed(2)}
-                      </span>
+
+        <div className="productPage__details">
+          <div className="productPage__tabs">
+            <button
+              className={`productPage__tab ${
+                activeTab === "description" ? "productPage__tab--active" : ""
+              }`}
+              onClick={() => setActiveTab("description")}>
+              Description
+            </button>
+            <button
+              className={`productPage__tab ${
+                activeTab === "specifications" ? "productPage__tab--active" : ""
+              }`}
+              onClick={() => setActiveTab("specifications")}>
+              Specifications
+            </button>
+            <button
+              className={`productPage__tab ${
+                activeTab === "reviews" ? "productPage__tab--active" : ""
+              }`}
+              onClick={() => setActiveTab("reviews")}>
+              Reviews ({product.opinions.length})
+            </button>
+          </div>
+          {renderTabContent()}
+        </div>
+        {similarProducts.length > 0 && (
+          <div className="productPage__similar-products">
+            <h2 className="productPage__similar-products-title">
+              You May Also Like
+              {getCurrentCategory() && ` in `}
+              <span>{getCurrentCategory()}</span>
+            </h2>
+            {similarProductsLoading ? (
+              <div className="productPage__loading">Loading products...</div>
+            ) : (
+              <Slider {...sliderSettings}>
+                {similarProducts.map((similarProduct) => (
+                  <div
+                    key={`similar-${similarProduct.id}`}
+                    className="productPage__similar-product"
+                    onClick={() => navigate(`/product/${similarProduct.id}`)}>
+                    <div className="productPage__similar-product-inner">
+                      <img
+                        src={`${config.apiUrl}/media/${similarProduct.photos[0]?.path}`}
+                        alt={similarProduct.name}
+                        className="productPage__similar-product-img"
+                      />
+                      <h3 className="productPage__similar-product-name">
+                        {similarProduct.name}
+                      </h3>
+                      <div className="productPage__similar-product-prices">
+                        {similarProduct.old_price &&
+                          !isNaN(similarProduct.old_price) && (
+                            <span className="productPage__similar-product-old-price">
+                              ${parseFloat(similarProduct.old_price).toFixed(2)}
+                            </span>
+                          )}
+                        <span className="productPage__similar-product-current-price">
+                          ${parseFloat(similarProduct.price).toFixed(2)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <p>No similar products found in this category.</p>
-          )}
-        </div>
+                ))}
+              </Slider>
+            )}
+          </div>
+        )}
       </div>
       <ToastContainer />
     </section>

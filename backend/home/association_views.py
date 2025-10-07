@@ -68,8 +68,10 @@ class FrequentlyBoughtTogetherAPI(APIView):
                 unique_recommendations.append(rec)
                 seen_ids.add(rec["product"]["id"])
 
-        print(f"Returning {len(unique_recommendations)} unique recommendations")
-        return Response(unique_recommendations[:5])
+        max_recommendations = int(request.GET.get('max_recommendations', 5))
+        
+        print(f"Returning {len(unique_recommendations[:max_recommendations])} unique recommendations (max: {max_recommendations})")
+        return Response(unique_recommendations[:max_recommendations])
 
 
 class UpdateAssociationRulesAPI(APIView):
@@ -77,7 +79,11 @@ class UpdateAssociationRulesAPI(APIView):
 
     def post(self, request):
         try:
-            print("Starting enhanced association rules update...")
+            min_support = float(request.data.get('min_support', 0.005))
+            min_confidence = float(request.data.get('min_confidence', 0.05))  
+            min_lift = float(request.data.get('min_lift', 1.0))
+            
+            print(f"Starting association rules update with thresholds: support={min_support}, confidence={min_confidence}, lift={min_lift}")
             
             cache_key = "association_rules_processing"
             if cache.get(cache_key):
@@ -109,17 +115,21 @@ class UpdateAssociationRulesAPI(APIView):
                         transactions.append(product_ids)
 
                 if len(transactions) < 2:
+                    print(f"⚠️ Not enough transactions: {len(transactions)} (need at least 2)")
                     return Response(
                         {
                             "message": "Not enough transactions to generate association rules.",
                             "rules_created": 0,
+                            "total_transactions": len(transactions),
                         }
                     )
 
-                print(f"Processing {len(transactions)} transactions with enhanced algorithm")
+                print(f"✅ Processing {len(transactions)} transactions with Apriori algorithm")
+                print(f"📊 Thresholds: support={min_support}, confidence={min_confidence}, lift={min_lift}")
 
                 association_engine = CustomAssociationRules(
-                    min_support=0.008, min_confidence=0.08
+                    min_support=min_support, 
+                    min_confidence=min_confidence
                 )
                 rules = association_engine.generate_association_rules(transactions)
 
@@ -134,6 +144,9 @@ class UpdateAssociationRulesAPI(APIView):
 
                         pair_key = (product_1_id, product_2_id)
                         if pair_key in created_pairs:
+                            continue
+
+                        if rule["lift"] < min_lift:
                             continue
 
                         associations_to_create.append(
@@ -160,17 +173,27 @@ class UpdateAssociationRulesAPI(APIView):
                 if associations_to_create:
                     ProductAssociation.objects.bulk_create(associations_to_create)
 
-                print(f"Created {rules_processed} enhanced association rules using bitmap pruning")
+                print(f"✅ Created {rules_processed} association rules using Apriori algorithm")
+                print(f"📊 Rules stats: {rules_processed} rules from {len(transactions)} transactions")
+                
+                if rules_processed == 0:
+                    print(f"⚠️ No rules created! Check thresholds: support={min_support}, confidence={min_confidence}, lift={min_lift}")
+                    print(f"💡 Try lowering thresholds or checking if transactions have enough product pairs")
                 
                 cache.delete("association_rules_list")
                 
                 return Response(
                     {
-                        "message": f"Enhanced association rules updated successfully",
+                        "message": f"Association rules updated successfully",
                         "rules_created": rules_processed,
                         "total_transactions": len(transactions),
-                        "algorithm": "Enhanced Apriori with Bitmap Pruning",
-                        "optimization": "Bulk operations + Caching",
+                        "thresholds": {
+                            "min_support": min_support,
+                            "min_confidence": min_confidence,
+                            "min_lift": min_lift
+                        },
+                        "algorithm": "Apriori Algorithm (Agrawal & Srikant 1994)",
+                        "optimization": "Bitmap Pruning + Bulk Operations",
                     }
                 )
                 
@@ -266,3 +289,103 @@ class AssociationRulesAnalysisAPI(APIView):
                 }
             }
         )
+
+
+class ProductAssociationDebugAPI(APIView):
+    """
+    Debug endpoint to analyze association rules for a specific product.
+    Shows which products are recommended and why (with formulas).
+    """
+
+    def get(self, request):
+        product_id = request.GET.get('product_id')
+        if not product_id:
+            return Response(
+                {"error": "product_id parameter required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response(
+                {"error": f"Product {product_id} not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        associations = ProductAssociation.objects.filter(
+            product_1_id=product_id
+        ).select_related('product_2').order_by('-lift', '-confidence')[:10]
+        
+        total_rules = ProductAssociation.objects.count()
+        product_rules_count = ProductAssociation.objects.filter(product_1_id=product_id).count()
+        
+        transactions_with_product = OrderProduct.objects.filter(
+            product_id=product_id
+        ).values('order_id').distinct().count()
+        
+        total_transactions = Order.objects.count()
+        
+        product_support = transactions_with_product / total_transactions if total_transactions > 0 else 0
+        
+        rules_details = []
+        for assoc in associations:
+            transactions_with_both = OrderProduct.objects.filter(
+                product_id=product_id
+            ).values('order_id').distinct().filter(
+                order_id__in=OrderProduct.objects.filter(
+                    product_id=assoc.product_2_id
+                ).values('order_id')
+            ).count()
+            
+            transactions_with_product2 = OrderProduct.objects.filter(
+                product_id=assoc.product_2_id
+            ).values('order_id').distinct().count()
+            
+            product2_support = transactions_with_product2 / total_transactions if total_transactions > 0 else 0
+            
+            rules_details.append({
+                "product_2": {
+                    "id": assoc.product_2.id,
+                    "name": assoc.product_2.name
+                },
+                "metrics": {
+                    "support": round(assoc.support, 4),
+                    "confidence": round(assoc.confidence, 4),
+                    "lift": round(assoc.lift, 4)
+                },
+                "formula_verification": {
+                    "support_formula": f"Support(A,B) = {transactions_with_both}/{total_transactions} = {round(assoc.support, 4)}",
+                    "confidence_formula": f"Confidence(A→B) = Support(A,B)/Support(A) = {round(assoc.support, 4)}/{round(product_support, 4)} = {round(assoc.confidence, 4)}",
+                    "lift_formula": f"Lift(A→B) = Support(A,B)/(Support(A)×Support(B)) = {round(assoc.support, 4)}/({round(product_support, 4)}×{round(product2_support, 4)}) = {round(assoc.lift, 4)}"
+                },
+                "interpretation": {
+                    "support": f"{round(assoc.support * 100, 2)}% of transactions contain both products",
+                    "confidence": f"If customer buys {product.name}, there's {round(assoc.confidence * 100, 1)}% chance they'll buy {assoc.product_2.name}",
+                    "lift": f"Products are bought together {round(assoc.lift, 2)}x more than random chance" if assoc.lift > 1 else f"Products are bought together {round(assoc.lift, 2)}x less than random chance"
+                }
+            })
+        
+        return Response({
+            "product": {
+                "id": product.id,
+                "name": product.name
+            },
+            "statistics": {
+                "total_transactions": total_transactions,
+                "transactions_with_product": transactions_with_product,
+                "product_support": round(product_support, 4),
+                "total_rules_in_system": total_rules,
+                "rules_for_this_product": product_rules_count
+            },
+            "top_associations": rules_details,
+            "formulas_used": {
+                "support": "Support(A,B) = count(transactions with A and B) / total_transactions",
+                "confidence": "Confidence(A→B) = Support(A,B) / Support(A)",
+                "lift": "Lift(A→B) = Support(A,B) / (Support(A) × Support(B))"
+            },
+            "references": [
+                "Agrawal, R., Srikant, R. (1994). Fast algorithms for mining association rules. VLDB.",
+                "Brin, S., Motwani, R., Silverstein, C. (1997). Beyond market baskets. ACM SIGMOD."
+            ]
+        })

@@ -54,26 +54,101 @@ Signals -> CAR: CustomAssociationRules(min_support=0.01, min_confidence=0.1)
 activate CAR
 
 CAR -> CAR: generate_association_rules(transactions)
-CAR -> CAR: _find_frequent_itemsets_with_bitmap()
+CAR -> CAR: _find_frequent_itemsets_with_bitmap(transactions)
 
 note right of CAR
-  Bitmap optimization:
-  for item in transaction:
-    bitmap |= (1 << item_to_id[item])
+  **Krok 1-2: Zlicz i filtruj pojedyncze produkty**
+  item_counts = defaultdict(int)
+  for transaction in transactions:
+    for item in transaction:
+      item_counts[item] += 1
+  
+  min_count_threshold = min_support * total
+  frequent_items = {item: support 
+    if count >= min_count_threshold}
+  
+  **Wzór:** Support(X) = count(X) / |transactions|
+  **Źródło:** Agrawal & Srikant (1994)
 end note
 
-CAR -> CAR: _generate_2_itemsets_with_bitmap()
-CAR -> CAR: _generate_optimized_rules_from_itemsets()
+CAR -> CAR: **Krok 3:** Twórz bitmapy dla transakcji
+CAR -> CAR: item_to_id = {item: idx}
+CAR -> CAR: transaction_bitmaps = []
 
-loop Dla każdej pary produktów
-  CAR -> CAR: support = count / total_transactions
-  CAR -> CAR: confidence = support / support_1
-  CAR -> CAR: lift = support / (support_1 * support_2)
+note right of CAR
+  **Optymalizacja bitmap (Zaki 2000):**
+  for transaction in transactions:
+    bitmap = 0
+    for item in transaction:
+      if item in item_to_id:
+        bitmap |= (1 << item_to_id[item])
+    transaction_bitmaps.append(bitmap)
+end note
+
+CAR -> CAR: **Krok 4:** _generate_2_itemsets_with_bitmap()
+
+loop Dla każdej pary (i, j) where i < j
+  CAR -> CAR: item1_bit = 1 << item_to_id[item1]
+  CAR -> CAR: item2_bit = 1 << item_to_id[item2]
+  CAR -> CAR: pair_bitmap = item1_bit | item2_bit
   
-  alt confidence >= min_confidence
-    CAR -> CAR: Dodaj do rules[]
+  CAR -> CAR: count = sum(1 for tb in transaction_bitmaps\nif (tb & pair_bitmap) == pair_bitmap)
+  
+  alt count >= min_count_threshold
+    CAR -> CAR: support = count / total_transactions
+    CAR -> CAR: frequent_2_itemsets[pair] = support
   end
 end
+
+CAR -> CAR: _generate_optimized_rules_from_itemsets(frequent_itemsets, transactions)
+
+CAR -> CAR: **Krok 1:** Twórz item_support_cache
+loop Dla itemset if len(itemset) == 1
+  CAR -> CAR: item_support_cache[item] = support
+end
+
+CAR -> CAR: **Krok 2:** Generuj reguły dla par
+
+loop Dla każdej pary (item1, item2) in frequent_itemsets
+  CAR -> CAR: support_1 = item_support_cache.get(item1, 0)
+  CAR -> CAR: support_2 = item_support_cache.get(item2, 0)
+  
+  note right of CAR
+    **Wzory (Agrawal & Srikant 1994):**
+    Confidence(A→B) = Support(A,B) / Support(A)
+    Lift(A→B) = Support(A,B) / (Support(A) × Support(B))
+    
+    **Źródło dla Lift:** Brin, Motwani, Silverstein (1997)
+  end note
+  
+  alt support_1 > 0
+    CAR -> CAR: confidence_1_to_2 = support / support_1
+  else
+    CAR -> CAR: confidence_1_to_2 = 0
+  end
+  
+  alt support_2 > 0
+    CAR -> CAR: confidence_2_to_1 = support / support_2
+  else
+    CAR -> CAR: confidence_2_to_1 = 0
+  end
+  
+  alt (support_1 * support_2) > 0
+    CAR -> CAR: lift = support / (support_1 * support_2)
+  else
+    CAR -> CAR: lift = 0
+  end
+  
+  alt confidence_1_to_2 >= min_confidence
+    CAR -> CAR: rules.append({item1→item2, support, confidence_1_to_2, lift})
+  end
+  
+  alt confidence_2_to_1 >= min_confidence
+    CAR -> CAR: rules.append({item2→item1, support, confidence_2_to_1, lift})
+  end
+end
+
+CAR -> CAR: rules.sort(key=lambda: (lift, confidence), reverse=True)
 
 CAR --> Signals: Lista reguł z metrykami
 deactivate CAR

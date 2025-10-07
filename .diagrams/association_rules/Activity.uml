@@ -53,31 +53,83 @@ if (Klient finalizuje zamówienie?) then (TAK)
       :generate_association_rules();
       
       partition "Apriori Algorithm Implementation" {
-        :_find_frequent_itemsets_with_bitmap();
-        :item_counts dla pojedynczych produktów;
-        :Filtruj według min_support threshold;
+        :_find_frequent_itemsets_with_bitmap(transactions);
         
-        :_generate_2_itemsets_with_bitmap();
         note right
-          Używa bitmap operations:
-          bitmap |= (1 << item_to_id[item])
+          Wzór: Support(X) = count(X) / |transactions|
+          Źródło: Agrawal & Srikant (1994)
         end note
         
-        :Oblicz support dla par produktów;
-        :frequent_2_itemsets = {};
+        :Krok 1: item_counts = defaultdict(int);
+        :Zlicz pojedyncze produkty (1-itemsets);
+        :min_count_threshold = min_support * total;
+        
+        :Krok 2: Filtruj przez min_support;
+        :frequent_items = {} (early pruning);
+        
+        :Krok 3: Twórz bitmapy;
+        :item_to_id mapping;
+        :transaction_bitmaps = [];
+        
+        note right
+          Bitmap optimization:
+          bitmap |= (1 << item_to_id[item])
+          Źródło: Zaki (2000)
+        end note
+        
+        :Krok 4: _generate_2_itemsets_with_bitmap();
+        
+        :Iteruj pary (i, j) gdzie i < j;
+        :pair_bitmap = item1_bit | item2_bit;
+        :count = sum(1 for tb if (tb & pair_bitmap) == pair_bitmap);
+        
+        if (count >= min_count_threshold?) then (TAK)
+          :support = count / total_transactions;
+          :frequent_2_itemsets[pair] = support;
+        endif
       }
       
       partition "Rules Generation" {
-        :_generate_optimized_rules_from_itemsets();
+        :_generate_optimized_rules_from_itemsets(frequent_itemsets, transactions);
         
-        :Dla każdej pary (item1, item2):;
-        :support_1 = item_support_cache[item1];
-        :support_2 = item_support_cache[item2];
-        :confidence = support / support_1;
-        :lift = support / (support_1 * support_2);
+        :Krok 1: Twórz cache dla pojedynczych itemów;
+        :item_support_cache = {};
+        :for itemset if len(itemset) == 1;
         
-        if (confidence >= min_confidence?) then (TAK)
-          :Dodaj do rules[];
+        :Krok 2: Dla każdej pary (2-itemsets);
+        :support_1 = item_support_cache.get(item1, 0);
+        :support_2 = item_support_cache.get(item2, 0);
+        
+        note right
+          Wzory (Agrawal & Srikant 1994):
+          Confidence(A→B) = Support(A,B) / Support(A)
+          Lift(A→B) = Support(A,B) / (Support(A) × Support(B))
+        end note
+        
+        if (support_1 > 0?) then (TAK)
+          :confidence_1_to_2 = support / support_1;
+        else (NIE)
+          :confidence_1_to_2 = 0;
+        endif
+        
+        if (support_2 > 0?) then (TAK)
+          :confidence_2_to_1 = support / support_2;
+        else (NIE)
+          :confidence_2_to_1 = 0;
+        endif
+        
+        if ((support_1 * support_2) > 0?) then (TAK)
+          :lift = support / (support_1 * support_2);
+        else (NIE)
+          :lift = 0;
+        endif
+        
+        if (confidence_1_to_2 >= min_confidence?) then (TAK)
+          :rules.append({item1→item2, support, confidence, lift});
+        endif
+        
+        if (confidence_2_to_1 >= min_confidence?) then (TAK)
+          :rules.append({item2→item1, support, confidence, lift});
         endif
       }
       

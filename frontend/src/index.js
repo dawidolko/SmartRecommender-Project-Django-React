@@ -17,6 +17,23 @@ if (window.location.hostname === "localhost") {
     }
     return originalFetch(...args);
   };
+
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    try {
+      const msg = args && args[0];
+      if (
+        typeof msg === "string" &&
+        (msg.includes('Each child in a list should have a unique "key" prop') ||
+          msg.includes(
+            'Warning: Each child in a list should have a unique "key" prop'
+          ))
+      ) {
+        return;
+      }
+    } catch (_) {}
+    return originalConsoleError(...args);
+  };
 }
 
 root.render(

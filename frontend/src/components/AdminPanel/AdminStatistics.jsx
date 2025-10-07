@@ -48,6 +48,45 @@ const AdminStatistics = () => {
     fetchRecommendationSettings();
     fetchAssociationRules();
     fetchAlgorithmStatus();
+
+    const checkAndGenerateRules = async () => {
+      const token = localStorage.getItem("access");
+      try {
+        const res = await axios.get(`${config.apiUrl}/api/association-rules/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.data.rules || res.data.rules.length === 0) {
+          console.log(
+            "📊 No association rules found. Auto-generating with default thresholds..."
+          );
+
+          axios
+            .post(
+              `${config.apiUrl}/api/update-association-rules/`,
+              {
+                min_support: 0.005, // 0.5%
+                min_confidence: 0.05, // 5%
+                min_lift: 1.0,
+              },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            )
+            .then(() => {
+              console.log("✅ Association rules auto-generated successfully");
+              fetchAssociationRules();
+            })
+            .catch((err) => {
+              console.error("❌ Failed to auto-generate rules:", err);
+            });
+        }
+      } catch (err) {
+        console.error("Error checking association rules:", err);
+      }
+    };
+
+    setTimeout(checkAndGenerateRules, 1000);
   }, []);
 
   useEffect(() => {
@@ -135,14 +174,35 @@ const AdminStatistics = () => {
     }
   };
 
-  const fetchAssociationRules = async () => {
+  const fetchAssociationRules = async (bypassCache = false) => {
     setAssociationLoading(true);
     const token = localStorage.getItem("access");
     try {
-      const res = await axios.get(`${config.apiUrl}/api/association-rules/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const cacheBuster = bypassCache ? `?t=${Date.now()}` : "";
+      const res = await axios.get(
+        `${config.apiUrl}/api/association-rules/${cacheBuster}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("📊 Association Rules API Response:", res.data);
+
       setAssociationRules(res.data.rules ? res.data.rules.slice(0, 10) : []);
+
+      if (res.data.total_rules !== undefined) {
+        console.log(
+          `📊 Total association rules in system: ${
+            res.data.total_rules
+          }, Showing: ${res.data.rules?.length || 0}`
+        );
+      }
+
+      if (!res.data.rules || res.data.rules.length === 0) {
+        console.warn(
+          "⚠️ No association rules found. Click 'Update Rules' to generate them."
+        );
+      }
     } catch (err) {
       console.error("Error fetching association rules:", err);
       toast.error("Failed to fetch association rules.");
@@ -162,13 +222,25 @@ const AdminStatistics = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(
-        `Successfully updated association rules using custom Apriori algorithm! Created ${res.data.rules_created} rules.`
-      );
-      fetchAssociationRules();
+
+      if (res.data.rules_created === 0) {
+        toast.warning(
+          `⚠️ No association rules created! Current transactions: ${res.data.total_transactions}`,
+          { autoClose: 8000 }
+        );
+      } else {
+        toast.success(
+          `✅ Successfully created ${res.data.rules_created} association rules from ${res.data.total_transactions} transactions!`,
+          { autoClose: 5000 }
+        );
+      }
+
+      fetchAssociationRules(true);
     } catch (err) {
       console.error("Error updating association rules:", err);
-      toast.error("Failed to update association rules.");
+      const errorMsg =
+        err.response?.data?.error || "Failed to update association rules.";
+      toast.error(errorMsg);
     } finally {
       setIsUpdatingRules(false);
     }
@@ -412,7 +484,8 @@ const AdminStatistics = () => {
               together. These rules power the "Frequently Bought Together"
               recommendations in the shopping cart.{" "}
               <strong>
-                Using custom manual Apriori algorithm implementation.
+                Using custom manual Apriori algorithm implementation with real
+                formulas from scientific literature (Agrawal & Srikant 1994).
               </strong>
             </p>
 

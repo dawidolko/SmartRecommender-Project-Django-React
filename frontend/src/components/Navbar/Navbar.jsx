@@ -253,9 +253,7 @@ const Navbar = () => {
                     <AiOutlineHeart className="navbar__heart" />
                   </div>
                 </NavLink>
-                <NavLink to="/cart" onClick={closeNav}>
-                  <CartPreview />
-                </NavLink>
+                <CartPreview />
               </li>
             </ul>
             <div className="navbar__hamburger" onClick={handleClick}>

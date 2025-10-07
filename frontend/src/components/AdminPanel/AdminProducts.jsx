@@ -266,10 +266,13 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {}
+        console.log(`Updated product similarity for product ${productId}`);
+      } catch (error) {
+        console.error("Error updating product similarity:", error);
+      }
 
       try {
-        await axios.post(
+        const rulesRes = await axios.post(
           `${config.apiUrl}/api/update-association-rules/`,
           {},
           {
@@ -279,7 +282,10 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {}
+        console.log(`Updated ${rulesRes.data.rules_created} association rules`);
+      } catch (error) {
+        console.error("Error updating association rules:", error);
+      }
 
       try {
         await axios.post(
@@ -292,7 +298,10 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {}
+        console.log(`Processed recommendations for product ${productId}`);
+      } catch (error) {
+        console.error("Error processing recommendations:", error);
+      }
 
       toast.success("Product added successfully with all integrations!");
       clearForm();
@@ -368,10 +377,13 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {}
+        console.log(`Updated product similarity for product ${editId}`);
+      } catch (error) {
+        console.error("Error updating product similarity:", error);
+      }
 
       try {
-        await axios.post(
+        const rulesRes = await axios.post(
           `${config.apiUrl}/api/update-association-rules/`,
           {},
           {
@@ -381,7 +393,10 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {}
+        console.log(`Updated ${rulesRes.data.rules_created} association rules`);
+      } catch (error) {
+        console.error("Error updating association rules:", error);
+      }
 
       try {
         await axios.post(
@@ -394,7 +409,10 @@ const AdminProducts = () => {
             },
           }
         );
-      } catch (error) {}
+        console.log(`Processed recommendations for product ${editId}`);
+      } catch (error) {
+        console.error("Error processing recommendations:", error);
+      }
 
       setEditId(null);
       setEditName("");
