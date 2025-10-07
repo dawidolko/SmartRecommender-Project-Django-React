@@ -109,12 +109,24 @@ package "Machine Learning Components" {
     -batch_size: int = 1000
     --
     +build_user_product_matrix(): defaultdict
-    +normalize_matrix_minmax(): np.array
-    +calculate_cosine_similarity(): np.array
+    +apply_mean_centering(): np.array
+    +calculate_product_similarity(): np.array
     +bulk_create_similarities(): int
     --
-    Item-Based Collaborative Filtering
-    używa cosine similarity między produktami
+    **ITEM-BASED Collaborative Filtering**
+    Porównuje PRODUKTY (nie użytkowników!)
+    
+    Algorytm:
+    1. Macierz[users][products] z ilościami
+    2. Mean-centering per user (Sarwar 2001)
+    3. Transpose → macierz[products][users]
+    4. Cosine similarity między produktami
+    5. Threshold 0.3, bulk save 1000
+    
+    Przykład:
+    User kupił Laptop
+    → System: "Laptop podobny do Monitor (0.85)"
+    → Rekomendacja: Monitor
   }
   
   class UserRecommendationGenerator {
@@ -123,8 +135,26 @@ package "Machine Learning Components" {
     +calculate_weighted_scores(): defaultdict
     +update_user_recommendations(): int
     --
-    Generuje finalne rekomendacje
-    na podstawie podobieństwa produktów
+    **Generuje rekomendacje dla użytkownika**
+    
+    Logika:
+    1. Pobierz co User kupił (np. Laptop, Mouse)
+    2. Dla każdego produktu znajdź top 5 podobnych
+       (z ProductSimilarity table)
+    3. Agreguj scores (suma podobieństw)
+    4. Zapisz top produkty do UserProductRecommendation
+    
+    Przykład:
+    User kupił: [Laptop, Mouse]
+    Laptop podobny do: Monitor(0.85), Keyboard(0.72)
+    Mouse podobny do: Keyboard(0.65), MousePad(0.58)
+    
+    Agregacja scores:
+    Keyboard: 0.72 + 0.65 = 1.37 (NAJWYŻSZY!)
+    Monitor: 0.85
+    MousePad: 0.58
+    
+    Rekomendacje: [Keyboard, Monitor, MousePad]
   }
 }
 

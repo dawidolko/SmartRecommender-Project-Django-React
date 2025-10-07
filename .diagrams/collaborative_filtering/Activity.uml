@@ -82,28 +82,86 @@ partition "Matrix Building" {
   :matrix = np.array(matrix, dtype=np.float32);
 }
 
-partition "MinMax Normalization" {
-  :scaler = MinMaxScaler();
+partition "Mean-Centering (Sarwar et al. 2001)" {
   :normalized_matrix = np.zeros_like(matrix);
-  :print("Applying MinMax normalization to user-product matrix");
+  :print("Applying mean-centering (Adjusted Cosine Similarity)");
+  
+  note right
+    **DLACZEGO Mean-Centering?**
+    
+    Eliminuje bias użytkowników:
+    - User A kupuje dużo (10+ prod) → wysokie wartości
+    - User B kupuje mało (2-3 prod) → niskie wartości
+    
+    Mean-centering normalizuje do średniej użytkownika
+  end note
   
   repeat
-    if (np.sum(user_row) > 0?) then (yes)
-      :user_row_reshaped = user_row.reshape(-1, 1);
-      :normalized_row = scaler.fit_transform(user_row_reshaped).flatten();
-      :normalized_matrix[i] = normalized_row;
+    :purchased_items = user_row[user_row > 0];
+    
+    if (len(purchased_items) > 0?) then (yes)
+      :user_mean = np.mean(purchased_items);
+      :normalized_matrix[i] = user_row - user_mean;
+      
+      note right
+        Przykład:
+        User: [1, 5, 0, 0]
+        Mean: (1+5)/2 = 3.0
+        Normalized: [1-3, 5-3, 0-3, 0-3]
+                  = [-2, +2, -3, -3]
+        
+        Pokazuje relatywne preferencje
+        zamiast absolutnych wartości
+      end note
     else (no)
       :normalized_matrix[i] = user_row;
     endif
   repeat while (more user rows)
 }
 
-partition "Similarity Calculation" {
+partition "Product Similarity Calculation" {
   if (normalized_matrix.shape valid?) then (yes)
     :product_similarity = cosine_similarity(normalized_matrix.T);
+    
     note right
-      .T oznacza transpozycję -
-      oblicza podobieństwo między produktami
+      **ITEM-BASED CF - KLUCZOWY MOMENT!**
+      
+      .T = TRANSPOZYCJA macierzy
+      
+      PRZED transpose:
+      macierz[users][products]
+      Wiersze = użytkownicy
+      Kolumny = produkty
+      
+      PO transpose (.T):
+      macierz[products][users]
+      Wiersze = PRODUKTY
+      Kolumny = użytkownicy
+      
+      Cosine similarity porównuje teraz
+      WEKTORY PRODUKTÓW!
+      
+      Każdy produkt ma wektor:
+      [ile kupił User1, ile User2, ile User3, ...]
+      
+      Przykład:
+      Laptop = [User1:2, User2:1, User3:0, User4:1]
+      Monitor = [User1:1, User2:2, User3:0, User4:1]
+      Mouse = [User1:0, User2:0, User3:2, User4:0]
+      
+      → similarity(Laptop, Monitor) = 0.85 (WYSOKA!)
+        bo ci sami users kupują oba
+      → similarity(Laptop, Mouse) = 0.12 (NISKA)
+        bo różni users
+      
+      **JAK TO DZIAŁA DLA UŻYTKOWNIKA?**
+      User1 kupił Laptop
+      → System: "Laptop podobny do Monitor (0.85)"
+      → Rekomendacja: Monitor
+      
+      NIE porównujemy użytkowników między sobą!
+      Porównujemy PRODUKTY na podstawie
+      tego kto je kupił razem!
     end note
   else (no)
     :return 0;
@@ -153,20 +211,78 @@ partition "User Recommendations Generation" {
   :user_products = [extract product_ids from orders and cart];
   :recommendations = defaultdict(float);
   
+  note left
+    **PRZYKŁAD JAK TO DZIAŁA:**
+    
+    User kupił:
+    - Laptop (product_id=10)
+    - Mouse (product_id=25)
+    
+    Co dalej?
+  end note
+  
   repeat
     :similarities = ProductSimilarity.objects.filter(
       product1_id=product_id, 
       similarity_type="collaborative"
     ).order_by("-similarity_score")[:5];
     
+    note right
+      Dla Laptop (id=10) znajdujemy top 5 podobnych:
+      1. Monitor (similarity: 0.85)
+      2. Keyboard (similarity: 0.72)
+      3. Webcam (similarity: 0.45)
+      4. USB Hub (similarity: 0.38)
+      5. Laptop Bag (similarity: 0.33)
+      
+      Dla Mouse (id=25) znajdujemy top 5:
+      1. Keyboard (similarity: 0.65)
+      2. MousePad (similarity: 0.58)
+      3. USB Hub (similarity: 0.42)
+      4. Headset (similarity: 0.35)
+      5. Webcam (similarity: 0.31)
+    end note
+    
     repeat
       :recommendations[similarity.product2_id] += float(similarity.similarity_score);
+      
+      note left
+        **AGREGACJA SCORES:**
+        
+        Monitor: 0.85 (tylko z Laptop)
+        Keyboard: 0.72 + 0.65 = 1.37 (z obu!)
+        MousePad: 0.58 (tylko z Mouse)
+        Webcam: 0.45 + 0.31 = 0.76 (z obu!)
+        USB Hub: 0.38 + 0.42 = 0.80 (z obu!)
+        
+        **RANKING (po score):**
+        1. Keyboard: 1.37 ← NAJLEPSZY!
+        2. Monitor: 0.85
+        3. USB Hub: 0.80
+        4. Webcam: 0.76
+        5. MousePad: 0.58
+        
+        Te produkty są polecane użytkownikowi!
+      end note
     repeat while (more similarities)
   repeat while (more user products)
   
   repeat
     :UserProductRecommendation.objects.update_or_create();
   repeat while (more recommendations)
+  
+  note right
+    Zapisujemy do bazy:
+    UserProductRecommendation(
+      user=User1,
+      product=Keyboard,
+      score=1.37,
+      recommendation_type="collaborative"
+    )
+    
+    Frontend pobiera te rekomendacje
+    i wyświetla w Dashboard/Home
+  end note
 }
 
 partition "Frontend Display" {

@@ -12,7 +12,16 @@ package "System Collaborative Filtering" {
     usecase "Przeglądaj rekomendowane produkty" as UC1
     usecase "Dodaj produkty do koszyka" as UC2
     usecase "Finalizuj zamówienie" as UC3
-    usecase "Otrzymuj personalizowane sugestie" as UC4
+    usecase "Otrzymuj sugestie podobnych produktów" as UC4
+    
+    note right of UC4
+      Jeśli User kupił Laptop
+      → System poleca Monitor, Keyboard
+      (bo inne osoby kupowały je razem)
+      
+      NIE polecamy produktów
+      podobnych UŻYTKOWNIKÓW!
+    end note
   }
   
   package "Backend - Automatyczne" {
@@ -105,19 +114,31 @@ UC29 ..> UC30 : <<includes>>
 
 ' Notes
 note top of UC16
-  Item-Based Collaborative Filtering
-  - MinMax normalization per user
-  - Cosine similarity między produktami
-  - Threshold filtering (0.3)
-  - Bulk operations (1000 batch)
+  **ITEM-BASED Collaborative Filtering**
+  NIE porównujemy użytkowników!
+  Porównujemy PRODUKTY na podstawie
+  tego kto je kupił razem.
+  
+  Algorytm:
+  1. Mean-centering per user
+  2. Cosine similarity między produktami
+  3. Threshold filtering (0.3)
+  4. Bulk operations (1000 batch)
 end note
 
 note right of UC19
   product_similarity = 
   cosine_similarity(normalized_matrix.T)
   
-  .T = transpozycja
-  produkty vs produkty
+  .T = TRANSPOZYCJA!
+  Wiersze = produkty (nie users!)
+  
+  Przykład:
+  Laptop często kupowany z Monitor
+  → similarity(Laptop, Monitor) = 0.85
+  
+  Jeśli User kupił Laptop
+  → Rekomendujemy Monitor
 end note
 
 note left of UC6

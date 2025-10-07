@@ -57,10 +57,6 @@ const AdminStatistics = () => {
         });
 
         if (!res.data.rules || res.data.rules.length === 0) {
-          console.log(
-            "📊 No association rules found. Auto-generating with default thresholds..."
-          );
-
           axios
             .post(
               `${config.apiUrl}/api/update-association-rules/`,
@@ -74,7 +70,6 @@ const AdminStatistics = () => {
               }
             )
             .then(() => {
-              console.log("✅ Association rules auto-generated successfully");
               fetchAssociationRules();
             })
             .catch((err) => {
@@ -186,16 +181,9 @@ const AdminStatistics = () => {
         }
       );
 
-      console.log("📊 Association Rules API Response:", res.data);
-
       setAssociationRules(res.data.rules ? res.data.rules.slice(0, 10) : []);
 
       if (res.data.total_rules !== undefined) {
-        console.log(
-          `📊 Total association rules in system: ${
-            res.data.total_rules
-          }, Showing: ${res.data.rules?.length || 0}`
-        );
       }
 
       if (!res.data.rules || res.data.rules.length === 0) {

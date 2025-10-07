@@ -22,7 +22,6 @@ from rest_framework.permissions import IsAdminUser
 from .custom_recommendation_engine import CustomContentBasedFilter
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import MinMaxScaler
 
 
 class RecommendationSettingsView(APIView):
@@ -118,16 +117,19 @@ class ProcessRecommendationsView(APIView):
 
         matrix = np.array(matrix, dtype=np.float32)
         
-        print("Applying MinMax normalization to user-product matrix")
-        scaler = MinMaxScaler()
+        print("Applying mean-centering (Adjusted Cosine Similarity - Sarwar et al. 2001)")
+        normalized_matrix = np.zeros_like(matrix, dtype=np.float32)
         
-        normalized_matrix = np.zeros_like(matrix)
         for i, user_row in enumerate(matrix):
-            if np.sum(user_row) > 0:
-                user_row_reshaped = user_row.reshape(-1, 1)
-                normalized_row = scaler.fit_transform(user_row_reshaped).flatten()
-                normalized_matrix[i] = normalized_row
+            # Calculate mean only from purchased items (non-zero values)
+            purchased_items = user_row[user_row > 0]
+            
+            if len(purchased_items) > 0:
+                user_mean = np.mean(purchased_items)
+                # Subtract user mean from all values (mean-centering)
+                normalized_matrix[i] = user_row - user_mean
             else:
+                # User has no purchases, keep zeros
                 normalized_matrix[i] = user_row
 
         if normalized_matrix.shape[0] > 1 and normalized_matrix.shape[1] > 1:
@@ -160,7 +162,7 @@ class ProcessRecommendationsView(APIView):
             if similarities_to_create:
                 ProductSimilarity.objects.bulk_create(similarities_to_create)
             
-            print(f"Created {similarity_count} collaborative similarities with threshold {similarity_threshold}")
+            print(f"Created {similarity_count} collaborative similarities using Adjusted Cosine Similarity (Sarwar et al. 2001) with threshold {similarity_threshold}")
             
             cache.set(cache_key, similarity_count, timeout=getattr(settings, 'CACHE_TIMEOUT_LONG', 7200))
             

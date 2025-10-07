@@ -266,7 +266,6 @@ const AdminProducts = () => {
             },
           }
         );
-        console.log(`Updated product similarity for product ${productId}`);
       } catch (error) {
         console.error("Error updating product similarity:", error);
       }
@@ -282,7 +281,6 @@ const AdminProducts = () => {
             },
           }
         );
-        console.log(`Updated ${rulesRes.data.rules_created} association rules`);
       } catch (error) {
         console.error("Error updating association rules:", error);
       }
@@ -298,7 +296,6 @@ const AdminProducts = () => {
             },
           }
         );
-        console.log(`Processed recommendations for product ${productId}`);
       } catch (error) {
         console.error("Error processing recommendations:", error);
       }
@@ -377,7 +374,6 @@ const AdminProducts = () => {
             },
           }
         );
-        console.log(`Updated product similarity for product ${editId}`);
       } catch (error) {
         console.error("Error updating product similarity:", error);
       }
@@ -393,7 +389,6 @@ const AdminProducts = () => {
             },
           }
         );
-        console.log(`Updated ${rulesRes.data.rules_created} association rules`);
       } catch (error) {
         console.error("Error updating association rules:", error);
       }
@@ -409,7 +404,6 @@ const AdminProducts = () => {
             },
           }
         );
-        console.log(`Processed recommendations for product ${editId}`);
       } catch (error) {
         console.error("Error processing recommendations:", error);
       }

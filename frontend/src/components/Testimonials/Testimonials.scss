@@ -45,6 +45,10 @@
     box-sizing: border-box;
     transition: box-shadow 0.3s ease, background-color 0.3s ease;
 
+    // Flexbox layout for consistent alignment
+    display: flex;
+    flex-direction: column;
+
     &:hover {
       background-color: $btn-disabled-gray;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
@@ -70,12 +74,12 @@
   &__img {
     width: 100%;
     max-width: 250px;
-    height: auto;
+    height: 180px; // Fixed height for all images
     margin-bottom: 0.5em;
     object-fit: cover;
     border-radius: 4px;
     transition: transform 0.3s ease;
-    max-height: 180px;
+    flex-shrink: 0; // Don't shrink image
 
     &:hover {
       transform: scale(1.02);
@@ -93,6 +97,7 @@
     min-width: 100%;
     text-transform: uppercase;
     font-weight: bold;
+    flex-shrink: 0; // Don't shrink category
   }
 
   &__name {
@@ -100,6 +105,18 @@
     font-weight: 500;
     margin-bottom: 0.3em;
     transition: color 0.3s ease;
+    
+    // Limit to 2 lines with ellipsis
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; // Standard property
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3em;
+    max-height: 2.6em; // 2 lines * 1.3em line-height
+    min-height: 2.6em; // Always reserve space for 2 lines
+    flex-shrink: 0; // Don't shrink name
 
     &:hover {
       text-decoration: underline;
@@ -111,7 +128,8 @@
   &__price {
     font-weight: 500;
     font-size: 1.6rem;
-    margin-bottom: 1em;
+    margin-top: auto; // Push price to bottom of flex container
+    padding-top: 0.5em; // Small spacing from name
   }
 
   &__old-price {

@@ -50,13 +50,9 @@ const CartContent = () => {
       const params = new URLSearchParams();
       productIds.forEach((id) => params.append("product_ids[]", id));
 
-      console.log("🛒 Fetching cart recommendations for products:", productIds);
-
       const response = await axios.get(
         `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`
       );
-
-      console.log("🛒 Cart recommendations response:", response.data);
 
       if (!response.data || response.data.length === 0) {
         console.warn(

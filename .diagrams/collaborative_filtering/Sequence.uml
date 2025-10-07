@@ -67,26 +67,50 @@ else Cache Miss
     CFE --> PRV: return 0
   else Sufficient Data
     
-    == Matrix Building & Normalization ==
+    == Matrix Building & Mean-Centering ==
     
     CFE -> CFE: matrix = np.array(matrix, dtype=np.float32)
-    CFE -> CFE: scaler = MinMaxScaler()
-    CFE -> CFE: print("Applying MinMax normalization to user-product matrix")
+    CFE -> CFE: normalized_matrix = np.zeros_like(matrix)
+    CFE -> CFE: print("Applying mean-centering (Adjusted Cosine - Sarwar 2001)")
     
     loop For each user row
-      CFE -> CFE: if np.sum(user_row) > 0:
-      CFE -> CFE: normalized_row = scaler.fit_transform(user_row)
-      CFE -> CFE: normalized_matrix[i] = normalized_row
+      CFE -> CFE: purchased_items = user_row[user_row > 0]
+      CFE -> CFE: if len(purchased_items) > 0:
+      CFE -> CFE: user_mean = np.mean(purchased_items)
+      CFE -> CFE: normalized_matrix[i] = user_row - user_mean
     end
+    
+    note right of CFE
+      Mean-centering eliminuje bias
+      użytkowników kupujących dużo vs mało
+      
+      User A: [1, 5] → mean=3 → [-2, +2]
+      Pokazuje relatywne preferencje
+    end note
     
     == Similarity Calculation ==
     
     CFE -> CFE: product_similarity = cosine_similarity(normalized_matrix.T)
     
     note right of CFE
-      .T = transpozycja
-      Oblicza podobieństwo między produktami
-      na podstawie wzorców zakupów użytkowników
+      **ITEM-BASED CF - KLUCZOWY KROK!**
+      
+      .T = TRANSPOZYCJA macierzy
+      Wiersze stają się kolumnami
+      
+      PRZED: macierz[users][products]
+      PO: macierz[products][users]
+      
+      Cosine similarity porównuje teraz
+      WEKTORY PRODUKTÓW (nie użytkowników!)
+      
+      Przykład:
+      Product1 = [User1:2, User2:0, User3:1]
+      Product2 = [User1:1, User2:2, User3:0]
+      → similarity(Product1, Product2) = 0.42
+      
+      Jeśli User1 kupił Product1
+      → Polecamy Product2 (bo podobny)
     end note
     
     == Database Update ==

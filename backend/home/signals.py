@@ -111,6 +111,11 @@ def handle_sentiment_analysis(sender, instance, created, **kwargs):
 def run_all_analytics_after_order(order):
     print(f"Running analytics for order {order.id}")
 
+    # Invalidate collaborative filtering cache when new order is placed
+    cache_key = "collaborative_similarity_matrix"
+    cache.delete(cache_key)
+    print(f"Invalidated CF cache after order {order.id}")
+
     if not getattr(order, "_skip_analytics", False):
         generate_association_rules_after_order(order)
 
