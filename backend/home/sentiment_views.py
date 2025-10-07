@@ -12,42 +12,43 @@ from .custom_recommendation_engine import CustomFuzzySearch
 class SentimentSearchAPIView(APIView):
     """
     Sentiment-based product search using lexicon-based sentiment analysis.
-    
+
     Algorithm: Ranks products by sentiment score calculated from:
     - Customer opinions (weight: 40%)
     - Product description (weight: 25%)
     - Product name (weight: 15%)
     - Product specifications (weight: 12%)
     - Product categories (weight: 8%)
-    
+
     Mathematical Formula (Liu, Bing 2012 - "Sentiment Analysis and Opinion Mining"):
-    
+
     Sentiment_Score = (Positive_Count - Negative_Count) / Total_Words
-    
+
     Where:
     - Positive_Count = number of positive words in text (from positive_words lexicon)
     - Negative_Count = number of negative words in text (from negative_words lexicon)
     - Total_Words = total number of words in text
-    
+
     Score Range: [-1.0, +1.0]
     - Score > 0.1  → Positive sentiment
     - Score < -0.1 → Negative sentiment
     - Otherwise    → Neutral sentiment
-    
+
     Multi-Source Aggregation (per product):
-    Final_Score = (Opinion_Score * 0.40) + (Description_Score * 0.25) + 
+    Final_Score = (Opinion_Score * 0.40) + (Description_Score * 0.25) +
                   (Name_Score * 0.15) + (Spec_Score * 0.12) + (Category_Score * 0.08)
-    
-    Source: Liu, B. (2012). "Sentiment Analysis and Opinion Mining", 
+
+    Source: Liu, B. (2012). "Sentiment Analysis and Opinion Mining",
             Morgan & Claypool Publishers. Chapter 2: Sentiment Lexicons.
-    
+
     Implementation: CustomSentimentAnalysis.analyze_sentiment() in custom_recommendation_engine.py
     """
+
     permission_classes = [AllowAny]
 
     def get(self, request):
         from .custom_recommendation_engine import CustomSentimentAnalysis
-        
+
         query = request.GET.get("q", "").strip()
 
         if not query:
@@ -62,71 +63,87 @@ class SentimentSearchAPIView(APIView):
                 | Q(specification__specification__icontains=query)
             )
             .select_related("sentiment_summary")
-            .prefetch_related("categories", "photoproduct_set", "specification_set", "opinion_set")
+            .prefetch_related(
+                "categories", "photoproduct_set", "specification_set", "opinion_set"
+            )
             .distinct()
         )
 
         analyzer = CustomSentimentAnalysis()
         products_with_scores = []
-        
+
         for product in products:
             opinion_scores = []
-            opinions = product.opinion_set.all()[:20] 
+            opinions = product.opinion_set.all()[:20]
             for opinion in opinions:
                 score, _ = analyzer.analyze_sentiment(opinion.content)
                 opinion_scores.append(score)
-            opinion_sentiment = sum(opinion_scores) / len(opinion_scores) if opinion_scores else 0.0
-            
+            opinion_sentiment = (
+                sum(opinion_scores) / len(opinion_scores) if opinion_scores else 0.0
+            )
+
             desc_score, _ = analyzer.analyze_sentiment(product.description or "")
-            
+
             name_score, _ = analyzer.analyze_sentiment(product.name)
-            
+
             spec_texts = []
             for spec in product.specification_set.all()[:10]:
                 spec_texts.append(f"{spec.parameter_name} {spec.specification}")
             spec_combined = " ".join(spec_texts)
-            spec_score, _ = analyzer.analyze_sentiment(spec_combined) if spec_combined else (0.0, "neutral")
-            
-            category_names = " ".join([cat.name for cat in product.categories.all()])
-            category_score, _ = analyzer.analyze_sentiment(category_names) if category_names else (0.0, "neutral")
-            
-            final_score = (
-                opinion_sentiment * 0.40 +
-                desc_score * 0.25 +
-                name_score * 0.15 +
-                spec_score * 0.12 +
-                category_score * 0.08
+            spec_score, _ = (
+                analyzer.analyze_sentiment(spec_combined)
+                if spec_combined
+                else (0.0, "neutral")
             )
-            
-            products_with_scores.append({
-                'product': product,
-                'final_score': final_score,
-                'opinion_score': opinion_sentiment,
-                'desc_score': desc_score,
-                'name_score': name_score,
-                'spec_score': spec_score,
-                'category_score': category_score,
-                'opinion_count': len(opinion_scores)
-            })
-        
-        products_with_scores.sort(key=lambda x: x['final_score'], reverse=True)
-        
-        serializer = ProductSerializer([item['product'] for item in products_with_scores], many=True)
-        data = serializer.data
-        
-        for i, item in enumerate(products_with_scores):
-            product = item['product']
 
-            data[i]["sentiment_score"] = round(item['final_score'], 3)
+            category_names = " ".join([cat.name for cat in product.categories.all()])
+            category_score, _ = (
+                analyzer.analyze_sentiment(category_names)
+                if category_names
+                else (0.0, "neutral")
+            )
+
+            final_score = (
+                opinion_sentiment * 0.40
+                + desc_score * 0.25
+                + name_score * 0.15
+                + spec_score * 0.12
+                + category_score * 0.08
+            )
+
+            products_with_scores.append(
+                {
+                    "product": product,
+                    "final_score": final_score,
+                    "opinion_score": opinion_sentiment,
+                    "desc_score": desc_score,
+                    "name_score": name_score,
+                    "spec_score": spec_score,
+                    "category_score": category_score,
+                    "opinion_count": len(opinion_scores),
+                }
+            )
+
+        products_with_scores.sort(key=lambda x: x["final_score"], reverse=True)
+
+        serializer = ProductSerializer(
+            [item["product"] for item in products_with_scores], many=True
+        )
+        data = serializer.data
+
+        for i, item in enumerate(products_with_scores):
+            product = item["product"]
+
+            data[i]["sentiment_score"] = round(item["final_score"], 3)
             data[i]["sentiment_breakdown"] = {
-                "opinion_score": round(item['opinion_score'], 3),
-                "description_score": round(item['desc_score'], 3),
-                "name_score": round(item['name_score'], 3),
-                "specification_score": round(item['spec_score'], 3),
-                "category_score": round(item['category_score'], 3)
+                "opinion_score": round(item["opinion_score"], 3),
+                "description_score": round(item["desc_score"], 3),
+                "name_score": round(item["name_score"], 3),
+                "specification_score": round(item["spec_score"], 3),
+                "category_score": round(item["category_score"], 3),
             }
-            data[i]["total_opinions"] = item['opinion_count']
-            
+            data[i]["total_opinions"] = item["opinion_count"]
+
             if hasattr(product, "sentiment_summary") and product.sentiment_summary:
                 data[i]["positive_count"] = product.sentiment_summary.positive_count
                 data[i]["negative_count"] = product.sentiment_summary.negative_count
@@ -145,186 +162,210 @@ class SentimentAnalysisDebugAPI(APIView):
     Shows analysis from all sources: opinions, description, name, specifications, categories.
     No authentication required for transparency.
     """
+
     permission_classes = [AllowAny]
 
     def get(self, request):
         from .custom_recommendation_engine import CustomSentimentAnalysis
         from .models import Opinion
-        
+
         product_id = request.GET.get("product_id")
-        
+
         if not product_id:
             return Response({"error": "product_id parameter required"}, status=400)
-        
+
         try:
             product = Product.objects.prefetch_related(
-                'opinion_set', 'specification_set', 'categories'
+                "opinion_set", "specification_set", "categories"
             ).get(id=product_id)
         except Product.DoesNotExist:
             return Response({"error": f"Product {product_id} not found"}, status=404)
-        
+
         analyzer = CustomSentimentAnalysis()
-        
+
         opinions = Opinion.objects.filter(product=product)[:5]
         opinion_details = []
         opinion_scores = []
-        
+
         for opinion in opinions:
             score, category = analyzer.analyze_sentiment(opinion.content)
             opinion_scores.append(score)
-            
+
             words = opinion.content.lower().split()
             positive_count = sum(1 for word in words if word in analyzer.positive_words)
             negative_count = sum(1 for word in words if word in analyzer.negative_words)
             total_words = len(words)
-            
-            opinion_details.append({
-                "opinion_id": opinion.id,
-                "opinion_excerpt": opinion.content[:100] + "..." if len(opinion.content) > 100 else opinion.content,
-                "calculation": {
-                    "positive_words_found": positive_count,
-                    "negative_words_found": negative_count,
-                    "total_words": total_words,
-                    "formula": f"({positive_count} - {negative_count}) / {total_words} = {score:.3f}",
-                    "sentiment_score": round(score, 3),
-                    "category": category
+
+            opinion_details.append(
+                {
+                    "opinion_id": opinion.id,
+                    "opinion_excerpt": (
+                        opinion.content[:100] + "..."
+                        if len(opinion.content) > 100
+                        else opinion.content
+                    ),
+                    "calculation": {
+                        "positive_words_found": positive_count,
+                        "negative_words_found": negative_count,
+                        "total_words": total_words,
+                        "formula": f"({positive_count} - {negative_count}) / {total_words} = {score:.3f}",
+                        "sentiment_score": round(score, 3),
+                        "category": category,
+                    },
                 }
-            })
-        
-        opinion_avg = sum(opinion_scores) / len(opinion_scores) if opinion_scores else 0.0
-        
+            )
+
+        opinion_avg = (
+            sum(opinion_scores) / len(opinion_scores) if opinion_scores else 0.0
+        )
+
         desc_text = product.description or ""
         desc_score, desc_category = analyzer.analyze_sentiment(desc_text)
         desc_words = desc_text.lower().split()
         desc_positive = sum(1 for word in desc_words if word in analyzer.positive_words)
         desc_negative = sum(1 for word in desc_words if word in analyzer.negative_words)
-        
+
         name_score, name_category = analyzer.analyze_sentiment(product.name)
         name_words = product.name.lower().split()
         name_positive = sum(1 for word in name_words if word in analyzer.positive_words)
         name_negative = sum(1 for word in name_words if word in analyzer.negative_words)
-        
+
         spec_texts = []
         spec_details = []
         for spec in product.specification_set.all()[:10]:
             spec_text = f"{spec.parameter_name} {spec.specification}"
             spec_texts.append(spec_text)
-            
+
             spec_score_item, spec_cat_item = analyzer.analyze_sentiment(spec_text)
             spec_words = spec_text.lower().split()
             spec_pos = sum(1 for word in spec_words if word in analyzer.positive_words)
             spec_neg = sum(1 for word in spec_words if word in analyzer.negative_words)
-            
-            spec_details.append({
-                "parameter": spec.parameter_name,
-                "value": spec.specification,
-                "score": round(spec_score_item, 3),
-                "category": spec_cat_item,
-                "positive_words": spec_pos,
-                "negative_words": spec_neg
-            })
-        
+
+            spec_details.append(
+                {
+                    "parameter": spec.parameter_name,
+                    "value": spec.specification,
+                    "score": round(spec_score_item, 3),
+                    "category": spec_cat_item,
+                    "positive_words": spec_pos,
+                    "negative_words": spec_neg,
+                }
+            )
+
         spec_combined = " ".join(spec_texts)
-        spec_score, spec_category = analyzer.analyze_sentiment(spec_combined) if spec_combined else (0.0, "neutral")
-        
+        spec_score, spec_category = (
+            analyzer.analyze_sentiment(spec_combined)
+            if spec_combined
+            else (0.0, "neutral")
+        )
+
         category_names = " ".join([cat.name for cat in product.categories.all()])
-        category_score, category_cat = analyzer.analyze_sentiment(category_names) if category_names else (0.0, "neutral")
+        category_score, category_cat = (
+            analyzer.analyze_sentiment(category_names)
+            if category_names
+            else (0.0, "neutral")
+        )
         cat_words = category_names.lower().split()
         cat_positive = sum(1 for word in cat_words if word in analyzer.positive_words)
         cat_negative = sum(1 for word in cat_words if word in analyzer.negative_words)
-        
+
         final_score = (
-            opinion_avg * 0.40 +
-            desc_score * 0.25 +
-            name_score * 0.15 +
-            spec_score * 0.12 +
-            category_score * 0.08
+            opinion_avg * 0.40
+            + desc_score * 0.25
+            + name_score * 0.15
+            + spec_score * 0.12
+            + category_score * 0.08
         )
-        
-        return Response({
-            "product_id": product_id,
-            "product_name": product.name,
-            
-            "multi_source_analysis": {
-                "opinions": {
-                    "weight": "40%",
-                    "count": len(opinion_scores),
-                    "average_score": round(opinion_avg, 3),
-                    "contribution_to_final": round(opinion_avg * 0.40, 3),
-                    "sample_details": opinion_details,
-                    "formula": f"Σ({len(opinion_scores)} scores) / {len(opinion_scores)} = {opinion_avg:.3f}"
+
+        return Response(
+            {
+                "product_id": product_id,
+                "product_name": product.name,
+                "multi_source_analysis": {
+                    "opinions": {
+                        "weight": "40%",
+                        "count": len(opinion_scores),
+                        "average_score": round(opinion_avg, 3),
+                        "contribution_to_final": round(opinion_avg * 0.40, 3),
+                        "sample_details": opinion_details,
+                        "formula": f"Σ({len(opinion_scores)} scores) / {len(opinion_scores)} = {opinion_avg:.3f}",
+                    },
+                    "description": {
+                        "weight": "25%",
+                        "text_excerpt": (
+                            desc_text[:150] + "..."
+                            if len(desc_text) > 150
+                            else desc_text
+                        ),
+                        "score": round(desc_score, 3),
+                        "category": desc_category,
+                        "contribution_to_final": round(desc_score * 0.25, 3),
+                        "positive_words": desc_positive,
+                        "negative_words": desc_negative,
+                        "total_words": len(desc_words),
+                        "formula": f"({desc_positive} - {desc_negative}) / {len(desc_words)} = {desc_score:.3f}",
+                    },
+                    "name": {
+                        "weight": "15%",
+                        "text": product.name,
+                        "score": round(name_score, 3),
+                        "category": name_category,
+                        "contribution_to_final": round(name_score * 0.15, 3),
+                        "positive_words": name_positive,
+                        "negative_words": name_negative,
+                        "total_words": len(name_words),
+                        "formula": f"({name_positive} - {name_negative}) / {len(name_words)} = {name_score:.3f}",
+                    },
+                    "specifications": {
+                        "weight": "12%",
+                        "count": len(spec_details),
+                        "combined_score": round(spec_score, 3),
+                        "category": spec_category,
+                        "contribution_to_final": round(spec_score * 0.12, 3),
+                        "sample_details": spec_details[:5],
+                    },
+                    "categories": {
+                        "weight": "8%",
+                        "text": category_names,
+                        "score": round(category_score, 3),
+                        "category": category_cat,
+                        "contribution_to_final": round(category_score * 0.08, 3),
+                        "positive_words": cat_positive,
+                        "negative_words": cat_negative,
+                        "total_words": len(cat_words) if cat_words else 0,
+                    },
                 },
-                "description": {
-                    "weight": "25%",
-                    "text_excerpt": desc_text[:150] + "..." if len(desc_text) > 150 else desc_text,
-                    "score": round(desc_score, 3),
-                    "category": desc_category,
-                    "contribution_to_final": round(desc_score * 0.25, 3),
-                    "positive_words": desc_positive,
-                    "negative_words": desc_negative,
-                    "total_words": len(desc_words),
-                    "formula": f"({desc_positive} - {desc_negative}) / {len(desc_words)} = {desc_score:.3f}"
+                "final_calculation": {
+                    "formula": "Final = (Opinion×0.40) + (Desc×0.25) + (Name×0.15) + (Spec×0.12) + (Cat×0.08)",
+                    "calculation": f"({opinion_avg:.3f}×0.40) + ({desc_score:.3f}×0.25) + ({name_score:.3f}×0.15) + ({spec_score:.3f}×0.12) + ({category_score:.3f}×0.08)",
+                    "final_score": round(final_score, 3),
+                    "final_category": (
+                        "Positive"
+                        if final_score > 0.1
+                        else "Negative" if final_score < -0.1 else "Neutral"
+                    ),
+                    "breakdown": {
+                        "from_opinions": round(opinion_avg * 0.40, 3),
+                        "from_description": round(desc_score * 0.25, 3),
+                        "from_name": round(name_score * 0.15, 3),
+                        "from_specifications": round(spec_score * 0.12, 3),
+                        "from_categories": round(category_score * 0.08, 3),
+                    },
                 },
-                "name": {
-                    "weight": "15%",
-                    "text": product.name,
-                    "score": round(name_score, 3),
-                    "category": name_category,
-                    "contribution_to_final": round(name_score * 0.15, 3),
-                    "positive_words": name_positive,
-                    "negative_words": name_negative,
-                    "total_words": len(name_words),
-                    "formula": f"({name_positive} - {name_negative}) / {len(name_words)} = {name_score:.3f}"
+                "formulas_used": {
+                    "per_text": "Sentiment_Score = (Positive_Count - Negative_Count) / Total_Words",
+                    "final_aggregation": "Final = (Opinion×0.40) + (Description×0.25) + (Name×0.15) + (Specification×0.12) + (Category×0.08)",
+                    "thresholds": "Positive: score > 0.1, Negative: score < -0.1, Neutral: -0.1 ≤ score ≤ 0.1",
                 },
-                "specifications": {
-                    "weight": "12%",
-                    "count": len(spec_details),
-                    "combined_score": round(spec_score, 3),
-                    "category": spec_category,
-                    "contribution_to_final": round(spec_score * 0.12, 3),
-                    "sample_details": spec_details[:5]
+                "lexicon_info": {
+                    "positive_words_count": len(analyzer.positive_words),
+                    "negative_words_count": len(analyzer.negative_words),
+                    "examples_positive": list(analyzer.positive_words)[:10],
+                    "examples_negative": list(analyzer.negative_words)[:10],
                 },
-                "categories": {
-                    "weight": "8%",
-                    "text": category_names,
-                    "score": round(category_score, 3),
-                    "category": category_cat,
-                    "contribution_to_final": round(category_score * 0.08, 3),
-                    "positive_words": cat_positive,
-                    "negative_words": cat_negative,
-                    "total_words": len(cat_words) if cat_words else 0
-                }
-            },
-            
-            "final_calculation": {
-                "formula": "Final = (Opinion×0.40) + (Desc×0.25) + (Name×0.15) + (Spec×0.12) + (Cat×0.08)",
-                "calculation": f"({opinion_avg:.3f}×0.40) + ({desc_score:.3f}×0.25) + ({name_score:.3f}×0.15) + ({spec_score:.3f}×0.12) + ({category_score:.3f}×0.08)",
-                "final_score": round(final_score, 3),
-                "final_category": "Positive" if final_score > 0.1 else "Negative" if final_score < -0.1 else "Neutral",
-                "breakdown": {
-                    "from_opinions": round(opinion_avg * 0.40, 3),
-                    "from_description": round(desc_score * 0.25, 3),
-                    "from_name": round(name_score * 0.15, 3),
-                    "from_specifications": round(spec_score * 0.12, 3),
-                    "from_categories": round(category_score * 0.08, 3)
-                }
-            },
-            
-            "formulas_used": {
-                "per_text": "Sentiment_Score = (Positive_Count - Negative_Count) / Total_Words",
-                "final_aggregation": "Final = (Opinion×0.40) + (Description×0.25) + (Name×0.15) + (Specification×0.12) + (Category×0.08)",
-                "thresholds": "Positive: score > 0.1, Negative: score < -0.1, Neutral: -0.1 ≤ score ≤ 0.1"
-            },
-            
-            "lexicon_info": {
-                "positive_words_count": len(analyzer.positive_words),
-                "negative_words_count": len(analyzer.negative_words),
-                "examples_positive": list(analyzer.positive_words)[:10],
-                "examples_negative": list(analyzer.negative_words)[:10]
-            },
-            
-            "source": "Liu, B. (2012). Sentiment Analysis and Opinion Mining, Morgan & Claypool Publishers, Chapter 2: Sentiment Lexicons"
-        })
+                "source": "Liu, B. (2012). Sentiment Analysis and Opinion Mining, Morgan & Claypool Publishers, Chapter 2: Sentiment Lexicons",
+            }
+        )
 
 
 class FuzzySearchAPIView(APIView):
@@ -348,17 +389,12 @@ class FuzzySearchAPIView(APIView):
             if cached_result:
                 return Response(cached_result)
 
-            products_query = Product.objects.select_related("sentiment_summary").prefetch_related(
+            products_query = Product.objects.select_related(
+                "sentiment_summary"
+            ).prefetch_related(
                 "categories", "photoproduct_set", "specification_set", "tags"
             )
-            
-            if len(query) >= 3:
-                products_query = products_query.filter(
-                    Q(name__icontains=query[:3]) |
-                    Q(description__icontains=query[:3]) |
-                    Q(categories__name__icontains=query[:3])
-                ).distinct()
-            
+
             products = list(products_query[:1000])
 
             fuzzy_results = self._simple_fuzzy_search(query, products, fuzzy_threshold)
@@ -378,7 +414,7 @@ class FuzzySearchAPIView(APIView):
 
             serializer = ProductSerializer(sorted_products, many=True)
             data = serializer.data
-            
+
             for i, result in enumerate(fuzzy_results):
                 product = result["product"]
                 data[i]["fuzzy_score"] = float(result["score"])
@@ -396,7 +432,13 @@ class FuzzySearchAPIView(APIView):
                         min(product.sentiment_summary.total_opinions / 10.0, 1.0)
                     )
                     data[i]["sentiment_variance"] = float(
-                        abs(0.5 - abs(float(product.sentiment_summary.average_sentiment_score))) * 2
+                        abs(
+                            0.5
+                            - abs(
+                                float(product.sentiment_summary.average_sentiment_score)
+                            )
+                        )
+                        * 2
                     )
                 else:
                     data[i]["sentiment_score"] = 0
@@ -405,87 +447,38 @@ class FuzzySearchAPIView(APIView):
 
             cache.set(cache_key, data, timeout=900)
             return Response(data)
-            
+
         except Exception as e:
             return Response({"error": f"Search error: {str(e)}"}, status=500)
 
     def _simple_fuzzy_search(self, query, products, threshold):
-        results = []
-        query_lower = query.lower()
-        query_words = query_lower.split()
-        
-        for product in products:
-            name_lower = product.name.lower()
-            desc_lower = (product.description or "").lower()
-            
-            name_score = 0.0
-            if query_lower in name_lower:
-                name_score = 1.0
-            else:
-                word_matches = sum(1 for word in query_words if word in name_lower)
-                name_score = word_matches / len(query_words) if query_words else 0.0
-            
-            desc_score = 0.0
-            if query_lower in desc_lower:
-                desc_score = 0.8
-            else:
-                word_matches = sum(1 for word in query_words if word in desc_lower)
-                desc_score = (word_matches / len(query_words)) * 0.8 if query_words else 0.0
-            
-            category_score = 0.0
-            for cat in product.categories.all():
-                cat_name = cat.name.lower()
-                if query_lower in cat_name:
-                    category_score = 0.6
-                    break
-                else:
-                    word_matches = sum(1 for word in query_words if word in cat_name)
-                    if word_matches > 0:
-                        category_score = max(category_score, (word_matches / len(query_words)) * 0.6)
-            
-            spec_score = 0.0
-            try:
-                for spec in product.specification_set.all()[:5]:
-                    spec_text = f"{spec.parameter_name} {spec.specification}".lower()
-                    if query_lower in spec_text:
-                        spec_score = 0.4
-                        break
-                    else:
-                        word_matches = sum(1 for word in query_words if word in spec_text)
-                        if word_matches > 0:
-                            spec_score = max(spec_score, (word_matches / len(query_words)) * 0.4)
-            except:
-                pass
-            
-            tag_score = 0.0
-            try:
-                for tag in product.tags.all():
-                    tag_name = tag.name.lower()
-                    if query_lower in tag_name:
-                        tag_score = 0.3
-                        break
-                    else:
-                        word_matches = sum(1 for word in query_words if word in tag_name)
-                        if word_matches > 0:
-                            tag_score = max(tag_score, (word_matches / len(query_words)) * 0.3)
-            except:
-                pass
-            
-            total_score = (name_score * 0.4 + desc_score * 0.3 + 
-                          category_score * 0.2 + spec_score * 0.05 + tag_score * 0.05)
-            
-            if total_score >= threshold:
-                results.append({
-                    "product": product,
-                    "score": round(total_score, 3),
-                    "name_score": round(name_score, 3),
-                    "desc_score": round(desc_score, 3),
-                    "category_score": round(category_score, 3),
-                    "spec_score": round(spec_score, 3),
-                    "tag_score": round(tag_score, 3)
-                })
-        
-        results.sort(key=lambda x: x["score"], reverse=True)
+        """
+        Enhanced fuzzy search using CustomFuzzySearch with advanced algorithms:
+
+        Algorithms implemented in CustomFuzzySearch (custom_recommendation_engine.py):
+        1. Levenshtein Distance - O(n*m) space-optimized character-level similarity
+        2. Trigram Similarity - N-gram matching for spelling error tolerance
+        3. Word-level Similarity - Exact + partial word matching with context
+        4. Chunked Processing - Sliding window for long texts (150 chars + 30 overlap)
+
+        Field Weights (from CustomFuzzySearch):
+        - Name: 45%
+        - Description: 25%
+        - Category: 20%
+        - Specifications: 10%
+        """
+        fuzzy_engine = CustomFuzzySearch()
+
+        results = fuzzy_engine.search_products(query, products, threshold)
+
+        # TODO: Remove debug prints
+        if not results and products:
+            test_results = fuzzy_engine.search_products(query, products[:10], 0.1)
+            if test_results:
+                print(f"   [DEBUG] Found {len(test_results)} with threshold=0.1")
+                print(f"   [DEBUG] Top score: {test_results[0]['score']:.3f}")
+                print(f"   [DEBUG] Your threshold {threshold} might be too high!")
+
         return results
 
     def match_price_range(self, price, price_range):
