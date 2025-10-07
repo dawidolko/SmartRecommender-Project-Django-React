@@ -1,4 +1,4 @@
-Ostatnia aktualizacja: 07/01/2025
+Ostatnia aktualizacja: 07/10/2025
 
 # 🧠 Analiza Sentymentu w Wyszukiwaniu Produktów
 
