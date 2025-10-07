@@ -49,6 +49,7 @@ from .recommendation_views import (
 
 from .sentiment_views import (
     SentimentSearchAPIView,
+    SentimentAnalysisDebugAPI,
     FuzzySearchAPIView,
 )
 
@@ -166,6 +167,11 @@ urlpatterns = [
         "api/sentiment-search/",
         SentimentSearchAPIView.as_view(),
         name="sentiment-search",
+    ),
+    path(
+        "api/sentiment-analysis-debug/",
+        SentimentAnalysisDebugAPI.as_view(),
+        name="sentiment-analysis-debug",
     ),
     path("api/fuzzy-search/", FuzzySearchAPIView.as_view(), name="fuzzy-search"),
     path(

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineInfoCircle } from "react-icons/ai";
 import axios from "axios";
 import config from "../../config/config";
 import "./SearchModal.scss";
@@ -82,17 +82,54 @@ const SearchModal = ({ isOpen, onClose }) => {
       <div
         className="search-modal-content"
         onClick={(e) => e.stopPropagation()}>
-        <button className="search-modal-close" onClick={onClose}>
-          <AiOutlineClose />
+        <button
+          className="search-modal-close"
+          onClick={onClose}
+          aria-label="Close Search Modal">
+          ✕
         </button>
 
         <div className="search-modal-header">
           <h2>Search Products</h2>
-          <button
-            className="search-modal-toggle"
-            onClick={() => setIsAdvanced(!isAdvanced)}>
-            {isAdvanced ? "Sentiment Search" : "Fuzzy Search"}
-          </button>
+          <div className="search-mode-info">
+            {!isAdvanced && searchResults.length > 0 && (
+              <div className="sentiment-info-tooltip">
+                <button
+                  className="info-icon"
+                  type="button"
+                  title="How Sentiment Analysis Works">
+                  <AiOutlineInfoCircle />
+                </button>
+                <div className="tooltip-content">
+                  <strong>Multi-Source Sentiment Analysis:</strong>
+                  <p>Score = (Positive - Negative) / Total Words</p>
+                  <p>
+                    <small>📊 Analyzed from 5 sources:</small>
+                    <br />
+                    <small>👥 Opinions (40%) • 📝 Description (25%)</small>
+                    <br />
+                    <small>
+                      🏷️ Name (15%) • 📋 Specs (12%) • 🗂️ Categories (8%)
+                    </small>
+                  </p>
+                  <p>
+                    <small>Range: -1.0 (negative) to +1.0 (positive)</small>
+                  </p>
+                  <p>
+                    <small>
+                      Source: Liu, B. (2012) - Sentiment Analysis and Opinion
+                      Mining
+                    </small>
+                  </p>
+                </div>
+              </div>
+            )}
+            <button
+              className="search-modal-toggle"
+              onClick={() => setIsAdvanced(!isAdvanced)}>
+              {isAdvanced ? "Sentiment Search" : "Fuzzy Search"}
+            </button>
+          </div>
         </div>
 
         <form
@@ -190,7 +227,41 @@ const SearchModal = ({ isOpen, onClose }) => {
                     )}
                     {!isAdvanced && product.sentiment_score != null && (
                       <div className="search-modal-sentiment">
-                        Sentiment Score: {product.sentiment_score.toFixed(2)}
+                        <div className="sentiment-score">
+                          <strong>Sentiment Score:</strong>{" "}
+                          {product.sentiment_score.toFixed(2)}
+                          <span
+                            className={`sentiment-badge ${
+                              product.sentiment_score > 0.1
+                                ? "positive"
+                                : product.sentiment_score < -0.1
+                                ? "negative"
+                                : "neutral"
+                            }`}>
+                            {product.sentiment_score > 0.1
+                              ? "😊 Positive"
+                              : product.sentiment_score < -0.1
+                              ? "😞 Negative"
+                              : "😐 Neutral"}
+                          </span>
+                        </div>
+                        {product.total_opinions > 0 && (
+                          <div className="sentiment-details">
+                            <span className="opinion-count">
+                              📝 {product.total_opinions} opinion
+                              {product.total_opinions !== 1 ? "s" : ""}
+                            </span>
+                            {(product.positive_count ||
+                              product.negative_count ||
+                              product.neutral_count) && (
+                              <span className="opinion-breakdown">
+                                👍 {product.positive_count || 0} | 👎{" "}
+                                {product.negative_count || 0} | 😐{" "}
+                                {product.neutral_count || 0}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

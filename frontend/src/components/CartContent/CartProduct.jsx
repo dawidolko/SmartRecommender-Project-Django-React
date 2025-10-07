@@ -41,7 +41,7 @@ const CartProduct = ({ id, name, price, photos, removeItemFromCart }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          paddingBottom: "50px",
+          paddingBottom: "44px",
         }}>
         <button
           className="cart__action-btn"

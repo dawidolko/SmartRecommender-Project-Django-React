@@ -71,8 +71,19 @@ package "Custom Algorithm - custom_recommendation_engine.py" {
     +_calculate_intensity_multiplier(words, index): float
     +_tokenize_text(text): list
     --
-    Implementuje prawdziwy wzór SentiWordNet:
+    Base Formula (Liu, B. 2012):
     score = (positive - negative) / total_words
+    
+    Multi-Source Formula:
+    Final_Score = (Opinion×0.40) + (Desc×0.25) +
+                  (Name×0.15) + (Spec×0.12) + (Cat×0.08)
+    
+    Sources Analyzed:
+    👥 Opinions (40% weight) - Customer reviews
+    📝 Description (25% weight) - Product description
+    🏷️ Name (15% weight) - Product name keywords
+    📋 Specifications (12% weight) - Technical specs
+    🗂️ Categories (8% weight) - Product categories
   }
 }
 
@@ -115,15 +126,33 @@ package "Frontend Components" {
     -searchTerm: string
     -searchResults: Array
     -isAdvanced: boolean
+    -isLoading: boolean
+    -error: string
     -priceRange: string
-    -fuzzyThreshold: number
+    -fuzzyThreshold: number = 0.6
     --
     +performSentimentSearch()
     +performFuzzySearch()
-    +useEffect([searchTerm, isAdvanced])
+    +useEffect([searchTerm, isAdvanced]) - 300ms delay
     +handleProductClick()
+    +handleAdvancedSearch()
     --
-    Toggle między Sentiment/Fuzzy search
+    Imports: AiOutlineSearch, AiOutlineInfoCircle
+    Button: ✕ (text, 24px, bold, black on red)
+    Tooltip: Multi-Source Sentiment Info
+    Conditional: !isAdvanced && searchResults.length > 0
+  }
+  
+  class SearchModal_scss {
+    +search-modal-close: 36px×36px
+    +info-icon: 36px×36px, rgba(59,130,246,0.1)
+    +tooltip-content: gradient(#ffffff, #f8fafc)
+    +search-modal-toggle: 36px height
+    --
+    Close button: color: rgb(0,0,0), font-size: 24px
+    Info icon: blue accent, 18px SVG
+    Tooltip: position: absolute, top: calc(100% + 12px)
+    Hover effects: translateY(-2px), box-shadow
   }
   
   class ProductReviewAPIView {
@@ -135,6 +164,8 @@ package "Frontend Components" {
     -create_opinion_with_sentiment()
   }
 }
+
+SearchModal_jsx ..> SearchModal_scss : uses styles
 
 package "Database Migration" {
   

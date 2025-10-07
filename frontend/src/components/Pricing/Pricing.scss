@@ -42,6 +42,7 @@
     min-height: 350px;
     max-height: 350px;
     width: 100%;
+    background-color: darken(#000000, 5%);
 
     &:hover {
       transform: translateY(-5px);

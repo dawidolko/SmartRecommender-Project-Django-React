@@ -15,10 +15,17 @@ participant "SentimentAnalysis Model" as SA
 
 C -> Search: Otwiera modal wyszukiwania
 activate Search
+note right of Search
+  Imports:
+  - AiOutlineSearch
+  - AiOutlineInfoCircle
+  Close button: ✕ (text)
+end note
 
 C -> Search: Wpisuje zapytanie "excellent laptop"
-Search -> Search: useEffect wykrywa zmiany searchTerm
+Search -> Search: useEffect wykrywa zmiany searchTerm (300ms debounce)
 Search -> Search: !isAdvanced (sentiment mode)
+Search -> Search: setIsLoading(true)
 
 Search -> API1: GET /api/sentiment-search/?q=excellent laptop
 activate API1
@@ -34,6 +41,20 @@ API1 -> API1: Serialize products with sentiment scores
 
 API1 --> Search: Response z produktami sortowanymi według sentymentu
 deactivate API1
+
+Search -> Search: setIsLoading(false)
+Search -> Search: setSearchResults(response.data)
+
+alt searchResults.length > 0 && !isAdvanced
+  Search -> Search: Wyświetl tooltip info z AiOutlineInfoCircle
+  note right
+    Tooltip zawiera:
+    - Multi-Source Sentiment Analysis
+    - Formula: (Positive - Negative) / Total Words
+    - 5 źródeł: Opinions (40%), Description (25%),
+      Name (15%), Specs (12%), Categories (8%)
+  end note
+end
 
 Search -> Search: Renderuj wyniki z sentiment scores
 Search --> C: Wyświetla produkty z metrykami sentymentu
@@ -96,7 +117,21 @@ activate SA
 SA --> CSA: All opinions for this product
 deactivate SA
 
-CSA -> CSA: Calculate average sentiment across all opinions
+CSA -> CSA: Calculate opinion_avg from all opinions
+CSA -> CSA: Analyze product.description → desc_score
+CSA -> CSA: Analyze product.name → name_score
+CSA -> CSA: Analyze specifications → spec_score
+CSA -> CSA: Analyze categories → category_score
+
+note right of CSA
+  Multi-Source Weighted Calculation:
+  final_score = (opinion_avg × 0.40) +
+                (desc_score × 0.25) +
+                (name_score × 0.15) +
+                (spec_score × 0.12) +
+                (category_score × 0.08)
+end note
+
 CSA -> CSA: Count positive/neutral/negative opinions
 CSA --> Signals: sentiment_data = {average_score: 0.65, positive_count: 12, ...}
 deactivate CSA

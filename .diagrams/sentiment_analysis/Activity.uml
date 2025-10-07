@@ -3,15 +3,29 @@ start
 
 partition "Frontend - SearchModal.jsx" {
   :Klient wpisuje zapytanie w pasku wyszukiwania;
+  
+  note right
+    Imports:
+    - AiOutlineSearch
+    - AiOutlineInfoCircle
+    Close button: ✕ (text, no SVG)
+  end note
+  
   :useEffect wykrywa zmiany searchTerm;
+  :setTimeout 300ms debounce;
   
   if (isAdvanced mode?) then (Fuzzy Search)
     :performFuzzySearch();
+    :setIsLoading(true);
     :GET /api/fuzzy-search/;
   else (Sentiment Search)
     :performSentimentSearch();
+    :setIsLoading(true);
     :GET /api/sentiment-search/;
   endif
+  
+  :setIsLoading(false);
+  :setSearchResults(response.data);
 }
 
 partition "Backend - sentiment_views.py" {
@@ -19,8 +33,35 @@ partition "Backend - sentiment_views.py" {
   :Wyszukaj produkty według query;
   :select_related("sentiment_summary");
   :order_by sentiment_score DESC;
+  
+  note right
+    Multi-Source Sentiment Analysis:
+    Final_Score = (Opinion×0.40) + 
+                  (Desc×0.25) + 
+                  (Name×0.15) + 
+                  (Spec×0.12) + 
+                  (Cat×0.08)
+  end note
+  
   :Zwróć produkty z metrykami sentymentu;
 }
+
+if (searchResults.length > 0 && !isAdvanced?) then (yes)
+  :Wyświetl tooltip info z AiOutlineInfoCircle;
+  
+  note right
+    Tooltip Multi-Source Info:
+    - Formula: (Positive - Negative) / Total Words
+    - 5 źródeł z wagami:
+      👥 Opinions (40%)
+      📝 Description (25%)
+      🏷️ Name (15%)
+      📋 Specs (12%)
+      🗂️ Categories (8%)
+  end note
+else (no)
+  :Ukryj tooltip;
+endif
 
 :Wyświetl wyniki z sentiment score;
 
