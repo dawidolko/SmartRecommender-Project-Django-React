@@ -1,18 +1,38 @@
-To be corrected: 06/06/2025
+⚠️ **DEPRECATED - SEE NEW DOCUMENTATION**
 
-# 🔍 Fuzzy Logic in Product Search
+This file contains outdated information about the "Fuzzy Search" feature.
 
-## What Is "Fuzzy Search" in Shop?
+**NEW IMPLEMENTATION (2025-01-08):**
+The system now uses **TRUE FUZZY LOGIC** (Zadeh 1965, Mamdani 1975) instead of simple heuristic matching.
 
-Fuzzy search is an intelligent product discovery algorithm that:
+📖 **See complete documentation:** [`fuzzy_logic_system.md`](./fuzzy_logic_system.md)
 
-- **Finds products despite typos or misspellings**
-- **Matches partial words and phrases** in product data
-- **Weights different product attributes** based on importance
-- **Applies similarity scoring** instead of exact matching
-- **Filters results by price range** categories
+---
 
-This system makes shop smarter by helping customers find what they're looking for even when they don't know exact product names or make spelling mistakes.
+# 🔍 ~~Fuzzy Search~~ → 🧠 Fuzzy Logic System
+
+## What Changed?
+
+### Old Approach (Heuristic "Fuzzy" Search):
+
+- ❌ Simple text similarity (Levenshtein distance, trigrams)
+- ❌ Weighted sum of scores
+- ❌ No linguistic reasoning
+- ❌ Not real "fuzzy logic" from academic perspective
+
+### New Approach (True Fuzzy Logic Inference):
+
+- ✅ **Membership functions** (trimf, trapmf)
+- ✅ **Linguistic variables** (very_low, low, medium, high, very_high)
+- ✅ **IF-THEN rules** (12 rules with linguistic terms)
+- ✅ **Mamdani inference** (fuzzification → rule evaluation → aggregation → defuzzification)
+- ✅ **Centroid defuzzification** for crisp output
+
+---
+
+## What Is "Fuzzy Logic" in This System?
+
+**Fuzzy Logic** (Zadeh, 1965) is a mathematical framework for reasoning with uncertainty using:
 
 ---
 

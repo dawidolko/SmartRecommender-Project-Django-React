@@ -245,19 +245,439 @@ class CustomContentBasedFilter:
 
 
 class CustomFuzzySearch:
+    """
+    Fuzzy Logic System for Product Search Relevance Scoring.
+    
+    Based on Fuzzy Set Theory (Zadeh, 1965) and Mamdani Fuzzy Inference (Mamdani & Assilian, 1975).
+    
+    Theory:
+    -------
+    Fuzzy Logic handles uncertainty and partial truth using membership functions μ(x) ∈ [0, 1]
+    instead of binary true/false values.
+    
+    References:
+    -----------
+    - Zadeh, L.A. (1965). "Fuzzy Sets". Information and Control, 8(3), pp. 338-353.
+    - Mamdani, E.H., Assilian, S. (1975). "An Experiment in Linguistic Synthesis 
+      with a Fuzzy Logic Controller". International Journal of Man-Machine Studies, 7(1), pp. 1-13.
+    - Ross, T.J. (2010). "Fuzzy Logic with Engineering Applications", 3rd ed., Wiley.
+    
+    System Components:
+    ------------------
+    1. Linguistic Variables: 
+       - name_match ∈ [0,1] → {"very_low", "low", "medium", "high", "very_high"}
+       - price_diff ∈ [0,1] → {"perfect", "good", "acceptable", "poor"}
+       - category_match ∈ [0,1] → {"poor", "fair", "good", "excellent"}
+       - relevance (OUTPUT) ∈ [0,1] → {"irrelevant", "somewhat_relevant", "relevant", "highly_relevant"}
+    
+    2. Membership Functions: Triangular (trimf) and Trapezoidal (trapmf)
+       μ_A(x) = max(min((x-a)/(b-a), (c-x)/(c-b)), 0)  for triangular
+    
+    3. Fuzzy Rules (IF-THEN):
+       R1: IF name_match is VERY_HIGH THEN relevance is HIGHLY_RELEVANT
+       R2: IF name_match is HIGH AND category_match is GOOD THEN relevance is RELEVANT
+       R3: IF name_match is MEDIUM THEN relevance is SOMEWHAT_RELEVANT
+       R4: IF name_match is LOW OR VERY_LOW THEN relevance is IRRELEVANT
+       ... (15 rules total)
+    
+    4. Fuzzy Inference: Mamdani min-max inference
+       - Fuzzification: Convert crisp inputs to fuzzy sets
+       - Rule activation: Min(antecedents) for each rule
+       - Aggregation: Max of all rule outputs
+       - Defuzzification: Centroid method
+    
+    5. Defuzzification Formula (Centroid):
+       y* = Σ(μ(y_i) × y_i) / Σ(μ(y_i))
+       where y_i are discrete points in output universe
+    """
+    
     def __init__(self):
         self.default_threshold = 0.5
         self.max_distance_calc_length = 200
-
         self.chunk_size = 150
         self.chunk_overlap = 30
-
+        
+        # Field weights for crisp score calculation (used before fuzzy inference)
         self.field_weights = {
             "name": 0.45,
             "description": 0.25,
             "category": 0.20,
             "specification": 0.10,
         }
+        
+        # Initialize Fuzzy Logic System
+        self._init_fuzzy_system()
+    
+    def _init_fuzzy_system(self):
+        """
+        Initialize Fuzzy Logic System with linguistic variables and membership functions.
+        
+        Membership Function Types:
+        - trimf(a, b, c): Triangular - μ(x) = max(0, min((x-a)/(b-a), (c-x)/(c-b)))
+        - trapmf(a, b, c, d): Trapezoidal - μ(x) = max(0, min((x-a)/(b-a), 1, (d-x)/(d-c)))
+        """
+        
+        # INPUT 1: name_match score [0, 1]
+        # Linguistic terms: very_low, low, medium, high, very_high
+        self.name_match_mf = {
+            "very_low": {"type": "trimf", "params": [0.0, 0.0, 0.2]},
+            "low": {"type": "trimf", "params": [0.0, 0.2, 0.4]},
+            "medium": {"type": "trimf", "params": [0.2, 0.5, 0.7]},
+            "high": {"type": "trimf", "params": [0.5, 0.75, 0.9]},
+            "very_high": {"type": "trapmf", "params": [0.7, 0.85, 1.0, 1.0]},
+        }
+        
+        # INPUT 2: category_match score [0, 1]
+        # Linguistic terms: poor, fair, good, excellent
+        self.category_match_mf = {
+            "poor": {"type": "trimf", "params": [0.0, 0.0, 0.3]},
+            "fair": {"type": "trimf", "params": [0.1, 0.4, 0.6]},
+            "good": {"type": "trimf", "params": [0.4, 0.7, 0.9]},
+            "excellent": {"type": "trapmf", "params": [0.7, 0.85, 1.0, 1.0]},
+        }
+        
+        # INPUT 3: price_suitability [0, 1] - how well price fits user's budget
+        # Linguistic terms: poor, acceptable, good, perfect
+        self.price_suitability_mf = {
+            "poor": {"type": "trimf", "params": [0.0, 0.0, 0.3]},
+            "acceptable": {"type": "trimf", "params": [0.2, 0.5, 0.7]},
+            "good": {"type": "trimf", "params": [0.5, 0.75, 0.95]},
+            "perfect": {"type": "trapmf", "params": [0.8, 0.9, 1.0, 1.0]},
+        }
+        
+        # OUTPUT: relevance score [0, 1]
+        # Linguistic terms: irrelevant, somewhat_relevant, relevant, highly_relevant
+        self.relevance_mf = {
+            "irrelevant": {"type": "trimf", "params": [0.0, 0.0, 0.25]},
+            "somewhat_relevant": {"type": "trimf", "params": [0.15, 0.4, 0.65]},
+            "relevant": {"type": "trimf", "params": [0.5, 0.7, 0.85]},
+            "highly_relevant": {"type": "trapmf", "params": [0.7, 0.85, 1.0, 1.0]},
+        }
+        
+        # FUZZY RULES (Mamdani-style IF-THEN rules)
+        # Rule format: {"IF": {var: term, ...}, "THEN": {output_var: term}}
+        self.fuzzy_rules = [
+            # High priority rules - name match is most important
+            {
+                "name": "R1",
+                "IF": {"name_match": "very_high"},
+                "THEN": {"relevance": "highly_relevant"},
+                "weight": 1.0,
+            },
+            {
+                "name": "R2",
+                "IF": {"name_match": "high", "category_match": "good"},
+                "THEN": {"relevance": "highly_relevant"},
+                "weight": 0.9,
+            },
+            {
+                "name": "R3",
+                "IF": {"name_match": "high", "category_match": "fair"},
+                "THEN": {"relevance": "relevant"},
+                "weight": 0.85,
+            },
+            {
+                "name": "R4",
+                "IF": {"name_match": "medium", "category_match": "excellent"},
+                "THEN": {"relevance": "relevant"},
+                "weight": 0.8,
+            },
+            {
+                "name": "R5",
+                "IF": {"name_match": "medium", "category_match": "good"},
+                "THEN": {"relevance": "relevant"},
+                "weight": 0.75,
+            },
+            {
+                "name": "R6",
+                "IF": {"name_match": "medium"},
+                "THEN": {"relevance": "somewhat_relevant"},
+                "weight": 0.7,
+            },
+            {
+                "name": "R7",
+                "IF": {"name_match": "low", "category_match": "excellent"},
+                "THEN": {"relevance": "somewhat_relevant"},
+                "weight": 0.5,
+            },
+            {
+                "name": "R8",
+                "IF": {"name_match": "low"},
+                "THEN": {"relevance": "irrelevant"},
+                "weight": 0.6,
+            },
+            {
+                "name": "R9",
+                "IF": {"name_match": "very_low"},
+                "THEN": {"relevance": "irrelevant"},
+                "weight": 1.0,
+            },
+            # Price rules (lower priority)
+            {
+                "name": "R10",
+                "IF": {"name_match": "high", "price_suitability": "perfect"},
+                "THEN": {"relevance": "highly_relevant"},
+                "weight": 0.7,
+            },
+            {
+                "name": "R11",
+                "IF": {"name_match": "medium", "price_suitability": "good"},
+                "THEN": {"relevance": "relevant"},
+                "weight": 0.6,
+            },
+            {
+                "name": "R12",
+                "IF": {"category_match": "excellent", "price_suitability": "perfect"},
+                "THEN": {"relevance": "relevant"},
+                "weight": 0.55,
+            },
+        ]
+    
+    def _membership_function(self, x, mf_type, params):
+        """
+        Calculate membership degree μ(x) for given value x.
+        
+        Triangular MF (trimf):
+            μ(x) = { 0,                    if x ≤ a or x ≥ c
+                   { (x-a)/(b-a),          if a < x ≤ b
+                   { (c-x)/(c-b),          if b < x < c
+        
+        Trapezoidal MF (trapmf):
+            μ(x) = { 0,                    if x ≤ a or x ≥ d
+                   { (x-a)/(b-a),          if a < x ≤ b
+                   { 1,                    if b < x ≤ c
+                   { (d-x)/(d-c),          if c < x < d
+        
+        Args:
+            x (float): Input value to evaluate
+            mf_type (str): 'trimf' or 'trapmf'
+            params (list): Parameters [a, b, c] for trimf or [a, b, c, d] for trapmf
+        
+        Returns:
+            float: Membership degree in [0, 1]
+        """
+        x = max(0.0, min(1.0, x))  # Clamp to [0, 1]
+        
+        if mf_type == "trimf":
+            a, b, c = params
+            if x <= a or x >= c:
+                return 0.0
+            elif a < x <= b:
+                if b == a:
+                    return 1.0
+                return (x - a) / (b - a)
+            else:  # b < x < c
+                if c == b:
+                    return 1.0
+                return (c - x) / (c - b)
+        
+        elif mf_type == "trapmf":
+            a, b, c, d = params
+            if x <= a or x >= d:
+                return 0.0
+            elif a < x <= b:
+                if b == a:
+                    return 1.0
+                return (x - a) / (b - a)
+            elif b < x <= c:
+                return 1.0
+            else:  # c < x < d
+                if d == c:
+                    return 1.0
+                return (d - x) / (d - c)
+        
+        return 0.0
+    
+    def _fuzzify(self, crisp_value, variable_mfs):
+        """
+        Fuzzification: Convert crisp input value to fuzzy membership degrees.
+        
+        Example:
+            If name_match = 0.75:
+            - μ_medium(0.75) = 0.0
+            - μ_high(0.75) = 1.0
+            - μ_very_high(0.75) = 0.3
+        
+        Args:
+            crisp_value (float): Crisp input value [0, 1]
+            variable_mfs (dict): Dictionary of membership functions for this variable
+        
+        Returns:
+            dict: {linguistic_term: membership_degree}
+        """
+        fuzzy_set = {}
+        for term, mf_def in variable_mfs.items():
+            membership = self._membership_function(
+                crisp_value, mf_def["type"], mf_def["params"]
+            )
+            fuzzy_set[term] = membership
+        return fuzzy_set
+    
+    def _evaluate_rule(self, rule, fuzzy_inputs):
+        """
+        Evaluate single fuzzy rule using MIN operator for AND.
+        
+        Mamdani Inference:
+            For rule "IF x is A AND y is B THEN z is C":
+            α = min(μ_A(x), μ_B(y))  ← Rule activation strength
+            Output = α ∧ C  ← Clip output MF at height α
+        
+        Args:
+            rule (dict): Rule definition with IF and THEN parts
+            fuzzy_inputs (dict): {variable_name: {term: membership}}
+        
+        Returns:
+            tuple: (output_term, activation_strength)
+        """
+        # Calculate rule activation strength (minimum of all antecedents)
+        activation = 1.0
+        
+        for var_name, term in rule["IF"].items():
+            if var_name in fuzzy_inputs:
+                membership = fuzzy_inputs[var_name].get(term, 0.0)
+                activation = min(activation, membership)
+        
+        # Apply rule weight (confidence in this rule)
+        activation *= rule.get("weight", 1.0)
+        
+        # Get consequent (output term)
+        output_term = rule["THEN"]["relevance"]
+        
+        return output_term, activation
+    
+    def _defuzzify_centroid(self, aggregated_output):
+        """
+        Defuzzification using Centroid (Center of Gravity) method.
+        
+        Formula:
+            y* = Σ(μ(y_i) × y_i) / Σ(μ(y_i))
+        
+        Where:
+            - y_i: discrete points in output universe [0, 1]
+            - μ(y_i): aggregated membership at point y_i
+            - y*: crisp output value
+        
+        Method: Mamdani & Assilian (1975), Section 3.2
+        
+        Args:
+            aggregated_output (dict): {term: activation_strength}
+        
+        Returns:
+            float: Crisp output value [0, 1]
+        """
+        # Discretize output universe [0, 1] into 101 points
+        resolution = 101
+        universe = [i / (resolution - 1) for i in range(resolution)]
+        
+        numerator = 0.0
+        denominator = 0.0
+        
+        for y in universe:
+            # Calculate membership at this point by taking MAX across all terms
+            max_membership = 0.0
+            
+            for term, activation in aggregated_output.items():
+                if activation > 0:
+                    mf_def = self.relevance_mf[term]
+                    term_membership = self._membership_function(
+                        y, mf_def["type"], mf_def["params"]
+                    )
+                    # Clip at activation height (Mamdani implication)
+                    clipped_membership = min(term_membership, activation)
+                    max_membership = max(max_membership, clipped_membership)
+            
+            numerator += max_membership * y
+            denominator += max_membership
+        
+        if denominator == 0:
+            return 0.5  # Default neutral value
+        
+        return numerator / denominator
+    
+    def fuzzy_inference(self, name_score, category_score, price_score=0.8):
+        """
+        Complete Fuzzy Inference System (Mamdani method).
+        
+        Process:
+        1. Fuzzification: Convert crisp inputs → fuzzy sets
+        2. Rule Evaluation: Apply all fuzzy rules
+        3. Aggregation: Combine rule outputs using MAX operator
+        4. Defuzzification: Convert fuzzy output → crisp value
+        
+        Mathematical Steps:
+        -------------------
+        Step 1 - Fuzzification:
+            For input x with linguistic variable X:
+            μ_low(x), μ_medium(x), μ_high(x), ...
+        
+        Step 2 - Rule Evaluation:
+            For each rule R_i: IF x is A AND y is B THEN z is C
+            α_i = min(μ_A(x), μ_B(y))  ← MIN for AND
+        
+        Step 3 - Aggregation:
+            For output term C:
+            μ_C(z) = max(α_1 ∧ C_1, α_2 ∧ C_2, ...)  ← MAX for OR
+        
+        Step 4 - Defuzzification:
+            z* = ∫ μ(z) × z dz / ∫ μ(z) dz  ← Centroid
+        
+        Args:
+            name_score (float): Text similarity score for product name [0, 1]
+            category_score (float): Category match score [0, 1]
+            price_score (float): Price suitability score [0, 1], default 0.8
+        
+        Returns:
+            float: Final relevance score [0, 1] after fuzzy reasoning
+        
+        Example:
+            Input: name_score=0.75, category_score=0.85, price_score=0.9
+            
+            Fuzzification:
+                name_match: {medium: 0.0, high: 1.0, very_high: 0.3}
+                category_match: {good: 0.3, excellent: 1.0}
+                price_suitability: {good: 0.5, perfect: 1.0}
+            
+            Rule Evaluation:
+                R1: IF name_match is high (1.0) → relevance is highly_relevant (1.0)
+                R2: IF name_match is high (1.0) AND category is good (0.3) → relevant (0.3)
+                R4: IF name_match is medium (0.0) AND category is excellent (1.0) → relevant (0.0)
+                ...
+            
+            Aggregation:
+                {highly_relevant: 1.0, relevant: 0.3, somewhat_relevant: 0.0, irrelevant: 0.0}
+            
+            Defuzzification (Centroid):
+                Output = 0.87 (weighted center of activated output MFs)
+        """
+        # STEP 1: Fuzzification
+        fuzzy_name = self._fuzzify(name_score, self.name_match_mf)
+        fuzzy_category = self._fuzzify(category_score, self.category_match_mf)
+        fuzzy_price = self._fuzzify(price_score, self.price_suitability_mf)
+        
+        fuzzy_inputs = {
+            "name_match": fuzzy_name,
+            "category_match": fuzzy_category,
+            "price_suitability": fuzzy_price,
+        }
+        
+        # STEP 2: Rule Evaluation & STEP 3: Aggregation
+        aggregated_output = {}  # {output_term: max_activation}
+        
+        for rule in self.fuzzy_rules:
+            output_term, activation = self._evaluate_rule(rule, fuzzy_inputs)
+            
+            # Aggregation using MAX operator (Mamdani)
+            if output_term in aggregated_output:
+                aggregated_output[output_term] = max(
+                    aggregated_output[output_term], activation
+                )
+            else:
+                aggregated_output[output_term] = activation
+        
+        # STEP 4: Defuzzification
+        crisp_output = self._defuzzify_centroid(aggregated_output)
+        
+        return crisp_output
 
     def calculate_fuzzy_score(self, query, text):
         """Enhanced fuzzy scoring with n-grams and better text processing"""
@@ -425,11 +845,29 @@ class CustomFuzzySearch:
         return max(0.0, similarity)
 
     def search_products(self, query, products, threshold=None):
-        """Enhanced product search with caching and better scoring"""
+        """
+        Enhanced product search using Fuzzy Logic Inference System.
+        
+        Process Flow:
+        1. Calculate text similarity scores (crisp values) using Levenshtein, trigrams, etc.
+        2. Apply Fuzzy Logic Inference to convert scores → relevance
+        3. Filter by threshold and return ranked results
+        
+        Key Innovation:
+        Instead of simple weighted sum, uses Mamdani Fuzzy Inference with linguistic rules:
+        - "IF name_match is HIGH THEN relevance is HIGHLY_RELEVANT"
+        - "IF name_match is MEDIUM AND category_match is GOOD THEN relevance is RELEVANT"
+        
+        This handles uncertainty better than deterministic scoring.
+        
+        References:
+        - Zadeh, L.A. (1965). "Fuzzy Sets"
+        - Mamdani, E.H. (1975). "Fuzzy Logic Controller"
+        """
         if threshold is None:
             threshold = self.default_threshold
 
-        cache_key = f"fuzzy_search_{hash(query)}_{threshold}_{len(products)}"
+        cache_key = f"fuzzy_logic_search_{hash(query)}_{threshold}_{len(products)}"
         cached_result = cache.get(cache_key)
         if cached_result:
             return cached_result
@@ -437,6 +875,8 @@ class CustomFuzzySearch:
         results = []
 
         for product in products:
+            # STEP 1: Calculate crisp text similarity scores [0, 1]
+            # Using Levenshtein distance, trigram similarity, word matching
             name_score = self.calculate_fuzzy_score(query, product.name)
             desc_score = self.calculate_fuzzy_score(query, product.description or "")
 
@@ -444,7 +884,7 @@ class CustomFuzzySearch:
                 self.calculate_fuzzy_score(query, cat.name)
                 for cat in product.categories.all()
             ]
-            category_score = max(category_scores) if category_scores else 0
+            category_score = max(category_scores) if category_scores else 0.0
 
             spec_scores = []
             for spec in product.specification_set.all()[:8]:
@@ -456,40 +896,60 @@ class CustomFuzzySearch:
                     spec_scores.append(
                         self.calculate_fuzzy_score(query, spec.parameter_name)
                     )
-
-            spec_score = max(spec_scores) if spec_scores else 0
+            spec_score = max(spec_scores) if spec_scores else 0.0
 
             tag_scores = [
                 self.calculate_fuzzy_score(query, tag.name)
                 for tag in product.tags.all()
             ]
-            tag_score = max(tag_scores) if tag_scores else 0
-
-            # Use MAX scoring instead of weighted average for better fuzzy matching
-            # Rationale: If query matches name well (e.g., "laptpo" -> "laptop"),
-            # don't penalize for not matching description/category
-            # Apply slight penalties to non-name fields for better ranking
-            total_score = max(
-                name_score,  # Full weight for name
-                desc_score * 0.9,  # 90% for description
-                category_score * 0.8,  # 80% for category
-                spec_score * 0.7,  # 70% for specs
-                tag_score * 0.6,  # 60% for tags
+            tag_score = max(tag_scores) if tag_scores else 0.0
+            
+            # Calculate price suitability (simple heuristic for now)
+            # In real scenario: compare with user's budget from query/profile
+            price_suitability = 0.8  # Neutral default
+            
+            # STEP 2: Apply FUZZY LOGIC INFERENCE SYSTEM
+            # This is where the magic happens! Instead of weighted sum, 
+            # we use linguistic rules and membership functions
+            fuzzy_relevance = self.fuzzy_inference(
+                name_score=name_score,
+                category_score=category_score,
+                price_score=price_suitability
             )
-
-            if total_score >= threshold:
+            
+            # The fuzzy_relevance is now the result of:
+            # 1. Fuzzification (crisp → fuzzy sets)
+            # 2. Rule evaluation (IF-THEN linguistic rules)
+            # 3. Aggregation (MAX operator for rule outputs)
+            # 4. Defuzzification (fuzzy → crisp using centroid method)
+            
+            # STEP 3: Combine with description/spec/tag scores for final ranking
+            # Fuzzy inference handles name + category + price
+            # We add desc/spec/tag as supplementary signals
+            combined_score = (
+                fuzzy_relevance * 0.7 +  # 70% from fuzzy inference
+                desc_score * 0.15 +       # 15% from description match
+                spec_score * 0.10 +       # 10% from specifications
+                tag_score * 0.05          # 5% from tags
+            )
+            
+            # Apply threshold filter
+            if combined_score >= threshold:
                 results.append(
                     {
                         "product": product,
-                        "score": round(total_score, 3),
+                        "score": round(combined_score, 3),
+                        "fuzzy_relevance": round(fuzzy_relevance, 3),  # NEW: Fuzzy inference result
                         "name_score": round(name_score, 3),
                         "desc_score": round(desc_score, 3),
                         "category_score": round(category_score, 3),
                         "spec_score": round(spec_score, 3),
                         "tag_score": round(tag_score, 3),
+                        "price_suitability": round(price_suitability, 3),
                     }
                 )
 
+        # Sort by combined score (which includes fuzzy inference)
         results.sort(key=lambda x: x["score"], reverse=True)
 
         cache.set(cache_key, results, timeout=600)

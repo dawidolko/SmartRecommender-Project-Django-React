@@ -418,11 +418,13 @@ class FuzzySearchAPIView(APIView):
             for i, result in enumerate(fuzzy_results):
                 product = result["product"]
                 data[i]["fuzzy_score"] = float(result["score"])
+                data[i]["fuzzy_relevance"] = float(result.get("fuzzy_relevance", 0))  # NEW: Fuzzy Logic output
                 data[i]["name_score"] = float(result["name_score"])
                 data[i]["desc_score"] = float(result["desc_score"])
                 data[i]["category_score"] = float(result["category_score"])
                 data[i]["spec_score"] = float(result["spec_score"])
                 data[i]["tag_score"] = float(result.get("tag_score", 0))
+                data[i]["price_suitability"] = float(result.get("price_suitability", 0.8))
 
                 if hasattr(product, "sentiment_summary") and product.sentiment_summary:
                     data[i]["sentiment_score"] = float(

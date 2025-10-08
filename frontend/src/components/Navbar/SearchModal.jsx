@@ -124,10 +124,49 @@ const SearchModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
             )}
+            {isAdvanced && searchResults.length > 0 && (
+              <div className="sentiment-info-tooltip">
+                <button
+                  className="info-icon"
+                  type="button"
+                  title="How Fuzzy Logic Works">
+                  <AiOutlineInfoCircle />
+                </button>
+                <div className="tooltip-content">
+                  <strong>Fuzzy Logic Inference System:</strong>
+                  <p>🧠 Mamdani Fuzzy Inference (1975)</p>
+                  <p>
+                    <small>📐 Process:</small>
+                    <br />
+                    <small>1. Fuzzification: Crisp → Fuzzy Sets</small>
+                    <br />
+                    <small>2. Rule Evaluation: IF-THEN Rules</small>
+                    <br />
+                    <small>3. Aggregation: MAX Operator</small>
+                    <br />
+                    <small>4. Defuzzification: Centroid Method</small>
+                  </p>
+                  <p>
+                    <small>🎯 Linguistic Variables:</small>
+                    <br />
+                    <small>• Name Match: very_low → very_high</small>
+                    <br />
+                    <small>• Category Match: poor → excellent</small>
+                    <br />
+                    <small>• Relevance: irrelevant → highly_relevant</small>
+                  </p>
+                  <p>
+                    <small>
+                      Source: Zadeh, L.A. (1965) - Fuzzy Sets Theory
+                    </small>
+                  </p>
+                </div>
+              </div>
+            )}
             <button
               className="search-modal-toggle"
               onClick={() => setIsAdvanced(!isAdvanced)}>
-              {isAdvanced ? "Sentiment Search" : "Fuzzy Search"}
+              {isAdvanced ? "Sentiment Search" : "Fuzzy Logic Search"}
             </button>
           </div>
         </div>
@@ -221,8 +260,26 @@ const SearchModal = ({ isOpen, onClose }) => {
                       ${product.price}
                     </p>
                     {isAdvanced && product.fuzzy_score && (
-                      <div className="search-modal-score">
-                        Fuzzy Match: {(product.fuzzy_score * 100).toFixed(0)}%
+                      <div className="search-modal-fuzzy-logic">
+                        <div className="fuzzy-main-score">
+                          <strong>Fuzzy Logic Score:</strong>{" "}
+                          {(product.fuzzy_score * 100).toFixed(0)}%
+                        </div>
+                        {product.fuzzy_relevance && (
+                          <div className="fuzzy-inference-score">
+                            <small>
+                              🧠 Fuzzy Inference:{" "}
+                              {(product.fuzzy_relevance * 100).toFixed(0)}%
+                            </small>
+                          </div>
+                        )}
+                        <div className="fuzzy-breakdown">
+                          <small>
+                            📝 Name: {(product.name_score * 100).toFixed(0)}% |
+                            🗂️ Category:{" "}
+                            {(product.category_score * 100).toFixed(0)}%
+                          </small>
+                        </div>
                       </div>
                     )}
                     {!isAdvanced && product.sentiment_score != null && (

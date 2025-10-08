@@ -489,6 +489,55 @@
       }
     }
   }
+
+  .search-modal-fuzzy-logic {
+    margin-top: 8px;
+    padding: 10px;
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05) 0%,
+      rgba(139, 92, 246, 0.05) 100%
+    );
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+
+    .fuzzy-main-score {
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: $label-color;
+
+      strong {
+        color: rgb(99, 102, 241);
+        font-weight: 600;
+      }
+    }
+
+    .fuzzy-inference-score {
+      margin-bottom: 4px;
+      padding: 4px 8px;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: 6px;
+      display: inline-block;
+
+      small {
+        font-size: 11px;
+        color: rgb(139, 92, 246);
+        font-weight: 600;
+      }
+    }
+
+    .fuzzy-breakdown {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(99, 102, 241, 0.15);
+
+      small {
+        font-size: 11px;
+        color: $preview-empty;
+        line-height: 1.5;
+      }
+    }
+  }
 }
 
 .search-modal-no-results {
