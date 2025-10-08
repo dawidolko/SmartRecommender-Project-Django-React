@@ -1,0 +1,422 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{url}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{pdfpages}
+
+% Marginesy
+\geometry{left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% Interlinia 1,5
+\onehalfspacing
+
+% Wcięcia akapitów
+\setlength{\parindent}{1cm}
+
+% Tytuły
+\titleformat{\section}[block]{\bfseries\Large\filcenter}{}{1em}{}
+\titleformat{\subsection}[block]{\bfseries\large}{}{1em}{}
+
+\begin{document}
+
+\begin{titlepage}
+
+\begin{minipage}{0.7\textwidth}
+    {\large\bf UNIWERSYTET RZESZOWSKI}\\
+    {\large\bf Wydział Nauk Ścisłych i Technicznych}
+\end{minipage}
+\hfill
+\begin{minipage}{0.25\textwidth}
+    \centering
+    \includegraphics[width=8em]{logoUR.jpg}
+\end{minipage}
+
+
+\vspace{3cm}
+
+\begin{center}
+    {\Large Dawid Olko} \\
+    {\large nr albumu: 125148} \\
+    {\large Kierunek: Informatyka}
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+    {\LARGE\bf System rekomendacji produktów oparty na filtracji współpracy, analizie sentymentu i regułach asocjacyjnych}
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{center}
+    {\large Praca inżynierska}
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+    {\large Praca wykonana pod kierunkiem}\\
+    {\large dr inż. Piotra Grochowalskiego}
+\end{flushright}
+
+\vspace{3cm}
+
+\begin{center}
+    {\large Rzesz\'ow, 2026}
+\end{center}
+
+\end{titlepage}
+
+% Spis treści
+\tableofcontents
+\newpage
+
+
+\section*{Wstęp}
+\addcontentsline{toc}{section}{Wstęp}
+
+Rozwój technologii e-commerce oraz dynamiczny wzrost ilości dostępnych produktów w sklepach internetowych stworzył nowe wyzwanie – problem wyboru optymalnego produktu spośród tysięcy opcji. W odpowiedzi na to wyzwanie narodziły się systemy rekomendacyjne, które od początku XXI wieku stały się fundamentalnym narzędziem wspierającym decyzje użytkowników. Pionierskie prace Resnick i Varian (1997) oraz implementacja systemu rekomendacji przez Amazon.com zapoczątkowały rewolucję w prezentowaniu produktów, przekształcając pasywne przeglądanie w spersonalizowane doświadczenie zakupowe. Algorytmy te nie tylko zwiększają zadowolenie użytkowników, ale także stanowią kluczowy czynnik rentowności platform e-commerce, generując wysokie wzrosty całkowitej sprzedaży w przypadku liderów branży.
+
+Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza zaawansowanego systemu rekomendacyjnego dla platformy e-commerce, wykorzystującego trzy fundamentalne metody: \textit{Collaborative Filtering}, \textit{Analizę Sentymentu} oraz \textit{Reguły Asocjacyjne} z algorytmem \textit{Apriori}. Praca prezentuje kompleksowe podejście do problemu rekomendacji, łącząc klasyczne algorytmy znane z literatury naukowej z własnymi rozwiązaniami optymalizacyjnymi.
+
+W pierwszym rozdziale omówione zostaną teoretyczne podstawy systemów rekomendacyjnych, ich geneza i znaczenie w kontekście współczesnego e-commerce. Zaprezentowana zostanie klasyfikacja metod rekomendacyjnych wraz z ich charakterystyką, zaletami i ograniczeniami. Szczególną uwagę poświęcono matematycznym fundamentom trzech implementowanych algorytmów, w tym miarom podobieństwa (Adjusted Cosine Similarity według Sarwar et al. 2001), analizie sentymentu opartej na słowniku (Liu 2012) oraz metrykach reguł asocjacyjnych (Support, Confidence, Lift według Agrawal \& Srikant 1994).
+
+Drugi rozdział skupia się na szczegółowej analizie pierwszej metody – \textit{Collaborative Filtering}. Przedstawiona zostanie implementacja wykorzystująca \textit{Adjusted Cosine Similarity} do analizy macierzy użytkownik-produkt oraz bibliotekę scikit-learn do obliczania podobieństw między użytkownikami. Omówione zostaną wzory matematyczne, proces generowania rekomendacji typu "użytkownicy podobni do Ciebie kupili również" oraz mechanizmy optymalizacyjne (zapisywanie wyników w pamięci podręcznej, operacje grupowe na bazie danych).
+
+Trzeci rozdział poświęcony będzie drugiej metodzie – \textit{Analizie Sentymentu} opinii klientów, opisie produktu, kategorii oraz specyfikacji. Zaprezentowana zostanie implementacja wykorzystująca analizę sentymentu opartą na słowniku (Liu 2012) z rozszerzonym słownikiem zawierającym ponad 200 słów pozytywnych i negatywnych. Szczegółowo omówiony zostanie system wieloźródłowej agregacji sentymentu, który analizuje opinie klientów (waga: 40\%), opisy produktów (25\%), nazwy (15\%), specyfikacje (12\%) oraz kategorie (8\%), generując kompleksową ocenę sentymentu produktu w skali od -1.0 do +1.0.
+
+Czwarty rozdział przedstawia trzecią metodę – \textit{Reguły Asocjacyjne} z algorytmem \textit{Apriori}. Omówiona zostanie implementacja klasycznego algorytmu (Agrawal \& Srikant 1994) w wersji zoptymalizowanej. Szczegółowo zaprezentowane zostaną wzory matematyczne dla metryk \textit{Support}, \textit{Confidence} oraz \textit{Lift}, proces identyfikacji produktów często kupowanych razem oraz zastosowanie reguł w funkcjonalności "Klienci kupili również".
+
+Piąty rozdział zawiera opis architektury technicznej systemu oraz mechanizmów optymalizacyjnych. Przedstawiony zostanie stos technologiczny: Django REST Framework (backend), React 18 (frontend), PostgreSQL (baza danych) oraz system cache'owania Redis. Omówione zostaną techniki optymalizacji wydajności: wielopoziomowy cache z czasami wygaśnięcia, operacje bulk INSERT redukujące liczbę zapytań do bazy oraz indeksowanie kolumn wykorzystywanych w operacjach JOIN.
+
+Szósty rozdział prezentuje wyniki eksperymentów oraz analizę porównawczą trzech zaimplementowanych metod. Przedstawione zostaną metryki wydajności (czas obliczeń, zużycie pamięci) oraz jakości rekomendacji dla każdej metody osobno. Analiza obejmuje również badanie wpływu parametrów algorytmów na jakość generowanych rekomendacji oraz przykłady rekomendacji dla różnych profili użytkowników.
+
+Siódmy rozdział zawiera wnioski końcowe, podsumowanie osiągniętych rezultatów oraz identyfikację ograniczeń zaimplementowanego systemu. Omówione zostaną główne wyzwania napotkane podczas implementacji, takie jak problem zimnego startu dla nowych użytkowników i produktów czy konieczność regularnej aktualizacji modeli rekomendacji. Przedstawione zostaną również kierunki dalszego rozwoju systemu.
+
+Praca została zrealizowana w oparciu o aktualną literaturę naukową z zakresu systemów rekomendacyjnych, uczenia maszynowego oraz analizy danych. Szczególną wartością niniejszego opracowania jest manualnie zaimplementowany algorytm \textit{Apriori} z optymalizacjami, implementacja analizy sentymentu z systemem wieloźródłowej agregacji oraz implementacja \textit{Collaborative Filtering} z \textit{Adjusted Cosine Similarity}. Praca prezentuje rzeczywisty, funkcjonalny system e-commerce z pełną integracją wszystkich komponentów.
+
+\newpage
+
+\section*{Rozdzia\l{} 1}
+\addcontentsline{toc}{section}{Rozdział 1: Teoretyczne podstawy systemów rekomendacyjnych}
+\section*{Teoretyczne podstawy systemów rekomendacyjnych}
+
+\subsection*{1.1 Historia i ewolucja systemów rekomendacyjnych}
+\addcontentsline{toc}{subsection}{1.1 Historia i ewolucja systemów rekomendacyjnych}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{1.2 Klasyfikacja metod rekomendacyjnych}
+\addcontentsline{toc}{subsection}{1.2 Klasyfikacja metod rekomendacyjnych}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{1.3 Matematyczne fundamenty algorytmów}
+\addcontentsline{toc}{subsection}{1.3 Matematyczne fundamenty algorytmów}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\newpage
+
+\section*{Rozdzia\l{} 2}
+\addcontentsline{toc}{section}{Rozdział 2: Collaborative Filtering}
+\section*{Collaborative Filtering}
+
+\subsection*{2.1 Wprowadzenie do metody Collaborative Filtering}
+\addcontentsline{toc}{subsection}{2.1 Wprowadzenie do metody Collaborative Filtering}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{2.2 Adjusted Cosine Similarity}
+\addcontentsline{toc}{subsection}{2.2 Adjusted Cosine Similarity}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{2.3 Implementacja algorytmu}
+\addcontentsline{toc}{subsection}{2.3 Implementacja algorytmu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\subsection*{2.4 Generowanie rekomendacji}
+\addcontentsline{toc}{subsection}{2.4 Generowanie rekomendacji}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+
+\subsection*{2.5 Mechanizmy optymalizacyjne}
+\addcontentsline{toc}{subsection}{2.5 Mechanizmy optymalizacyjne}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.
+
+\newpage
+
+\section*{Rozdzia\l{} 3}
+\addcontentsline{toc}{section}{Rozdział 3: Analiza Sentymentu}
+\section*{Analiza Sentymentu}
+
+\subsection*{3.1 Wprowadzenie do analizy sentymentu}
+\addcontentsline{toc}{subsection}{3.1 Wprowadzenie do analizy sentymentu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{3.2 Analiza sentymentu oparta na słowniku}
+\addcontentsline{toc}{subsection}{3.2 Analiza sentymentu oparta na słowniku}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{3.3 System wieloźródłowej agregacji sentymentu}
+\addcontentsline{toc}{subsection}{3.3 System wieloźródłowej agregacji sentymentu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\subsection*{3.4 Implementacja analizy sentymentu}
+\addcontentsline{toc}{subsection}{3.4 Implementacja analizy sentymentu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+
+\subsection*{3.5 Przykłady zastosowania}
+\addcontentsline{toc}{subsection}{3.5 Przykłady zastosowania}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.
+
+\newpage
+
+\section*{Rozdzia\l{} 4}
+\addcontentsline{toc}{section}{Rozdział 4: Reguły Asocjacyjne - algorytm Apriori}
+\section*{Reguły Asocjacyjne - algorytm Apriori}
+
+\subsection*{4.1 Wprowadzenie do reguł asocjacyjnych}
+\addcontentsline{toc}{subsection}{4.1 Wprowadzenie do reguł asocjacyjnych}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{4.2 Algorytm Apriori}
+\addcontentsline{toc}{subsection}{4.2 Algorytm Apriori}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{4.3 Metryki Support, Confidence i Lift}
+\addcontentsline{toc}{subsection}{4.3 Metryki Support, Confidence i Lift}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\subsection*{4.4 Implementacja algorytmu}
+\addcontentsline{toc}{subsection}{4.4 Implementacja algorytmu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+
+\subsection*{4.5 Optymalizacje algorytmu}
+\addcontentsline{toc}{subsection}{4.5 Optymalizacje algorytmu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.
+
+\subsection*{4.6 Funkcjonalność "Klienci kupili również"}
+\addcontentsline{toc}{subsection}{4.6 Funkcjonalność "Klienci kupili również"}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.
+
+\newpage
+
+\section*{Rozdzia\l{} 5}
+\addcontentsline{toc}{section}{Rozdział 5: Architektura techniczna systemu}
+\section*{Architektura techniczna systemu}
+
+\subsection*{5.1 Stos technologiczny}
+\addcontentsline{toc}{subsection}{5.1 Stos technologiczny}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{5.2 Backend - Django REST Framework}
+\addcontentsline{toc}{subsection}{5.2 Backend - Django REST Framework}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{5.3 Frontend - React 18}
+\addcontentsline{toc}{subsection}{5.3 Frontend - React 18}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\subsection*{5.4 Baza danych - PostgreSQL}
+\addcontentsline{toc}{subsection}{5.4 Baza danych - PostgreSQL}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+
+\subsection*{5.5 System cache'owania - Redis}
+\addcontentsline{toc}{subsection}{5.5 System cache'owania - Redis}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.
+
+\subsection*{5.6 Mechanizmy optymalizacji wydajności}
+\addcontentsline{toc}{subsection}{5.6 Mechanizmy optymalizacji wydajności}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.
+
+\subsection*{5.7 Indeksowanie bazy danych}
+\addcontentsline{toc}{subsection}{5.7 Indeksowanie bazy danych}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
+
+\newpage
+
+\section*{Rozdzia\l{} 6}
+\addcontentsline{toc}{section}{Rozdział 6: Wyniki eksperymentów i analiza porównawcza}
+\section*{Wyniki eksperymentów i analiza porównawcza}
+
+\subsection*{6.1 Metodologia badań}
+\addcontentsline{toc}{subsection}{6.1 Metodologia badań}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{6.2 Metryki wydajności}
+\addcontentsline{toc}{subsection}{6.2 Metryki wydajności}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{6.3 Metryki jakości rekomendacji}
+\addcontentsline{toc}{subsection}{6.3 Metryki jakości rekomendacji}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\subsection*{6.4 Porównanie metod Collaborative Filtering}
+\addcontentsline{toc}{subsection}{6.4 Porównanie metod Collaborative Filtering}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+
+\subsection*{6.5 Porównanie metod Analizy Sentymentu}
+\addcontentsline{toc}{subsection}{6.5 Porównanie metod Analizy Sentymentu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.
+
+\subsection*{6.6 Porównanie metod Reguł Asocjacyjnych}
+\addcontentsline{toc}{subsection}{6.6 Porównanie metod Reguł Asocjacyjnych}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.
+
+\subsection*{6.7 Wpływ parametrów na jakość rekomendacji}
+\addcontentsline{toc}{subsection}{6.7 Wpływ parametrów na jakość rekomendacji}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
+
+\subsection*{6.8 Przykłady rekomendacji dla różnych profili użytkowników}
+\addcontentsline{toc}{subsection}{6.8 Przykłady rekomendacji dla różnych profili użytkowników}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis.
+
+\newpage
+
+\section*{Rozdzia\l{} 7}
+\addcontentsline{toc}{section}{Rozdział 7: Wnioski końcowe}
+\section*{Wnioski końcowe}
+
+\subsection*{7.1 Podsumowanie osiągniętych rezultatów}
+\addcontentsline{toc}{subsection}{7.1 Podsumowanie osiągniętych rezultatów}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\subsection*{7.2 Ograniczenia zaimplementowanego systemu}
+\addcontentsline{toc}{subsection}{7.2 Ograniczenia zaimplementowanego systemu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+\subsection*{7.3 Problem zimnego startu}
+\addcontentsline{toc}{subsection}{7.3 Problem zimnego startu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+
+\subsection*{7.4 Wyzwania podczas implementacji}
+\addcontentsline{toc}{subsection}{7.4 Wyzwania podczas implementacji}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+
+\subsection*{7.5 Kierunki dalszego rozwoju systemu}
+\addcontentsline{toc}{subsection}{7.5 Kierunki dalszego rozwoju systemu}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.
+
+\newpage
+
+\section*{Zako\'nczenie}
+\addcontentsline{toc}{section}{Zakończenie}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+
+Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.
+
+At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.
+
+\newpage
+\section*{Streszczenie}
+\addcontentsline{toc}{section}{Streszczenie}
+
+\noindent
+\textbf{Tytuł pracy w języku polskim:}\\
+System rekomendacyjny dla platformy e-commerce z wykorzystaniem Collaborative Filtering, Analizy Sentymentu oraz Reguł Asocjacyjnych.
+
+\noindent
+\textbf{Streszczenie:}\\
+Niniejsza praca poświęcona jest zaprojektowaniu i implementacji systemu rekomendacyjnego dla platformy e-commerce.
+
+Celem pracy było stworzenie funkcjonalnego systemu wykorzystującego trzy metody rekomendacji: Collaborative Filtering, Analizę Sentymentu oraz Reguły Asocjacyjne z algorytmem Apriori.
+
+Praca składa się z siedmiu rozdziałów. Pierwszy rozdział omawia teoretyczne podstawy systemów rekomendacyjnych oraz matematyczne fundamenty implementowanych algorytmów. Drugi rozdział prezentuje implementację metody Collaborative Filtering z wykorzystaniem Adjusted Cosine Similarity. Trzeci rozdział opisuje system analizy sentymentu opartej na słowniku z wieloźródłową agregacją. Czwarty rozdział zawiera implementację algorytmu Apriori wraz z optymalizacjami. Piąty rozdział przedstawia architekturę techniczną systemu oraz mechanizmy optymalizacji wydajności. Szósty rozdział prezentuje wyniki eksperymentów i analizę porównawczą metod. Siódmy rozdział zawiera wnioski końcowe oraz kierunki dalszego rozwoju.
+
+\noindent
+\textbf{Tytuł pracy w języku angielskim:}\\
+Recommendation system for e-commerce platform using Collaborative Filtering, Sentiment Analysis and Association Rules.
+
+\newpage
+\renewcommand{\refname}{} 
+\section*{Literatura}
+\addcontentsline{toc}{section}{Literatura}
+
+\begin{thebibliography}{9}
+\bibitem{agrawal1994}
+Rakesh Agrawal, Ramakrishnan Srikant,
+\textit{Fast Algorithms for Mining Association Rules},
+Proceedings of the 20th International Conference on Very Large Data Bases, 1994.
+
+\bibitem{liu2012}
+Bing Liu,
+\textit{Sentiment Analysis and Opinion Mining},
+Morgan \& Claypool Publishers, 2012.
+
+\bibitem{resnick1997}
+Paul Resnick, Hal R. Varian,
+\textit{Recommender Systems},
+Communications of the ACM, Vol. 40, No. 3, 1997.
+
+\bibitem{sarwar2001}
+Badrul Sarwar, George Karypis, Joseph Konstan, John Riedl,
+\textit{Item-based Collaborative Filtering Recommendation Algorithms},
+Proceedings of the 10th International Conference on World Wide Web, 2001.
+
+\bibitem{zaki2000}
+Mohammed J. Zaki,
+\textit{Scalable Algorithms for Association Mining},
+IEEE Transactions on Knowledge and Data Engineering, 2000.
+
+\end{thebibliography}
+
+\newpage
+
+%\begin{figure}[H]
+    %\centering
+    %\includegraphics[width=\textwidth]{Oświadczenie.pdf}
+%\end{figure}
+\end{document}
+
+
