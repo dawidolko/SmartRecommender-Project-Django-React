@@ -58,7 +58,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <main>
+    <main style={{ width: "100%" }}>
       <motion.div
         className="stat_Cards"
         initial={{ opacity: 0, y: 20 }}
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
         <SalesOverviewChart data={dashboardData.trend} />
         <CategoryDistributionChart
           category_distribution={dashboardData.category_distribution}
-        />{" "}
+        />
       </div>
     </main>
   );
