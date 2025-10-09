@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from django.db.models import Q, Avg, F
+from rest_framework import status
+from django.db.models import Q, Avg, F, Count
 from django.core.cache import cache
 from django.conf import settings
 from .models import Product, ProductSentimentSummary, SentimentAnalysis
@@ -492,3 +493,173 @@ class FuzzySearchAPIView(APIView):
             return True
         except:
             return True
+
+
+class FuzzyLogicRecommendationsAPIView(APIView):
+    """
+    Implements true fuzzy logic system with:
+    - 1: Fuzzy Membership Functions (price, quality, popularity)
+    - 2: Fuzzy User Profiling (category interests, price sensitivity)
+    - 3: Simplified Fuzzy Inference Engine (Mamdani-style)
+
+    Based on:
+    - Zadeh, L. A. (1965). "Fuzzy sets". Information and Control.
+    - Mamdani, E. H. (1975). "Application of fuzzy algorithms for control of simple dynamic plant"
+    """
+
+    def get(self, request):
+        """
+        Get fuzzy logic recommendations for the user.
+
+        Query params:
+        - limit: number of recommendations (default: 10)
+        - debug: if 'true', returns detailed rule activations
+        """
+        from home.fuzzy_logic_engine import (
+            FuzzyMembershipFunctions,
+            FuzzyUserProfile,
+            SimpleFuzzyInference,
+        )
+
+        limit = int(request.GET.get("limit", 10))
+        debug_mode = request.GET.get("debug", "false").lower() == "true"
+
+        # Check cache first
+        cache_key = f"fuzzy_recommendations_{request.user.id if request.user.is_authenticated else 'guest'}_{limit}"
+
+        if not debug_mode:
+            cached_result = cache.get(cache_key)
+            if cached_result:
+                return Response({**cached_result, "cached": True})
+
+        try:
+            # Initialize fuzzy system components
+            membership_functions = FuzzyMembershipFunctions()
+
+            # Build user profile
+            if request.user.is_authenticated:
+                user_profile = FuzzyUserProfile(user=request.user)
+            else:
+                # For guests, use session data if available
+                session_data = request.session.get("user_activity", {})
+                user_profile = FuzzyUserProfile(session_data=session_data)
+
+            # Initialize fuzzy inference engine
+            fuzzy_engine = SimpleFuzzyInference(membership_functions, user_profile)
+
+            # Get products to evaluate (exclude out-of-stock)
+            products_query = Product.objects.filter(quantity__gt=0).annotate(
+                review_count=Count("productreview")
+            )
+
+            # Limit to 500 products for performance
+            products = list(products_query[:500])
+
+            if not products:
+                return Response(
+                    {
+                        "recommendations": [],
+                        "message": "No products available",
+                        "user_profile": user_profile.get_profile_summary(),
+                    }
+                )
+
+            # Evaluate each product with fuzzy inference
+            scored_products = []
+
+            for product in products:
+                # Get product categories
+                product_categories = [cat.name for cat in product.categories.all()]
+
+                # Calculate fuzzy category match (max across all categories)
+                category_match = 0.0
+                for cat in product_categories:
+                    match = user_profile.fuzzy_category_match(cat)
+                    category_match = max(category_match, match)
+
+                # Prepare product data for fuzzy evaluation
+                product_data = {
+                    "price": float(product.price),
+                    "rating": float(product.rating) if product.rating else 3.0,
+                    "view_count": getattr(product, "view_count", 0),
+                }
+
+                # Evaluate with fuzzy inference
+                fuzzy_result = fuzzy_engine.evaluate_product(
+                    product_data, category_match
+                )
+
+                scored_products.append(
+                    {
+                        "product": product,
+                        "fuzzy_score": fuzzy_result["fuzzy_score"],
+                        "rule_activations": (
+                            fuzzy_result["rule_activations"] if debug_mode else None
+                        ),
+                        "category_match": fuzzy_result["category_match"],
+                    }
+                )
+
+            # Sort by fuzzy score
+            scored_products.sort(key=lambda x: x["fuzzy_score"], reverse=True)
+
+            # Take top N
+            top_products = scored_products[:limit]
+
+            # Serialize results
+            recommendations = []
+            for item in top_products:
+                product_data = ProductSerializer(item["product"]).data
+
+                rec = {
+                    "product": product_data,
+                    "fuzzy_score": item["fuzzy_score"],
+                    "category_match": item["category_match"],
+                }
+
+                if debug_mode:
+                    rec["rule_activations"] = item["rule_activations"]
+
+                recommendations.append(rec)
+
+            result = {
+                "recommendations": recommendations,
+                "total_evaluated": len(products),
+                "user_profile": user_profile.get_profile_summary(),
+                "fuzzy_system": {
+                    "implementation": "VARIANT B+: Membership Functions + User Profile + Mamdani Inference",
+                    "components": [
+                        "OPTION 1: Fuzzy Membership Functions (triangular/trapezoidal)",
+                        "OPTION 3: Fuzzy User Profiling (category interests, price sensitivity)",
+                        "OPTION 4-lite: Simplified Mamdani Inference (5 rules, T-norms, weighted defuzzification)",
+                    ],
+                    "references": [
+                        "Zadeh, L. A. (1965). Fuzzy sets. Information and Control.",
+                        "Mamdani, E. H. (1975). Application of fuzzy algorithms for control of simple dynamic plant.",
+                    ],
+                },
+                "cached": False,
+            }
+
+            if debug_mode:
+                result["rule_explanations"] = fuzzy_engine.get_rule_explanations()
+
+            # Cache for 1 hour
+            if not debug_mode:
+                cache.set(cache_key, result, timeout=3600)
+
+            return Response(result)
+
+        except Exception as e:
+            print(f"Error in fuzzy logic recommendations: {e}")
+            import traceback
+
+            traceback.print_exc()
+
+            return Response(
+                {
+                    "error": str(e),
+                    "message": "Error generating fuzzy logic recommendations",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

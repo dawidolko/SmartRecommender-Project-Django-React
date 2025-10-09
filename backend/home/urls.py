@@ -51,6 +51,7 @@ from .sentiment_views import (
     SentimentSearchAPIView,
     SentimentAnalysisDebugAPI,
     FuzzySearchAPIView,
+    FuzzyLogicRecommendationsAPIView,
 )
 
 from .association_views import (
@@ -174,6 +175,11 @@ urlpatterns = [
         name="sentiment-analysis-debug",
     ),
     path("api/fuzzy-search/", FuzzySearchAPIView.as_view(), name="fuzzy-search"),
+    path(
+        "api/fuzzy-logic-recommendations/",
+        FuzzyLogicRecommendationsAPIView.as_view(),
+        name="fuzzy-logic-recommendations",
+    ),
     path(
         "api/recommendation-settings/",
         RecommendationSettingsView.as_view(),
