@@ -182,6 +182,59 @@ class RecommendationPreviewView(APIView):
     def get(self, request):
         algorithm = request.GET.get("algorithm", "collaborative")
 
+        # Handle fuzzy logic separately - it uses real-time computation
+        if algorithm == "fuzzy_logic":
+            from home.fuzzy_logic_engine import (
+                FuzzyMembershipFunctions,
+                FuzzyUserProfile,
+                SimpleFuzzyInference
+            )
+            from home.models import Product
+            from django.db.models import Count
+
+            try:
+                # Initialize fuzzy system
+                membership_functions = FuzzyMembershipFunctions()
+                user_profile = FuzzyUserProfile(user=request.user)
+                fuzzy_engine = SimpleFuzzyInference(membership_functions, user_profile)
+
+                # Get products
+                products_query = Product.objects.all().annotate(
+                    review_count=Count('opinion')
+                )[:100]
+
+                # Score products
+                scored_products = []
+                for product in products_query:
+                    product_categories = [cat.name for cat in product.categories.all()]
+                    category_match = max([user_profile.fuzzy_category_match(cat) for cat in product_categories] or [0.0])
+
+                    product_data = {
+                        'price': float(product.price),
+                        'rating': float(product.rating) if product.rating else 3.0,
+                        'view_count': getattr(product, 'view_count', 0)
+                    }
+
+                    fuzzy_result = fuzzy_engine.evaluate_product(product_data, category_match)
+                    scored_products.append((product, fuzzy_result['fuzzy_score']))
+
+                # Sort and take top 6
+                scored_products.sort(key=lambda x: x[1], reverse=True)
+                products = [p[0] for p in scored_products[:6]]
+
+                serializer = ProductSerializer(products, many=True)
+                return Response(serializer.data)
+
+            except Exception as e:
+                print(f"Error in fuzzy logic preview: {e}")
+                import traceback
+                traceback.print_exc()
+                # Fallback to random products
+                products = list(Product.objects.all()[:6])
+                serializer = ProductSerializer(products, many=True)
+                return Response(serializer.data)
+
+        # Handle collaborative and content_based normally
         recommendations = (
             UserProductRecommendation.objects.filter(
                 user=request.user, recommendation_type=algorithm

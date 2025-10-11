@@ -547,9 +547,9 @@ class FuzzyLogicRecommendationsAPIView(APIView):
             # Initialize fuzzy inference engine
             fuzzy_engine = SimpleFuzzyInference(membership_functions, user_profile)
 
-            # Get products to evaluate (exclude out-of-stock)
-            products_query = Product.objects.filter(quantity__gt=0).annotate(
-                review_count=Count("productreview")
+            # Get products to evaluate
+            products_query = Product.objects.all().annotate(
+                review_count=Count("opinion")
             )
 
             # Limit to 500 products for performance

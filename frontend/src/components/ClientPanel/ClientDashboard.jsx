@@ -68,8 +68,12 @@ const ClientDashboard = () => {
           setRecommendationTitle(
             "Recommended For You (Collaborative Filtering)"
           );
-        } else {
+        } else if (algorithm === "content_based") {
           setRecommendationTitle("Recommended For You (Content-Based)");
+        } else if (algorithm === "fuzzy_logic") {
+          setRecommendationTitle("Recommended For You (Fuzzy Logic)");
+        } else {
+          setRecommendationTitle("Recommended For You");
         }
 
         return axios.get(
@@ -271,8 +275,12 @@ const ClientDashboard = () => {
 
       if (algorithm === "collaborative") {
         setRecommendationTitle("Recommended For You (Collaborative Filtering)");
-      } else {
+      } else if (algorithm === "content_based") {
         setRecommendationTitle("Recommended For You (Content-Based)");
+      } else if (algorithm === "fuzzy_logic") {
+        setRecommendationTitle("Recommended For You (Fuzzy Logic)");
+      } else {
+        setRecommendationTitle("Recommended For You");
       }
     } catch (err) {
       console.error("Error fetching recommended products:", err);

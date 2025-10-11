@@ -42,16 +42,13 @@ class MarkovRecommendationsAPI(APIView):
 
     def get(self, request):
         try:
-            cache_key = "markov_engine_trained"
-            engine = cache.get(cache_key)
-
-            if engine is None:
-                print(
-                    "Training Markov Chain and Naive Bayes models... (this may take 10-15 seconds)"
-                )
-                engine = self._train_probabilistic_engine()
-                cache.set(cache_key, engine, timeout=10800)
-                print("Training complete! Models cached for 3 hours.")
+            # Cache disabled due to pickle issues with lambda in CustomMarkovChain
+            # Training is fast (~10 seconds) so we train on each request
+            print(
+                "Training Markov Chain and Naive Bayes models... (this may take 10-15 seconds)"
+            )
+            engine = self._train_probabilistic_engine()
+            print("Training complete!")
 
             user = User.objects.first()
             if not user:
@@ -305,21 +302,122 @@ class MarkovRecommendationsAPI(APIView):
 
         return sequences
 
+    def _prepare_purchase_data(self):
+        features = []
+        labels = []
+
+        users = User.objects.annotate(
+            order_count=Count("order"),
+            total_spent=Sum("order__orderproduct__product__price"),
+        ).filter(order_count__gte=1)[:300]
+
+        for user in users:
+            user_features = self._extract_user_features(user)
+
+            recent_orders = Order.objects.filter(
+                user=user, date_order__gte=timezone.now() - timedelta(days=30)
+            )
+
+            label = "will_purchase" if recent_orders.exists() else "will_not_purchase"
+
+            features.append(user_features)
+            labels.append(label)
+
+        return features, labels
+
+    def _prepare_churn_data(self):
+        features = []
+        labels = []
+
+        users = User.objects.annotate(
+            order_count=Count("order"), last_order_date=Max("order__date_order")
+        ).filter(order_count__gte=1)[:300]
+
+        for user in users:
+            user_features = self._extract_user_features(user)
+
+            last_order = Order.objects.filter(user=user).order_by("-date_order").first()
+            days_since_last_order = (
+                (timezone.now().date() - last_order.date_order.date()).days
+                if last_order
+                else 999
+            )
+
+            label = "will_churn" if days_since_last_order > 60 else "will_not_churn"
+
+            features.append(user_features)
+            labels.append(label)
+
+        return features, labels
+
+    def _extract_user_features(self, user):
+        orders = Order.objects.filter(user=user)
+        total_orders = orders.count()
+
+        if total_orders == 0:
+            return {
+                "total_orders": 0,
+                "avg_order_value": 0,
+                "days_since_last_order": 999,
+                "favorite_category": "none",
+                "order_frequency": 0,
+            }
+
+        total_spent = sum(
+            order_product.product.price * order_product.quantity
+            for order in orders
+            for order_product in order.orderproduct_set.all()
+        )
+
+        avg_order_value = total_spent / total_orders if total_orders > 0 else 0
+
+        last_order = orders.order_by("-date_order").first()
+        days_since_last_order = (
+            (timezone.now().date() - last_order.date_order.date()).days
+            if last_order
+            else 999
+        )
+
+        category_counts = defaultdict(int)
+        for order in orders:
+            for order_product in order.orderproduct_set.all():
+                for category in order_product.product.categories.all():
+                    category_counts[category.name] += 1
+
+        favorite_category = (
+            max(category_counts, key=category_counts.get) if category_counts else "none"
+        )
+
+        first_order = orders.order_by("date_order").first()
+        last_order = orders.order_by("-date_order").first()
+        if first_order and last_order and total_orders > 1:
+            days_between = (
+                last_order.date_order.date() - first_order.date_order.date()
+            ).days
+            order_frequency = total_orders / max(days_between, 1)
+        else:
+            order_frequency = 0
+
+        return {
+            "total_orders": total_orders,
+            "avg_order_value": float(avg_order_value),
+            "days_since_last_order": days_since_last_order,
+            "favorite_category": favorite_category,
+            "order_frequency": order_frequency,
+        }
+
 
 class BayesianInsightsAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         try:
-            cache_key = "markov_engine_trained"
-            engine = cache.get(cache_key)
-
-            if engine is None:
-                print("Training probabilistic models for Bayesian insights...")
-                markov_api = MarkovRecommendationsAPI()
-                engine = markov_api._train_probabilistic_engine()
-                cache.set(cache_key, engine, timeout=10800)
-                print("Training complete!")
+            # Cache disabled due to pickle issues with lambda in CustomMarkovChain
+            # Training is fast (~10 seconds) so we train on each request
+            print("Training probabilistic models for Bayesian insights...")
+            markov_api = MarkovRecommendationsAPI()
+            engine = markov_api._train_probabilistic_engine()
+            print("Training complete!")
 
             # Get user for personalized insights
             user = User.objects.filter(order__isnull=False).first()

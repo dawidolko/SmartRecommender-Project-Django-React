@@ -9,6 +9,7 @@ import {
   FiLogOut,
   FiMenu,
   FiBarChart2,
+  FiCpu,
 } from "react-icons/fi";
 import "./ClientPanel.scss";
 
@@ -90,6 +91,17 @@ const ClientSidebar = () => {
               }>
               <FiBarChart2 className="client-aside__link-icon icon-probabilistic" />
               {isOpen && <span>Smart Recommendations</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/client/fuzzy-logic"
+              className={({ isActive }) =>
+                "client-aside__link " +
+                (isActive ? "client-aside__link--active" : "")
+              }>
+              <FiCpu className="client-aside__link-icon icon-fuzzy" />
+              {isOpen && <span>Fuzzy Logic</span>}
             </NavLink>
           </li>
           <li>

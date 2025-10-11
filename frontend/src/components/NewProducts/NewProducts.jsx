@@ -93,7 +93,11 @@ const NewProducts = () => {
     if (currentAlgorithm) {
       return currentAlgorithm === "collaborative"
         ? "Recommended for You (Collaborative Filtering)"
-        : "Recommended for You (Content-Based)";
+        : currentAlgorithm === "content_based"
+        ? "Recommended for You (Content-Based)"
+        : currentAlgorithm === "fuzzy_logic"
+        ? "Recommended for You (Fuzzy Logic)"
+        : "Recommended for You";
     }
     return "Our Latest Products";
   };
