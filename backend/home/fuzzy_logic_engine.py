@@ -37,10 +37,10 @@ class FuzzyMembershipFunctions:
         self.rating_mid = 3.5
         self.rating_high = 4.5
 
-        # Popularity thresholds (view count)
-        self.pop_low = 50
-        self.pop_mid = 200
-        self.pop_high = 1000
+        # Popularity thresholds (order count - adjusted for real data)
+        self.pop_low = 2
+        self.pop_mid = 10
+        self.pop_high = 30
 
     # ===== PRICE MEMBERSHIP FUNCTIONS =====
 
@@ -174,11 +174,13 @@ class FuzzyMembershipFunctions:
             return 0.0
 
     def mu_popularity_medium(self, view_count):
-        """Medium popularity"""
+        """
+        Trapezoidal membership function for 'medium' popularity.
+
+        Full membership at pop_low to pop_mid, then decreases to pop_high.
+        """
         if view_count < self.pop_low:
             return 0.0
-        elif view_count < self.pop_mid:
-            return (view_count - self.pop_low) / (self.pop_mid - self.pop_low)
         elif view_count <= self.pop_mid:
             return 1.0
         elif view_count < self.pop_high:
@@ -375,7 +377,8 @@ class FuzzyUserProfile:
         """
         Fuzzy matching between user's interests and product category.
 
-        Uses fuzzy category similarity matrix and T-norm/T-conorm aggregation.
+        Uses weighted combination of user interest and category similarity
+        to provide better differentiation between products.
 
         Args:
             product_category: str, category name
@@ -383,54 +386,87 @@ class FuzzyUserProfile:
         Returns:
             Membership degree [0.0, 1.0] representing how well the category matches
         """
-        # Fuzzy similarity matrix - models relationships between categories
-        # E.g., Gaming is "somewhat" related to Electronics (0.7)
-        category_similarity = {
-            "Gaming": {
-                "Gaming": 1.0,
-                "Electronics": 0.7,
-                "Computers": 0.8,
-                "Tech": 0.6,
-                "Accessories": 0.5,
-            },
-            "Electronics": {
-                "Electronics": 1.0,
-                "Gaming": 0.7,
-                "Computers": 0.8,
-                "Photography": 0.6,
-                "Tech": 0.9,
-            },
-            "Photography": {
-                "Photography": 1.0,
-                "Cameras": 0.9,
-                "Electronics": 0.6,
-                "Accessories": 0.7,
-            },
-            "Computers": {
-                "Computers": 1.0,
-                "Electronics": 0.8,
-                "Gaming": 0.8,
-                "Tech": 0.9,
-                "Office": 0.6,
-            },
-            "Home": {"Home": 1.0, "Kitchen": 0.8, "Garden": 0.6, "Furniture": 0.7},
-        }
-
         max_match = 0.0
 
         for user_cat, user_interest in self.category_interests.items():
-            # Get similarity between user's category and product's category
-            similarity = category_similarity.get(user_cat, {}).get(
-                product_category, 0.0
-            )
+            # Calculate fuzzy similarity between categories
+            similarity = self._calculate_category_similarity(user_cat, product_category)
 
-            # T-norm (min) for AND: user has interest AND categories are similar
-            match = min(user_interest, similarity)
+            # Weighted combination (60% similarity, 40% interest)
+            # This gives more weight to category similarity while still considering user interest
+            match = (similarity * 0.6) + (user_interest * 0.4)
 
             # T-conorm (max) for OR: accumulate best match
             max_match = max(max_match, match)
 
         return max_match
+
+    def _calculate_category_similarity(self, cat1, cat2):
+        """
+        Calculate fuzzy similarity between two categories with hierarchical matching.
+
+        Uses dot-notation hierarchy (e.g., 'electronics.phones'):
+        - Exact match: 1.0
+        - Same main + subcategory: 0.85-0.95
+        - Same main, different sub: 0.5-0.7
+        - Related categories: 0.3-0.5
+        - Unrelated: 0.1-0.2
+        """
+        cat1_lower = cat1.lower()
+        cat2_lower = cat2.lower()
+
+        # Exact match
+        if cat1_lower == cat2_lower:
+            return 1.0
+
+        # Check substring match
+        if cat1_lower in cat2_lower or cat2_lower in cat1_lower:
+            return 0.85
+
+        # Parse hierarchical structure (e.g., "electronics.phones")
+        cat1_parts = cat1_lower.split('.')
+        cat2_parts = cat2_lower.split('.')
+
+        cat1_main = cat1_parts[0] if cat1_parts else cat1_lower
+        cat2_main = cat2_parts[0] if cat2_parts else cat2_lower
+        cat1_sub = cat1_parts[1] if len(cat1_parts) > 1 else None
+        cat2_sub = cat2_parts[1] if len(cat2_parts) > 1 else None
+
+        # Same main category
+        if cat1_main == cat2_main:
+            if cat1_sub and cat2_sub:
+                return 0.95 if cat1_sub == cat2_sub else 0.6
+            return 0.7
+
+        # Define category relationships
+        relations = {
+            'electronics': ['components', 'peripherals', 'wearables'],
+            'components': ['electronics', 'peripherals', 'gaming'],
+            'peripherals': ['components', 'accessories', 'gaming'],
+            'accessories': ['peripherals', 'power', 'office'],
+            'gaming': ['components', 'peripherals', 'computers'],
+            'computers': ['components', 'gaming', 'laptops'],
+            'laptops': ['computers', 'components'],
+            'wearables': ['electronics', 'accessories'],
+        }
+
+        # Check direct relationship
+        if cat2_main in relations.get(cat1_main, []):
+            pos = relations[cat1_main].index(cat2_main)
+            return 0.5 if pos == 0 else (0.4 if pos <= 1 else 0.3)
+
+        # Check reverse relationship
+        if cat1_main in relations.get(cat2_main, []):
+            pos = relations[cat2_main].index(cat1_main)
+            return 0.5 if pos == 0 else (0.4 if pos <= 1 else 0.3)
+
+        # Check if both are tech-related (fallback)
+        tech_cats = {'electronics', 'components', 'peripherals', 'gaming', 'computers', 'laptops', 'wearables'}
+        if cat1_main in tech_cats and cat2_main in tech_cats:
+            return 0.25
+
+        # Unrelated categories
+        return 0.1
 
     def get_profile_summary(self):
         """Returns human-readable profile summary"""
@@ -495,11 +531,15 @@ class SimpleFuzzyInference:
                 ),
                 "weight": 0.9,
             },
-            # Rule 2: Category match + high popularity → medium recommendation
+            # Rule 2: Category match + popularity (medium OR high) → recommendation
             {
                 "name": "R2: Popular in Category",
                 "eval": lambda p, cat_match: min(
-                    cat_match, self.mf.mu_popularity_high(p.get("view_count", 0))
+                    cat_match,
+                    max(
+                        self.mf.mu_popularity_medium(p.get("view_count", 0)),
+                        self.mf.mu_popularity_high(p.get("view_count", 0))
+                    )
                 ),
                 "weight": 0.7,
             },
@@ -541,6 +581,27 @@ class SimpleFuzzyInference:
                     else 0.0
                 ),
                 "weight": 0.8,
+            },
+            # Rule 6: Quality-Price ratio (independent of category)
+            {
+                "name": "R6: Quality-Price Balance",
+                "eval": lambda p, cat_match: max(
+                    # Good quality + any reasonable price
+                    min(
+                        self.mf.mu_quality_high(p.get("rating", 0)),
+                        max(
+                            self.mf.mu_price_cheap(p.get("price", 0)) * 0.8,
+                            self.mf.mu_price_medium(p.get("price", 0)) * 1.0,
+                            self.mf.mu_price_expensive(p.get("price", 0)) * 0.6
+                        )
+                    ),
+                    # Medium quality + cheap price
+                    min(
+                        self.mf.mu_quality_medium(p.get("rating", 0)),
+                        self.mf.mu_price_cheap(p.get("price", 0))
+                    ) * 0.7
+                ),
+                "weight": 0.75,
             },
         ]
 
@@ -633,6 +694,15 @@ class SimpleFuzzyInference:
                 "condition": "IF user is NOT price sensitive AND product is EXPENSIVE AND quality is HIGH",
                 "consequence": "THEN boost recommendation (weight: 0.8)",
                 "interpretation": "Premium users get expensive high-quality products boosted",
+            }
+        )
+
+        explanations.append(
+            {
+                "rule": "R6: Quality-Price Balance",
+                "condition": "IF (quality is HIGH AND price is REASONABLE) OR (quality is MEDIUM AND price is CHEAP)",
+                "consequence": "THEN moderate recommendation (weight: 0.75)",
+                "interpretation": "Products with good value for money, regardless of category preferences",
             }
         )
 

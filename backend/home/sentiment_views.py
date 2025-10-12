@@ -549,7 +549,9 @@ class FuzzyLogicRecommendationsAPIView(APIView):
 
             # Get products to evaluate
             products_query = Product.objects.all().annotate(
-                review_count=Count("opinion")
+                review_count=Count("opinion"),
+                avg_rating=Avg("opinion__rating"),
+                order_count=Count("orderproduct", distinct=True)
             )
 
             # Limit to 500 products for performance
@@ -580,8 +582,8 @@ class FuzzyLogicRecommendationsAPIView(APIView):
                 # Prepare product data for fuzzy evaluation
                 product_data = {
                     "price": float(product.price),
-                    "rating": float(product.rating) if product.rating else 3.0,
-                    "view_count": getattr(product, "view_count", 0),
+                    "rating": float(product.avg_rating) if product.avg_rating else 3.0,
+                    "view_count": product.order_count if hasattr(product, "order_count") else 0,
                 }
 
                 # Evaluate with fuzzy inference

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Cpu, Layers, Settings, TrendingUp, X } from "react-feather";
+import { Cpu, Layers, Settings, X } from "react-feather";
 import config from "../../config/config";
 import "./ClientProbabilistic.scss";
 
@@ -189,7 +189,6 @@ const ClientFuzzyLogic = () => {
         />
         <TabButton id="profile" label="User Profile" icon={Layers} />
         <TabButton id="rules" label="Fuzzy Rules" icon={Settings} />
-        <TabButton id="system" label="System Info" icon={TrendingUp} />
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={modalTitle}>
@@ -338,23 +337,24 @@ const ClientFuzzyLogic = () => {
             </div>
 
             <div className="category-interests">
-              <h3>Top Category Interests (Fuzzy Degrees)</h3>
+              <h3>Your Favorite Categories</h3>
               <p className="explanation">
-                Each category has a <strong>fuzzy membership degree</strong>{" "}
-                [0,1] representing your interest level. These are computed using{" "}
-                <strong>T-conorms</strong> for aggregation.
+                These categories are ranked based on your shopping behavior.
+                The bar shows your interest level from 0% (no interest) to 100% (highest interest).
               </p>
               <div className="interests-list">
                 {(userProfile.top_interests || []).map(([category, degree], idx) => (
                   <div key={idx} className="interest-item">
-                    <span className="category-name">{category}</span>
+                    <div className="interest-header">
+                      <span className="category-name">{category}</span>
+                      <span className="interest-percentage">
+                        {(degree * 100).toFixed(0)}%
+                      </span>
+                    </div>
                     <div className="interest-bar">
                       <div
                         className="interest-fill"
                         style={{ width: `${degree * 100}%` }}></div>
-                      <span className="interest-value">
-                        μ = {degree.toFixed(3)}
-                      </span>
                     </div>
                   </div>
                 ))}
@@ -366,11 +366,10 @@ const ClientFuzzyLogic = () => {
         {activeTab === "rules" && (
           <div className="rules-section">
             <div className="section-header">
-              <h2>Fuzzy Inference Rules</h2>
+              <h2>How Recommendations Are Made</h2>
               <p>
-                Our system uses <strong>5 Mamdani-style fuzzy rules</strong> to
-                evaluate products. Each rule uses{" "}
-                <strong>T-norms (min)</strong> for AND conditions.
+                Our system uses <strong>6 intelligent rules</strong> to find the best products for you.
+                Each rule looks at different aspects like price, quality, and category match.
               </p>
             </div>
 
@@ -378,20 +377,22 @@ const ClientFuzzyLogic = () => {
               {ruleExplanations.map((rule, idx) => (
                 <div key={idx} className="rule-card">
                   <div className="rule-header">
+                    <span className="rule-number">Rule {idx + 1}</span>
                     <h3>{rule.rule}</h3>
                   </div>
                   <div className="rule-body">
-                    <div className="rule-row">
-                      <strong>Condition:</strong>
-                      <span>{rule.condition}</span>
+                    <div className="rule-explanation">
+                      <p className="rule-interpretation">{rule.interpretation}</p>
                     </div>
-                    <div className="rule-row">
-                      <strong>Consequence:</strong>
-                      <span>{rule.consequence}</span>
-                    </div>
-                    <div className="rule-row">
-                      <strong>Interpretation:</strong>
-                      <span>{rule.interpretation}</span>
+                    <div className="rule-details">
+                      <div className="rule-detail-item">
+                        <span className="detail-label">When:</span>
+                        <span className="detail-value">{rule.condition}</span>
+                      </div>
+                      <div className="rule-detail-item">
+                        <span className="detail-label">Then:</span>
+                        <span className="detail-value">{rule.consequence}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -399,90 +400,27 @@ const ClientFuzzyLogic = () => {
             </div>
 
             <div className="fuzzy-logic-explanation">
-              <h3>How Fuzzy Inference Works</h3>
-              <ul>
-                <li>
-                  <strong>Fuzzification:</strong> Convert product attributes
-                  (price, quality, popularity) to fuzzy membership degrees using
-                  triangular/trapezoidal functions.
-                </li>
-                <li>
-                  <strong>Rule Evaluation:</strong> Apply each rule using
-                  T-norms (min) for AND and T-conorms (max) for OR.
-                </li>
-                <li>
-                  <strong>Aggregation:</strong> Combine rule outputs using
-                  weighted average.
-                </li>
-                <li>
-                  <strong>Defuzzification:</strong> Compute final fuzzy score
-                  [0,1] representing recommendation strength.
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "system" && (
-          <div className="system-section">
-            <div className="section-header">
-              <h2>Fuzzy Logic System Information</h2>
-              <p>
-                Technical details about the implementation of our fuzzy logic
-                recommendation engine.
-              </p>
-            </div>
-
-            <div className="system-info-card">
-              <h3>Implementation</h3>
-              <p className="system-value">
-                {fuzzySystem.implementation || "VARIANT B+"}
-              </p>
-            </div>
-
-            <div className="system-components">
-              <h3>System Components</h3>
-              <ul>
-                {(fuzzySystem.components || []).map((component, idx) => (
-                  <li key={idx}>{component}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="system-references">
-              <h3>Academic References</h3>
-              <ul>
-                {(fuzzySystem.references || []).map((reference, idx) => (
-                  <li key={idx}>{reference}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="system-stats">
-              <h3>Statistics</h3>
-              <div className="stats-grid">
-                <div className="stat-item">
-                  <span className="stat-label">Products Evaluated</span>
-                  <span className="stat-value">
-                    {recommendationsData.length || 0}
-                  </span>
+              <h3>How It Works Behind the Scenes</h3>
+              <div className="explanation-grid">
+                <div className="explanation-card">
+                  <div className="explanation-icon">1</div>
+                  <h4>Analyze Product</h4>
+                  <p>We look at price, quality ratings, and popularity for each product.</p>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-label">Fuzzy Rules</span>
-                  <span className="stat-value">{ruleExplanations.length}</span>
+                <div className="explanation-card">
+                  <div className="explanation-icon">2</div>
+                  <h4>Apply Rules</h4>
+                  <p>Each of the 5 rules evaluates how well the product matches your preferences.</p>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-label">Average Fuzzy Score</span>
-                  <span className="stat-value">
-                    {recommendationsData.length > 0
-                      ? (
-                          recommendationsData.reduce(
-                            (sum, p) => sum + p.fuzzy_score,
-                            0
-                          ) / recommendationsData.length
-                        ).toFixed(3)
-                      : "N/A"}
-                  </span>
+                <div className="explanation-card">
+                  <div className="explanation-icon">3</div>
+                  <h4>Calculate Score</h4>
+                  <p>All rule results are combined to create a final recommendation score.</p>
+                </div>
+                <div className="explanation-card">
+                  <div className="explanation-icon">4</div>
+                  <h4>Rank Products</h4>
+                  <p>Products with the highest scores are shown first in your recommendations.</p>
                 </div>
               </div>
             </div>

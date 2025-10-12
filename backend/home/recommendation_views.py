@@ -190,7 +190,7 @@ class RecommendationPreviewView(APIView):
                 SimpleFuzzyInference
             )
             from home.models import Product
-            from django.db.models import Count
+            from django.db.models import Count, Avg
 
             try:
                 # Initialize fuzzy system
@@ -198,9 +198,11 @@ class RecommendationPreviewView(APIView):
                 user_profile = FuzzyUserProfile(user=request.user)
                 fuzzy_engine = SimpleFuzzyInference(membership_functions, user_profile)
 
-                # Get products
+                # Get products with necessary annotations
                 products_query = Product.objects.all().annotate(
-                    review_count=Count('opinion')
+                    review_count=Count('opinion'),
+                    avg_rating=Avg('opinion__rating'),
+                    order_count=Count('orderproduct', distinct=True)
                 )[:100]
 
                 # Score products
@@ -211,8 +213,8 @@ class RecommendationPreviewView(APIView):
 
                     product_data = {
                         'price': float(product.price),
-                        'rating': float(product.rating) if product.rating else 3.0,
-                        'view_count': getattr(product, 'view_count', 0)
+                        'rating': float(product.avg_rating) if product.avg_rating else 3.0,
+                        'view_count': product.order_count if hasattr(product, 'order_count') else 0
                     }
 
                     fuzzy_result = fuzzy_engine.evaluate_product(product_data, category_match)
