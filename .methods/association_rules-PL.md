@@ -10,8 +10,6 @@ Ostatnia aktualizacja: 07/10/2025
 - Pomaga klientom odkrywać **powiązane produkty** podczas zakupów
 - Umożliwia administratorom przeglądanie i **zarządzanie tymi relacjami** w panelu
 - Używa **prawdziwych wzorów matematycznych** z literatury naukowej (Agrawal & Srikant 1994)
-- Obsługuje **konfigurowalne progi** (min_support, min_confidence, min_lift) z panelu admina
-- Wykorzystuje **cache-busting** dla płynnej aktualizacji UI bez przeładowania strony
 
 Reguły bazują na **rzeczywistej historii zamówień** i są przeliczane dynamicznie przy nowych zakupach.
 

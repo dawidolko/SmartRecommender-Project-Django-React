@@ -309,3 +309,5 @@ def association_rules(request):
 1. Klient składa zamówienie → **Signal** → Przelicz reguły
 2. Klient dodaje do koszyka → **API** → Pokaż rekomendacje
 3. Admin klika "Update Rules" → **API** → Wymuś przeliczenie
+
+https://www-users.cse.umn.edu/~kumar001/dmbook/ch6.pdf

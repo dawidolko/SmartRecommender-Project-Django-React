@@ -457,3 +457,5 @@ sim(Laptop, Telefon) = cosine_similarity(Laptop_vector, Telefon_vector) = 0.05 (
 - `/api/recommendation-settings/` → Zarządza ustawieniami algorytmu
 - `/api/recommendation-preview/` → Podgląd rekomendacji
 ````
+
+https://files.grouplens.org/papers/www10_sarwar.pdf
