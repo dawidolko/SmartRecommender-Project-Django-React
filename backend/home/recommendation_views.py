@@ -28,7 +28,9 @@ class RecommendationSettingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        settings = RecommendationSettings.objects.filter(user=request.user).first()
+        # Get global setting (from any admin user or first setting)
+        # This ensures all users see the same algorithm
+        settings = RecommendationSettings.objects.first()
         return Response(
             {
                 "active_algorithm": (
@@ -39,12 +41,26 @@ class RecommendationSettingsView(APIView):
 
     def post(self, request):
         algorithm = request.data.get("algorithm", "collaborative")
-        settings, created = RecommendationSettings.objects.get_or_create(
-            user=request.user, defaults={"active_algorithm": algorithm}
-        )
-        if not created:
+
+        # Get or create global setting (use first user as placeholder)
+        # Update all existing settings to maintain consistency
+        settings = RecommendationSettings.objects.first()
+
+        if settings:
+            # Update existing global setting
             settings.active_algorithm = algorithm
             settings.save()
+        else:
+            # Create new global setting
+            settings = RecommendationSettings.objects.create(
+                user=request.user,
+                active_algorithm=algorithm
+            )
+
+        # Update all other settings to match (optional, for consistency)
+        RecommendationSettings.objects.exclude(id=settings.id).update(
+            active_algorithm=algorithm
+        )
 
         return Response(
             {
