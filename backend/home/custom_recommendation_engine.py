@@ -696,7 +696,7 @@ class CustomSentimentAnalysis:
             "thrilling", "fun", "entertaining", "enjoyable", "pleasant", "delightful",
             "smooth", "efficient", "reliable", "durable", "sturdy", "solid",
             "premium", "luxury", "high-quality", "top-notch", "first-class", "superior",
-            "affordable", "cheap", "bargain", "value", "worthwhile", "reasonable",
+            "affordable", "bargain", "value", "worthwhile", "reasonable", "economical",
             "helpful", "useful", "convenient", "practical", "functional", "effective",
             "user-friendly", "intuitive", "simple", "easy", "straightforward", "clear",
             "precise", "accurate", "detailed", "comprehensive", "complete", "thorough",
