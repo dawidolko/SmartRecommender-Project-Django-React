@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.conf import settings
 from .models import Order, OrderProduct, ProductAssociation, Product
 from .serializers import ProductSerializer
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from rest_framework.permissions import IsAuthenticated
 from .custom_recommendation_engine import CustomAssociationRules
 
@@ -324,9 +324,43 @@ class ProductAssociationDebugAPI(APIView):
             product_id=product_id
         ).values('order_id').distinct().count()
         
-        total_transactions = Order.objects.count()
+        multi_product_orders = Order.objects.annotate(
+            product_count=Count('orderproduct')
+        ).filter(product_count__gte=2)
+        
+        total_transactions = multi_product_orders.count()
+        all_orders_count = Order.objects.count()
+        single_product_orders_count = all_orders_count - total_transactions
         
         product_support = transactions_with_product / total_transactions if total_transactions > 0 else 0
+        
+        orders_with_product = Order.objects.filter(
+            orderproduct__product_id=product_id
+        ).select_related('user').prefetch_related('orderproduct_set__product').distinct()
+        
+        orders_details = []
+        for order in orders_with_product:
+            products_in_order = [
+                {
+                    "id": op.product.id,
+                    "name": op.product.name,
+                    "quantity": op.quantity
+                }
+                for op in order.orderproduct_set.all()
+            ]
+            orders_details.append({
+                "order_id": order.id,
+                "user": {
+                    "id": order.user.id,
+                    "email": order.user.email,
+                    "first_name": order.user.first_name,
+                    "last_name": order.user.last_name,
+                    "username": order.user.username
+                },
+                "date_order": order.date_order.strftime("%Y-%m-%d %H:%M:%S"),
+                "products": products_in_order,
+                "total_items": len(products_in_order)
+            })
         
         rules_details = []
         for assoc in associations:
@@ -372,17 +406,27 @@ class ProductAssociationDebugAPI(APIView):
                 "name": product.name
             },
             "statistics": {
-                "total_transactions": total_transactions,
+                "all_orders_in_db": all_orders_count,
+                "single_product_orders": single_product_orders_count,
+                "multi_product_orders": total_transactions,
+                "total_transactions_used_in_algorithm": total_transactions,
                 "transactions_with_product": transactions_with_product,
                 "product_support": round(product_support, 4),
                 "total_rules_in_system": total_rules,
-                "rules_for_this_product": product_rules_count
+                "rules_for_this_product": product_rules_count,
+                "note": f"Algorithm uses only {total_transactions} orders with 2+ products (excludes {single_product_orders_count} single-product orders)"
             },
+            "orders_with_this_product": orders_details,
             "top_associations": rules_details,
             "formulas_used": {
-                "support": "Support(A,B) = count(transactions with A and B) / total_transactions",
+                "support": "Support(A,B) = count(transactions with A and B) / total_transactions (only 2+ product orders)",
                 "confidence": "Confidence(A→B) = Support(A,B) / Support(A)",
                 "lift": "Lift(A→B) = Support(A,B) / (Support(A) × Support(B))"
+            },
+            "algorithm_behavior": {
+                "filtering": "Association rules ONLY use orders with 2+ products",
+                "reason": "Single-product orders cannot show 'bought together' patterns",
+                "impact": f"Using {total_transactions} transactions instead of {all_orders_count} total orders"
             },
             "references": [
                 "Agrawal, R., Srikant, R. (1994). Fast algorithms for mining association rules. VLDB.",

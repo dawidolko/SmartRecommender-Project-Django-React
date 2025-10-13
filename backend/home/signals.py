@@ -167,14 +167,18 @@ def generate_user_recommendations_after_order(user):
 
 def generate_association_rules_after_order(order):
     try:
-        orders = Order.objects.prefetch_related("orderproduct_set__product").all()[
-            :1000
-        ]
+        cache.delete_many([
+            "association_rules_list",
+            "collaborative_similarity_matrix",
+            "content_based_similarity_matrix"
+        ])
+        
+        orders = Order.objects.prefetch_related("orderproduct_set__product").all()
         transactions = []
 
-        for order in orders:
+        for order_obj in orders:
             product_ids = [
-                str(item.product_id) for item in order.orderproduct_set.all()
+                str(item.product_id) for item in order_obj.orderproduct_set.all()
             ]
             if len(product_ids) >= 2:
                 transactions.append(product_ids)
@@ -183,33 +187,37 @@ def generate_association_rules_after_order(order):
             print("Not enough transactions for association rules")
             return
 
+        print(f"🔄 Generating association rules from {len(transactions)} transactions...")
+        
         association_engine = CustomAssociationRules(
-            min_support=0.01, min_confidence=0.1
+            min_support=0.001, min_confidence=0.01
         )
         rules = association_engine.generate_association_rules(transactions)
 
+        print(f"📊 Generated {len(rules)} rules, deleting old rules...")
         ProductAssociation.objects.all().delete()
-        created_count = 0
-
-        for rule in rules[:500]:
+        
+        rules_to_create = []
+        for rule in rules:
             try:
-                ProductAssociation.objects.get_or_create(
-                    product_1_id=int(rule["product_1"]),
-                    product_2_id=int(rule["product_2"]),
-                    defaults={
-                        "support": rule["support"],
-                        "confidence": rule["confidence"],
-                        "lift": rule["lift"],
-                    },
-                )
-                created_count += 1
-            except Exception as e:
+                product_1 = Product.objects.get(id=int(rule["product_1"]))
+                product_2 = Product.objects.get(id=int(rule["product_2"]))
+                
+                rules_to_create.append(ProductAssociation(
+                    product_1=product_1,
+                    product_2=product_2,
+                    support=rule["support"],
+                    confidence=rule["confidence"],
+                    lift=rule["lift"],
+                ))
+            except (Product.DoesNotExist, ValueError):
                 continue
 
-        print(f"Created {created_count} association rules")
+        ProductAssociation.objects.bulk_create(rules_to_create, batch_size=500)
+        print(f"✅ Created {len(rules_to_create)} association rules")
 
     except Exception as e:
-        print(f"Error generating association rules: {e}")
+        print(f"❌ Error generating association rules: {e}")
 
 
 def update_user_cb_recommendations(user):

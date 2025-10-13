@@ -1,4 +1,4 @@
-Ostatnia aktualizacja: 07/10/2025
+Ostatnia aktualizacja: 13/10/2025
 
 # 🔗 Reguły Asocjacyjne - System "Często Kupowane Razem"
 
@@ -875,7 +875,76 @@ print(f"Rules for product {product_id}: {rules.count()}")
 - **Zbyt mało** (0-1 produkt): Zmniejsz progi używając **Lenient preset**
 - **Dokładnie 1 produkt**: Ustaw `min_lift: 100.0` (tylko super silne reguły)
 
-### Problem 5: "Failed to fetch association rules" (błąd 401/403)
+### Problem 5: Niezgodność w obliczeniach Lift (np. DB: 82.5 vs Manual: 50.0)
+
+**Przyczyna:** Algorytm filtruje zamówienia z tylko 1 produktem (nie można znaleźć "kupowanych razem")
+
+**Wyjaśnienie:**
+
+```python
+# W seederze (seed.py, linia 16776):
+num_products = random.randint(1, 5)  # Losuje 1-5 produktów
+
+# Rezultat:
+# - 35 zamówień (17.5%) ma tylko 1 produkt → WYKLUCZANE
+# - 165 zamówień (82.5%) ma 2+ produkty → UŻYWANE W APRIORI
+
+# W algorytmie (custom_recommendation_engine.py, linia 488-490):
+if len(limited_transaction) >= 2:  # ← FILTRUJE!
+    filtered_transactions.append(limited_transaction)
+```
+
+**Weryfikacja:**
+
+1. **Użyj Debug API**:
+   ```bash
+   curl "http://localhost:8000/api/product-association-debug/?product_id=100"
+   ```
+2. **Sprawdź statystyki**:
+
+   ```json
+   {
+     "statistics": {
+       "all_orders_in_db": 200,
+       "single_product_orders": 35,
+       "multi_product_orders": 165,
+       "total_transactions_used_in_algorithm": 165
+     }
+   }
+   ```
+
+3. **Uruchom skrypt weryfikacyjny**:
+   ```bash
+   cd backend
+   python3 find_single_product_orders.py
+   ```
+
+**Interpretacja:**
+
+- ✅ **Algorytm używa 165** (tylko 2+ produkty) - POPRAWNE!
+- ❌ **Manualne obliczenia używały 200** (wszystkie zamówienia) - BŁĄD!
+- 📚 **Zgodne z teorią Apriori** (Agrawal & Srikant, 1994)
+
+**Przykład obliczeń:**
+
+```
+Product 100 występuje w 2 zamówieniach (oba mają 2+ produkty)
+Product 358 występuje w 2 zamówieniach (1 ma tylko 1 produkt → WYKLUCZONY!)
+
+POPRAWNE obliczenia (algorytm):
+Support(100) = 2/165 = 0.0121
+Support(358) = 1/165 = 0.0061  (Order #97 wykluczony!)
+Support(100,358) = 1/165 = 0.0061
+Lift = 0.0061 / (0.0121 × 0.0061) = 82.5 ✅
+
+BŁĘDNE obliczenia (manualne):
+Support(100) = 2/200 = 0.01
+Support(358) = 2/200 = 0.01  (Błąd: liczył Order #97!)
+Support(100,358) = 1/200 = 0.005
+Lift = 0.005 / (0.01 × 0.01) = 50.0 ❌
+```
+
+### Problem 6: "Failed to fetch association rules" (błąd 401/403)
 
 **Przyczyna:** Brak lub nieważny token JWT
 
@@ -885,7 +954,7 @@ print(f"Rules for product {product_id}: {rules.count()}")
 2. Jeśli brak tokenu, zaloguj się ponownie
 3. Jeśli token wygasł, odśwież stronę (auto-refresh tokenu)
 
-### Problem 6: Reguły nie generują się automatycznie po zamówieniu
+### Problem 7: Reguły nie generują się automatycznie po zamówieniu
 
 **Przyczyna:** Problem z Django signals lub baza danych
 
@@ -909,6 +978,457 @@ print(f"Rules for product {product_id}: {rules.count()}")
    order = Order.objects.last()
    generate_association_rules_after_order(order)
    ```
+
+---
+
+## 🧪 Testowanie i Weryfikacja
+
+### 1. Skrypty Testowe Python
+
+Projekt zawiera 2 skrypty do testowania algorytmu Apriori:
+
+#### **a) `find_single_product_orders.py` - Analiza Zamówień**
+
+**Lokalizacja:** `backend/find_single_product_orders.py`
+
+**Cel:** Pokazuje rozkład zamówień według liczby produktów (wyjaśnia dlaczego algorytm używa 165, nie 200)
+
+**Uruchomienie:**
+
+```bash
+cd backend
+python3 find_single_product_orders.py
+```
+
+**Przykładowy output:**
+
+```
+======================================================================
+ROZKŁAD ZAMÓWIEŃ WEDŁUG LICZBY PRODUKTÓW
+======================================================================
+Zamówienia z 1 produktem: 35
+Zamówienia z 2 produktami: 45
+Zamówienia z 3 produktami: 52
+Zamówienia z 4 produktami: 48
+Zamówienia z 5 produktami: 20
+
+======================================================================
+ZAMÓWIENIA Z TYLKO 1 PRODUKTEM (Total: 35)
+======================================================================
+Order # 80 | User: client3 | Product: Lexar 1TB NVMe | Qty: 2
+Order # 70 | User: client2 | Product: Logitech C920 | Qty: 6
+...
+
+======================================================================
+ZAMÓWIENIA Z 2+ PRODUKTAMI (używane w Apriori): 165
+======================================================================
+Order #  1 | User: admin1 | Products (3): Radeon RX 7800 XT, Nikon Z, ...
+Order #  2 | User: admin1 | Products (4): TP-Link MR200, MSI Z790, ...
+...
+
+======================================================================
+PODSUMOWANIE
+======================================================================
+Wszystkie zamówienia:              200
+Zamówienia z 1 produktem:          35 (17.5%)
+Zamówienia z 2+ produktami:        165 (82.5%)
+
+✓ Algorytm Apriori używa 165 transakcji (tylko 2+ produkty)
+✓ To dlatego Lift = 82.5 (używa 165), nie 50.0 (używałoby 200)
+```
+
+**Co sprawdza:**
+
+- Rozkład zamówień według liczby produktów
+- Listę zamówień z tylko 1 produktem (wykluczanych z Apriori)
+- Przykłady zamówień z wieloma produktami (używanych w algorytmie)
+- Statystyki porównujące 165 vs 200 transakcji
+
+---
+
+#### **b) `shell_verify_apriori.py` - Weryfikacja Obliczeń**
+
+**Lokalizacja:** `backend/shell_verify_apriori.py`
+
+**Cel:** Weryfikuje poprawność obliczeń Support, Confidence, Lift dla konkretnych produktów
+
+**Uruchomienie:**
+
+```bash
+cd backend
+python3 manage.py shell < shell_verify_apriori.py
+```
+
+**Przykładowy output:**
+
+```
+================================================================================
+WERYFIKACJA ALGORYTMU APRIORI - DLACZEGO 165, NIE 200?
+================================================================================
+
+📊 STATYSTYKI ZAMÓWIEŃ:
+   Wszystkie zamówienia:        200
+   Zamówienia z 1 produktem:    35 (17.5%)
+   Zamówienia z 2+ produktami:  165 (82.5%)
+
+🔍 PRODUKT 100: AMD Ryzen 5 8600G
+   Zamówienia z tym produktem: 2
+   - Order #139: Produkty [100, 193] | User: client9
+   - Order #46: Produkty [358, 362, 167, 353, 100] | User: admin5
+
+🔍 PRODUKT 358: DJI Dwukierunkowy hub ładujący do FLIP
+   Zamówienia z tym produktem: 2
+   - Order #97: Produkty [358] | User: client5  ← WYKLUCZONY (1 produkt)
+   - Order #46: Produkty [358, 362, 167, 353, 100] | User: admin5
+
+📐 OBLICZENIA SUPPORT (używając 165 transakcji z 2+ produktami):
+   Support(100) = 2/165 = 0.012121
+   Support(358) = 1/165 = 0.006061  ← Order #97 wykluczony!
+   Support(100,358) = 1/165 = 0.006061
+
+🚀 OBLICZENIA LIFT:
+   Lift = Support(100,358) / (Support(100) × Support(358))
+   Lift = 0.006061 / (0.012121 × 0.006061)
+   Lift = 0.006061 / 0.000073
+   Lift = 82.50
+
+✅ WERYFIKACJA:
+   Lift z bazy danych: 82.50
+   Lift obliczony:     82.50
+   Zgadza się: ✓ TAK
+
+================================================================================
+💡 WNIOSKI:
+================================================================================
+1. Algorytm Apriori POPRAWNIE używa tylko 165 zamówień z 2+ produktami
+2. Pomija 35 zamówień z 1 produktem (nie można znaleźć 'kupowanych razem')
+3. Dlatego Lift = 82.5 (używa 165), a nie 50.0 (używałoby 200)
+4. To jest ZGODNE z teorią Apriori (Agrawal & Srikant, 1994)
+================================================================================
+```
+
+**Co sprawdza:**
+
+- Poprawność obliczeń Support dla pojedynczych produktów
+- Poprawność obliczeń Support dla par produktów
+- Poprawność obliczeń Lift
+- Zgodność z wartościami w bazie danych
+- Wyjaśnienie dlaczego Order #97 jest wykluczony
+
+---
+
+### 2. Debug API Endpoint
+
+**Endpoint:** `GET /api/product-association-debug/?product_id={id}`
+
+**Autoryzacja:** ❌ Nie wymagana (endpoint publiczny dla debugowania)
+
+**Przykład:**
+
+```bash
+curl "http://localhost:8000/api/product-association-debug/?product_id=100"
+```
+
+**Przykładowa odpowiedź:**
+
+```json
+{
+  "product": {
+    "id": 100,
+    "name": "AMD Ryzen 5 8600G"
+  },
+  "statistics": {
+    "all_orders_in_db": 200,
+    "single_product_orders": 35,
+    "multi_product_orders": 165,
+    "total_transactions_used_in_algorithm": 165,
+    "transactions_with_product": 2,
+    "product_support": 0.0121,
+    "total_rules_in_system": 1000,
+    "rules_for_this_product": 3,
+    "note": "Algorithm uses only 165 orders with 2+ products (excludes 35 single-product orders)"
+  },
+  "orders_with_this_product": [
+    {
+      "order_id": 139,
+      "user": {
+        "id": 14,
+        "email": "client9@example.com",
+        "first_name": "Client",
+        "last_name": "Number9",
+        "username": "client9"
+      },
+      "date_order": "2025-10-06 15:35:55",
+      "products": [
+        {
+          "id": 100,
+          "name": "AMD Ryzen 5 8600G",
+          "quantity": 2
+        },
+        {
+          "id": 193,
+          "name": "JBL Tune 720BT Czarne",
+          "quantity": 2
+        }
+      ],
+      "total_items": 2
+    }
+  ],
+  "top_associations": [
+    {
+      "product_2": {
+        "id": 358,
+        "name": "DJI Dwukierunkowy hub ładujący do FLIP"
+      },
+      "metrics": {
+        "support": 0.0061,
+        "confidence": 0.5,
+        "lift": 82.5
+      },
+      "formula_verification": {
+        "support_formula": "Support(A,B) = 1/165 = 0.0061",
+        "confidence_formula": "Confidence(A→B) = 0.0061/0.0121 = 0.5",
+        "lift_formula": "Lift(A→B) = 0.0061/(0.0121×0.0061) = 82.5"
+      },
+      "interpretation": {
+        "support": "0.61% of transactions contain both products",
+        "confidence": "If customer buys AMD Ryzen 5 8600G, there's 50.0% chance they'll buy DJI hub",
+        "lift": "Products are bought together 82.50x more than random chance"
+      }
+    }
+  ],
+  "formulas_used": {
+    "support": "Support(A,B) = count(transactions with A and B) / total_transactions (only 2+ product orders)",
+    "confidence": "Confidence(A→B) = Support(A,B) / Support(A)",
+    "lift": "Lift(A→B) = Support(A,B) / (Support(A) × Support(B))"
+  },
+  "algorithm_behavior": {
+    "filtering": "Association rules ONLY use orders with 2+ products",
+    "reason": "Single-product orders cannot show 'bought together' patterns",
+    "impact": "Using 165 transactions instead of 200 total orders"
+  }
+}
+```
+
+**Co pokazuje:**
+
+- Statystyki filtrowania transakcji (165 vs 200)
+- Pełną listę zamówień z tym produktem + dane użytkowników
+- Top reguły asocjacyjne z weryfikacją wzorów matematycznych
+- Interpretację metryk w języku naturalnym
+- Wyjaśnienie zachowania algorytmu
+
+---
+
+### 3. Django Shell - Manualne Testowanie
+
+**Cel:** Interaktywne sprawdzanie reguł i obliczeń
+
+**Uruchomienie:**
+
+```bash
+cd backend
+python3 manage.py shell
+```
+
+**Przykładowe komendy:**
+
+#### a) Sprawdź liczbę zamówień
+
+```python
+from home.models import Order, OrderProduct
+from django.db.models import Count
+
+# Wszystkie zamówienia
+total = Order.objects.count()
+print(f"Total orders: {total}")
+
+# Zamówienia z tylko 1 produktem
+single = Order.objects.annotate(
+    product_count=Count('orderproduct')
+).filter(product_count=1).count()
+print(f"Single-product orders: {single}")
+
+# Zamówienia z 2+ produktami (używane w Apriori)
+multi = Order.objects.annotate(
+    product_count=Count('orderproduct')
+).filter(product_count__gte=2).count()
+print(f"Multi-product orders: {multi}")
+```
+
+#### b) Sprawdź reguły dla produktu
+
+```python
+from home.models import ProductAssociation, Product
+
+product_id = 100
+product = Product.objects.get(id=product_id)
+
+# Znajdź wszystkie reguły dla tego produktu
+rules = ProductAssociation.objects.filter(product_1_id=product_id)
+print(f"\nRules for {product.name}: {rules.count()}")
+
+for rule in rules[:5]:  # Top 5
+    print(f"\n{product.name} → {rule.product_2.name}")
+    print(f"  Support: {rule.support*100:.2f}%")
+    print(f"  Confidence: {rule.confidence*100:.1f}%")
+    print(f"  Lift: {rule.lift:.2f}x")
+```
+
+#### c) Weryfikuj obliczenia ręcznie
+
+```python
+# Znajdź zamówienia z produktem 100
+orders_with_100 = Order.objects.annotate(
+    product_count=Count('orderproduct')
+).filter(
+    product_count__gte=2,  # Tylko 2+ produkty!
+    orderproduct__product_id=100
+).distinct()
+
+print(f"\nOrders with product 100: {orders_with_100.count()}")
+
+for order in orders_with_100:
+    products = [op.product_id for op in order.orderproduct_set.all()]
+    print(f"  Order #{order.id}: {products} | User: {order.user.username}")
+
+# Oblicz Support ręcznie
+multi_orders = Order.objects.annotate(
+    product_count=Count('orderproduct')
+).filter(product_count__gte=2).count()
+
+support_100 = orders_with_100.count() / multi_orders
+print(f"\nSupport(100) = {orders_with_100.count()}/{multi_orders} = {support_100:.6f}")
+```
+
+---
+
+### 4. Browser DevTools - Frontend Testing
+
+#### a) Sprawdź localStorage (progi)
+
+```javascript
+// W konsoli przeglądarki
+console.log(localStorage.getItem("associationThresholds"));
+// Output: {"min_support":0.01,"min_confidence":0.1,"min_lift":1}
+```
+
+#### b) Monitoruj requesty API
+
+```javascript
+// DevTools → Network → filter: "association"
+// Zobacz cache-busting: ?t=1704672000000
+```
+
+#### c) Testuj progi programatically
+
+```javascript
+// Ustaw ultra-strict progi
+localStorage.setItem(
+  "associationThresholds",
+  JSON.stringify({
+    min_support: 0.03,
+    min_confidence: 0.5,
+    min_lift: 100.0,
+  })
+);
+location.reload();
+```
+
+---
+
+### 5. Scenariusz Testowy End-to-End
+
+**Cel:** Przetestuj cały przepływ od seedera do rekomendacji w koszyku
+
+**Kroki:**
+
+1. **Wygeneruj dane testowe**
+
+   ```bash
+   cd backend
+   python3 manage.py seed
+   ```
+
+2. **Sprawdź rozkład zamówień**
+
+   ```bash
+   python3 find_single_product_orders.py
+   ```
+
+   ✅ Powinno pokazać: 200 zamówień, 35 z 1 produktem, 165 z 2+
+
+3. **Weryfikuj obliczenia**
+
+   ```bash
+   python3 manage.py shell < shell_verify_apriori.py
+   ```
+
+   ✅ Powinno pokazać: Lift = 82.5 (zgodne z DB)
+
+4. **Sprawdź Debug API**
+
+   ```bash
+   curl "http://localhost:8000/api/product-association-debug/?product_id=100" | python3 -m json.tool
+   ```
+
+   ✅ Powinno zwrócić: statistics z 165 transakcjami, lista zamówień z userami
+
+5. **Przetestuj Admin Panel**
+
+   - Otwórz Admin Panel → Association Rules
+   - Kliknij "Balanced" → "Update Rules"
+   - ✅ Powinno utworzyć ~15-20 reguł
+
+6. **Przetestuj koszyk**
+
+   - Dodaj produkt 100 (AMD Ryzen 5 8600G) do koszyka
+   - ✅ Powinno pokazać rekomendacje (np. DJI hub, Lift: 82.50x)
+
+7. **Zmień progi na strict**
+
+   - Admin Panel → "Strict" (2% / 20% / 1.5) → "Update Rules"
+   - Odśwież koszyk
+   - ✅ Powinno pokazać mniej rekomendacji (tylko najsilniejsze)
+
+8. **Zmień progi na ultra-strict**
+   - Admin Panel → Custom: min_lift = 100.0 → "Update Rules"
+   - Odśwież koszyk
+   - ✅ Powinno pokazać max 1-2 rekomendacje (Lift ≥ 100x)
+
+---
+
+### 6. Automatyczne Testy Jednostkowe (Przyszłość)
+
+**Przykładowa struktura testów:**
+
+```python
+# backend/home/tests/test_association_rules.py
+
+from django.test import TestCase
+from home.models import Order, OrderProduct, Product, ProductAssociation
+from home.custom_recommendation_engine import CustomAssociationRules
+
+class AssociationRulesTestCase(TestCase):
+    def setUp(self):
+        # Stwórz testowe produkty i zamówienia
+        pass
+
+    def test_filters_single_product_orders(self):
+        """Algorytm powinien wykluczyć zamówienia z 1 produktem"""
+        # TODO: Implementacja
+        pass
+
+    def test_support_calculation(self):
+        """Support powinien być obliczany używając 165, nie 200"""
+        # TODO: Implementacja
+        pass
+
+    def test_lift_calculation(self):
+        """Lift powinien zgadzać się z wzorem matematycznym"""
+        # TODO: Implementacja
+        pass
+```
 
 ---
 

@@ -310,4 +310,108 @@ def association_rules(request):
 2. Klient dodaje do koszyka → **API** → Pokaż rekomendacje
 3. Admin klika "Update Rules" → **API** → Wymuś przeliczenie
 
+---
+
+## 🔍 **Kluczowe Odkrycie: Dlaczego 165, Nie 200?**
+
+### **Problem:**
+
+Algorytm używa 165 transakcji, ale w bazie jest 200 zamówień. Dlaczego?
+
+### **Odpowiedź:**
+
+```python
+# W seederze (seed.py, linia 16776):
+num_products = random.randint(1, 5)  # Losuje 1-5 produktów
+
+# Rezultat:
+# - 35 zamówień (17.5%) ma tylko 1 produkt → WYKLUCZANE
+# - 165 zamówień (82.5%) ma 2+ produkty → UŻYWANE
+
+# W algorytmie (custom_recommendation_engine.py, linia 488-490):
+if len(limited_transaction) >= 2:  # ← FILTRUJE!
+    filtered_transactions.append(limited_transaction)
+```
+
+### **Dlaczego to ważne:**
+
+**Reguły asocjacyjne** szukają produktów **kupowanych RAZEM**. Zamówienie z tylko 1 produktem nie ma sensu w tym kontekście.
+
+### **Przykład obliczeń:**
+
+```
+Product 100: AMD Ryzen 5 8600G (występuje w 2 zamówieniach)
+Product 358: DJI Hub (występuje w 2 zamówieniach, ale 1 ma tylko 1 produkt!)
+
+POPRAWNE obliczenia (algorytm):
+Support(100) = 2/165 = 0.0121
+Support(358) = 1/165 = 0.0061  (Order #97 z 1 produktem WYKLUCZONY!)
+Support(100,358) = 1/165 = 0.0061
+Lift = 0.0061 / (0.0121 × 0.0061) = 82.5 ✅
+
+BŁĘDNE obliczenia (gdyby używać 200):
+Support(100) = 2/200 = 0.01
+Support(358) = 2/200 = 0.01  (Błąd: liczył Order #97!)
+Support(100,358) = 1/200 = 0.005
+Lift = 0.005 / (0.01 × 0.01) = 50.0 ❌
+```
+
+**Weryfikacja:**
+
+```bash
+cd backend
+python3 find_single_product_orders.py  # Pokaże 35 wykluczonych zamówień
+python3 manage.py shell < shell_verify_apriori.py  # Zweryfikuje obliczenia
+```
+
+---
+
+## 🧪 **Testowanie**
+
+### **1. Skrypty Python:**
+
+```bash
+# Analiza zamówień (165 vs 200)
+python3 find_single_product_orders.py
+
+# Weryfikacja obliczeń Lift
+python3 manage.py shell < shell_verify_apriori.py
+```
+
+### **2. Debug API:**
+
+```bash
+curl "http://localhost:8000/api/product-association-debug/?product_id=100"
+```
+
+Zwróci:
+
+- Statystyki: 200 zamówień, 35 wykluczonych, 165 używanych
+- Listę zamówień z danymi użytkowników
+- Weryfikację wzorów matematycznych
+- Wyjaśnienie zachowania algorytmu
+
+### **3. Django Shell:**
+
+```python
+from home.models import Order, ProductAssociation
+from django.db.models import Count
+
+# Sprawdź rozkład
+multi = Order.objects.annotate(
+    product_count=Count('orderproduct')
+).filter(product_count__gte=2).count()
+print(f"Multi-product orders: {multi}")  # 165
+
+# Sprawdź reguły
+rules = ProductAssociation.objects.filter(product_1_id=100)
+for rule in rules:
+    print(f"{rule.product_1.name} → {rule.product_2.name}")
+    print(f"  Lift: {rule.lift:.2f}x")
+```
+
+---
+
+## 📚 **Źródła**
+
 https://www-users.cse.umn.edu/~kumar001/dmbook/ch6.pdf
