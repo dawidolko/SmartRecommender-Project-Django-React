@@ -209,7 +209,14 @@ class UpdateAssociationRulesAPI(APIView):
 
 class AssociationRulesListAPI(APIView):
     def get(self, request):
-        cache_key = "association_rules_list"
+        # Check if user wants all rules
+        fetch_all = request.GET.get("all", "").lower() == "true"
+        
+        if fetch_all:
+            cache_key = "association_rules_all"
+        else:
+            cache_key = "association_rules_list"
+        
         cached_result = cache.get(cache_key)
         
         if cached_result:
@@ -218,14 +225,18 @@ class AssociationRulesListAPI(APIView):
                 "cached": True
             })
 
-        rules = (
+        rules_query = (
             ProductAssociation.objects.all()
             .select_related("product_1", "product_2")
-            .order_by("-lift")[:20]
+            .order_by("-lift")
         )
+        
+        # If not fetching all, limit to top 20
+        if not fetch_all:
+            rules_query = rules_query[:20]
 
         serialized_rules = []
-        for rule in rules:
+        for rule in rules_query:
             serialized_rules.append(
                 {
                     "id": rule.id,

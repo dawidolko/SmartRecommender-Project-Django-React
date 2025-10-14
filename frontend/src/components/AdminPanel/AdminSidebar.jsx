@@ -11,6 +11,7 @@ import {
   User,
   BarChart,
   TrendingUp,
+  Bug,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./AdminPanel.scss";
@@ -64,6 +65,12 @@ const SIDEBAR_ITEMS = [
     icon: TrendingUp,
     color: "#8B5CF6",
     href: "/admin/probabilistic",
+  },
+  {
+    name: "Debug",
+    icon: Bug,
+    color: "#F97316",
+    href: "/admin/debug",
   },
   {
     name: "Account",

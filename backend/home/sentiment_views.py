@@ -499,3 +499,118 @@ class FuzzySearchAPIView(APIView):
             return True
         except:
             return True
+
+
+class SentimentAnalysisDebugView(APIView):
+    """
+    Debug view for Sentiment Analysis system.
+    Returns statistics and top products by sentiment.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            all_sentiments = SentimentAnalysis.objects.all()
+            total_sentiments = all_sentiments.count()
+
+            positive_count = all_sentiments.filter(sentiment_category="positive").count()
+            negative_count = all_sentiments.filter(sentiment_category="negative").count()
+            neutral_count = all_sentiments.filter(sentiment_category="neutral").count()
+
+            # Calculate percentages
+            positive_percentage = (
+                round((positive_count / total_sentiments) * 100, 2)
+                if total_sentiments > 0
+                else 0
+            )
+            negative_percentage = (
+                round((negative_count / total_sentiments) * 100, 2)
+                if total_sentiments > 0
+                else 0
+            )
+            neutral_percentage = (
+                round((neutral_count / total_sentiments) * 100, 2)
+                if total_sentiments > 0
+                else 0
+            )
+
+            # Get top 10 products by positive sentiment
+            top_positive_data = []
+            try:
+                top_positive = (
+                    ProductSentimentSummary.objects.filter(average_sentiment__gt=0)
+                    .select_related("product")
+                    .order_by("-average_sentiment")[:10]
+                )
+
+                for summary in top_positive:
+                    try:
+                        product = summary.product
+                        review_count = getattr(summary, 'total_opinions', 0)
+                        if not review_count:
+                            review_count = product.opinion_set.count()
+                        
+                        top_positive_data.append({
+                            "product_name": product.name,
+                            "product_id": product.id,
+                            "avg_sentiment": float(summary.average_sentiment),
+                            "review_count": review_count,
+                        })
+                    except Exception:
+                        continue
+            except Exception:
+                pass
+
+            # Get top 10 products by negative sentiment
+            top_negative_data = []
+            try:
+                top_negative = (
+                    ProductSentimentSummary.objects.filter(average_sentiment__lt=0)
+                    .select_related("product")
+                    .order_by("average_sentiment")[:10]
+                )
+
+                for summary in top_negative:
+                    try:
+                        product = summary.product
+                        review_count = getattr(summary, 'total_opinions', 0)
+                        if not review_count:
+                            review_count = product.opinion_set.count()
+                        
+                        top_negative_data.append({
+                            "product_name": product.name,
+                            "product_id": product.id,
+                            "avg_sentiment": float(summary.average_sentiment),
+                            "review_count": review_count,
+                        })
+                    except Exception:
+                        continue
+            except Exception:
+                pass
+
+            return Response({
+                "total_sentiments": total_sentiments,
+                "positive_count": positive_count,
+                "positive_percentage": positive_percentage,
+                "negative_count": negative_count,
+                "negative_percentage": negative_percentage,
+                "neutral_count": neutral_count,
+                "neutral_percentage": neutral_percentage,
+                "top_positive": top_positive_data,
+                "top_negative": top_negative_data,
+            })
+
+        except Exception as e:
+            # Return empty data instead of error
+            return Response({
+                "total_sentiments": 0,
+                "positive_count": 0,
+                "positive_percentage": 0,
+                "negative_count": 0,
+                "negative_percentage": 0,
+                "neutral_count": 0,
+                "neutral_percentage": 0,
+                "top_positive": [],
+                "top_negative": [],
+                "error_message": str(e)
+            })

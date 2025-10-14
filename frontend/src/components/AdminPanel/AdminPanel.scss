@@ -1,6 +1,26 @@
 @use "../../global.scss" as *;
 @use "sass:color";
 
+* {
+  box-sizing: border-box;
+}
+
+.admin-main,
+.admin-content,
+[class*="-section"],
+[class*="-card"],
+[class*="-container"] {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+motion > div,
+.motion-div {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .hero {
   display: none;
 }
@@ -208,6 +228,8 @@
     align-items: center;
     flex-grow: 1;
     background-color: $wrapper-bg;
+    overflow-x: hidden;
+    width: 100%;
 
     @media (max-width: 500px) {
       margin-top: 0;
@@ -221,17 +243,29 @@
       flex: 1;
       width: 100%;
       max-width: 1400px;
+      overflow-x: hidden;
+      box-sizing: border-box;
 
       @media (max-width: 1024px) {
         max-width: 100%;
+        padding: 20px;
+      }
+
+      @media (max-width: 800px) {
+        padding: 15px;
       }
 
       @media (max-width: 600px) {
-        padding: 0px;
+        padding: 10px;
       }
 
       @media (max-width: 500px) {
-        padding-top: 10px;
+        padding: 10px 5px;
+      }
+
+      > * {
+        max-width: 100%;
+        box-sizing: border-box;
       }
     }
 
@@ -258,9 +292,45 @@
     flex: 1;
     position: relative;
     z-index: 10;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      padding: 0;
+    }
 
     @media (max-width: 600px) {
-      padding: 0 1rem;
+      padding: 0;
+    }
+
+    > * {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+
+  &-statistics {
+    &-container {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    &-card {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    &-content {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
   }
 
@@ -373,15 +443,15 @@
       background-color: $btn-primary-blue;
       border: 1px solid $btn-primary-blue;
       color: $realwhite;
-      font-weight: 600;
-      padding: 1rem 1.8rem;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
       max-width: 250px !important;
       border-radius: 8px;
       border: none;
       cursor: pointer;
       transition: background-color 0.3s ease;
       margin-top: 0.5rem;
-      font-size: 2rem;
+      font-size: 1rem;
 
       &:hover {
         background-color: $text-black;
@@ -682,6 +752,17 @@
 .recommendation {
   &-control-section {
     margin-top: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      margin-top: 1rem;
+    }
   }
 
   &-card {
@@ -694,6 +775,24 @@
     padding: 24px;
     box-shadow: 0 4px 6px -1px $recommendation-shadow;
     margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      padding: 18px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+      border-radius: 6px;
+    }
   }
 
   &-title {
@@ -701,12 +800,26 @@
     font-weight: 600;
     margin-bottom: 20px;
     color: $text-black;
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
   }
 
   &-controls {
     display: flex;
     flex-direction: column;
     gap: 20px;
+
+    @media (max-width: 768px) {
+      gap: 16px;
+    }
   }
 
   &-preview {
@@ -718,6 +831,15 @@
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 4px 6px -1px $recommendation-shadow;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
   }
 }
 
@@ -770,6 +892,11 @@
     display: flex;
     gap: 12px;
 
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .btn {
       &-primary {
         background-color: $btn-primary-blue;
@@ -790,6 +917,12 @@
           background-color: $text-black;
           border-color: $text-black;
           cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+          padding: 12px 16px;
+          font-size: 14px;
         }
       }
 
@@ -812,6 +945,12 @@
           background-color: $btn-disabled-gray;
           border-color: $btn-disabled-gray;
           cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+          padding: 12px 16px;
+          font-size: 14px;
         }
       }
     }
@@ -1052,6 +1191,24 @@
       $card-gradient-end
     );
     border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      padding: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+      margin-top: 1rem;
+    }
   }
 
   &-card {
@@ -1063,6 +1220,21 @@
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 4px $association-shadow;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      padding: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      padding: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+    }
   }
 
   &-header {
@@ -1070,6 +1242,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
   }
 
   &-title {
@@ -1100,10 +1278,13 @@
 
     .association-rules-table {
       overflow-x: auto;
+      width: 100%;
+      box-sizing: border-box;
 
       table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 600px;
 
         th,
         td {
@@ -1124,24 +1305,161 @@
         td:last-child {
           font-weight: 500;
         }
+
+        @media (max-width: 800px) {
+          min-width: 500px;
+          font-size: 0.9rem;
+
+          th,
+          td {
+            padding: 0.6rem 0.75rem;
+          }
+        }
+
+        @media (max-width: 600px) {
+          min-width: 450px;
+          font-size: 0.85rem;
+
+          th,
+          td {
+            padding: 0.5rem 0.6rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          min-width: 400px;
+          font-size: 0.8rem;
+
+          th,
+          td {
+            padding: 0.4rem 0.5rem;
+          }
+        }
       }
     }
   }
 
   @media (max-width: 768px) {
+    &-section {
+      padding: 1rem;
+    }
+
+    &-card {
+      padding: 1rem;
+    }
+
     &-header {
       flex-direction: column;
       gap: 1rem;
       align-items: stretch;
     }
 
-    &-table {
+    &-actions {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    &-title {
+      font-size: 1.3rem;
+      flex-wrap: wrap;
+
+      .custom-implementation-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+      }
+    }
+
+    &-description {
       font-size: 0.9rem;
+    }
+
+    &-table {
+      font-size: 0.85rem;
+      overflow-x: auto;
+
+      table {
+        min-width: 600px;
+      }
 
       th,
       td {
-        padding: 0.5rem 0.75rem;
+        padding: 0.5rem;
+        font-size: 0.8rem;
       }
+    }
+  }
+
+  @media (max-width: 480px) {
+    &-section {
+      padding: 0.5rem;
+    }
+
+    &-title {
+      font-size: 1.1rem;
+      gap: 0.3rem;
+
+      .association-rules-icon {
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+    }
+
+    &-actions {
+      button {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+.show-all-rules-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border: 1px solid $text-black;
+  background: $realwhite;
+  color: $text-black;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: $text-black;
+    color: $realwhite;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+
+    .icon {
+      width: 0.9rem;
+      height: 0.9rem;
     }
   }
 }
@@ -1158,6 +1476,8 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.3s ease;
+  font-size: 1rem;
+  white-space: nowrap;
 
   &:hover {
     border: 1px solid $btn-primary-blue;
@@ -1179,9 +1499,25 @@
   .icon {
     width: 1rem;
     height: 1rem;
+    flex-shrink: 0;
 
     &.rotating {
       animation: rotate 1s linear infinite;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+
+    .icon {
+      width: 0.9rem;
+      height: 0.9rem;
     }
   }
 }
@@ -1204,23 +1540,29 @@
     margin-bottom: 3rem;
     width: 100%;
     justify-items: center;
+    box-sizing: border-box;
+    padding: 0;
 
     @media (max-width: 1024px) {
       grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
     }
 
+    @media (max-width: 800px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      max-width: 100%;
+      gap: 1rem;
     }
 
     @media (max-width: 520px) {
       max-width: 100%;
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
     }
 
     &__content {
@@ -1233,9 +1575,22 @@
       background-color: $stat-card-default;
       box-shadow: 0 4px 8px $stat-shadow;
       transition: transform 0.3s ease;
-      width: 250px;
+      width: 100%;
+      max-width: 250px;
       border: $stat-border 1px solid;
       min-height: 150px;
+      box-sizing: border-box;
+      min-width: 250px;
+
+      @media (max-width: 800px) {
+        padding: 1.5rem;
+        max-width: 100%;
+      }
+
+      @media (max-width: 520px) {
+        padding: 1.25rem;
+        min-height: 120px;
+      }
 
       &-first {
         background: $btn-primary-blue;
@@ -1281,7 +1636,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: row;
-      font-size: 1.8rem;
+      font-size: 1.8rem !important;
       gap: 1rem;
     }
 
@@ -1426,7 +1781,7 @@
 }
 
 .name-span {
-  font-size: 3.5rem;
+  font-size: 2.5rem !important;
   color: $text-black;
   margin-bottom: 1rem;
   text-align: left;
@@ -1613,7 +1968,7 @@ select {
     backdrop-filter: blur(10px);
 
     &__title {
-      font-size: 2rem;
+      font-size: 1.6rem;
       font-weight: 600;
       margin-bottom: 1.5rem;
       color: $text-black;
@@ -2073,6 +2428,24 @@ select {
       $card-gradient-end
     );
     border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      padding: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+      margin-top: 1rem;
+    }
   }
 
   &-card {
@@ -2084,6 +2457,21 @@ select {
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 4px $stats-shadow;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    @media (max-width: 800px) {
+      padding: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      padding: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+    }
   }
 
   &-header {
@@ -2147,7 +2535,7 @@ select {
           display: inline-block;
           padding: 0.25rem 0.75rem;
           border-radius: 9999px;
-          font-size: 0.75rem;
+          font-size: 1.25rem;
           font-weight: 500;
 
           &.custom {
@@ -2186,7 +2574,7 @@ select {
           color: $realwhite;
           padding: 0.25rem 0.75rem;
           border-radius: 4px;
-          font-size: 0.75rem;
+          font-size: 1.25rem;
           font-weight: 500;
         }
       }
@@ -2200,7 +2588,7 @@ select {
   border: 1px solid $badge-custom-border;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 1.25rem;
   font-weight: 500;
   margin-left: 0.5rem;
 }
@@ -2395,6 +2783,835 @@ select {
           padding: 0.2rem 0.5rem;
         }
       }
+    }
+  }
+}
+.modal-content-large {
+  background: linear-gradient(135deg, $card-gradient-start, $card-gradient-end);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  padding: 2rem;
+  box-shadow: 0 10px 25px $modal-shadow;
+  border: 1px solid $card-border;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body-rules {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+
+  .modal-loading,
+  .modal-empty {
+    text-align: center;
+    padding: 3rem;
+    color: $text-black;
+    font-size: 1.2rem;
+  }
+}
+
+.rules-table-container {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+
+  thead {
+    background: $text-black;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    th {
+      color: $realwhite;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      transition: background 0.2s;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        color: $text-black;
+        font-size: 1.2rem;
+
+        &:first-child {
+          font-weight: 600;
+          color: $btn-primary-blue;
+        }
+
+        &:nth-child(4),
+        &:nth-child(5),
+        &:nth-child(6) {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+  &-btn {
+    padding: 0.5rem 1rem;
+    background: $btn-primary-blue;
+    color: $realwhite;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover:not(:disabled) {
+      background: $text-black;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &-info {
+    font-weight: 500;
+    color: $text-black;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content-large {
+    width: 95%;
+    padding: 1.5rem;
+    max-height: 85vh;
+  }
+
+  .modal-header {
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .modal-body-rules {
+    .modal-loading,
+    .modal-empty {
+      padding: 2rem;
+      font-size: 1rem;
+    }
+  }
+
+  .association-rules-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .rules-table {
+    font-size: 0.8rem;
+    min-width: 500px;
+
+    thead th {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    tbody td {
+      padding: 0.5rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    &-btn {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    &-info {
+      width: 100%;
+      text-align: center;
+      order: -1;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content-large {
+    width: 98%;
+    padding: 1rem;
+    max-height: 80vh;
+  }
+
+  .modal-header {
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    .modal-close {
+      font-size: 1.5rem;
+    }
+  }
+
+  .rules-table {
+    font-size: 0.7rem;
+    min-width: 450px;
+
+    thead th {
+      padding: 0.5rem 0.3rem;
+      font-size: 0.75rem;
+    }
+
+    tbody td {
+      padding: 0.4rem 0.3rem;
+      font-size: 0.7rem;
+    }
+  }
+
+  .pagination {
+    &-btn {
+      font-size: 0.85rem;
+      padding: 0.6rem 0.8rem;
+    }
+
+    &-info {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.debug-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.debug-header {
+  margin-bottom: 2rem;
+
+  .debug-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 2.5rem;
+    color: $text-black;
+    margin-bottom: 0.5rem;
+
+    .debug-icon {
+      color: #f97316;
+    }
+  }
+
+  .debug-description {
+    color: $text-black;
+    font-size: 1.1rem;
+    opacity: 0.8;
+  }
+}
+
+.method-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, $card-gradient-start, $card-gradient-end);
+  padding: 1rem;
+  border-radius: 8px;
+
+  .method-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: $realwhite;
+    color: $text-black;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
+
+    .tab-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active {
+      background: $btn-primary-blue;
+      color: $realwhite;
+      border-color: $btn-primary-blue;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+  }
+}
+
+.debug-content {
+  min-height: 400px;
+}
+
+.debug-loading {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.5rem;
+  color: $text-black;
+}
+
+.debug-section {
+  .section-title {
+    font-size: 2rem;
+    color: $text-black;
+    margin-bottom: 2rem;
+  }
+}
+
+.debug-card {
+  background: linear-gradient(135deg, $card-gradient-start, $card-gradient-end);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  h3 {
+    font-size: 1.5rem;
+    color: $text-black;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid $btn-primary-blue;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.debug-info {
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 600;
+      color: $text-black;
+      font-size: 1rem;
+    }
+
+    .value {
+      color: $text-black;
+      font-size: 1rem;
+
+      &.success {
+        color: #10b981;
+        font-weight: 600;
+      }
+
+      &.error {
+        color: #ef4444;
+        font-weight: 600;
+      }
+
+      &.code {
+        font-family: "Courier New", monospace;
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+.similarities-table,
+.sentiment-table,
+.association-table {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: $text-black;
+
+      th {
+        color: $realwhite;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        transition: background 0.2s;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.05);
+        }
+
+        td {
+          padding: 0.75rem 1rem;
+          color: $text-black;
+
+          &.similarity-value,
+          &.lift-value {
+            font-weight: 600;
+            color: $btn-primary-blue;
+          }
+
+          &.sentiment-positive {
+            font-weight: 600;
+            color: #10b981;
+          }
+
+          &.sentiment-negative {
+            font-weight: 600;
+            color: #ef4444;
+          }
+        }
+      }
+    }
+  }
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: $text-black;
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+.product-selector {
+  margin: 1rem 0;
+
+  .product-select {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 2px solid $text-black;
+    border-radius: 8px;
+    background: $realwhite;
+    color: $text-black;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:focus {
+      outline: none;
+      border-color: $btn-primary-blue;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  }
+}
+
+.formulas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+
+  .formula-card {
+    background: rgba(59, 130, 246, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid $btn-primary-blue;
+
+    h4 {
+      color: $btn-primary-blue;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .formula-text {
+      font-family: "Courier New", monospace;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 0.75rem;
+      border-radius: 4px;
+      color: $text-black;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .formula-explanation {
+      color: $text-black;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      line-height: 1.5;
+    }
+  }
+}
+
+.sources-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+
+  .source-item {
+    background: rgba(59, 130, 246, 0.03);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+
+    h4 {
+      color: $btn-primary-blue;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .debug-info {
+      .info-row {
+        margin-bottom: 0.75rem;
+
+        &.interpretation {
+          background: rgba(16, 185, 129, 0.05);
+          padding: 0.5rem;
+          border-radius: 4px;
+          border-left: 3px solid #10b981;
+        }
+      }
+    }
+  }
+}
+
+.opinion-detail {
+  background: rgba(0, 0, 0, 0.02);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid $btn-primary-blue;
+
+  h4 {
+    color: $btn-primary-blue;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .opinion-text {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    border-radius: 4px;
+    font-style: italic;
+    color: $text-black;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+}
+
+.rule-detail {
+  background: rgba(0, 0, 0, 0.02);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #10b981;
+
+  h4 {
+    color: #10b981;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .interpretation {
+    background: rgba(16, 185, 129, 0.05);
+    padding: 0.5rem;
+    border-radius: 4px;
+    border-left: 3px solid #10b981;
+    margin-top: 0.5rem;
+  }
+}
+
+.associations-table {
+  overflow-x: auto;
+  margin-top: 1rem;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: $text-black;
+
+      th {
+        color: $realwhite;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        transition: background 0.2s;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.05);
+        }
+
+        td {
+          padding: 0.75rem 1rem;
+          color: $text-black;
+
+          &.metric-value {
+            font-weight: 600;
+            font-family: "Courier New", monospace;
+          }
+        }
+      }
+    }
+  }
+}
+
+.info-note {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+  border-left: 4px solid $btn-primary-blue;
+  color: $text-black;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.references-list {
+  list-style: none;
+  padding: 0;
+
+  li {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    border-left: 3px solid $btn-primary-blue;
+    color: $text-black;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
+.reference-text {
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 4px;
+  border-left: 4px solid $btn-primary-blue;
+  color: $text-black;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .debug-container {
+    padding: 1rem;
+  }
+
+  .debug-header {
+    .debug-title {
+      font-size: 1.8rem;
+    }
+
+    .debug-description {
+      font-size: 0.95rem;
+    }
+  }
+
+  .method-selector {
+    flex-direction: column;
+
+    .method-tab {
+      width: 100%;
+    }
+  }
+
+  .debug-card {
+    padding: 1.5rem;
+
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .debug-info {
+    .info-row {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+
+  .similarities-table,
+  .sentiment-table,
+  .association-table {
+    font-size: 0.85rem;
+
+    table {
+      thead th {
+        padding: 0.75rem 0.5rem;
+      }
+
+      tbody td {
+        padding: 0.5rem;
+      }
+    }
+  }
+
+  .formulas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-panel {
+  button,
+  .btn,
+  input[type="button"],
+  input[type="submit"],
+  .admin-btn,
+  .action-button,
+  .pagination-btn,
+  .modal-btn,
+  .tab-btn,
+  .method-tab {
+    font-size: 1.5rem !important;
+    font-weight: 500 !important;
+  }
+
+  input:not([type="submit"]):not([type="button"]),
+  select,
+  textarea,
+  .admin-form-input,
+  .admin-form-select,
+  .admin-form-textarea,
+  .product-select {
+    font-size: 1.5rem !important;
+  }
+
+  h1,
+  .admin-page-title,
+  .debug-title {
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+  }
+
+  h2,
+  .admin-section-title,
+  .section-title {
+    font-size: 1.75rem !important;
+    font-weight: 600 !important;
+  }
+
+  h3,
+  .admin-card-title {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+  }
+
+  p,
+  span:not(.icon):not(.lucide),
+  div:not(.icon-container),
+  td,
+  th,
+  label {
+    font-size: 1.5rem;
+  }
+
+  small,
+  .admin-text-small,
+  .admin-hint,
+  .status-badge {
+    font-size: 1.25rem !important;
+  }
+
+  table {
+    font-size: 1.5rem;
+
+    th {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    td {
+      font-weight: 400;
+      font-size: 1.5rem;
+    }
+  }
+
+  .admin-nav-item {
+    font-size: 1.5rem !important;
+  }
+
+  .stat_Cards__content {
+    h3 {
+      font-size: 1.75rem !important;
+    }
+
+    .value {
+      font-size: 2.5rem !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  .modal-title,
+  .pagination-modal h2 {
+    font-size: 2rem !important;
+  }
+
+  .debug-description {
+    font-size: 1.5rem !important;
+  }
+
+  .info-row {
+    .label,
+    .value {
+      font-size: 1.5rem !important;
+    }
+  }
+
+  .association-rules-section {
+    h2 {
+      font-size: 2rem !important;
+    }
+  }
+
+  .algorithm-status-section {
+    h2 {
+      font-size: 2rem !important;
     }
   }
 }

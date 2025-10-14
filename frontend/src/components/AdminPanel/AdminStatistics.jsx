@@ -42,6 +42,11 @@ const AdminStatistics = () => {
   const [associationLoading, setAssociationLoading] = useState(false);
   const [isUpdatingRules, setIsUpdatingRules] = useState(false);
   const [algorithmStatus, setAlgorithmStatus] = useState(null);
+  const [showAllRulesModal, setShowAllRulesModal] = useState(false);
+  const [allRules, setAllRules] = useState([]);
+  const [allRulesLoading, setAllRulesLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rulesPerPage = 50;
 
   useEffect(() => {
     fetchStats();
@@ -232,6 +237,31 @@ const AdminStatistics = () => {
     } finally {
       setIsUpdatingRules(false);
     }
+  };
+
+  const fetchAllRules = async () => {
+    setAllRulesLoading(true);
+    const token = localStorage.getItem("access");
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/api/association-rules/?all=true`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setAllRules(res.data.rules || []);
+      setShowAllRulesModal(true);
+    } catch (err) {
+      console.error("Error fetching all rules:", err);
+      toast.error("Failed to fetch all rules.");
+    } finally {
+      setAllRulesLoading(false);
+    }
+  };
+
+  const closeAllRulesModal = () => {
+    setShowAllRulesModal(false);
+    setCurrentPage(1);
   };
 
   const handleAlgorithmChange = (algorithm) => {
@@ -456,15 +486,24 @@ const AdminStatistics = () => {
                 Custom Apriori
               </span>
             </h2>
-            <button
-              className="update-rules-btn"
-              onClick={updateAssociationRules}
-              disabled={isUpdatingRules}>
-              <RefreshCw
-                className={`icon ${isUpdatingRules ? "rotating" : ""}`}
-              />
-              {isUpdatingRules ? "Updating..." : "Update Rules"}
-            </button>
+            <div className="association-rules-actions">
+              <button
+                className="show-all-rules-btn"
+                onClick={fetchAllRules}
+                disabled={allRulesLoading || associationRules.length === 0}>
+                <List className="icon" />
+                {allRulesLoading ? "Loading..." : "Show All Rules"}
+              </button>
+              <button
+                className="update-rules-btn"
+                onClick={updateAssociationRules}
+                disabled={isUpdatingRules}>
+                <RefreshCw
+                  className={`icon ${isUpdatingRules ? "rotating" : ""}`}
+                />
+                {isUpdatingRules ? "Updating..." : "Update Rules"}
+              </button>
+            </div>
           </div>
 
           <div className="association-rules-content">
@@ -641,6 +680,92 @@ const AdminStatistics = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Modal - Show All Rules */}
+      {showAllRulesModal && (
+        <div className="modal-overlay" onClick={closeAllRulesModal}>
+          <div
+            className="modal-content-large"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>All Association Rules ({allRules.length})</h2>
+              <button className="modal-close" onClick={closeAllRulesModal}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body-rules">
+              {allRulesLoading ? (
+                <div className="modal-loading">Loading all rules...</div>
+              ) : allRules.length > 0 ? (
+                <>
+                  <div className="rules-table-container">
+                    <table className="rules-table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Product 1</th>
+                          <th>Product 2</th>
+                          <th>Support</th>
+                          <th>Confidence</th>
+                          <th>Lift</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allRules
+                          .slice(
+                            (currentPage - 1) * rulesPerPage,
+                            currentPage * rulesPerPage
+                          )
+                          .map((rule, index) => (
+                            <tr key={rule.id || index}>
+                              <td>
+                                {(currentPage - 1) * rulesPerPage + index + 1}
+                              </td>
+                              <td>{rule.product_1.name}</td>
+                              <td>{rule.product_2.name}</td>
+                              <td>{(rule.support * 100).toFixed(2)}%</td>
+                              <td>{(rule.confidence * 100).toFixed(1)}%</td>
+                              <td>{rule.lift.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="pagination">
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}>
+                      Previous
+                    </button>
+                    <span className="pagination-info">
+                      Page {currentPage} of{" "}
+                      {Math.ceil(allRules.length / rulesPerPage)}
+                    </span>
+                    <button
+                      className="pagination-btn"
+                      onClick={() =>
+                        setCurrentPage((p) =>
+                          Math.min(
+                            Math.ceil(allRules.length / rulesPerPage),
+                            p + 1
+                          )
+                        )
+                      }
+                      disabled={
+                        currentPage >= Math.ceil(allRules.length / rulesPerPage)
+                      }>
+                      Next
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="modal-empty">No rules available.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

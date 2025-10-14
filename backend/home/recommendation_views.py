@@ -32,7 +32,7 @@ class RecommendationSettingsView(APIView):
         return Response(
             {
                 "active_algorithm": (
-                    settings.active_algorithm if settings else None  # ✅ Nie ustawiaj domyślnego
+                    settings.active_algorithm if settings else None 
                 )
             }
         )
@@ -125,13 +125,12 @@ class ProcessRecommendationsView(APIView):
             
             if len(purchased_items) > 0:
                 user_mean = np.mean(purchased_items)
-                # TYLKO odejmuj średnią od zakupionych produktów (>0)
-                # Zero pozostaje zerem (brak zakupu)
+
                 for j, val in enumerate(user_row):
                     if val > 0:
                         normalized_matrix[i][j] = val - user_mean
                     else:
-                        normalized_matrix[i][j] = 0  # Zero pozostaje zerem
+                        normalized_matrix[i][j] = 0  
             else:
                 normalized_matrix[i] = user_row
 
@@ -143,7 +142,7 @@ class ProcessRecommendationsView(APIView):
             similarities_to_create = []
             similarity_count = 0
             
-            similarity_threshold = 0.5  # Podniesiono z 0.3 do 0.5 (tylko silne podobieństwa)
+            similarity_threshold = 0.5 
             
             for i, product1_id in enumerate(product_ids):
                 for j, product2_id in enumerate(product_ids):
@@ -373,11 +372,10 @@ class CollaborativeFilteringDebugView(APIView):
     Debug endpoint dla Collaborative Filtering - pokazuje szczegóły macierzy,
     cache, statystyki i potencjalne błędy
     """
-    permission_classes = []  # BEZ AUTORYZACJI - dla debugowania
+    permission_classes = [] 
 
     def get(self, request):
         try:
-            # 1. Podstawowe statystyki
             users = User.objects.all()
             products = Product.objects.all()
             orders = OrderProduct.objects.all()
@@ -386,12 +384,10 @@ class CollaborativeFilteringDebugView(APIView):
             products_count = products.count()
             orders_count = orders.count()
             
-            # 2. Sprawdź cache
             cache_key = "collaborative_similarity_matrix"
             cached_result = cache.get(cache_key)
             cache_status = "HIT (dane w cache)" if cached_result else "MISS (brak danych)"
             
-            # 3. User-Product Matrix info
             user_product_matrix = defaultdict(dict)
             for order in orders.select_related("order", "product"):
                 user_product_matrix[order.order.user_id][order.product_id] = order.quantity
@@ -399,20 +395,16 @@ class CollaborativeFilteringDebugView(APIView):
             users_with_purchases = len(user_product_matrix.keys())
             total_purchases = sum(len(products) for products in user_product_matrix.values())
             
-            # 4. Macierz info
             matrix_shape = f"({users_with_purchases}, {products_count})"
             total_cells = users_with_purchases * products_count
             sparsity = ((total_cells - total_purchases) / total_cells * 100) if total_cells > 0 else 0
             
-            # 5. ProductSimilarity statistics
             cf_similarities = ProductSimilarity.objects.filter(similarity_type="collaborative")
             cf_count = cf_similarities.count()
             
-            # Potencjalne pary (bez przekątnej)
             total_possible_pairs = products_count * (products_count - 1)
             percentage_saved = (cf_count / total_possible_pairs * 100) if total_possible_pairs > 0 else 0
             
-            # TOP 10 similarities
             top_10 = cf_similarities.order_by('-similarity_score')[:10]
             top_similarities = [
                 {
@@ -425,15 +417,13 @@ class CollaborativeFilteringDebugView(APIView):
                 for sim in top_10
             ]
             
-            # 6. Przykładowy wektor użytkownika (pierwszy użytkownik z zakupami)
             sample_user_vector = None
             if user_product_matrix:
                 first_user_id = list(user_product_matrix.keys())[0]
                 user_purchases = user_product_matrix[first_user_id]
                 
-                # Wektor dla wszystkich produktów
                 product_ids = list(products.values_list('id', flat=True))
-                vector = [user_purchases.get(pid, 0) for pid in product_ids[:20]]  # Pierwsze 20
+                vector = [user_purchases.get(pid, 0) for pid in product_ids[:20]]
                 
                 sample_user_vector = {
                     "user_id": first_user_id,
@@ -442,10 +432,8 @@ class CollaborativeFilteringDebugView(APIView):
                     "vector_length": len(product_ids)
                 }
             
-            # 7. Sprawdź czy są dane do obliczeń
             can_compute = users_with_purchases >= 2 and products_count >= 2
             
-            # 8. Diagnostyka
             issues = []
             if cf_count == 0:
                 issues.append("⚠️ BRAK podobieństw collaborative w bazie - uruchom algorytm!")
