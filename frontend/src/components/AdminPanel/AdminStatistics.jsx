@@ -61,8 +61,8 @@ const AdminStatistics = () => {
             .post(
               `${config.apiUrl}/api/update-association-rules/`,
               {
-                min_support: 0.005, // 0.5%
-                min_confidence: 0.05, // 5%
+                min_support: 0.005,
+                min_confidence: 0.05,
                 min_lift: 1.0,
               },
               {
@@ -144,7 +144,6 @@ const AdminStatistics = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // ✅ NIE ustawiaj domyślnego algorytmu jeśli backend nie zwrócił żadnego
       const algorithm = res.data.active_algorithm || null;
       setCurrentAlgorithm(algorithm);
       setSelectedAlgorithm(algorithm);
