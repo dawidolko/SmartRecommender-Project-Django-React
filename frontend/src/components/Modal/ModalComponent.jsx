@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
 import FormComponent from "./FormComponent";
-import { AiOutlineClose } from "react-icons/ai";
 
 const ModalComponent = ({
   onClose,
@@ -47,10 +46,10 @@ const ModalComponent = ({
           message={message}
         />
         <button
-          className="modal__close modal__close--absolute"
+          className="common-modal-close modal__close modal__close--absolute"
           onClick={handleClose}
           aria-label="Close">
-          <AiOutlineClose />
+          ×
         </button>
       </motion.div>
     </motion.div>

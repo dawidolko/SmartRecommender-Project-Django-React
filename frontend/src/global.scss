@@ -422,3 +422,203 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.common-image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+  cursor: zoom-out;
+
+  &__content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+  }
+
+  &__image {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
+    cursor: default;
+  }
+}
+
+.common-close-button {
+  position: absolute;
+  top: -47px;
+  right: -47px;
+  width: 50px;
+  height: 50px;
+  background: $modal-close-red;
+  color: $realwhite;
+  border: 2px solid $modal-close-red;
+  border-radius: 4px;
+  font-size: 3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  font-weight: 300;
+  z-index: 10001;
+
+  &:hover {
+    color: darken($modal-close-red, 10%);
+    background: transparent;
+    border: 2px solid $modal-close-red;
+    transform: rotate(90deg) scale(1.1);
+  }
+
+  &:active {
+    transform: rotate(90deg) scale(1);
+  }
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 2.5rem;
+    top: 20px;
+    right: 20px;
+  }
+
+  @media (max-width: 480px) {
+    width: 36px;
+    height: 36px;
+    font-size: 2rem;
+    top: 15px;
+    right: 15px;
+  }
+}
+
+.common-modal-close {
+  background: $modal-close-red;
+  color: $realwhite;
+  border: 2px solid $modal-close-red;
+  border-radius: 4px;
+  font-size: 2.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  font-weight: 300;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  &:hover {
+    color: darken($modal-close-red, 10%);
+    background: transparent;
+    border: 2px solid $modal-close-red;
+    transform: rotate(90deg) scale(1.1);
+  }
+
+  &:active {
+    transform: rotate(90deg) scale(1);
+  }
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+    font-size: 2rem;
+  }
+}
+
+.common-shop-image-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: zoom-out;
+  animation: fadeIn 0.3s ease;
+
+  &__content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+  }
+
+  &__image {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
+  }
+
+  &__close {
+    position: absolute;
+    top: -47px;
+    right: -47px;
+    width: 50px;
+    height: 50px;
+    background: $modal-close-red;
+    color: $realwhite;
+    border: 2px solid $modal-close-red;
+    border-radius: 4px;
+    font-size: 3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    line-height: 1;
+    font-weight: 300;
+    z-index: 10000;
+
+    &:hover {
+      color: darken($modal-close-red, 10%);
+      background: transparent;
+      border: 2px solid $modal-close-red;
+      transform: rotate(90deg) scale(1.1);
+    }
+
+    &:active {
+      transform: rotate(90deg) scale(1);
+    }
+
+    @media (max-width: 768px) {
+      width: 40px;
+      height: 40px;
+      font-size: 2.5rem;
+      top: -35px;
+      right: -35px;
+    }
+
+    @media (max-width: 480px) {
+      width: 36px;
+      height: 36px;
+      font-size: 2rem;
+      top: 10px;
+      right: 10px;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

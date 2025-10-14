@@ -689,8 +689,11 @@ const AdminStatistics = () => {
             onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>All Association Rules ({allRules.length})</h2>
-              <button className="modal-close" onClick={closeAllRulesModal}>
-                ✕
+              <button
+                className="common-modal-close modal-close"
+                onClick={closeAllRulesModal}
+                aria-label="Close modal">
+                ×
               </button>
             </div>
             <div className="modal-body-rules">

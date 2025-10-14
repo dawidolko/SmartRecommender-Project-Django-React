@@ -287,12 +287,6 @@ See `.database/` directory for complete database documentation and entity relati
 
 ---
 
-## 🖼️ Screenshots
-
-[<img src="images/mobile_home.png" width="80%"/>](images/mobile_home.png)
-
----
-
 ## 🧑‍💻 Team
 
 <table>

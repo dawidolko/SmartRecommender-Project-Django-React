@@ -70,34 +70,6 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  background-color: $client-status-rejected-badge;
-  border: 1px solid $client-status-rejected-badge;
-  font-size: 20px;
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  color: rgb(0, 0, 0);
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 1;
-
-  &:hover {
-    background-color: $close-hover-bg;
-    border: 1px solid $client-status-rejected-badge;
-    color: $client-status-rejected-badge;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
-  }
 }
 
 .search-modal-header {

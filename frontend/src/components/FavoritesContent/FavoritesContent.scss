@@ -89,18 +89,27 @@
   }
 
   &__action-btn {
-    padding: 0.15em;
+    padding: 0.8rem 1.5rem;
     background-color: $btn-primary-blue;
-    border: 1px solid $btn-primary-blue;
-    border-radius: 3px;
+    border: 2px solid $btn-primary-blue;
+    border-radius: 8px;
     color: $realwhite;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
+    font-size: 1.4rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 
     &:hover {
-      background-color: $darkblack;
-      border: 1px solid $btn-primary-blue;
+      background-color: $realwhite;
+      border: 2px solid $btn-primary-blue;
       color: $btn-primary-blue;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 

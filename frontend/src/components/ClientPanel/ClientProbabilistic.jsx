@@ -12,14 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import {
-  TrendingUp,
-  ShoppingBag,
-  Clock,
-  Heart,
-  X,
-  Calendar,
-} from "react-feather";
+import { TrendingUp, ShoppingBag, Clock, Heart, Calendar } from "react-feather";
 import config from "../../config/config";
 import "./ClientProbabilistic.scss";
 
@@ -42,8 +35,11 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="modal-close" onClick={onClose}>
-            <X size={24} />
+          <button
+            className="common-modal-close modal-close"
+            onClick={onClose}
+            aria-label="Close modal">
+            ×
           </button>
         </div>
         <div className="modal-body">{children}</div>

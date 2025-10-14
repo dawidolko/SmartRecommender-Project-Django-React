@@ -120,7 +120,6 @@ button {
   color: var(--button-text);
   padding: 0.8rem 1.6rem;
   border-radius: 0.4rem;
-  transition: background-color 0.3s;
 }
 
 button:hover {

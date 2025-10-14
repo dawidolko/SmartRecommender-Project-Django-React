@@ -138,7 +138,7 @@
     @include flexCenter(column);
     position: relative;
     width: 100%;
-    max-height: 450px;
+    min-height: 500px;
     padding: 1.5em;
     overflow: hidden;
     box-shadow: 2px 2px 8px $product-shadow;
@@ -151,7 +151,8 @@
 
     &:hover {
       transform: translateY(-5px);
-      transition: transform 0.5s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
   }
 
@@ -184,11 +185,12 @@
     margin-bottom: 1em;
     overflow: hidden;
     position: relative;
-    height: 200px;
+    height: 250px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
 
     &-enlarge {
       &-btn {
@@ -243,9 +245,12 @@
 
   &__content {
     @include flexCenter(column);
-    gap: 0.5em;
+    gap: 0.8em;
     flex-grow: 1;
     justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
 
   &__name {
@@ -255,6 +260,12 @@
     overflow: hidden;
     word-wrap: break-word;
     white-space: normal;
+    min-height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    line-height: 1.2;
 
     &:hover {
       text-decoration: underline;
@@ -263,11 +274,27 @@
   }
 
   &__btn {
-    border: 1px solid $name-hover-color;
+    padding: 12px 24px;
+    background: $btn-primary-blue;
+    color: $realwhite;
+    border: 2px solid $btn-primary-blue;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
     &:hover {
-      border: 1px solid $name-hover-color;
-      background-color: $realwhite;
-      color: $name-hover-color;
+      background: $realwhite;
+      color: $btn-primary-blue;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 
@@ -276,7 +303,8 @@
     justify-content: center;
     gap: 1em;
     align-items: center;
-    margin-bottom: 1em;
+    margin-bottom: 0.8em;
+    min-height: 3rem;
 
     .shop__price--discounted {
       text-decoration: line-through;
@@ -292,7 +320,7 @@
 
   &__price {
     font-weight: bolder;
-    color: $price-color;
+    color: $main;
     margin-bottom: 0.5em;
     font-size: 3.5rem;
     @media (max-width: 1024px) {
@@ -311,16 +339,33 @@
 
   &__category {
     &__main {
-      border-radius: 5px;
+      display: inline-block;
+      padding: 8px 16px;
+      background: linear-gradient(
+        135deg,
+        $btn-primary-blue 0%,
+        darken($btn-primary-blue, 10%) 100%
+      );
+      color: $realwhite;
       font-size: 1.2rem;
-      color: $category-text;
-      margin-bottom: 0.5em;
-      border: 1px solid $category-text;
-      padding: 0.5em;
-      border-radius: 3px;
-      min-width: 100%;
+      font-weight: 600;
+      border-radius: 6px;
+      margin-bottom: 0.8em;
       text-transform: uppercase;
-      font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+      transition: all 0.3s ease;
+      min-width: 100%;
+      text-align: center;
+      min-height: 2.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      }
     }
   }
 
@@ -562,55 +607,6 @@
     color: $toggle-color;
     font-size: 1rem;
     width: 100%;
-  }
-
-  .image-overlay {
-    position: fixed;
-    inset: 0;
-    background: $image-overlay-bg;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    cursor: zoom-out;
-
-    .image-overlay-content {
-      position: relative;
-      max-width: 90%;
-      max-height: 90%;
-    }
-
-    .overlay-image {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 10px;
-      box-shadow: 0 0 20px $overlay-shadow;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: -35px;
-      right: -35px;
-      background-color: $close-btn-bg;
-      border: 1px solid $close-btn-bg;
-      color: $close-btn-text;
-      border: none;
-      font-size: 1.6rem;
-      font-weight: bold;
-      width: 35px;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      box-shadow: 0 0 10px $close-btn-shadow;
-
-      &:hover {
-        background-color: $close-hover-bg;
-        border: 1px solid $close-btn-bg;
-        color: $close-btn-bg;
-      }
-    }
   }
 
   .hamburger-icon {

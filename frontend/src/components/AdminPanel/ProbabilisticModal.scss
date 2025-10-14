@@ -45,19 +45,6 @@
     }
   }
 
-  &-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    color: $forecast-confidence;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: $realwhite;
-    }
-  }
-
   &-body {
     color: $modal-body-text;
 

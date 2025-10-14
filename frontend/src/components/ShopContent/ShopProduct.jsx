@@ -131,15 +131,19 @@ const ShopProduct = (props) => {
       </div>
 
       {isImageEnlarged && (
-        <div className="image-overlay" onClick={handleOverlayClick}>
-          <div className="image-overlay-content">
+        <div className="common-shop-image-overlay" onClick={handleOverlayClick}>
+          <div className="common-shop-image-overlay__content">
             <button
-              className="close-btn"
+              className="common-shop-image-overlay__close"
               onClick={closeImageOverlay}
               aria-label="Close Image">
-              ✕
+              ×
             </button>
-            <img className="overlay-image" src={imgs[0]} alt={name} />
+            <img
+              className="common-shop-image-overlay__image"
+              src={imgs[0]}
+              alt={name}
+            />
           </div>
         </div>
       )}

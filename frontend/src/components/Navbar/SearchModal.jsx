@@ -83,10 +83,10 @@ const SearchModal = ({ isOpen, onClose }) => {
         className="search-modal-content"
         onClick={(e) => e.stopPropagation()}>
         <button
-          className="search-modal-close"
+          className="common-modal-close search-modal-close"
           onClick={onClose}
           aria-label="Close Search Modal">
-          ✕
+          ×
         </button>
 
         <div className="search-modal-header">

@@ -283,7 +283,6 @@
     }
 
     &-image {
-      width: 50%;
       height: 150px;
       object-fit: cover;
       border-radius: 4px;
@@ -331,7 +330,7 @@
 
     &-price {
       font-weight: bold;
-      color: $recommendation-price;
+      color: $main;
       margin-bottom: 0.5rem;
       flex-shrink: 0;
     }
@@ -345,66 +344,30 @@
 
     &-button {
       background: $btn-primary-blue;
-      border: 1px solid $btn-primary-blue;
+      border: 2px solid $btn-primary-blue;
       color: $realwhite;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
       margin-top: auto;
       flex-shrink: 0;
+      font-size: 1.4rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
 
       &:hover {
-        background: $transparent-bg;
-        border: 1px solid $btn-primary-blue;
+        background: $realwhite;
+        border: 2px solid $btn-primary-blue;
         color: $btn-primary-blue;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
       }
-    }
-  }
 
-  &__image-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: $image-overlay-bg;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    cursor: pointer;
-
-    &-content {
-      position: relative;
-      max-width: 90%;
-      max-height: 90%;
-    }
-
-    &-close {
-      position: absolute;
-      right: -40px;
-      top: -40px;
-      background-color: $modal-close-red;
-      border: 1px solid $modal-close-red;
-      color: $realwhite;
-      font-size: 2rem;
-      border: none;
-      cursor: pointer;
-      z-index: 3000;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0);
-        border: 1px solid $modal-close-red;
-        color: $modal-close-red;
+      &:active {
+        transform: translateY(0);
       }
-    }
-
-    &-image {
-      max-width: 100%;
-      max-height: 80vh;
-      object-fit: contain;
     }
   }
 }

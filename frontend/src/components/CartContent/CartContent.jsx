@@ -176,15 +176,16 @@ const CartContent = () => {
           )}
 
           {enlargedImage && (
-            <div className="cart__image-overlay" onClick={closeImageOverlay}>
-              <div className="cart__image-overlay-content">
+            <div className="common-image-overlay" onClick={closeImageOverlay}>
+              <div className="common-image-overlay__content">
                 <button
-                  className="cart__image-overlay-close"
-                  onClick={closeImageOverlay}>
+                  className="common-close-button"
+                  onClick={closeImageOverlay}
+                  aria-label="Close image">
                   ×
                 </button>
                 <img
-                  className="cart__image-overlay-image"
+                  className="common-image-overlay__image"
                   src={enlargedImage.url}
                   alt={enlargedImage.name}
                 />

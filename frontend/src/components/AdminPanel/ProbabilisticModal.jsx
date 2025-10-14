@@ -1,5 +1,4 @@
 import React from "react";
-import { X } from "lucide-react";
 import "./ProbabilisticModal.scss";
 
 const ProbabilisticModal = ({ isOpen, onClose, title, type, data }) => {
@@ -226,8 +225,11 @@ const ProbabilisticModal = ({ isOpen, onClose, title, type, data }) => {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="modal-close" onClick={onClose}>
-            <X size={24} />
+          <button
+            className="common-modal-close modal-close"
+            onClick={onClose}
+            aria-label="Close modal">
+            ×
           </button>
         </div>
         <div className="modal-body">{renderModalContent()}</div>

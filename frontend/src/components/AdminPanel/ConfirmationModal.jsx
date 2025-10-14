@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
 import "./AdminPanel.scss";
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
@@ -15,8 +14,11 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
         exit={{ opacity: 0, y: -50 }}>
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="modal-close" onClick={onClose}>
-            <X size={24} />
+          <button
+            className="common-modal-close modal-close"
+            onClick={onClose}
+            aria-label="Close modal">
+            ×
           </button>
         </div>
         <div className="modal-body">

@@ -362,18 +362,20 @@ const ProductPage = () => {
           </div>
 
           {isImageEnlarged && (
-            <div className="productPage__overlay" onClick={closeImageOverlay}>
-              <button
-                className="productPage__overlay-close"
-                onClick={() => setIsImageEnlarged(false)}
-                aria-label="Close image">
-                ×
-              </button>
-              <img
-                className="productPage__overlay-image"
-                src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
-                alt={product.name}
-              />
+            <div className="common-image-overlay" onClick={closeImageOverlay}>
+              <div className="common-image-overlay__content">
+                <button
+                  className="common-close-button"
+                  onClick={() => setIsImageEnlarged(false)}
+                  aria-label="Close image">
+                  ×
+                </button>
+                <img
+                  className="common-image-overlay__image"
+                  src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                  alt={product.name}
+                />
+              </div>
             </div>
           )}
 
@@ -485,27 +487,56 @@ const ProductPage = () => {
                 {similarProducts.map((similarProduct) => (
                   <div
                     key={`similar-${similarProduct.id}`}
-                    className="productPage__similar-product"
-                    onClick={() => navigate(`/product/${similarProduct.id}`)}>
-                    <div className="productPage__similar-product-inner">
+                    className="productPage__similar-product">
+                    <div
+                      className="productPage__similar-product-inner"
+                      onClick={() => navigate(`/product/${similarProduct.id}`)}>
                       <img
                         src={`${config.apiUrl}/media/${similarProduct.photos[0]?.path}`}
                         alt={similarProduct.name}
                         className="productPage__similar-product-img"
                       />
-                      <h3 className="productPage__similar-product-name">
-                        {similarProduct.name}
-                      </h3>
-                      <div className="productPage__similar-product-prices">
-                        {similarProduct.old_price &&
-                          !isNaN(similarProduct.old_price) && (
-                            <span className="productPage__similar-product-old-price">
-                              ${parseFloat(similarProduct.old_price).toFixed(2)}
-                            </span>
+                      <div className="productPage__similar-product-content">
+                        <p className="productPage__similar-product-category">
+                          {`CATEGORY: ${
+                            similarProduct.categories?.[0]
+                              ?.replace(".", " > ")
+                              .toUpperCase() || "N/A"
+                          }`}
+                        </p>
+                        <h3 className="productPage__similar-product-name">
+                          {similarProduct.name}
+                        </h3>
+                        <div className="productPage__similar-product-prices">
+                          {similarProduct.old_price &&
+                            !isNaN(similarProduct.old_price) && (
+                              <span className="productPage__similar-product-old-price">
+                                $
+                                {parseFloat(similarProduct.old_price).toFixed(
+                                  2
+                                )}
+                              </span>
+                            )}
+                          <span className="productPage__similar-product-current-price">
+                            ${parseFloat(similarProduct.price).toFixed(2)}
+                          </span>
+                        </div>
+                        <button
+                          className="productPage__similar-product-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(similarProduct.id);
+                            toast.success("Added to Cart", {
+                              position: "top-center",
+                              autoClose: 3000,
+                              theme: "colored",
+                            });
+                          }}>
+                          ADD TO CART{" "}
+                          {items[similarProduct.id] > 0 && (
+                            <span>({items[similarProduct.id]})</span>
                           )}
-                        <span className="productPage__similar-product-current-price">
-                          ${parseFloat(similarProduct.price).toFixed(2)}
-                        </span>
+                        </button>
                       </div>
                     </div>
                   </div>
