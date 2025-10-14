@@ -144,7 +144,8 @@ const AdminStatistics = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      const algorithm = res.data.active_algorithm || "collaborative";
+      // ✅ NIE ustawiaj domyślnego algorytmu jeśli backend nie zwrócił żadnego
+      const algorithm = res.data.active_algorithm || null;
       setCurrentAlgorithm(algorithm);
       setSelectedAlgorithm(algorithm);
     } catch (err) {
@@ -239,7 +240,7 @@ const AdminStatistics = () => {
   };
 
   const handleApplyAlgorithm = async () => {
-    if (isProcessing) return;
+    if (isProcessing || !selectedAlgorithm) return;
 
     setTimeout(() => {
       window.location.reload();
@@ -280,9 +281,10 @@ const AdminStatistics = () => {
     }
   };
 
-  const hasChanges = currentAlgorithm !== selectedAlgorithm;
+  const hasChanges =
+    selectedAlgorithm !== null && currentAlgorithm !== selectedAlgorithm;
 
-  if (loading && currentAlgorithm === null) {
+  if (loading) {
     return <div className="loading-spinner"></div>;
   }
 
@@ -516,97 +518,130 @@ const AdminStatistics = () => {
         </div>
       </motion.div>
 
-      {currentAlgorithm !== null && (
-        <motion.div
-          className="recommendation-control-section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}>
-          <div className="recommendation-card">
-            <h2 className="recommendation-title">Recommendation System</h2>
-            <div className="recommendation-controls">
-              <div className="algorithm-selection">
-                <label className="algorithm-label">Select Algorithm:</label>
-                <div className="algorithm-options">
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      value="collaborative"
-                      checked={selectedAlgorithm === "collaborative"}
-                      onChange={() => handleAlgorithmChange("collaborative")}
-                      disabled={isProcessing}
-                    />
-                    Collaborative Filtering (CF) - Library Implementation
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      value="content_based"
-                      checked={selectedAlgorithm === "content_based"}
-                      onChange={() => handleAlgorithmChange("content_based")}
-                      disabled={isProcessing}
-                    />
-                    Content-Based Filtering (CBF) -{" "}
-                    <strong>Custom Manual Implementation</strong>
-                  </label>
-                </div>
-              </div>
-              <div className="algorithm-actions">
-                <button
-                  className="btn-primary"
-                  onClick={handleApplyAlgorithm}
-                  disabled={isProcessing || !hasChanges}
-                  style={{
-                    opacity: !hasChanges && !isProcessing ? 0.5 : 1,
-                    cursor:
-                      !hasChanges && !isProcessing ? "not-allowed" : "pointer",
-                  }}>
-                  {isProcessing ? "Processing..." : "Apply Algorithm"}
-                </button>
+      <motion.div
+        className="recommendation-control-section"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}>
+        <div className="recommendation-card">
+          <h2 className="recommendation-title">Recommendation System</h2>
+          {currentAlgorithm === null && (
+            <div
+              className="algorithm-warning"
+              style={{
+                padding: "12px",
+                marginBottom: "16px",
+                backgroundColor: "#fff3cd",
+                border: "1px solid #ffc107",
+                borderRadius: "8px",
+                color: "#856404",
+              }}>
+              ⚠️ <strong>No algorithm selected.</strong> Please choose an
+              algorithm below and click "Apply Algorithm" to generate
+              recommendations.
+            </div>
+          )}
+          <div className="recommendation-controls">
+            <div className="algorithm-selection">
+              <label className="algorithm-label">Select Algorithm:</label>
+              <div className="algorithm-options">
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    value="collaborative"
+                    checked={selectedAlgorithm === "collaborative"}
+                    onChange={() => handleAlgorithmChange("collaborative")}
+                    disabled={isProcessing}
+                  />
+                  Collaborative Filtering (CF) - Library Implementation
+                </label>
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    value="content_based"
+                    checked={selectedAlgorithm === "content_based"}
+                    onChange={() => handleAlgorithmChange("content_based")}
+                    disabled={isProcessing}
+                  />
+                  Content-Based Filtering (CBF) -{" "}
+                  <strong>Custom Manual Implementation</strong>
+                </label>
               </div>
             </div>
+            <div className="algorithm-actions">
+              <button
+                className="btn-primary"
+                onClick={handleApplyAlgorithm}
+                disabled={
+                  isProcessing ||
+                  !selectedAlgorithm ||
+                  (!hasChanges && currentAlgorithm !== null)
+                }
+                style={{
+                  opacity:
+                    (!selectedAlgorithm ||
+                      (!hasChanges && currentAlgorithm !== null)) &&
+                    !isProcessing
+                      ? 0.5
+                      : 1,
+                  cursor:
+                    (!selectedAlgorithm ||
+                      (!hasChanges && currentAlgorithm !== null)) &&
+                    !isProcessing
+                      ? "not-allowed"
+                      : "pointer",
+                }}>
+                {isProcessing
+                  ? "Processing..."
+                  : currentAlgorithm === null
+                  ? "Generate Recommendations"
+                  : "Apply Algorithm"}
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div className="recommendation-preview">
-            <h3 className="preview-title">
-              {currentAlgorithm === "collaborative"
-                ? "Collaborative Filtering Preview (Library)"
-                : "Content-Based Filtering Preview (Custom Manual)"}
-            </h3>
-            <div className="preview-content">
-              {recommendationPreview.length > 0 ? (
-                <div className="preview-products">
-                  {recommendationPreview.map((product) => (
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="preview-product-link"
-                      key={product.id}>
-                      <div className="preview-product">
-                        {product.photos?.[0]?.path && (
-                          <img
-                            src={`${config.apiUrl}/media/${product.photos[0].path}`}
-                            alt={product.name}
-                            className="preview-product-image"
-                          />
-                        )}
-                        <div className="preview-product-info">
-                          <h4>{product.name}</h4>
-                          <p>${product.price}</p>
-                        </div>
+        <div className="recommendation-preview">
+          <h3 className="preview-title">
+            {currentAlgorithm === "collaborative"
+              ? "Collaborative Filtering Preview (Library)"
+              : currentAlgorithm === "content_based"
+              ? "Content-Based Filtering Preview (Custom Manual)"
+              : "Recommendation Preview"}
+          </h3>
+          <div className="preview-content">
+            {recommendationPreview.length > 0 ? (
+              <div className="preview-products">
+                {recommendationPreview.map((product) => (
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="preview-product-link"
+                    key={product.id}>
+                    <div className="preview-product">
+                      {product.photos?.[0]?.path && (
+                        <img
+                          src={`${config.apiUrl}/media/${product.photos[0].path}`}
+                          alt={product.name}
+                          className="preview-product-image"
+                        />
+                      )}
+                      <div className="preview-product-info">
+                        <h4>{product.name}</h4>
+                        <p>${product.price}</p>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="preview-empty">
-                  No recommendations available. Click "Apply Algorithm" to
-                  generate.
-                </p>
-              )}
-            </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="preview-empty">
+                No recommendations available. Click "Apply Algorithm" to
+                generate.
+              </p>
+            )}
           </div>
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
     </div>
   );
 };

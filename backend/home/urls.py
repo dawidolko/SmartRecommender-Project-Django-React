@@ -45,6 +45,7 @@ from .recommendation_views import (
     RecommendationSettingsView,
     UpdateProductSimilarityView,
     RecommendationAlgorithmStatusView,
+    CollaborativeFilteringDebugView,
 )
 
 from .sentiment_views import (
@@ -208,6 +209,11 @@ urlpatterns = [
         "api/recommendation-algorithm-status/",
         RecommendationAlgorithmStatusView.as_view(),
         name="recommendation-algorithm-status",
+    ),
+    path(
+        "api/collaborative-filtering-debug/",
+        CollaborativeFilteringDebugView.as_view(),
+        name="collaborative-filtering-debug",
     ),
     path(
         "api/frequently-bought-together/",

@@ -32,7 +32,7 @@ class RecommendationSettingsView(APIView):
         return Response(
             {
                 "active_algorithm": (
-                    settings.active_algorithm if settings else "collaborative"
+                    settings.active_algorithm if settings else None  # ✅ Nie ustawiaj domyślnego
                 )
             }
         )
@@ -125,7 +125,13 @@ class ProcessRecommendationsView(APIView):
             
             if len(purchased_items) > 0:
                 user_mean = np.mean(purchased_items)
-                normalized_matrix[i] = user_row - user_mean
+                # TYLKO odejmuj średnią od zakupionych produktów (>0)
+                # Zero pozostaje zerem (brak zakupu)
+                for j, val in enumerate(user_row):
+                    if val > 0:
+                        normalized_matrix[i][j] = val - user_mean
+                    else:
+                        normalized_matrix[i][j] = 0  # Zero pozostaje zerem
             else:
                 normalized_matrix[i] = user_row
 
@@ -137,7 +143,7 @@ class ProcessRecommendationsView(APIView):
             similarities_to_create = []
             similarity_count = 0
             
-            similarity_threshold = 0.3
+            similarity_threshold = 0.5  # Podniesiono z 0.3 do 0.5 (tylko silne podobieństwa)
             
             for i, product1_id in enumerate(product_ids):
                 for j, product2_id in enumerate(product_ids):
@@ -360,3 +366,158 @@ class RecommendationAlgorithmStatusView(APIView):
                 ],
             }
         )
+
+
+class CollaborativeFilteringDebugView(APIView):
+    """
+    Debug endpoint dla Collaborative Filtering - pokazuje szczegóły macierzy,
+    cache, statystyki i potencjalne błędy
+    """
+    permission_classes = []  # BEZ AUTORYZACJI - dla debugowania
+
+    def get(self, request):
+        try:
+            # 1. Podstawowe statystyki
+            users = User.objects.all()
+            products = Product.objects.all()
+            orders = OrderProduct.objects.all()
+            
+            users_count = users.count()
+            products_count = products.count()
+            orders_count = orders.count()
+            
+            # 2. Sprawdź cache
+            cache_key = "collaborative_similarity_matrix"
+            cached_result = cache.get(cache_key)
+            cache_status = "HIT (dane w cache)" if cached_result else "MISS (brak danych)"
+            
+            # 3. User-Product Matrix info
+            user_product_matrix = defaultdict(dict)
+            for order in orders.select_related("order", "product"):
+                user_product_matrix[order.order.user_id][order.product_id] = order.quantity
+            
+            users_with_purchases = len(user_product_matrix.keys())
+            total_purchases = sum(len(products) for products in user_product_matrix.values())
+            
+            # 4. Macierz info
+            matrix_shape = f"({users_with_purchases}, {products_count})"
+            total_cells = users_with_purchases * products_count
+            sparsity = ((total_cells - total_purchases) / total_cells * 100) if total_cells > 0 else 0
+            
+            # 5. ProductSimilarity statistics
+            cf_similarities = ProductSimilarity.objects.filter(similarity_type="collaborative")
+            cf_count = cf_similarities.count()
+            
+            # Potencjalne pary (bez przekątnej)
+            total_possible_pairs = products_count * (products_count - 1)
+            percentage_saved = (cf_count / total_possible_pairs * 100) if total_possible_pairs > 0 else 0
+            
+            # TOP 10 similarities
+            top_10 = cf_similarities.order_by('-similarity_score')[:10]
+            top_similarities = [
+                {
+                    "product1_id": sim.product1_id,
+                    "product1_name": sim.product1.name,
+                    "product2_id": sim.product2_id,
+                    "product2_name": sim.product2.name,
+                    "score": float(sim.similarity_score)
+                }
+                for sim in top_10
+            ]
+            
+            # 6. Przykładowy wektor użytkownika (pierwszy użytkownik z zakupami)
+            sample_user_vector = None
+            if user_product_matrix:
+                first_user_id = list(user_product_matrix.keys())[0]
+                user_purchases = user_product_matrix[first_user_id]
+                
+                # Wektor dla wszystkich produktów
+                product_ids = list(products.values_list('id', flat=True))
+                vector = [user_purchases.get(pid, 0) for pid in product_ids[:20]]  # Pierwsze 20
+                
+                sample_user_vector = {
+                    "user_id": first_user_id,
+                    "total_purchases": len(user_purchases),
+                    "vector_sample": vector,
+                    "vector_length": len(product_ids)
+                }
+            
+            # 7. Sprawdź czy są dane do obliczeń
+            can_compute = users_with_purchases >= 2 and products_count >= 2
+            
+            # 8. Diagnostyka
+            issues = []
+            if cf_count == 0:
+                issues.append("⚠️ BRAK podobieństw collaborative w bazie - uruchom algorytm!")
+            if users_with_purchases < 2:
+                issues.append(f"⚠️ Za mało użytkowników z zakupami ({users_with_purchases} < 2)")
+            if total_purchases < 10:
+                issues.append(f"⚠️ Za mało zakupów w systemie ({total_purchases} < 10)")
+            if not can_compute:
+                issues.append("❌ Niewystarczające dane do obliczeń collaborative filtering")
+                
+            return Response({
+                "status": "success",
+                "algorithm": "Collaborative Filtering (Item-Based, Sarwar et al. 2001)",
+                "formula": "Adjusted Cosine Similarity with Mean-Centering",
+                
+                "database_stats": {
+                    "total_users": users_count,
+                    "total_products": products_count,
+                    "total_order_items": orders_count,
+                    "users_with_purchases": users_with_purchases,
+                    "total_purchases": total_purchases
+                },
+                
+                "matrix_info": {
+                    "shape": matrix_shape,
+                    "total_cells": total_cells,
+                    "non_zero_cells": total_purchases,
+                    "sparsity_percentage": round(sparsity, 2),
+                    "description": f"Macierz {matrix_shape} gdzie każdy wiersz = użytkownik, każda kolumna = produkt"
+                },
+                
+                "similarity_matrix_info": {
+                    "expected_shape": f"({products_count}, {products_count})",
+                    "total_possible_pairs": total_possible_pairs,
+                    "saved_similarities": cf_count,
+                    "percentage_saved": round(percentage_saved, 2),
+                    "threshold": 0.3,
+                    "description": "Tylko podobieństwa > 0.3 są zapisywane do bazy"
+                },
+                
+                "cache_info": {
+                    "cache_key": cache_key,
+                    "status": cache_status,
+                    "cached_value": cached_result,
+                    "timeout": "7200 sekund (2 godziny)"
+                },
+                
+                "top_10_similarities": top_similarities,
+                
+                "sample_user_vector": sample_user_vector,
+                
+                "computation_status": {
+                    "can_compute": can_compute,
+                    "issues": issues if issues else ["✅ Wszystko OK - można obliczyć podobieństwa"]
+                },
+                
+                "how_to_fix": {
+                    "if_zero_similarities": [
+                        "1. Przejdź do Admin Panel → Statistics",
+                        "2. Wybierz 'Collaborative Filtering'",
+                        "3. Kliknij 'Apply Algorithm'",
+                        "4. Poczekaj ~30 sekund na obliczenia",
+                        "5. Odśwież tę stronę aby zobaczyć wyniki"
+                    ],
+                    "manual_trigger": "POST /api/process-recommendations/ with {\"algorithm\": \"collaborative\"}"
+                }
+            })
+            
+        except Exception as e:
+            import traceback
+            return Response({
+                "status": "error",
+                "message": str(e),
+                "traceback": traceback.format_exc()
+            }, status=500)
