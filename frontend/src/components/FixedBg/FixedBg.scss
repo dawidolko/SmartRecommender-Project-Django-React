@@ -43,6 +43,13 @@
     background-color: $main;
     border-radius: 10px;
     color: $white;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+    }
   }
 }
 

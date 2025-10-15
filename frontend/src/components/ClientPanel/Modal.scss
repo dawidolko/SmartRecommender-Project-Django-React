@@ -34,28 +34,12 @@
     align-items: center;
     padding: 15px 20px;
     border-bottom: 1px solid black;
+    position: relative;
 
     h2 {
       margin: 0;
       font-size: 2.2rem;
       font-weight: 600;
-    }
-
-    .close-button {
-      background: $modal-close-danger;
-      border: none;
-      font-size: 2.2rem;
-      cursor: pointer;
-      color: black;
-      font-weight: bold;
-      transition: color 0.2s;
-      border: 1px solid $modal-close-danger;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0);
-        color: $modal-close-danger;
-        border: 1px solid $modal-close-danger;
-      }
     }
   }
 

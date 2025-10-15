@@ -86,7 +86,7 @@
       border-radius: 4px;
       font-weight: 500;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: all 0.3s ease;
 
       &:disabled {
         opacity: 0.7;
@@ -103,6 +103,8 @@
         background-color: $transparent-bg;
         border: 1px solid $review-btn-secondary;
         color: $review-btn-secondary;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(97, 97, 97, 0.3);
       }
     }
 
@@ -115,6 +117,8 @@
         background-color: $transparent-bg;
         border: 1px solid $btn-primary-blue;
         color: $btn-primary-blue;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
       }
     }
   }
@@ -139,11 +143,14 @@
     background-color: $btn-primary-blue !important;
     border: 1px solid $btn-primary-blue !important;
     color: $realwhite !important;
+    transition: all 0.3s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: $transparent-bg !important;
       border: 1px solid $btn-primary-blue !important;
       color: $btn-primary-blue !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
     }
   }
 }

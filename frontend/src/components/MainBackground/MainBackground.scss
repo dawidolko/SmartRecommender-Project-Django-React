@@ -140,11 +140,15 @@
     color: $white;
     border-radius: 8px;
     text-transform: uppercase;
+    transition: all 0.3s ease;
+    border: 1px solid $main;
 
     &:hover {
       background-color: rgba(255, 255, 255, 0);
       border: 1px solid $main;
       color: $main;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
     }
   }
 }

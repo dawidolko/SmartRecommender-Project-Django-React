@@ -34,6 +34,7 @@ import ClientAccount from "./components/ClientPanel/ClientAccount";
 import ClientProbabilistic from "./components/ClientPanel/ClientProbabilistic";
 
 import ScrollToTop from "./utils/ScrollToTop";
+import AccessibilityToolbar from "./components/AccessibilityToolbar/AccessibilityToolbar";
 
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
@@ -51,9 +52,14 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      {!location.pathname.startsWith("/admin") &&
+        !location.pathname.startsWith("/client") && <AccessibilityToolbar />}
       <FavoritesProvider>
         <ShopContext>
-          {location.pathname.startsWith("/admin") ? null : <Navbar />}
+          {location.pathname.startsWith("/admin") ||
+          location.pathname.startsWith("/client") ? null : (
+            <Navbar />
+          )}
           <ToastContainer
             position="top-center"
             autoClose={3000}
@@ -123,7 +129,10 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
-          {location.pathname.startsWith("/admin") ? null : <Footer />}
+          {location.pathname.startsWith("/admin") ||
+          location.pathname.startsWith("/client") ? null : (
+            <Footer />
+          )}
         </ShopContext>
       </FavoritesProvider>
     </>

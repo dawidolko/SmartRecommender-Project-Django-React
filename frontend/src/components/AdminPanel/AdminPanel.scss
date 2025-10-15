@@ -191,11 +191,23 @@ motion > div,
         background-color: $logout-red;
         border: 1px solid $logout-red;
         color: $realwhite;
+        transition: all 0.3s ease;
 
-        &:hover {
-          background-color: $text-black;
+        &:hover:not(:disabled) {
+          background-color: $transparent-bg;
           border: 1px solid $logout-red;
           color: $logout-red;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+      }
+
+      &--back {
+        transition: all 0.3s ease;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
         }
       }
 
@@ -282,6 +294,7 @@ motion > div,
     border-bottom: $header-border 1px solid;
     box-shadow: 0 8px 8px $box-shadow-gray;
     letter-spacing: 0.2rem;
+    margin-bottom: 0rem;
 
     @media (max-width: 1000px) {
       text-align: left;
@@ -468,7 +481,6 @@ motion > div,
 
   &-statistics {
     &-container {
-      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -592,12 +604,14 @@ motion > div,
     border: none;
     color: $pagination-btn-text;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-size: 1.6rem;
     padding: 1.6rem 2rem;
 
     &:hover:not(.disabled) {
       background-color: $pagination-btn-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(189, 189, 189, 0.3);
     }
 
     &.disabled {
@@ -617,12 +631,14 @@ motion > div,
     border: none;
     color: $pagination-btn-text;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-size: 1.6rem;
     padding: 1.6rem 2rem;
 
-    &:hover {
+    &:hover:not(.active) {
       background-color: $pagination-btn-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(189, 189, 189, 0.3);
     }
 
     &.active {
@@ -690,11 +706,14 @@ motion > div,
   border: 1px solid $btn-primary-blue;
   color: $realwhite;
   padding: 4px 6px;
+  transition: all 0.3s ease;
 
   &:hover {
     background-color: $text-black;
     border: 1px solid $btn-primary-blue;
     color: $btn-primary-blue;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
 }
 
@@ -908,9 +927,11 @@ motion > div,
         font-weight: 500;
         transition: all 0.3s ease;
 
-        &:hover {
+        &:hover:not(:disabled) {
           background-color: $text-black;
           color: $btn-primary-blue;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
         }
 
         &:disabled {
@@ -936,9 +957,11 @@ motion > div,
         font-weight: 500;
         transition: all 0.3s ease;
 
-        &:hover {
+        &:hover:not(:disabled) {
           background-color: $text-black;
           color: $greenhover;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(56, 142, 60, 0.3);
         }
 
         &:disabled {
@@ -1080,10 +1103,12 @@ motion > div,
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        transition: background 0.3s ease;
+        transition: all 0.3s ease;
 
-        &:hover {
+        &:hover:not(:disabled) {
           background: $probabilistic-btn-hover;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
         }
       }
     }
@@ -1435,6 +1460,8 @@ motion > div,
   &:hover:not(:disabled) {
     background: $text-black;
     color: $realwhite;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
   }
 
   &:disabled {
@@ -1475,20 +1502,16 @@ motion > div,
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   font-size: 1rem;
   white-space: nowrap;
-
-  &:hover {
-    border: 1px solid $btn-primary-blue;
-    background: $text-black;
-    color: $btn-primary-blue;
-  }
 
   &:hover:not(:disabled) {
     border: 1px solid $btn-primary-blue;
     background: $text-black;
     color: $btn-primary-blue;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
 
   &:disabled {
@@ -2698,7 +2721,7 @@ select {
         border-radius: 8px;
         background: white;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
         font-size: 0.875rem;
         font-weight: 500;
         text-align: center;
@@ -2714,7 +2737,7 @@ select {
 
         &:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         &:disabled {
@@ -2728,6 +2751,7 @@ select {
 
           &:hover:not(:disabled) {
             background: #ecfdf5;
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
           }
         }
 
@@ -2737,6 +2761,7 @@ select {
 
           &:hover:not(:disabled) {
             background: #fffbeb;
+            box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
           }
         }
 
@@ -2746,6 +2771,7 @@ select {
 
           &:hover:not(:disabled) {
             background: #fef2f2;
+            box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
           }
         }
       }

@@ -19,7 +19,7 @@
       cursor: pointer;
       color: $tab-inactive;
       font-weight: 500;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
       white-space: nowrap;
 
       span {
@@ -31,8 +31,9 @@
         border-bottom: 2px solid $blue;
       }
 
-      &:hover:not(.active) {
+      &:hover:not(.active):not(:disabled) {
         color: $blue;
+        transform: translateY(-2px);
       }
     }
   }
@@ -422,12 +423,14 @@
       border-radius: 4px;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s ease;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background: $text-black;
         color: $view-more-hover;
         border: 1px solid $view-more-hover;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
       }
     }
   }
@@ -1100,11 +1103,14 @@
     font-weight: 500;
     cursor: pointer;
     margin-top: 20px;
+    transition: all 0.3s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: $text-black;
       color: $view-more-hover;
       border: 1px solid $view-more-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
     }
   }
 }

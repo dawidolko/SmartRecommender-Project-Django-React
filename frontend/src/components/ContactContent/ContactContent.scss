@@ -113,11 +113,14 @@
     margin-top: 0.5em;
     font-size: 1.5rem;
     max-width: unset;
+    transition: all 0.3s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: transparent;
       color: $main;
       border: 2px solid $main;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
     }
   }
 

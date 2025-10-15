@@ -1,3 +1,13 @@
+// Mixin dla hover effect z dynamicznym cieniem
+@mixin button-hover-effect($color) {
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($color, 0.3);
+  }
+}
+
 $main: #e91e63;
 $white: #fafafa;
 $dark: #424242;

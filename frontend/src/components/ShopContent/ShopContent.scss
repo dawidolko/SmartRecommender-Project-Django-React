@@ -73,7 +73,7 @@
       border: 2px solid $button-border;
       border-radius: 25px;
       cursor: pointer;
-      transition: background-color 0.3s, transform 0.3s;
+      transition: all 0.3s ease;
       color: $button-text;
       font-weight: 500;
 
@@ -81,14 +81,13 @@
         background-color: $button-active-bg;
         color: $button-active-text;
         transform: scale(1.05);
-        transition: transform 0.5s ease;
       }
 
       &:hover {
         background-color: $button-active-bg;
         color: $button-active-text;
-        transform: scale(1.05);
-        transition: transform 0.5s ease;
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
       }
 
       &:focus {
@@ -163,6 +162,10 @@
       background-color: $navigate-hover-bg !important;
       color: $main;
       border: 1px solid $main !important;
+    }
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
     }
   }
 
@@ -280,7 +283,6 @@
     border: 2px solid $btn-primary-blue;
     border-radius: 8px;
     font-size: 1.4rem;
-    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
@@ -837,7 +839,8 @@
     background-color: $blue;
     color: $realwhite;
     border-color: $blue;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
 
   &.disabled {

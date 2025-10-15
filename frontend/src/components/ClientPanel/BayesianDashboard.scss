@@ -57,11 +57,13 @@
           font-size: 14px;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
 
-          &:hover {
+          &:hover:not(:disabled):not(.active) {
             background: $control-hover-bg;
             color: $control-hover-text;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
           }
 
           &.active {
@@ -107,13 +109,14 @@
       font-weight: 500;
       font-size: 14px;
       border-radius: 8px;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       white-space: nowrap;
       position: relative;
 
-      &:hover:not(.active) {
+      &:hover:not(.active):not(:disabled) {
         background: $dashboard-bg;
         color: $control-hover-text;
+        transform: translateY(-2px);
       }
 
       &.active {
@@ -275,10 +278,12 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.3s ease;
 
-            &:hover {
+            &:hover:not(:disabled) {
               background: darken($blue, 10%);
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
             }
           }
         }

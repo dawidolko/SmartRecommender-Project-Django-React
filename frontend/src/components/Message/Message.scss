@@ -22,10 +22,14 @@
     color: $white;
     border-radius: 5px;
     border: 1px solid $main;
+    transition: all 0.3s ease;
+
     &:hover {
       border: 1px solid $main;
-      color: $btn-primary-blue;
+      color: $main;
       background-color: rgba(255, 255, 255, 0) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
     }
   }
 

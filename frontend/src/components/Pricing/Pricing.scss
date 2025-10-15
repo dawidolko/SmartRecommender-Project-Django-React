@@ -107,17 +107,17 @@
     text-align: center;
     border-radius: 5px;
     text-decoration: none;
+    transition: all 0.3s ease;
   }
 
   @media (min-width: 768px) {
     &__link {
-      transition: background-color 0.3s ease, color 0.3s ease;
-      border: 1px solid $main;
-
       &:hover {
         color: $main;
         background-color: $darkblack;
         border: 1px solid $main;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
       }
     }
 

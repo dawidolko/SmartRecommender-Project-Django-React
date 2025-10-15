@@ -89,13 +89,15 @@
     color: $realwhite;
     cursor: pointer;
     border-radius: 5px;
-    transition: 0.3s;
+    transition: all 0.3s ease;
   }
 
-  button:hover {
+  button:hover:not(:disabled) {
     background-color: $realwhite;
     color: $btn-primary-blue;
     border: 1px solid $btn-primary-blue;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
 
   &__divider {
@@ -121,12 +123,14 @@
     color: $realwhite;
     cursor: pointer;
     border-radius: 20px;
-    transition: 0.3s;
+    transition: all 0.3s ease;
     margin-top: 20px;
   }
 
-  &__submitBtn:hover {
+  &__submitBtn:hover:not(:disabled) {
     background-color: color.adjust($register-submit-btn, $lightness: -30%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(123, 31, 162, 0.3);
   }
 
   &__footer {

@@ -167,6 +167,12 @@
     border-radius: 12px;
     background-color: $dark;
     color: $white;
+    &:hover {
+      background: $transparent-bg;
+      color: $dark;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
   }
 
   &__empty {
@@ -352,7 +358,6 @@
       margin-top: auto;
       flex-shrink: 0;
       font-size: 1.4rem;
-      font-weight: 600;
       transition: all 0.3s ease;
       text-transform: uppercase;
       letter-spacing: 0.5px;

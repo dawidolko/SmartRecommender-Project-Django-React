@@ -1,0 +1,468 @@
+import React, { useState, useEffect, useRef } from "react";
+import "./AccessibilityToolbar.scss";
+
+const AccessibilityToolbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [currentFontSize, setCurrentFontSize] = useState(100);
+  const [activeActions, setActiveActions] = useState({
+    grayscale: false,
+    "high-contrast": false,
+    "negative-contrast": false,
+    "light-background": false,
+    "links-underline": false,
+    "readable-font": false,
+  });
+
+  const toolbarRef = useRef(null);
+  const overlayRef = useRef(null);
+
+  const translations = {
+    pl: {
+      title: "Dostępność",
+      openPanel: "Otwórz panel dostępności",
+      enlargeText: "Powiększ tekst",
+      reduceText: "Pomniejsz tekst",
+      grayscale: "Skala szarości",
+      highContrast: "Wysoki kontrast",
+      negativeContrast: "Negatywny kontrast",
+      lightBackground: "Jasne tło",
+      underlineLinks: "Podkreślenie linków",
+      readableFont: "Czytelna czcionka",
+      reset: "Resetuj",
+    },
+  };
+
+  const t = translations.pl;
+
+  // Sprawdzanie szerokości ekranu
+  const checkMobile = () => {
+    const mobile = window.innerWidth <= 767;
+    setIsMobile(mobile);
+
+    if (mobile) {
+      document.documentElement.classList.add("pojo-a11y-mobile");
+      document.documentElement.classList.remove("pojo-a11y-desktop");
+    } else {
+      document.documentElement.classList.add("pojo-a11y-desktop");
+      document.documentElement.classList.remove("pojo-a11y-mobile");
+    }
+  };
+
+  // Inicjalizacja
+  useEffect(() => {
+    checkMobile();
+
+    const handleResize = () => {
+      clearTimeout(window.resizeTimer);
+      window.resizeTimer = setTimeout(checkMobile, 100);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ładowanie z localStorage po inicjalizacji
+  useEffect(() => {
+    loadFromLocalStorage();
+    handleGlobalOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Obsługa ESC
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
+
+  // Zapisywanie do localStorage
+  const saveToLocalStorage = (newActiveActions, fontSize) => {
+    const state = {
+      fontSize: fontSize > 100 ? `${fontSize}%` : "",
+      activeClasses: [],
+      activeButtons: [],
+    };
+
+    Object.keys(newActiveActions).forEach((action) => {
+      if (newActiveActions[action]) {
+        state.activeButtons.push(action);
+        state.activeClasses.push(`pojo-a11y-${action}`);
+      }
+    });
+
+    if (fontSize > 100) {
+      state.activeClasses.push(`pojo-a11y-resize-font-${fontSize}`);
+    }
+
+    localStorage.setItem("pojo-accessibility-state", JSON.stringify(state));
+  };
+
+  // Ładowanie z localStorage
+  const loadFromLocalStorage = () => {
+    const savedState = localStorage.getItem("pojo-accessibility-state");
+    if (!savedState) return;
+
+    try {
+      const state = JSON.parse(savedState);
+
+      if (state.fontSize) {
+        const fontSizeMatch = state.fontSize.match(/(\d+)%/);
+        if (fontSizeMatch) {
+          const size = parseInt(fontSizeMatch[1]);
+          setCurrentFontSize(size);
+          document.body.style.fontSize = state.fontSize;
+        }
+      }
+
+      if (state.activeClasses) {
+        state.activeClasses.forEach((className) => {
+          document.body.classList.add(className);
+        });
+      }
+
+      if (state.activeButtons) {
+        const newActiveActions = { ...activeActions };
+        state.activeButtons.forEach((action) => {
+          newActiveActions[action] = true;
+        });
+        setActiveActions(newActiveActions);
+      }
+    } catch (e) {
+      console.error("Błąd przywracania stanu dostępności:", e);
+    }
+  };
+
+  // Globalne opcje
+  const handleGlobalOptions = () => {
+    document.body.classList.add("pojo-a11y-focusable");
+
+    setTimeout(() => {
+      document.querySelectorAll('a[target="_blank"]').forEach((link) => {
+        if (!link.closest(".tabs") && !link.closest("[data-tabs]")) {
+          link.setAttribute("target", "");
+        }
+      });
+
+      document.querySelectorAll("a").forEach((link) => {
+        if (
+          !link.closest(".tabs") &&
+          !link.closest("[data-tabs]") &&
+          !link.getAttribute("role")
+        ) {
+          link.setAttribute("role", "link");
+        }
+      });
+    }, 100);
+  };
+
+  // Toggle toolbar
+  const toggleToolbar = (e) => {
+    e.preventDefault();
+    setIsOpen(!isOpen);
+  };
+
+  // Kliknięcie w overlay
+  const handleOverlayClick = (e) => {
+    if (e.target === overlayRef.current) {
+      setIsOpen(false);
+    }
+  };
+
+  // Powiększenie tekstu
+  const handleResizePlus = (e) => {
+    e.preventDefault();
+    if (currentFontSize < 130) {
+      const newSize = currentFontSize + 5;
+      setCurrentFontSize(newSize);
+      document.body.classList.remove(
+        `pojo-a11y-resize-font-${currentFontSize}`
+      );
+      document.body.classList.add(`pojo-a11y-resize-font-${newSize}`);
+
+      const newActiveActions = { ...activeActions };
+      newActiveActions["resize-plus"] = true;
+      saveToLocalStorage(newActiveActions, newSize);
+    }
+  };
+
+  // Pomniejszenie tekstu
+  const handleResizeMinus = (e) => {
+    e.preventDefault();
+    if (currentFontSize > 100) {
+      const newSize = currentFontSize - 5;
+      setCurrentFontSize(newSize);
+      document.body.classList.remove(
+        `pojo-a11y-resize-font-${currentFontSize}`
+      );
+
+      if (newSize > 100) {
+        document.body.classList.add(`pojo-a11y-resize-font-${newSize}`);
+      }
+
+      const newActiveActions = { ...activeActions };
+      saveToLocalStorage(newActiveActions, newSize);
+    }
+  };
+
+  // Toggle akcji (grayscale, kontrast, etc.)
+  const handleToggleAction = (action, e) => {
+    e.preventDefault();
+
+    const newActiveActions = { ...activeActions };
+    newActiveActions[action] = !newActiveActions[action];
+
+    if (newActiveActions[action]) {
+      document.body.classList.add(`pojo-a11y-${action}`);
+    } else {
+      document.body.classList.remove(`pojo-a11y-${action}`);
+    }
+
+    setActiveActions(newActiveActions);
+    saveToLocalStorage(newActiveActions, currentFontSize);
+  };
+
+  // Schema actions (tylko jedna może być aktywna)
+  const handleSchemaAction = (action, e) => {
+    e.preventDefault();
+
+    const schemaActions = [
+      "grayscale",
+      "high-contrast",
+      "negative-contrast",
+      "light-background",
+    ];
+    const newActiveActions = { ...activeActions };
+
+    // Wyłącz wszystkie schema actions
+    schemaActions.forEach((schemaAction) => {
+      if (schemaAction !== action && newActiveActions[schemaAction]) {
+        newActiveActions[schemaAction] = false;
+        document.body.classList.remove(`pojo-a11y-${schemaAction}`);
+      }
+    });
+
+    // Toggle wybranej akcji
+    newActiveActions[action] = !newActiveActions[action];
+
+    if (newActiveActions[action]) {
+      document.body.classList.add(`pojo-a11y-${action}`);
+    } else {
+      document.body.classList.remove(`pojo-a11y-${action}`);
+    }
+
+    setActiveActions(newActiveActions);
+    saveToLocalStorage(newActiveActions, currentFontSize);
+  };
+
+  // Reset wszystkich ustawień
+  const handleReset = (e) => {
+    e.preventDefault();
+
+    // Usuń wszystkie klasy z body
+    Object.keys(activeActions).forEach((action) => {
+      document.body.classList.remove(`pojo-a11y-${action}`);
+    });
+
+    // Usuń klasy rozmiaru czcionki
+    for (let i = 100; i <= 200; i += 5) {
+      document.body.classList.remove(`pojo-a11y-resize-font-${i}`);
+    }
+
+    document.body.style.fontSize = "";
+
+    setCurrentFontSize(100);
+    setActiveActions({
+      grayscale: false,
+      "high-contrast": false,
+      "negative-contrast": false,
+      "light-background": false,
+      "links-underline": false,
+      "readable-font": false,
+    });
+
+    localStorage.removeItem("pojo-accessibility-state");
+  };
+
+  return (
+    <nav
+      id="pojo-a11y-toolbar"
+      ref={toolbarRef}
+      className={`${
+        isMobile ? "pojo-a11y-toolbar-right" : "pojo-a11y-toolbar-left"
+      } ${isOpen ? "pojo-a11y-toolbar-open" : ""}`}
+      role="navigation">
+      <div className="pojo-a11y-toolbar-toggle">
+        <button
+          className="pojo-a11y-toolbar-link pojo-a11y-toolbar-toggle-link"
+          onClick={toggleToolbar}
+          title={t.openPanel}
+          aria-label={t.openPanel}>
+          <span className="pojo-sr-only sr-only">{t.openPanel}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="white"
+            width="30"
+            height="30">
+            <circle cx="12" cy="4" r="2" />
+            <path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        className="pojo-a11y-toolbar-overlay"
+        ref={overlayRef}
+        onClick={handleOverlayClick}>
+        <div className="pojo-a11y-toolbar-inner">
+          <p className="pojo-a11y-toolbar-title">{t.title}</p>
+
+          <ul className="pojo-a11y-toolbar-items pojo-a11y-tools">
+            {/* Powiększ tekst */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-resize-font pojo-a11y-btn-resize-plus ${
+                  currentFontSize > 100 ? "active" : ""
+                }`}
+                onClick={handleResizePlus}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">
+                  <span style={{ fontSize: "1.5em", fontWeight: "bold" }}>
+                    A+
+                  </span>
+                </span>
+                <span className="pojo-a11y-toolbar-text">{t.enlargeText}</span>
+              </button>
+            </li>
+
+            {/* Pomniejsz tekst */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className="pojo-a11y-toolbar-link pojo-a11y-btn-resize-font pojo-a11y-btn-resize-minus"
+                onClick={handleResizeMinus}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">
+                  <span style={{ fontSize: "1em", fontWeight: "bold" }}>
+                    A-
+                  </span>
+                </span>
+                <span className="pojo-a11y-toolbar-text">{t.reduceText}</span>
+              </button>
+            </li>
+
+            {/* Skala szarości */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-grayscale ${
+                  activeActions["grayscale"] ? "active" : ""
+                }`}
+                onClick={(e) => handleSchemaAction("grayscale", e)}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">⚫⚪</span>
+                <span className="pojo-a11y-toolbar-text">{t.grayscale}</span>
+              </button>
+            </li>
+
+            {/* Wysoki kontrast */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-high-contrast ${
+                  activeActions["high-contrast"] ? "active" : ""
+                }`}
+                onClick={(e) => handleSchemaAction("high-contrast", e)}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">◐</span>
+                <span className="pojo-a11y-toolbar-text">{t.highContrast}</span>
+              </button>
+            </li>
+
+            {/* Negatywny kontrast */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-negative-contrast ${
+                  activeActions["negative-contrast"] ? "active" : ""
+                }`}
+                onClick={(e) => handleSchemaAction("negative-contrast", e)}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">◑</span>
+                <span className="pojo-a11y-toolbar-text">
+                  {t.negativeContrast}
+                </span>
+              </button>
+            </li>
+
+            {/* Jasne tło */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-light-background ${
+                  activeActions["light-background"] ? "active" : ""
+                }`}
+                onClick={(e) => handleSchemaAction("light-background", e)}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">☀</span>
+                <span className="pojo-a11y-toolbar-text">
+                  {t.lightBackground}
+                </span>
+              </button>
+            </li>
+
+            {/* Podkreślenie linków */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-links-underline ${
+                  activeActions["links-underline"] ? "active" : ""
+                }`}
+                onClick={(e) => handleToggleAction("links-underline", e)}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">
+                  <u>U</u>
+                </span>
+                <span className="pojo-a11y-toolbar-text">
+                  {t.underlineLinks}
+                </span>
+              </button>
+            </li>
+
+            {/* Czytelna czcionka */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className={`pojo-a11y-toolbar-link pojo-a11y-btn-readable-font ${
+                  activeActions["readable-font"] ? "active" : ""
+                }`}
+                onClick={(e) => handleToggleAction("readable-font", e)}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">
+                  <strong>B</strong>
+                </span>
+                <span className="pojo-a11y-toolbar-text">{t.readableFont}</span>
+              </button>
+            </li>
+
+            {/* Reset */}
+            <li className="pojo-a11y-toolbar-item">
+              <button
+                className="pojo-a11y-toolbar-link pojo-a11y-btn-reset"
+                onClick={handleReset}
+                tabIndex={isOpen ? 0 : -1}>
+                <span className="pojo-a11y-toolbar-icon">↺</span>
+                <span className="pojo-a11y-toolbar-text">{t.reset}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default AccessibilityToolbar;

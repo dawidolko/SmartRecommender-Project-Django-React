@@ -30,6 +30,13 @@
     font-weight: 500;
     border: none;
     font-size: 1.4rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
+    }
   }
 }
 

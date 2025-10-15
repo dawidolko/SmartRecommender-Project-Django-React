@@ -238,11 +238,13 @@
   .favorites {
     &__btn {
       padding: 0.8em 1.6em;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
       font-size: inherit;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background-color: $main;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
       }
     }
 
@@ -253,19 +255,23 @@
     }
 
     &__empty-btn {
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
-    &__empty-btn:hover {
+    &__empty-btn:hover:not(:disabled) {
       background-color: $main;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
     }
 
     &__modal-btn {
-      transition: border 0.3s ease, background-color 0.3s ease;
+      transition: all 0.3s ease;
 
-      &:hover {
+      &:hover:not(:disabled) {
         border: 1px solid $realwhite;
         background-color: inherit;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
     }
   }

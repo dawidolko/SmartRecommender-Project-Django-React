@@ -55,6 +55,8 @@
     background-color: $main;
     border-radius: 8px;
     color: $white;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
   }
 
   &__close {
@@ -71,11 +73,11 @@
     }
 
     &__btn {
-      border: 1px solid transparent;
-
-      &:hover {
+      &:hover:not(:disabled) {
         background-color: $modal-btn-hover;
         border: 1px solid $realwhite;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
       }
     }
   }

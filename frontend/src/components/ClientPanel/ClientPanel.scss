@@ -1,9 +1,16 @@
 @use "../../global.scss" as *;
 @use "sass:color";
 
+.client-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $wrapper-bg;
+}
+
 .client-panel {
   width: 100%;
-  min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -14,7 +21,6 @@
     padding: 20px;
     transition: width 0.3s ease;
     overflow-x: hidden;
-    margin-top: 100px;
     overflow-y: auto;
 
     &--open {
@@ -180,11 +186,23 @@
         background-color: $logout-red;
         border: 1px solid $logout-red;
         color: $realwhite;
+        transition: all 0.3s ease;
 
-        &:hover {
-          background-color: $text-black;
+        &:hover:not(:disabled) {
+          background-color: $transparent-bg;
           border: 1px solid $logout-red;
           color: $logout-red;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+      }
+
+      &--back {
+        transition: all 0.3s ease;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
         }
       }
     }
@@ -440,10 +458,13 @@
   border: 1px solid $btn-primary-blue !important;
   background-color: $btn-primary-blue;
   color: $realwhite;
+  transition: all 0.3s ease;
 
   &:hover {
     color: $btn-primary-blue !important;
     background-color: $client-btn-hover !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
 }
 
@@ -469,11 +490,13 @@ form {
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
     max-width: 150px;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: $client-form-btn-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
     }
   }
 }
@@ -598,12 +621,14 @@ form {
       padding: 0.6rem 1rem;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       font-size: 1.4rem;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background-color: transparent;
         color: $btn-primary-blue;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
       }
     }
 
@@ -793,6 +818,11 @@ form {
   .btn-primary {
     padding: 0.5rem 0.75rem;
     font-size: 1.2rem;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    }
   }
 
   .search-container2 input {
@@ -895,6 +925,11 @@ form {
   .btn-primary {
     padding: 0.4rem 0.6rem;
     font-size: 1rem;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    }
   }
 
   .search-container2 input {
