@@ -604,6 +604,17 @@ const AdminStatistics = () => {
                   Content-Based Filtering (CBF) -{" "}
                   <strong>Custom Manual Implementation</strong>
                 </label>
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    value="fuzzy_logic"
+                    checked={selectedAlgorithm === "fuzzy_logic"}
+                    onChange={() => handleAlgorithmChange("fuzzy_logic")}
+                    disabled={isProcessing}
+                  />
+                  Fuzzy Logic (FL) -{" "}
+                  <strong>Custom Manual Implementation</strong>
+                </label>
               </div>
             </div>
             <div className="algorithm-actions">
@@ -645,6 +656,8 @@ const AdminStatistics = () => {
               ? "Collaborative Filtering Preview (Library)"
               : currentAlgorithm === "content_based"
               ? "Content-Based Filtering Preview (Custom Manual)"
+              : currentAlgorithm === "fuzzy_logic"
+              ? "Fuzzy Logic Preview (Custom Manual)"
               : "Recommendation Preview"}
           </h3>
           <div className="preview-content">

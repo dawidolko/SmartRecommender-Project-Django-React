@@ -274,10 +274,11 @@ class RecommendationSettings(models.Model):
     ALGORITHM_CHOICES = [
         ('collaborative', 'Collaborative Filtering'),
         ('content_based', 'Content Based'),
+        ('fuzzy_logic', 'Fuzzy Logic'),
     ]
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    active_algorithm = models.CharField(max_length=20, choices=ALGORITHM_CHOICES, default='collaborative')
+    active_algorithm = models.CharField(max_length=30, choices=ALGORITHM_CHOICES, default='collaborative')
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:

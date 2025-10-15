@@ -1,31 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Line, Pie } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import { Link } from "react-router-dom";
+import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from "chart.js";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { TrendingUp, ShoppingBag, Clock, Heart, Calendar } from "react-feather";
+  TrendingUp,
+  ShoppingBag,
+  Clock,
+  Heart,
+  Calendar,
+  X,
+} from "react-feather";
 import config from "../../config/config";
 import "./ClientProbabilistic.scss";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -52,7 +40,6 @@ const ClientProbabilistic = () => {
   const [activeTab, setActiveTab] = useState("recommendations");
   const [recommendationsData, setRecommendationsData] = useState([]);
   const [shoppingProfile, setShoppingProfile] = useState({});
-  const [seasonalTips, setSeasonalTips] = useState([]);
   const [markovData, setMarkovData] = useState(null);
   const [bayesianData, setBayesianData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -115,7 +102,6 @@ const ClientProbabilistic = () => {
 
         setRecommendationsData(enhancedRecommendations);
         setShoppingProfile(insightsData.your_shopping_profile || {});
-        setSeasonalTips(insightsData.recommendations?.seasonal_tips || []);
       }
 
       setMarkovData(markovDataRes);
@@ -248,58 +234,6 @@ const ClientProbabilistic = () => {
           });
         break;
 
-      case "seasonal_trends":
-        fetch(`${config.apiUrl}/api/seasonal-trends/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            const modalContent = (
-              <div className="seasonal-trends">
-                <h3>Your Seasonal Shopping Patterns</h3>
-                <p>
-                  Our probability models have analyzed your shopping patterns
-                  throughout different seasons.
-                </p>
-
-                <div className="seasonal-insights">
-                  <h4>Seasonal Insights</h4>
-                  <ul className="seasonal-tips">
-                    {seasonalTips.map((tip, idx) => (
-                      <li key={idx}>{tip}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="recommended-categories">
-                  <h4>Recommended Categories This Season</h4>
-                  <div className="category-list">
-                    {data.recommendations?.slice(0, 3).map((rec, idx) => (
-                      <div key={idx} className="category-item">
-                        <h5>{rec.category}</h5>
-                        <p>
-                          Purchase Frequency: {rec.purchase_frequency}/month
-                        </p>
-                        <p>Next Purchase: {rec.next_purchase_likely}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-            showModal("SEASONAL TRENDS", modalContent);
-          })
-          .catch((error) => {
-            showModal(
-              "Error",
-              <p>Failed to load seasonal trends: {error.message}</p>
-            );
-          });
-        break;
-
       default:
         break;
     }
@@ -330,10 +264,12 @@ const ClientProbabilistic = () => {
           icon={Heart}
         />
         <TabButton id="profile" label="Shopping Profile" icon={ShoppingBag} />
-        <TabButton id="timing" label="Purchase Timing" icon={Clock} />
-        <TabButton id="trends" label="Seasonal Trends" icon={TrendingUp} />
-        <TabButton id="markov" label="Next Purchase" icon={Clock} />
-        <TabButton id="bayesian" label="Behavior Insights" icon={TrendingUp} />
+        <TabButton id="markov" label="Next Purchase (Markov)" icon={Clock} />
+        <TabButton
+          id="bayesian"
+          label="Behavior Insights (Bayesian)"
+          icon={TrendingUp}
+        />
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={modalTitle}>
@@ -466,147 +402,6 @@ const ClientProbabilistic = () => {
               <button
                 className="view-more-button"
                 onClick={() => handleViewMore("shopping_profile")}>
-                View Detailed Analysis
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "timing" && (
-          <div className="timing-section">
-            <div className="section-header">
-              <h2>Optimal Purchase Timing</h2>
-              <p>
-                Let our probabilistic models help you decide when to purchase
-                for the best deals and availability.
-              </p>
-            </div>
-
-            <div className="timing-insights">
-              <div className="timing-card">
-                <div className="card-header">
-                  <h3>Best Day to Shop</h3>
-                </div>
-                <div className="card-body">
-                  <div className="days-chart">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                      (day, idx) => (
-                        <div
-                          key={idx}
-                          className={`day-bar ${
-                            idx === 2 || idx === 5 ? "highlight" : ""
-                          }`}
-                          style={{ height: `${30 + Math.random() * 40}px` }}>
-                          <span className="day-label">{day}</span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                  <p className="timing-recommendation">
-                    Our model suggests <strong>Wednesday</strong> and{" "}
-                    <strong>Saturday</strong> as ideal shopping days based on
-                    your habits.
-                  </p>
-                </div>
-              </div>
-
-              <div className="timing-card">
-                <div className="card-header">
-                  <h3>Purchase Frequency</h3>
-                </div>
-                <div className="card-body">
-                  <div className="frequency-display">
-                    <div className="frequency-value">
-                      <span className="large-number">1.8</span>
-                      <span className="unit">times/month</span>
-                    </div>
-                  </div>
-                  <p className="timing-recommendation">
-                    You typically shop <strong>once every 16 days</strong>,
-                    which is your natural purchase cycle.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="next-purchase-prediction">
-              <h3>Next Purchase Prediction</h3>
-              <div className="prediction-content">
-                <div className="prediction-icon">
-                  <Calendar size={48} />
-                </div>
-                <div className="prediction-details">
-                  <p className="prediction-date">May 14, 2025</p>
-                  <p className="prediction-explanation">
-                    Based on your past purchase patterns, our probabilistic
-                    model predicts your next purchase will be around this date.
-                    The likelihood of this prediction is 75%.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "trends" && (
-          <div className="trends-section">
-            <div className="section-header">
-              <h2>Your Seasonal Shopping Patterns</h2>
-              <p>
-                Discover how your shopping behavior changes throughout the year.
-              </p>
-            </div>
-
-            <div className="seasonal-advice">
-              <h3>Seasonal Shopping Tips</h3>
-              <ul className="tips-list">
-                {seasonalTips.map((tip, idx) => (
-                  <li key={idx} className="tip-item">
-                    <span className="tip-icon">💡</span>
-                    <span className="tip-text">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="seasonal-chart">
-              <h3>Your Shopping Volume by Month</h3>
-              <div className="chart-container">
-                <Line
-                  data={{
-                    labels: [
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ],
-                    datasets: [
-                      {
-                        label: "Purchase Volume",
-                        data: [5, 3, 4, 6, 8, 7, 6, 9, 8, 10, 12, 15],
-                        borderColor: "rgb(75, 192, 192)",
-                        backgroundColor: "rgba(75, 192, 192, 0.2)",
-                        fill: true,
-                      },
-                    ],
-                  }}
-                  options={{ responsive: true }}
-                />
-              </div>
-            </div>
-
-            <div className="view-more-container">
-              <button
-                className="view-more-button"
-                onClick={() => handleViewMore("seasonal_trends")}>
                 View Detailed Analysis
               </button>
             </div>

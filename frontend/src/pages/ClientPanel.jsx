@@ -9,6 +9,7 @@ import ClientOrders from "../components/ClientPanel/ClientOrders";
 import ClientComplaints from "../components/ClientPanel/ClientComplaints";
 import ClientAccount from "../components/ClientPanel/ClientAccount";
 import ClientProbabilistic from "../components/ClientPanel/ClientProbabilistic";
+import ClientFuzzyLogic from "../components/ClientPanel/ClientFuzzyLogic";
 import "../components/ClientPanel/ClientPanel.scss";
 
 const ClientPanel = () => {
@@ -70,6 +71,7 @@ const ClientPanel = () => {
               <Route path="complaints" element={<ClientComplaints />} />
               <Route path="account" element={<ClientAccount />} />
               <Route path="probabilistic" element={<ClientProbabilistic />} />
+              <Route path="fuzzy-logic" element={<ClientFuzzyLogic />} />
               <Route
                 path="*"
                 element={<div style={{ padding: "2rem" }}>Page Not Found</div>}

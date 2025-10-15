@@ -28,7 +28,9 @@ class RecommendationSettingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        settings = RecommendationSettings.objects.filter(user=request.user).first()
+        # Get global setting (from any admin user or first setting)
+        # This ensures all users see the same algorithm
+        settings = RecommendationSettings.objects.first()
         return Response(
             {
                 "active_algorithm": (
@@ -39,12 +41,26 @@ class RecommendationSettingsView(APIView):
 
     def post(self, request):
         algorithm = request.data.get("algorithm", "collaborative")
-        settings, created = RecommendationSettings.objects.get_or_create(
-            user=request.user, defaults={"active_algorithm": algorithm}
-        )
-        if not created:
+
+        # Get or create global setting (use first user as placeholder)
+        # Update all existing settings to maintain consistency
+        settings = RecommendationSettings.objects.first()
+
+        if settings:
+            # Update existing global setting
             settings.active_algorithm = algorithm
             settings.save()
+        else:
+            # Create new global setting
+            settings = RecommendationSettings.objects.create(
+                user=request.user,
+                active_algorithm=algorithm
+            )
+
+        # Update all other settings to match (optional, for consistency)
+        RecommendationSettings.objects.exclude(id=settings.id).update(
+            active_algorithm=algorithm
+        )
 
         return Response(
             {
@@ -187,6 +203,61 @@ class RecommendationPreviewView(APIView):
     def get(self, request):
         algorithm = request.GET.get("algorithm", "collaborative")
 
+        # Handle fuzzy logic separately - it uses real-time computation
+        if algorithm == "fuzzy_logic":
+            from home.fuzzy_logic_engine import (
+                FuzzyMembershipFunctions,
+                FuzzyUserProfile,
+                SimpleFuzzyInference
+            )
+            from home.models import Product
+            from django.db.models import Count, Avg
+
+            try:
+                # Initialize fuzzy system
+                membership_functions = FuzzyMembershipFunctions()
+                user_profile = FuzzyUserProfile(user=request.user)
+                fuzzy_engine = SimpleFuzzyInference(membership_functions, user_profile)
+
+                # Get products with necessary annotations
+                products_query = Product.objects.all().annotate(
+                    review_count=Count('opinion'),
+                    avg_rating=Avg('opinion__rating'),
+                    order_count=Count('orderproduct', distinct=True)
+                )[:100]
+
+                # Score products
+                scored_products = []
+                for product in products_query:
+                    product_categories = [cat.name for cat in product.categories.all()]
+                    category_match = max([user_profile.fuzzy_category_match(cat) for cat in product_categories] or [0.0])
+
+                    product_data = {
+                        'price': float(product.price),
+                        'rating': float(product.avg_rating) if product.avg_rating else 3.0,
+                        'view_count': product.order_count if hasattr(product, 'order_count') else 0
+                    }
+
+                    fuzzy_result = fuzzy_engine.evaluate_product(product_data, category_match)
+                    scored_products.append((product, fuzzy_result['fuzzy_score']))
+
+                # Sort and take top 6
+                scored_products.sort(key=lambda x: x[1], reverse=True)
+                products = [p[0] for p in scored_products[:6]]
+
+                serializer = ProductSerializer(products, many=True)
+                return Response(serializer.data)
+
+            except Exception as e:
+                print(f"Error in fuzzy logic preview: {e}")
+                import traceback
+                traceback.print_exc()
+                # Fallback to random products
+                products = list(Product.objects.all()[:6])
+                serializer = ProductSerializer(products, many=True)
+                return Response(serializer.data)
+
+        # Handle collaborative and content_based normally
         recommendations = (
             UserProductRecommendation.objects.filter(
                 user=request.user, recommendation_type=algorithm

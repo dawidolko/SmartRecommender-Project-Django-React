@@ -134,7 +134,11 @@ const Testimonials = () => {
     if (localStorage.getItem("access") && productsState.currentAlgorithm) {
       return productsState.currentAlgorithm === "collaborative"
         ? "Personalized Recommendations (Collaborative Filtering)"
-        : "Personalized Recommendations (Content-Based)";
+        : productsState.currentAlgorithm === "content_based"
+        ? "Personalized Recommendations (Content-Based)"
+        : productsState.currentAlgorithm === "fuzzy_logic"
+        ? "Personalized Recommendations (Fuzzy Logic)"
+        : "Personalized Recommendations";
     }
     return "Discover Our Products";
   };
@@ -143,7 +147,11 @@ const Testimonials = () => {
     if (localStorage.getItem("access") && productsState.currentAlgorithm) {
       return productsState.currentAlgorithm === "collaborative"
         ? "Based on what users like you are buying"
-        : "Based on products similar to your preferences";
+        : productsState.currentAlgorithm === "content_based"
+        ? "Based on products similar to your preferences"
+        : productsState.currentAlgorithm === "fuzzy_logic"
+        ? "Based on fuzzy logic matching your preferences with uncertainty modeling"
+        : "Based on your shopping patterns";
     }
     return "Check out selected proposals from our product database – scroll to see more and test our recommendation system in action!";
   };
