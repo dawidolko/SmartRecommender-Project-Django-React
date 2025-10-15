@@ -420,7 +420,6 @@ const MarkovVisualization = ({
         )}
       </div>
 
-      {/* Statistics Panel */}
       <div className="markov-stats">
         <h4>Statistics</h4>
         <div className="stats-grid">

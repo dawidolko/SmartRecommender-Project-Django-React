@@ -414,7 +414,6 @@ const ProductPage = () => {
               Add to Cart {quantityInCart > 0 && `(${quantityInCart})`}
             </button>
 
-            {/* Quick recommendations - Desktop only */}
             {similarProducts.length > 0 && (
               <div className="productPage__quick-recommendations">
                 <h3 className="productPage__quick-recommendations-title">

@@ -44,7 +44,6 @@ const ClientFuzzyLogic = () => {
     setError(null);
 
     try {
-      // Fetch fuzzy logic recommendations with debug mode
       const response = await fetch(
         `${config.apiUrl}/api/fuzzy-logic-recommendations/?limit=10&debug=true`,
         {
@@ -61,7 +60,6 @@ const ClientFuzzyLogic = () => {
 
       const data = await response.json();
 
-      // Process recommendations
       const enhancedRecommendations = (data.recommendations || []).map(
         (rec) => {
           const imageUrl =
@@ -231,9 +229,7 @@ const ClientFuzzyLogic = () => {
                           <p className="product-price">${product.price}</p>
                           <div className="fuzzy-scores">
                             <div className="score-item">
-                              <span className="score-label">
-                                Fuzzy Score:
-                              </span>
+                              <span className="score-label">Fuzzy Score:</span>
                               <div className="score-bar">
                                 <div
                                   className="score-fill"
@@ -339,25 +335,28 @@ const ClientFuzzyLogic = () => {
             <div className="category-interests">
               <h3>Your Favorite Categories</h3>
               <p className="explanation">
-                These categories are ranked based on your shopping behavior.
-                The bar shows your interest level from 0% (no interest) to 100% (highest interest).
+                These categories are ranked based on your shopping behavior. The
+                bar shows your interest level from 0% (no interest) to 100%
+                (highest interest).
               </p>
               <div className="interests-list">
-                {(userProfile.top_interests || []).map(([category, degree], idx) => (
-                  <div key={idx} className="interest-item">
-                    <div className="interest-header">
-                      <span className="category-name">{category}</span>
-                      <span className="interest-percentage">
-                        {(degree * 100).toFixed(0)}%
-                      </span>
+                {(userProfile.top_interests || []).map(
+                  ([category, degree], idx) => (
+                    <div key={idx} className="interest-item">
+                      <div className="interest-header">
+                        <span className="category-name">{category}</span>
+                        <span className="interest-percentage">
+                          {(degree * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <div className="interest-bar">
+                        <div
+                          className="interest-fill"
+                          style={{ width: `${degree * 100}%` }}></div>
+                      </div>
                     </div>
-                    <div className="interest-bar">
-                      <div
-                        className="interest-fill"
-                        style={{ width: `${degree * 100}%` }}></div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -368,8 +367,9 @@ const ClientFuzzyLogic = () => {
             <div className="section-header">
               <h2>How Recommendations Are Made</h2>
               <p>
-                Our system uses <strong>6 intelligent rules</strong> to find the best products for you.
-                Each rule looks at different aspects like price, quality, and category match.
+                Our system uses <strong>6 intelligent rules</strong> to find the
+                best products for you. Each rule looks at different aspects like
+                price, quality, and category match.
               </p>
             </div>
 
@@ -382,7 +382,9 @@ const ClientFuzzyLogic = () => {
                   </div>
                   <div className="rule-body">
                     <div className="rule-explanation">
-                      <p className="rule-interpretation">{rule.interpretation}</p>
+                      <p className="rule-interpretation">
+                        {rule.interpretation}
+                      </p>
                     </div>
                     <div className="rule-details">
                       <div className="rule-detail-item">
@@ -405,22 +407,34 @@ const ClientFuzzyLogic = () => {
                 <div className="explanation-card">
                   <div className="explanation-icon">1</div>
                   <h4>Analyze Product</h4>
-                  <p>We look at price, quality ratings, and popularity for each product.</p>
+                  <p>
+                    We look at price, quality ratings, and popularity for each
+                    product.
+                  </p>
                 </div>
                 <div className="explanation-card">
                   <div className="explanation-icon">2</div>
                   <h4>Apply Rules</h4>
-                  <p>Each of the 5 rules evaluates how well the product matches your preferences.</p>
+                  <p>
+                    Each of the 5 rules evaluates how well the product matches
+                    your preferences.
+                  </p>
                 </div>
                 <div className="explanation-card">
                   <div className="explanation-icon">3</div>
                   <h4>Calculate Score</h4>
-                  <p>All rule results are combined to create a final recommendation score.</p>
+                  <p>
+                    All rule results are combined to create a final
+                    recommendation score.
+                  </p>
                 </div>
                 <div className="explanation-card">
                   <div className="explanation-icon">4</div>
                   <h4>Rank Products</h4>
-                  <p>Products with the highest scores are shown first in your recommendations.</p>
+                  <p>
+                    Products with the highest scores are shown first in your
+                    recommendations.
+                  </p>
                 </div>
               </div>
             </div>

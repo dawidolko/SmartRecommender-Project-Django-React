@@ -150,7 +150,6 @@ const AdminDebug = () => {
         </p>
       </motion.div>
 
-      {/* Method Selector */}
       <motion.div
         className="method-selector"
         initial={{ opacity: 0 }}
@@ -182,7 +181,6 @@ const AdminDebug = () => {
         </button>
       </motion.div>
 
-      {/* Debug Content */}
       <motion.div
         className="debug-content"
         key={activeMethod}
@@ -193,7 +191,6 @@ const AdminDebug = () => {
           <div className="debug-loading">Loading debug data...</div>
         ) : (
           <>
-            {/* Collaborative Filtering Debug */}
             {activeMethod === "collaborative" && (
               <div className="debug-section cf-debug">
                 <h2 className="section-title">
@@ -437,7 +434,6 @@ const AdminDebug = () => {
               </div>
             )}
 
-            {/* Sentiment Analysis Debug */}
             {activeMethod === "sentiment" && (
               <div className="debug-section sentiment-debug">
                 <h2 className="section-title">
@@ -1055,7 +1051,6 @@ const AdminDebug = () => {
               </div>
             )}
 
-            {/* Association Rules Debug */}
             {activeMethod === "association" && (
               <div className="debug-section association-debug">
                 <h2 className="section-title">

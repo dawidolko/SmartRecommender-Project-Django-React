@@ -465,16 +465,12 @@ class CustomFuzzySearch:
             ]
             tag_score = max(tag_scores) if tag_scores else 0
 
-            # Use MAX scoring instead of weighted average for better fuzzy matching
-            # Rationale: If query matches name well (e.g., "laptpo" -> "laptop"),
-            # don't penalize for not matching description/category
-            # Apply slight penalties to non-name fields for better ranking
             total_score = max(
-                name_score,  # Full weight for name
-                desc_score * 0.9,  # 90% for description
-                category_score * 0.8,  # 80% for category
-                spec_score * 0.7,  # 70% for specs
-                tag_score * 0.6,  # 60% for tags
+                name_score,  
+                desc_score * 0.9,  
+                category_score * 0.8,  
+                spec_score * 0.7,  
+                tag_score * 0.6, 
             )
 
             if total_score >= threshold:

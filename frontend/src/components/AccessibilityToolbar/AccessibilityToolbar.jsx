@@ -35,7 +35,6 @@ const AccessibilityToolbar = () => {
 
   const t = translations.pl;
 
-  // Sprawdzanie szerokości ekranu
   const checkMobile = () => {
     const mobile = window.innerWidth <= 767;
     setIsMobile(mobile);
@@ -49,7 +48,6 @@ const AccessibilityToolbar = () => {
     }
   };
 
-  // Inicjalizacja
   useEffect(() => {
     checkMobile();
 
@@ -66,14 +64,12 @@ const AccessibilityToolbar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ładowanie z localStorage po inicjalizacji
   useEffect(() => {
     loadFromLocalStorage();
     handleGlobalOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Obsługa ESC
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
@@ -85,7 +81,6 @@ const AccessibilityToolbar = () => {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
-  // Zapisywanie do localStorage
   const saveToLocalStorage = (newActiveActions, fontSize) => {
     const state = {
       fontSize: fontSize > 100 ? `${fontSize}%` : "",
@@ -107,7 +102,6 @@ const AccessibilityToolbar = () => {
     localStorage.setItem("pojo-accessibility-state", JSON.stringify(state));
   };
 
-  // Ładowanie z localStorage
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem("pojo-accessibility-state");
     if (!savedState) return;
@@ -142,7 +136,6 @@ const AccessibilityToolbar = () => {
     }
   };
 
-  // Globalne opcje
   const handleGlobalOptions = () => {
     document.body.classList.add("pojo-a11y-focusable");
 
@@ -165,20 +158,17 @@ const AccessibilityToolbar = () => {
     }, 100);
   };
 
-  // Toggle toolbar
   const toggleToolbar = (e) => {
     e.preventDefault();
     setIsOpen(!isOpen);
   };
 
-  // Kliknięcie w overlay
   const handleOverlayClick = (e) => {
     if (e.target === overlayRef.current) {
       setIsOpen(false);
     }
   };
 
-  // Powiększenie tekstu
   const handleResizePlus = (e) => {
     e.preventDefault();
     if (currentFontSize < 130) {
@@ -195,7 +185,6 @@ const AccessibilityToolbar = () => {
     }
   };
 
-  // Pomniejszenie tekstu
   const handleResizeMinus = (e) => {
     e.preventDefault();
     if (currentFontSize > 100) {
@@ -214,7 +203,6 @@ const AccessibilityToolbar = () => {
     }
   };
 
-  // Toggle akcji (grayscale, kontrast, etc.)
   const handleToggleAction = (action, e) => {
     e.preventDefault();
 
@@ -231,7 +219,6 @@ const AccessibilityToolbar = () => {
     saveToLocalStorage(newActiveActions, currentFontSize);
   };
 
-  // Schema actions (tylko jedna może być aktywna)
   const handleSchemaAction = (action, e) => {
     e.preventDefault();
 
@@ -243,7 +230,6 @@ const AccessibilityToolbar = () => {
     ];
     const newActiveActions = { ...activeActions };
 
-    // Wyłącz wszystkie schema actions
     schemaActions.forEach((schemaAction) => {
       if (schemaAction !== action && newActiveActions[schemaAction]) {
         newActiveActions[schemaAction] = false;
@@ -251,7 +237,6 @@ const AccessibilityToolbar = () => {
       }
     });
 
-    // Toggle wybranej akcji
     newActiveActions[action] = !newActiveActions[action];
 
     if (newActiveActions[action]) {
@@ -264,16 +249,13 @@ const AccessibilityToolbar = () => {
     saveToLocalStorage(newActiveActions, currentFontSize);
   };
 
-  // Reset wszystkich ustawień
   const handleReset = (e) => {
     e.preventDefault();
 
-    // Usuń wszystkie klasy z body
     Object.keys(activeActions).forEach((action) => {
       document.body.classList.remove(`pojo-a11y-${action}`);
     });
 
-    // Usuń klasy rozmiaru czcionki
     for (let i = 100; i <= 200; i += 5) {
       document.body.classList.remove(`pojo-a11y-resize-font-${i}`);
     }
@@ -328,7 +310,6 @@ const AccessibilityToolbar = () => {
           <p className="pojo-a11y-toolbar-title">{t.title}</p>
 
           <ul className="pojo-a11y-toolbar-items pojo-a11y-tools">
-            {/* Powiększ tekst */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-resize-font pojo-a11y-btn-resize-plus ${
@@ -345,7 +326,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Pomniejsz tekst */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className="pojo-a11y-toolbar-link pojo-a11y-btn-resize-font pojo-a11y-btn-resize-minus"
@@ -360,7 +340,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Skala szarości */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-grayscale ${
@@ -373,7 +352,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Wysoki kontrast */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-high-contrast ${
@@ -386,7 +364,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Negatywny kontrast */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-negative-contrast ${
@@ -401,7 +378,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Jasne tło */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-background-group pojo-a11y-btn-light-background ${
@@ -416,7 +392,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Podkreślenie linków */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-links-underline ${
@@ -433,7 +408,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Czytelna czcionka */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className={`pojo-a11y-toolbar-link pojo-a11y-btn-readable-font ${
@@ -448,7 +422,6 @@ const AccessibilityToolbar = () => {
               </button>
             </li>
 
-            {/* Reset */}
             <li className="pojo-a11y-toolbar-item">
               <button
                 className="pojo-a11y-toolbar-link pojo-a11y-btn-reset"

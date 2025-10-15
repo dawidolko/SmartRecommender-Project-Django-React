@@ -25,24 +25,19 @@ class FuzzyMembershipFunctions:
     """
 
     def __init__(self):
-        # Price thresholds (in PLN)
         self.price_low = 100
         self.price_mid_low = 500
         self.price_mid = 700
         self.price_mid_high = 1200
         self.price_high = 2000
 
-        # Rating thresholds (0-5 scale)
         self.rating_low = 2.5
         self.rating_mid = 3.5
         self.rating_high = 4.5
 
-        # Popularity thresholds (order count - adjusted for real data)
         self.pop_low = 2
         self.pop_mid = 10
         self.pop_high = 30
-
-    # ===== PRICE MEMBERSHIP FUNCTIONS =====
 
     def mu_price_cheap(self, price):
         """
@@ -107,8 +102,6 @@ class FuzzyMembershipFunctions:
         else:
             return 1.0
 
-    # ===== RATING/QUALITY MEMBERSHIP FUNCTIONS =====
-
     def mu_quality_low(self, rating):
         """
         Membership function for 'low quality' (poor ratings).
@@ -162,8 +155,6 @@ class FuzzyMembershipFunctions:
         else:
             return 1.0
 
-    # ===== POPULARITY MEMBERSHIP FUNCTIONS =====
-
     def mu_popularity_low(self, view_count):
         """Low popularity (few views)"""
         if view_count <= self.pop_low:
@@ -196,8 +187,6 @@ class FuzzyMembershipFunctions:
             return (view_count - self.pop_mid) / (self.pop_high - self.pop_mid)
         else:
             return 1.0
-
-    # ===== HELPER METHODS =====
 
     def get_price_fuzzy_set(self, price):
         """
@@ -246,9 +235,8 @@ class FuzzyUserProfile:
         self.user = user
         self.session_data = session_data or {}
         self.category_interests = {}
-        self.price_sensitivity = 0.5  # Default: medium sensitivity
+        self.price_sensitivity = 0.5  
 
-        # Build profile
         if user and user.is_authenticated:
             self._build_from_user_history()
         elif session_data:
@@ -264,7 +252,6 @@ class FuzzyUserProfile:
         """
         from home.models import Order
 
-        # Get user's orders
         orders = Order.objects.filter(user=self.user).prefetch_related(
             "orderproduct_set__product__categories"
         )
@@ -273,7 +260,6 @@ class FuzzyUserProfile:
             self._build_default_profile()
             return
 
-        # Count category purchases
         category_counts = defaultdict(int)
         total_items = 0
         total_spending = 0
@@ -283,24 +269,19 @@ class FuzzyUserProfile:
                 product = order_product.product
                 quantity = order_product.quantity
 
-                # Count categories
                 for category in product.categories.all():
                     category_counts[category.name] += quantity
 
                 total_items += quantity
                 total_spending += float(product.price) * quantity
 
-        # Normalize to [0, 1] - fuzzy membership degrees
         if total_items > 0:
             self.category_interests = {
                 cat: count / total_items for cat, count in category_counts.items()
             }
 
-        # Calculate price sensitivity
         if orders.count() > 0:
             avg_price = total_spending / total_items if total_items > 0 else 500
-            # Low avg price → high sensitivity (1.0)
-            # High avg price → low sensitivity (0.0)
             if avg_price < 300:
                 self.price_sensitivity = 0.9
             elif avg_price < 700:
@@ -327,24 +308,20 @@ class FuzzyUserProfile:
 
         for view in viewed:
             category = view.get("category", "Unknown")
-            time_spent = view.get("time_spent", 0)  # seconds
+            time_spent = view.get("time_spent", 0) 
 
-            # Fuzzy interest from time: more time = more interest
             interest_degree = self._fuzzy_interest_from_time(time_spent)
 
-            # Accumulate with T-conorma (max)
             category_time[category] = max(category_time[category], interest_degree)
             total_time += time_spent
 
         self.category_interests = dict(category_time)
 
-        # Infer price sensitivity from viewed products' prices
         avg_viewed_price = self.session_data.get("avg_viewed_price", 500)
         self.price_sensitivity = 0.8 if avg_viewed_price < 500 else 0.5
 
     def _build_default_profile(self):
         """Default profile for users without history"""
-        # Popular categories with moderate interest
         self.category_interests = {"Electronics": 0.5, "Home": 0.4, "Gaming": 0.3}
         self.price_sensitivity = 0.6
 
@@ -367,9 +344,9 @@ class FuzzyUserProfile:
         if seconds < 5:
             return 0.1
         elif seconds < 15:
-            return 0.3 + (seconds - 5) / 10 * 0.3  # 0.3 to 0.6
+            return 0.3 + (seconds - 5) / 10 * 0.3  
         elif seconds < 45:
-            return 0.6 + (seconds - 15) / 30 * 0.3  # 0.6 to 0.9
+            return 0.6 + (seconds - 15) / 30 * 0.3  
         else:
             return 0.9
 
@@ -389,14 +366,10 @@ class FuzzyUserProfile:
         max_match = 0.0
 
         for user_cat, user_interest in self.category_interests.items():
-            # Calculate fuzzy similarity between categories
             similarity = self._calculate_category_similarity(user_cat, product_category)
 
-            # Weighted combination (60% similarity, 40% interest)
-            # This gives more weight to category similarity while still considering user interest
             match = (similarity * 0.6) + (user_interest * 0.4)
 
-            # T-conorm (max) for OR: accumulate best match
             max_match = max(max_match, match)
 
         return max_match
@@ -415,15 +388,12 @@ class FuzzyUserProfile:
         cat1_lower = cat1.lower()
         cat2_lower = cat2.lower()
 
-        # Exact match
         if cat1_lower == cat2_lower:
             return 1.0
 
-        # Check substring match
         if cat1_lower in cat2_lower or cat2_lower in cat1_lower:
             return 0.85
 
-        # Parse hierarchical structure (e.g., "electronics.phones")
         cat1_parts = cat1_lower.split('.')
         cat2_parts = cat2_lower.split('.')
 
@@ -432,13 +402,11 @@ class FuzzyUserProfile:
         cat1_sub = cat1_parts[1] if len(cat1_parts) > 1 else None
         cat2_sub = cat2_parts[1] if len(cat2_parts) > 1 else None
 
-        # Same main category
         if cat1_main == cat2_main:
             if cat1_sub and cat2_sub:
                 return 0.95 if cat1_sub == cat2_sub else 0.6
             return 0.7
 
-        # Define category relationships
         relations = {
             'electronics': ['components', 'peripherals', 'wearables'],
             'components': ['electronics', 'peripherals', 'gaming'],
@@ -450,22 +418,18 @@ class FuzzyUserProfile:
             'wearables': ['electronics', 'accessories'],
         }
 
-        # Check direct relationship
         if cat2_main in relations.get(cat1_main, []):
             pos = relations[cat1_main].index(cat2_main)
             return 0.5 if pos == 0 else (0.4 if pos <= 1 else 0.3)
 
-        # Check reverse relationship
         if cat1_main in relations.get(cat2_main, []):
             pos = relations[cat2_main].index(cat1_main)
             return 0.5 if pos == 0 else (0.4 if pos <= 1 else 0.3)
 
-        # Check if both are tech-related (fallback)
         tech_cats = {'electronics', 'components', 'peripherals', 'gaming', 'computers', 'laptops', 'wearables'}
         if cat1_main in tech_cats and cat2_main in tech_cats:
             return 0.25
 
-        # Unrelated categories
         return 0.1
 
     def get_profile_summary(self):
@@ -505,7 +469,6 @@ class SimpleFuzzyInference:
         self.mf = membership_functions
         self.user_profile = user_profile
 
-        # Define fuzzy rules (Mamdani-style IF-THEN rules)
         self.rules = self._define_rules()
 
     def _define_rules(self):
@@ -519,7 +482,6 @@ class SimpleFuzzyInference:
             list of rule functions
         """
         rules = [
-            # Rule 1: High quality + reasonable price → high recommendation
             {
                 "name": "R1: High Quality Bargain",
                 "eval": lambda p, cat_match: min(
@@ -531,7 +493,6 @@ class SimpleFuzzyInference:
                 ),
                 "weight": 0.9,
             },
-            # Rule 2: Category match + popularity (medium OR high) → recommendation
             {
                 "name": "R2: Popular in Category",
                 "eval": lambda p, cat_match: min(
@@ -543,7 +504,6 @@ class SimpleFuzzyInference:
                 ),
                 "weight": 0.7,
             },
-            # Rule 3: Price sensitive user + cheap product → boost recommendation
             {
                 "name": "R3: Price Sensitive Match",
                 "eval": lambda p, cat_match: (
@@ -556,7 +516,6 @@ class SimpleFuzzyInference:
                 ),
                 "weight": 0.6,
             },
-            # Rule 4: High category match + good quality → high recommendation
             {
                 "name": "R4: Category Quality Match",
                 "eval": lambda p, cat_match: min(
@@ -568,12 +527,11 @@ class SimpleFuzzyInference:
                 ),
                 "weight": 0.85,
             },
-            # Rule 5: Low price insensitive user + expensive + high quality → boost
             {
                 "name": "R5: Premium Match",
                 "eval": lambda p, cat_match: (
                     min(
-                        1.0 - self.user_profile.price_sensitivity,  # Low sensitivity
+                        1.0 - self.user_profile.price_sensitivity, 
                         self.mf.mu_price_expensive(p.get("price", 0)),
                         self.mf.mu_quality_high(p.get("rating", 0)),
                     )
@@ -582,11 +540,9 @@ class SimpleFuzzyInference:
                 ),
                 "weight": 0.8,
             },
-            # Rule 6: Quality-Price ratio (independent of category)
             {
                 "name": "R6: Quality-Price Balance",
                 "eval": lambda p, cat_match: max(
-                    # Good quality + any reasonable price
                     min(
                         self.mf.mu_quality_high(p.get("rating", 0)),
                         max(
@@ -595,7 +551,6 @@ class SimpleFuzzyInference:
                             self.mf.mu_price_expensive(p.get("price", 0)) * 0.6
                         )
                     ),
-                    # Medium quality + cheap price
                     min(
                         self.mf.mu_quality_medium(p.get("rating", 0)),
                         self.mf.mu_price_cheap(p.get("price", 0))
@@ -626,16 +581,13 @@ class SimpleFuzzyInference:
         weight_sum = 0.0
 
         for rule in self.rules:
-            # Evaluate rule antecedent (T-norm applied inside rule eval)
             activation = rule["eval"](product_data, category_match)
 
             rule_activations[rule["name"]] = round(activation, 3)
 
-            # Accumulate for defuzzification (weighted average)
             weighted_sum += activation * rule["weight"]
             weight_sum += rule["weight"]
 
-        # Simplified defuzzification: weighted average
         fuzzy_score = weighted_sum / weight_sum if weight_sum > 0 else 0.0
 
         return {

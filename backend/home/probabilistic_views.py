@@ -42,8 +42,6 @@ class MarkovRecommendationsAPI(APIView):
 
     def get(self, request):
         try:
-            # Cache disabled due to pickle issues with lambda in CustomMarkovChain
-            # Training is fast (~10 seconds) so we train on each request
             print(
                 "Training Markov Chain and Naive Bayes models... (this may take 10-15 seconds)"
             )
@@ -85,19 +83,16 @@ class MarkovRecommendationsAPI(APIView):
                     if main_category:
                         last_category = main_category.name
 
-            # Get Markov predictions for next categories
             predicted_products = []
             if last_category and engine.markov_chain.transitions:
                 next_category_predictions = engine.predict_next_purchase_categories(
                     last_category, top_k=5
                 )
 
-                # Get products from predicted categories with real probabilities
                 for pred in next_category_predictions:
                     category_name = pred["state"]
                     probability = pred["probability"]
 
-                    # Find products in this category
                     category_products = Product.objects.filter(
                         categories__name=category_name
                     ).prefetch_related("photoproduct_set")[:2]
@@ -130,14 +125,12 @@ class MarkovRecommendationsAPI(APIView):
                     if len(predicted_products) >= 6:
                         break
 
-            # Calculate real next purchase probability using Naive Bayes
             user_features = self._extract_user_features(user)
             purchase_proba = 0.5
             if engine.naive_bayes_purchase.trained:
                 proba_dict = engine.predict_purchase_probability(user_features)
                 purchase_proba = proba_dict.get("will_purchase", 0.5)
 
-            # Calculate expected days to next purchase from historical data
             orders_list = list(user_orders)
             expected_days = 30
             if len(orders_list) >= 2:
@@ -151,7 +144,6 @@ class MarkovRecommendationsAPI(APIView):
                 if intervals:
                     expected_days = sum(intervals) // len(intervals)
 
-            # Get real sequence analysis from Markov insights
             markov_insights = engine.get_markov_insights()
             most_common_categories = markov_insights.get("most_popular_categories", [])
             most_common_sequence = (
@@ -160,7 +152,6 @@ class MarkovRecommendationsAPI(APIView):
                 else "Not enough data"
             )
 
-            # Calculate average cycle length from user's history
             avg_cycle_length = (
                 len(orders_list)
                 / max(
@@ -175,12 +166,10 @@ class MarkovRecommendationsAPI(APIView):
                 else 0
             )
 
-            # Generate forecast data for next 7 days using historical patterns
             forecast_data = []
             for i in range(7):
                 future_date = timezone.now().date() + timedelta(days=i + 1)
 
-                # Simple forecast based on historical average
                 avg_daily_quantity = 0
                 if orders_list:
                     total_quantity = sum(
@@ -210,7 +199,6 @@ class MarkovRecommendationsAPI(APIView):
                     }
                 )
 
-            # User predictions based on Markov chain
             user_predictions = []
             for pred_product in predicted_products[:5]:
                 user_predictions.append(
@@ -412,14 +400,11 @@ class BayesianInsightsAPI(APIView):
 
     def get(self, request):
         try:
-            # Cache disabled due to pickle issues with lambda in CustomMarkovChain
-            # Training is fast (~10 seconds) so we train on each request
             print("Training probabilistic models for Bayesian insights...")
             markov_api = MarkovRecommendationsAPI()
             engine = markov_api._train_probabilistic_engine()
             print("Training complete!")
 
-            # Get user for personalized insights
             user = User.objects.filter(order__isnull=False).first()
 
             category_preferences = {}
@@ -427,13 +412,10 @@ class BayesianInsightsAPI(APIView):
             if user and engine.naive_bayes_purchase.trained:
                 user_features = self._extract_user_features(user)
 
-                # Get favorite category from features
                 favorite_cat = user_features.get("favorite_category", "none")
 
-                # Use Naive Bayes to predict purchase probability for user
                 purchase_proba = engine.predict_purchase_probability(user_features)
 
-                # Calculate category preferences based on actual order data
                 category_counts = defaultdict(int)
                 all_orders = Order.objects.filter(user=user)
 
@@ -442,12 +424,10 @@ class BayesianInsightsAPI(APIView):
                         for category in order_product.product.categories.all():
                             category_counts[category.name] += order_product.quantity
 
-                # Normalize to probabilities
                 total_items = sum(category_counts.values()) if category_counts else 1
                 for cat_name, count in category_counts.items():
                     category_preferences[cat_name] = round(count / total_items, 3)
             else:
-                # Fallback: calculate from all users
                 category_counts = defaultdict(int)
                 for order in Order.objects.all()[:200]:
                     for order_product in order.orderproduct_set.all():
@@ -481,7 +461,6 @@ class BayesianInsightsAPI(APIView):
                 churn_proba = engine.predict_churn_probability(user_features)
                 churn_risk = churn_proba.get("will_churn", 0.5)
 
-            # Generate behavioral insights from Naive Bayes feature importance
             behavioral_insights = []
 
             if engine.naive_bayes_purchase.trained:
@@ -489,13 +468,11 @@ class BayesianInsightsAPI(APIView):
                     engine.naive_bayes_purchase.get_feature_importance()
                 )
 
-                # Sort by importance
                 sorted_features = sorted(
                     feature_importance.items(), key=lambda x: x[1], reverse=True
                 )
 
                 for feature_name, importance in sorted_features[:4]:
-                    # Generate description based on feature
                     if "order" in feature_name.lower():
                         description = f"Purchase frequency pattern detected based on {feature_name}"
                     elif "category" in feature_name.lower():
@@ -511,14 +488,13 @@ class BayesianInsightsAPI(APIView):
                             "description": description,
                             "confidence": round(
                                 min(importance / 5.0, 1.0), 2
-                            ),  # Normalize entropy to 0-1
+                            ), 
                         }
                     )
 
             recommendations = []
 
             if category_preferences:
-                # Recommend top categories
                 top_categories = sorted(
                     category_preferences.items(), key=lambda x: x[1], reverse=True
                 )[:3]
@@ -532,7 +508,6 @@ class BayesianInsightsAPI(APIView):
                         }
                     )
 
-            # Add churn-based recommendation
             if churn_risk > 0.6:
                 recommendations.append(
                     {

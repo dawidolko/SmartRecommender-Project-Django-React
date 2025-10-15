@@ -209,7 +209,6 @@ class UpdateAssociationRulesAPI(APIView):
 
 class AssociationRulesListAPI(APIView):
     def get(self, request):
-        # Check if user wants all rules
         fetch_all = request.GET.get("all", "").lower() == "true"
         
         if fetch_all:
@@ -231,7 +230,6 @@ class AssociationRulesListAPI(APIView):
             .order_by("-lift")
         )
         
-        # If not fetching all, limit to top 20
         if not fetch_all:
             rules_query = rules_query[:20]
 

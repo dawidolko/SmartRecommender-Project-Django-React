@@ -1114,7 +1114,6 @@
     }
   }
 
-  // Improved interest item styles
   .interest-item {
     margin-bottom: 20px;
 
@@ -1153,7 +1152,6 @@
     }
   }
 
-  // Improved rule card styles
   .rule-card {
     background: $realwhite;
     border: 1px solid $tab-border;
@@ -1231,7 +1229,6 @@
     }
   }
 
-  // Explanation grid for fuzzy rules
   .explanation-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

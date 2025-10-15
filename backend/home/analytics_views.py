@@ -378,14 +378,12 @@ class MyShoppingInsightsView(APIView):
             total_orders = user_orders.count()
             
             if total_orders == 0:
-                # For new users, show most popular products based on order count
                 sample_products = Product.objects.annotate(
                     order_count=Count('orderproduct')
                 ).order_by('-order_count')[:6]
 
                 personalized_suggestions = []
 
-                # Get max order count for normalization
                 max_orders = sample_products.first().order_count if sample_products.exists() else 1
 
                 for product in sample_products:
@@ -398,7 +396,6 @@ class MyShoppingInsightsView(APIView):
                             'sequence': getattr(photo, 'sequence', 1)
                         } for photo in product_photos]
 
-                    # Calculate match score based on popularity (50-80 range)
                     if max_orders > 0:
                         match_score = 50 + int((product.order_count / max_orders) * 30)
                     else:
@@ -598,23 +595,18 @@ class MyShoppingInsightsView(APIView):
                     } for photo in product_photos]
                 
                 if category_spending:
-                    # Calculate match score based on category spending
                     product_categories = [cat.name for cat in product.categories.all()]
                     match_score = 0
                     total_spending = sum(category_spending.values())
 
                     for cat in product_categories:
                         if cat in category_spending:
-                            # Weight by percentage of spending in this category
                             category_weight = (category_spending[cat] / total_spending) * 100
                             match_score += category_weight
 
-                    # Normalize to 60-95 range
                     match_score = min(95, max(60, int(match_score)))
                 else:
-                    # For new users, base score on product popularity
                     order_count = product.orderproduct_set.count()
-                    # Normalize to 50-80 range based on orders (max 100 orders = 80 score)
                     match_score = min(80, 50 + int(order_count * 0.3))
                 
                 suggestions.append({
@@ -709,7 +701,6 @@ class PurchasePredictionView(APIView):
 
             predictions = []
 
-            # Get user's favorite categories based on purchase history
             user_category_spending = (
                 OrderProduct.objects.filter(order__user=user)
                 .values('product__categories__name')
@@ -722,7 +713,6 @@ class PurchasePredictionView(APIView):
 
             favorite_categories = [item['product__categories__name'] for item in user_category_spending if item['product__categories__name']][:3]
 
-            # Get products from favorite categories that user hasn't purchased
             if favorite_categories:
                 products = Product.objects.filter(
                     categories__name__in=favorite_categories
@@ -732,28 +722,23 @@ class PurchasePredictionView(APIView):
                     popularity=Count('orderproduct')
                 ).order_by('-popularity')[:10]
             else:
-                # Fallback: most popular products
                 products = Product.objects.annotate(
                     popularity=Count('orderproduct')
                 ).order_by('-popularity')[:10]
 
-            # Calculate purchase probability based on category match and popularity
             total_spent_in_favs = sum(item['total_spent'] for item in user_category_spending if item['product__categories__name'] in favorite_categories)
 
             for product in products:
                 product_categories = [cat.name for cat in product.categories.all()]
 
-                # Base probability on category match
                 category_match_score = 0
                 for item in user_category_spending:
                     cat_name = item['product__categories__name']
                     if cat_name in product_categories and total_spent_in_favs > 0:
                         category_match_score += (item['total_spent'] / total_spent_in_favs) * 50
 
-                # Add popularity component (0-30 points)
                 popularity_score = min(30, product.popularity * 3) if hasattr(product, 'popularity') else 0
 
-                # Combine scores (60-95 range)
                 probability = min(95, 60 + int(category_match_score) + int(popularity_score))
 
                 predictions.append({

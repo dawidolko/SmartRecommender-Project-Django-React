@@ -10,7 +10,6 @@ Tests all three components:
 import os
 import django
 
-# Setup Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 django.setup()
 
@@ -24,16 +23,12 @@ print("=" * 80)
 print("FUZZY LOGIC RECOMMENDATION SYSTEM - TEST")
 print("=" * 80)
 
-# ============================================================================
-# TEST 1: Fuzzy Membership Functions
-# ============================================================================
 print("\n" + "=" * 80)
 print("TEST 1: FUZZY MEMBERSHIP FUNCTIONS")
 print("=" * 80)
 
 mf = FuzzyMembershipFunctions()
 
-# Test price membership functions
 test_prices = [50, 300, 800, 1500, 2500]
 print("\n--- Price Membership Functions ---")
 print(f"{'Price (PLN)':<12} {'m_cheap':<10} {'m_medium':<10} {'m_expensive':<12}")
@@ -44,7 +39,6 @@ for price in test_prices:
     expensive = mf.mu_price_expensive(price)
     print(f"{price:<12} {cheap:<10.3f} {medium:<10.3f} {expensive:<12.3f}")
 
-# Test quality membership functions
 test_ratings = [2.0, 3.0, 4.0, 4.5, 5.0]
 print("\n--- Quality Membership Functions ---")
 print(f"{'Rating':<10} {'m_low':<10} {'m_medium':<10} {'m_high':<10}")
@@ -55,7 +49,6 @@ for rating in test_ratings:
     high = mf.mu_quality_high(rating)
     print(f"{rating:<10.1f} {low:<10.3f} {medium:<10.3f} {high:<10.3f}")
 
-# Test popularity membership functions
 test_views = [30, 100, 500, 1500, 3000]
 print("\n--- Popularity Membership Functions ---")
 print(f"{'Views':<10} {'m_low':<10} {'m_medium':<10} {'m_high':<10}")
@@ -66,14 +59,10 @@ for views in test_views:
     high = mf.mu_popularity_high(views)
     print(f"{views:<10} {low:<10.3f} {medium:<10.3f} {high:<10.3f}")
 
-# ============================================================================
-# TEST 2: Fuzzy User Profile
-# ============================================================================
 print("\n" + "=" * 80)
 print("TEST 2: FUZZY USER PROFILE")
 print("=" * 80)
 
-# Test default profile (guest without history)
 print("\n--- Default Profile (Guest User) ---")
 user_profile = FuzzyUserProfile()
 profile_summary = user_profile.get_profile_summary()
@@ -83,7 +72,6 @@ print(f"Top Category Interests:")
 for cat, interest in profile_summary["top_interests"]:
     print(f"  - {cat}: {interest:.2f}")
 
-# Test category matching with similarity matrix
 print("\n--- Fuzzy Category Matching (T-norms & T-conorms) ---")
 test_categories = ["Gaming", "Electronics", "Photography", "Kitchen", "Unknown"]
 print(f"{'Product Category':<20} {'Fuzzy Match Score':<20}")
@@ -92,16 +80,12 @@ for cat in test_categories:
     match_score = user_profile.fuzzy_category_match(cat)
     print(f"{cat:<20} {match_score:<20.3f}")
 
-# ============================================================================
-# TEST 3: Simplified Fuzzy Inference
-# ============================================================================
 print("\n" + "=" * 80)
 print("TEST 3: SIMPLIFIED FUZZY INFERENCE ENGINE")
 print("=" * 80)
 
 fuzzy_engine = SimpleFuzzyInference(mf, user_profile)
 
-# Display fuzzy rules
 print("\n--- Fuzzy Rules (Mamdani-style) ---")
 rule_explanations = fuzzy_engine.get_rule_explanations()
 for i, rule in enumerate(rule_explanations, 1):
@@ -110,7 +94,6 @@ for i, rule in enumerate(rule_explanations, 1):
     print(f"  Consequence: {rule['consequence']}")
     print(f"  Interpretation: {rule['interpretation']}")
 
-# Test product evaluations
 print("\n" + "=" * 80)
 print("TEST 4: PRODUCT EVALUATION WITH FUZZY INFERENCE")
 print("=" * 80)
@@ -152,10 +135,8 @@ print(
 print("-" * 85)
 
 for product in test_products:
-    # Get category match
     category_match = user_profile.fuzzy_category_match(product["category"])
 
-    # Evaluate with fuzzy inference
     product_data = {
         "price": product["price"],
         "rating": product["rating"],
@@ -169,7 +150,6 @@ for product in test_products:
         f"{product['view_count']:<8} {result['category_match']:<10.3f} {result['fuzzy_score']:<12.3f}"
     )
 
-# Show detailed rule activations for one product
 print("\n--- Detailed Rule Activations for 'Budget Gaming Mouse' ---")
 product_data = {"price": 80, "rating": 4.5, "view_count": 500}
 category_match = user_profile.fuzzy_category_match("Gaming")
@@ -181,9 +161,6 @@ print("\nRule Activations:")
 for rule_name, activation in result["rule_activations"].items():
     print(f"  {rule_name:<35} {activation:.3f}")
 
-# ============================================================================
-# SUMMARY
-# ============================================================================
 print("\n" + "=" * 80)
 print("TEST SUMMARY")
 print("=" * 80)

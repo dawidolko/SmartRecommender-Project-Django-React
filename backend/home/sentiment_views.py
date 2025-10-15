@@ -472,7 +472,6 @@ class FuzzySearchAPIView(APIView):
 
         results = fuzzy_engine.search_products(query, products, threshold)
 
-        # TODO: Remove debug prints
         if not results and products:
             test_results = fuzzy_engine.search_products(query, products[:10], 0.1)
             if test_results:
@@ -494,7 +493,6 @@ class FuzzySearchAPIView(APIView):
         except:
             return True
 
-
 class SentimentAnalysisDebugView(APIView):
     """
     Debug view for Sentiment Analysis system.
@@ -511,7 +509,6 @@ class SentimentAnalysisDebugView(APIView):
             negative_count = all_sentiments.filter(sentiment_category="negative").count()
             neutral_count = all_sentiments.filter(sentiment_category="neutral").count()
 
-            # Calculate percentages
             positive_percentage = (
                 round((positive_count / total_sentiments) * 100, 2)
                 if total_sentiments > 0
@@ -528,7 +525,6 @@ class SentimentAnalysisDebugView(APIView):
                 else 0
             )
 
-            # Get top 10 products by positive sentiment
             top_positive_data = []
             try:
                 top_positive = (
@@ -555,7 +551,6 @@ class SentimentAnalysisDebugView(APIView):
             except Exception:
                 pass
 
-            # Get top 10 products by negative sentiment
             top_negative_data = []
             try:
                 top_negative = (
@@ -595,7 +590,6 @@ class SentimentAnalysisDebugView(APIView):
             })
 
         except Exception as e:
-            # Return empty data instead of error
             return Response({
                 "total_sentiments": 0,
                 "positive_count": 0,
@@ -745,7 +739,6 @@ class FuzzyLogicRecommendationsAPIView(APIView):
             if debug_mode:
                 result["rule_explanations"] = fuzzy_engine.get_rule_explanations()
 
-            # Cache for 1 hour
             if not debug_mode:
                 cache.set(cache_key, result, timeout=3600)
 

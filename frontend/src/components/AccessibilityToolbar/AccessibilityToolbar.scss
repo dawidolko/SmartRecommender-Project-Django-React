@@ -128,7 +128,6 @@ $toolbar-width: 180px;
   }
 }
 
-// Toolbar Position Mixin
 @mixin pojo-a11y-toolbar-position($direction) {
   &.pojo-a11y-toolbar-#{$direction} {
     #{$direction}: -#{$toolbar-width};
@@ -172,7 +171,6 @@ $toolbar-width: 180px;
   @include pojo-a11y-toolbar-position(left);
 }
 
-// Mobile/Desktop specific styles
 html.pojo-a11y-mobile #pojo-a11y-toolbar.pojo-a11y-toolbar-left {
   left: auto !important;
   right: -180px !important;
@@ -217,7 +215,6 @@ html.pojo-a11y-desktop #pojo-a11y-toolbar.pojo-a11y-toolbar-left {
   }
 }
 
-// Screen Reader Only
 .pojo-sr-only,
 .sr-only {
   position: absolute;
@@ -231,14 +228,12 @@ html.pojo-a11y-desktop #pojo-a11y-toolbar.pojo-a11y-toolbar-left {
   border-width: 0;
 }
 
-// Focusable
 body.pojo-a11y-focusable {
   *:focus {
     outline-offset: 2px;
   }
 }
 
-// Readable Font
 body.pojo-a11y-readable-font {
   &,
   *:not(i):not(span) {
@@ -247,7 +242,6 @@ body.pojo-a11y-readable-font {
   }
 }
 
-// Grayscale
 body.pojo-a11y-grayscale::before {
   content: "";
   position: fixed;
@@ -284,7 +278,6 @@ body.pojo-a11y-grayscale {
   }
 }
 
-// High Contrast
 body.pojo-a11y-high-contrast {
   .placebo {
     line-height: normal;
@@ -574,7 +567,6 @@ body.pojo-a11y-high-contrast {
   }
 }
 
-// Negative Contrast
 body.pojo-a11y-negative-contrast {
   &:not([id^="tidio"]):not([class^="tidio"]):not(#tidio-chat):not([data-tidio]),
   *:not(#pojo-a11y-toolbar):not([id^="tidio"]):not([class^="tidio"]):not(
@@ -605,7 +597,6 @@ body.pojo-a11y-negative-contrast {
   }
 }
 
-// Light Background
 body.pojo-a11y-light-background {
   &:not([id^="tidio"]):not([class^="tidio"]):not(#tidio-chat):not([data-tidio]),
   *:not(#pojo-a11y-toolbar):not(.pojo-a11y-toolbar-link):not([id^="tidio"]):not(
@@ -616,7 +607,6 @@ body.pojo-a11y-light-background {
   }
 }
 
-// Links Underline
 body.pojo-a11y-links-underline {
   a,
   a * {
@@ -624,7 +614,6 @@ body.pojo-a11y-links-underline {
   }
 }
 
-// Font Size Classes
 $start-loop: 100;
 $end-loop: 200;
 
@@ -661,7 +650,6 @@ $end-loop: 200;
   }
 }
 
-// Tidio Chat exceptions
 #tidio-chat,
 #tidio-chat *,
 [id^="tidio"],

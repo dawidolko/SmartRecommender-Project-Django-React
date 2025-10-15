@@ -694,7 +694,6 @@ const AdminStatistics = () => {
         </div>
       </motion.div>
 
-      {/* Modal - Show All Rules */}
       {showAllRulesModal && (
         <div className="modal-overlay" onClick={closeAllRulesModal}>
           <div
