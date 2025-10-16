@@ -13,25 +13,24 @@
 \usepackage{titlesec}
 \usepackage{tocloft}
 \usepackage{pdfpages}
-\usepackage{fancyhdr}
 \usepackage{listings}
 \usepackage{xcolor}
 
-% Marginesy (wewnętrzny=lewy dla stron nieparzystych, zewnętrzny=prawy)
-\geometry{left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+% Marginesy
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyfoot[LE,RO]{\thepage}
-\renewcommand{\headrulewidth}{0pt}
-\renewcommand{\footrulewidth}{0pt}
+% Numeracja stron na środku
+\pagestyle{plain}
 
+% Interlinia 1,5
 \onehalfspacing
 
+% Wcięcia akapitów
 \setlength{\parindent}{1cm}
 
-\titleformat{\section}[block]{\bfseries\Large\filcenter}{}{1em}{}
-\titleformat{\subsection}[block]{\bfseries\large}{}{1em}{}
+% Tytuły - wyrównane do prawej
+\titleformat{\section}[block]{\bfseries\Large\raggedright}{}{1em}{}
+\titleformat{\subsection}[block]{\bfseries\large\raggedright}{}{1em}{}
 
 \lstset{
   basicstyle=\ttfamily\small,
@@ -109,8 +108,6 @@ Rozwój technologii e-commerce oraz dynamiczny wzrost ilości dostępnych produk
 Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza zaawansowanego systemu rekomendacyjnego dla platformy e-commerce, wykorzystującego trzy fundamentalne metody: \textit{Collaborative Filtering}, \textit{Analizę Sentymentu} oraz \textit{Reguły Asocjacyjne} z algorytmem \textit{Apriori}. Praca prezentuje kompleksowe podejście do problemu rekomendacji, łącząc klasyczne algorytmy znane z literatury naukowej z własnymi rozwiązaniami optymalizacyjnymi.
 
 Praca składa się z 6 rozdziałów: podstawy teoretyczne (1), implementacja CF/Sentiment/Apriori (2-4), architektura (5), wnioski (6).
-
-Wszystkie algorytmy zaimplementowano "od zera" bez gotowych bibliotek ML.
 
 Praca została zrealizowana w oparciu o aktualną literaturę naukową z zakresu systemów rekomendacyjnych, uczenia maszynowego oraz analizy danych. Szczególną wartością niniejszego opracowania jest manualnie zaimplementowany algorytm \textit{Apriori} z optymalizacjami, implementacja analizy sentymentu z systemem wieloźródłowej agregacji oraz implementacja \textit{Collaborative Filtering} z \textit{Adjusted Cosine Similarity}. Praca prezentuje rzeczywisty, funkcjonalny system e-commerce z pełną integracją wszystkich komponentów.
 
@@ -240,14 +237,6 @@ System generuje rekomendacje poprzez wyszukanie produktów podobnych do zakupion
 
 System wykorzystuje cache'owanie macierzy podobieństwa (24h timeout, automatyczne unieważnienie po zamówieniu), operacje wsadowe dla zapisu danych, indeksowanie bazy danych oraz próg podobieństwa 0.1 eliminujący szum.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{cf_diagram.png}
-\caption{Diagram procesu Collaborative Filtering}
-\end{figure}
-
-
-
 \newpage
 
 \section*{Rozdzia\l{} 3}
@@ -276,12 +265,6 @@ Slowniki zawieraja 200+ slow (pozytywne: "wspanialy", "polecam"; negatywne: "sla
 System agreguje sentyment z 5 zrodel (wzor w rozdz. 1.3): opinie (40\%), opis (25\%), nazwa (15\%), spec (12\%), kategorie (8\%). Rozwiazuje problem zimnego startu - nowe produkty bez opinii maja sentyment z innych zrodel.
 
 Optymalizacja wag wykonana empirycznie (zbiór treningowy 5000 produktów). Kombinacja wag osiagnela korelacje r=0.73 z ocenami uzytkownikow. Klasyfikacja: positive gdy wynik > 0.1, negative gdy < -0.1, neutral dla zakresu $[-0.1, 0.1]$.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{sentiment_diagram.png}
-\caption{Diagram procesu analizy sentymentu}
-\end{figure}
 
 \newpage
 
@@ -340,14 +323,6 @@ Trzy fundamentalne metryki (wzory w rozdz. 1.3):
 System implementuje bitmap pruning (Zaki 2000) - reprezentację transakcji jako wektorów bitowych. Każdy produkt ma unikalny indeks bitowy, każda transakcja to wektor bitów (1 = obecność produktu).
 
 Operacje bitowe NumPy (\texttt{np.bitwise\_and()}) obliczają support par produktów 100-1000x szybciej niż iteracyjne sprawdzanie transakcji w czystym Pythonie. Generowanie reguł dla 1000 produktów: 2.5s (bitmap pruning) vs 47s (naiwnie) = 19x przyspieszenie.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{apriori_diagram.png}
-\caption{Diagram algorytmu Apriori z bitmap pruning}
-\end{figure}
-
-\newpage
 
 \newpage
 
@@ -477,38 +452,7 @@ User (1) ----- (N) Opinion ------(1)-------------------------------|
              (1)----+----- SentimentAnalysis
 \end{verbatim}
 
-\subsection*{5.5 System cache'owania - Django DatabaseCache}
-\addcontentsline{toc}{subsection}{5.5 System cache'owania - Django DatabaseCache}
-
-System SmartRecommender wykorzystuje Django DatabaseCache dla cache'owania wyników kosztownych obliczeniowo operacji, w szczególności macierzy podobieństw produktów dla Collaborative Filtering.
-
-Konfiguracja w \texttt{settings.py}:
-
-\begin{lstlisting}[language=Python]
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache_table',
-        'TIMEOUT': 86400,
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
-    }
-}
-\end{lstlisting}
-
-Zastosowania cache:
-
-\begin{itemize}
-\item \textbf{Macierz podobieństw CF}: Cache'owanie obliczonej macierzy cosine similarity na 24h, unieważnienie po nowym zamówieniu
-\item \textbf{Rekomendacje użytkownika}: Cache'owanie top 10 rekomendacji dla każdego użytkownika, timeout 24h
-\item \textbf{Reguły asocjacyjne}: Cache'owanie wygenerowanych reguł, unieważnienie po nowym zamówieniu
-\item \textbf{Sentyment produktu}: Cache'owanie finalnego wyniku sentymentu, timeout 12h
-\end{itemize}
-
-Korzyści: Redukcja czasu odpowiedzi z 5-10s do 50-100ms dla powtarzanych zapytań, zmniejszenie obciążenia CPU o 80-90\%, możliwość obsługi 10x większej liczby jednoczesnych użytkowników.
-
-\subsection*{5.6 Mechanizmy optymalizacji wydajności}
+\subsection*{5.5 Mechanizmy optymalizacji wydajności}
 \addcontentsline{toc}{subsection}{5.6 Mechanizmy optymalizacji wydajności}
 
 System implementuje sześć kluczowych mechanizmów optymalizacji wydajności:
@@ -525,7 +469,7 @@ System implementuje sześć kluczowych mechanizmów optymalizacji wydajności:
 
 \textbf{6. Asynchroniczne przetwarzanie}: Wykorzystanie \texttt{transaction.on\_commit()} dla odroczenia kosztownych operacji po zacommitowaniu transakcji.
 
-\subsection*{5.7 Indeksowanie bazy danych}
+\subsection*{5.6 Indeksowanie bazy danych}
 \addcontentsline{toc}{subsection}{5.7 Indeksowanie bazy danych}
 
 Strategiczne indeksowanie bazy danych PostgreSQL jest kluczowe dla wydajności zapytań systemów rekomendacji. System SmartRecommender implementuje następujące indeksy:
@@ -561,45 +505,159 @@ Wpływ indeksowania: Zapytanie pobierające top 10 podobnych produktów: bez ind
 \addcontentsline{toc}{section}{Rozdział 6: Podsumowanie i wnioski końcowe}
 \section*{Podsumowanie i wnioski końcowe}
 
-\subsection*{6.1 Osiągnięte rezultaty}
-\addcontentsline{toc}{subsection}{6.1 Osiągnięte rezultaty}
+Niniejsza praca inżynierska przedstawiła kompleksowy system rekomendacji produktów łączący trzy zaawansowane metody Machine Learning. Pierwszą z nich jest Collaborative Filtering oparty na metryce Adjusted Cosine Similarity wprowadzonej przez Sarwar et al. (2001), która uwzględnia indywidualne profile ratingowe użytkowników poprzez normalizację wektora ocen względem średniej oceny każdego użytkownika. Wzór ten, przedstawiony w równaniu (1) we Wstępie teoretycznym, stanowi fundament dla odkrywania podobieństw między produktami na podstawie historii zakupów użytkowników o podobnych preferencjach.
 
-Niniejsza praca inżynierska przedstawiła kompleksowy system rekomendacji produktów SmartRecommender, łączący trzy zaawansowane metody Machine Learning: Collaborative Filtering oparty na Adjusted Cosine Similarity, wieloźródłową analizę sentymentu oraz reguły asocjacyjne generowane algorytmem Apriori z optymalizacją bitmap pruning.
+Drugą zaimplementowaną metodą jest wieloźródłowa analiza sentymentu bazująca na podejściu lexicon-based opisanym przez Liu (2012). System agreguje sentyment z pięciu niezależnych źródeł informacji z wagami wyznaczonymi empirycznie poprzez Grid Search na zbiorze treningowym tysiąca produktów. Wagi zostały zoptymalizowane w taki sposób aby maksymalizować korelację Pearsona z rzeczywistymi ocenami gwiazdkowymi użytkowników, osiągając ostatecznie wartość współczynnika korelacji równą 0.73. Formuła agregacji, będąca liniową kombinacją pięciu składowych, została przedstawiona w równaniu (3) Wstępu.
 
-Zrealizowane cele pracy:
+Trzecią metodą są reguły asocjacyjne generowane klasycznym algorytmem Apriori wprowadzonym przez Agrawal i Srikant (1994). Algorytm ten wykorzystuje fundamentalną właściwość antymonotoniczności pozwalającą na efektywne przycinanie przestrzeni kandydatów. System SmartRecommender implementuje zaawansowaną optymalizację zwaną bitmap pruning opisaną przez Zaki (2000), która reprezentuje transakcje jako wektory bitowe umożliwiając wykonanie operacji przecięcia zbiorów poprzez szybkie operacje bitowe biblioteki NumPy. Dzięki temu implementacja osiąga dziewiętnastokrotne przyspieszenie względem naiwnego podejścia iteracyjnego, redukując czas generowania reguł dla tysiąca produktów z czterdziestu siedmiu sekund do zaledwie dwóch i pół sekundy.
 
-\begin{itemize}
-\item \textbf{Implementacja Collaborative Filtering}: System wykorzystuje Item-Based CF z Adjusted Cosine Similarity (Sarwar et al. 2001) do generowania rekomendacji na podstawie historii zakupów użytkowników. Implementacja zawiera mechanizmy cache'owania (24h timeout), bulk operations dla wydajności oraz automatyczną aktualizację macierzy podobieństw po każdym zamówieniu.
+Wydajność poszczególnych metod została zmierzona na rzeczywistym zbiorze danych zawierającym tysiąc produktów oraz dziesięć tysięcy zamówień użytkowników. Metoda Collaborative Filtering generuje macierzpodobieństw w czasie od pięciu do dziesięciu sekund przy pierwszym wywołaniu, jednakże dzięki mechanizmowi cache'owania z czasem wygaśnięcia dwudziestu czterech godzin, powtarzające się zapytania są obsługiwane w czasie pięćdziesięciu do stu milisekund. Złożoność obliczeniowa wyrażona notacją wielkie O wynosi O(n² · m) gdzie n oznacza liczbę produktów a m liczbę użytkowników, jednak dla zapytań trafiających w cache ulega redukcji do stałej złożoności O(1).
 
-\item \textbf{Implementacja analizy sentymentu}: System realizuje wieloźródłową analizę sentymentu (Liu, B. 2012) agregującą 5 źródeł informacji: opinie klientów (40\%), opis produktu (25\%), nazwa (15\%), specyfikacje (12\%), kategorie (8\%). Implementacja rozwiązuje problem zimnego startu dla produktów bez opinii poprzez wykorzystanie pozostałych źródeł.
+Analiza sentymentu pojedynczej opinii klienta wykonuje się w czasie od pięciu do piętnastu milisekund, podczas gdy kompletna analiza produktu zawierającego średnio dwadzieścia opinii oraz pięć dodatkowych źródeł tekstowych wymaga stu do trzystu milisekund. Złożoność tej metody można wyrazić jako O(n · m · w) gdzie n reprezentuje liczbę analizowanych produktów, m średnią liczbę opinii przypadających na produkt, a w średnią długość opinii mierzoną liczbą słów podlegających analizie słownikowej.
 
-\item \textbf{Implementacja reguł asocjacyjnych}: System wykorzystuje algorytm Apriori (Agrawal \& Srikant 1994) z bitmap pruning (Zaki 2000) do odkrywania wzorców zakupowych typu "Frequently Bought Together". Implementacja osiąga przyspieszenie 19-100x względem naiwnego podejścia dzięki operacjom bitowym NumPy.
+Generowanie reguł asocjacyjnych z wykorzystaniem optymalizacji bitmap pruning dla tysiąca produktów oraz dziesięciu tysięcy transakcji zakupowych trwa dwa i pół sekundy, podczas gdy naiwna implementacja bez optymalizacji wymaga czterdziestu siedmiu sekund. Pobieranie wygenerowanych reguł dla pojedynczego produktu przy odpowiednim indeksowaniu kolumn product\_1, lift oraz confidence w bazie danych PostgreSQL wykonuje się w czasie pięciu do dziesięciu milisekund. Złożoność algorytmu Apriori dla generowania dwuelementowych itemsetów wynosi teoretycznie O(n² · m), jednak zastosowanie bitmap pruning oraz wczesnego przycinania na podstawie właściwości antymonotoniczności redukuje ją w praktyce do O(n · m).
 
-\item \textbf{Architektura techniczna}: Pełnofunkcjonalny system e-commerce z backendem Django REST Framework, frontendem React 18, bazą danych PostgreSQL oraz zaawansowanymi mechanizmami optymalizacji (indeksowanie, bulk operations, select\_related, NumPy/BLAS).
+Kluczową optymalizacją wpływającą na wydajność całego systemu okazało się właściwe indeksowanie tabel bazy danych PostgreSQL. Indeksy złożone na kluczach obcych oraz kolumnach wykorzystywanych w klauzulach WHERE oraz ORDER BY przyśpieszyły zapytania JOIN od stu do stu sześćdziesięciu razy. Operacje wsadowe bulk\_create oraz bulk\_update frameworka Django ORM umożliwiły wstawianie tysięcy rekordów do bazy danych pięćdziesiąt do sto razy szybciej niż iteracyjne wywołania metody save(). Wykorzystanie biblioteki NumPy oraz optymalizowanych procedur BLAS dla operacji na macierzach przyśpieszyło obliczenia tysiąckrotnie w porównaniu do implementacji w czystym Pythonie bez wektoryzacji.
 
-\item \textbf{Panel debugowania}: Szczegółowe panele administratora prezentujące proces działania każdej metody ML, umożliwiające monitoring jakości rekomendacji oraz optymalizację parametrów algorytmów.
+System SmartRecommender posiada pewne ograniczenia wynikające z zastosowanych metod. Problem zimnego startu dotyczy wszystkich algorytmów opartych na danych historycznych. Nowi użytkownicy bez historii zakupów nie otrzymują spersonalizowanych rekomendacji z metody Collaborative Filtering, podobnie jak nowe produkty bez żadnych transakcji nie pojawiają się w regułach asocjacyjnych wymagających minimum dwóch transakcji zawierających daną parę produktów. Częściowym rozwiązaniem tego problemu jest wieloźródłowa analiza sentymentu, która potrafi generować sensowne oceny jakości nawet dla produktów bez opinii klientów, bazując na analizie opisów, nazw oraz specyfikacji technicznych.
 
-\item \textbf{Automatyzacja}: System sygnałów Django automatycznie aktualizuje rekomendacje po każdym zamówieniu oraz nowej opinii, zapewniając aktualność bez interwencji administratora.
-\end{itemize}
+Skalowalność systemu dla bardzo dużych katalogów produktów wymaga dalszych optymalizacji. Generowanie macierzy podobieństw dla dziesięciu tysięcy produktów ze złożonością kwadratową O(n²) wymagałoby kilkuminutowego przetwarzania, podobnie jak generowanie reguł asocjacyjnych algorytmem Apriori nawet z optymalizacją bitmap pruning trwałoby trzydzieści do sześćdziesięciu sekund. Macierz interakcji użytkownik-produkt w typowych systemach e-commerce charakteryzuje się bardzo wysoką rzadkością danych z gęstością od 0.1 do 1 procenta, co oznacza że 99 do 99.9 procenta komórek macierzy pozostaje pustych, prowadząc do mniejszej liczby wiarygodnych podobieństw oraz reguł asocjacyjnych.
 
-Wartość naukowa pracy: Implementacja wszystkich trzech metod rekomendacji "od zera" bez użycia gotowych bibliotek (poza NumPy/scikit-learn dla operacji podstawowych) pozwoliła na głębokie zrozumienie mechanizmów działania algorytmów oraz ich optymalizację dla specyficznych wymagań systemów e-commerce.
+Podejście do analizy sentymentu oparte na słowniku posiada ograniczenia w zakresie rozumienia kontekstu językowego. System nie radzi sobie z negacjami typu "nie polecam" versus "polecam", ironią ani sarkastycznymi komentarzami wymagającymi głębszej analizy kontekstualnej. Słownik zawierający dwieście słów nie pokrywa wszystkich możliwych sformułowań w języku polskim, a słowa posiadające różne konotacje w zależności od kontekstu takie jak "tani" mogą być błędnie klasyfikowane.
 
-\subsection*{6.2 Metryki wydajności}
-\addcontentsline{toc}{subsection}{6.2 Metryki wydajności}
+Możliwe kierunki dalszego rozwoju systemu obejmują implementację metod Deep Learning dla rekomendacji. Neural Collaborative Filtering zaproponowany przez He et al. (2017) wykorzystuje wielowarstwowe sieci neuronowe do uczenia nieliniowych interakcji między użytkownikami a produktami, potencjalnie osiągając wyższą dokładność niż klasyczne podejście Item-Based CF. Transformery takie jak BERT4Rec umożliwiają modelowanie sekwencyjnych wzorców zakupowych użytkowników uwzględniając kolejność i kontekst czasowy transakcji.
 
-Wydajność zaimplementowanych metod została zmierzona dla rzeczywistego zbioru danych zawierającego 1000 produktów oraz 10000 zamówień:
+Dla analizy sentymentu zastosowanie modeli językowych typu BERT lub RoBERTa fine-tunowanych na polskich opiniach e-commerce mogłoby znacząco poprawić dokładność klasyfikacji poprzez głębokie rozumienie kontekstu językowego, negacji oraz ironii. Aspect-based sentiment analysis umożliwiłaby ekstrakcję sentymentu dla poszczególnych aspektów produktu takich jak jakość wykonania, stosunek ceny do jakości czy szybkość dostawy, dostarczając użytkownikom bardziej szczegółowych informacji.
 
-\textbf{Collaborative Filtering}:
-\begin{itemize}
-\item Generowanie macierzy podobieństw (1000 produktów): 5-10 sekund (cache miss)
-\item Pobieranie rekomendacji dla użytkownika: 50-100ms (cache hit), 2-3s (cache miss)
-\item Złożoność: O(n² · m) gdzie n=produkty, m=użytkownicy, zredukowana do O(1) dla cache hits
-\item Cache hit ratio: 85-90\% (24h timeout)
-\end{itemize}
+Implementacja real-time recommendations z online learning pozwoliłaby na aktualizację modelu w czasie rzeczywistym po każdej interakcji użytkownika, nie ograniczając się jedynie do zakupów ale uwzględniając również kliknięcia, dodania do koszyka czy czas spędzony na przeglądaniu produktu. Framework A/B testingu umożliwiłby ciągłą optymalizację systemu w środowisku produkcyjnym poprzez eksperymentalne porównywanie skuteczności różnych metod rekomendacji mierzonej metrykami biznesowymi takimi jak współczynnik klikalności, współczynnik konwersji czy przychód przypadający na użytkownika.
 
-\textbf{Analiza Sentymentu}:
-\begin{itemize}
-\item Analiza pojedynczej opinii: 5-15ms
+Wartość naukowa oraz dydaktyczna niniejszej pracy polega na kompleksowej implementacji trzech fundamentalnie różnych paradygmatów systemów rekomendacji bez wykorzystania gotowych bibliotek wysokiego poziomu, co umożliwiło głębokie zrozumienie mechanizmów działania algorytmów oraz ich świadomą optymalizację dla specyficznych wymagań platform e-commerce. Praca stanowi użyteczne kompendium wiedzy zarówno dla celów akademickich jak i praktycznych wdrożeń w przemyśle.
+
+\newpage
+
+\newpage
+
+\section*{Zako\'nczenie}
+\addcontentsline{toc}{section}{Zakończenie}
+
+Niniejsza praca inżynierska przedstawiła kompleksowy system rekomendacji produktów łączący trzy zaawansowane metody Machine Learning oraz ich praktyczną implementację w formie funkcjonalnej aplikacji webowej. System wykorzystuje Django REST Framework dla warstwy backendowej, React 18 dla interfejsu użytkownika oraz PostgreSQL jako relacyjną bazę danych, tworząc nowoczesny stos technologiczny gotowy do wdrożenia produkcyjnego.
+
+Głównym osiągnięciem pracy jest udana integracja trzech fundamentalnie różnych paradygmatów rekomendacji, z których każdy wnosi unikalne wartości do systemu. Collaborative Filtering odkrywa wzorce zakupowe poprzez analizę historycznych transakcji użytkowników o podobnych preferencjach, bazując na założeniu że użytkownicy którzy mieli podobne wybory w przeszłości będą prawdopodobnie preferowali podobne produkty w przyszłości. Analiza sentymentu wykorzystuje opinie klientów oraz inne źródła tekstowe do automatycznej oceny jakości produktów, umożliwiając identyfikację artykułów wysokiej jakości nawet bez długiej historii sprzedażowej. Reguły asocjacyjne odkrywają produkty komplementarne często kupowane razem, wspierając strategie cross-sellingu oraz up-sellingu charakterystyczne dla platform e-commerce.
+
+Kluczowe wnioski wynikające z przeprowadzonych prac obejmują po pierwsze komplementarność zastosowanych metod, które adresują różne aspekty złożonego problemu rekomendacji i wzajemnie kompensują swoje ograniczenia. Problem zimnego startu dotykający Collaborative Filtering oraz reguły asocjacyjne jest częściowo rozwiązywany przez wieloźródłową analizę sentymentu, która potrafi generować sensowne oceny jakości dla produktów bez historii transakcji poprzez analizę opisów oraz specyfikacji technicznych.
+
+Po drugie, wartość implementacji algorytmów od podstaw bez wykorzystania gotowych bibliotek wysokiego poziomu pozwoliła na głębokie zrozumienie mechanizmów działania oraz świadome podejmowanie decyzji projektowych dostosowanych do specyfiki systemów e-commerce. Przykładowo ograniczenie reguł asocjacyjnych do dwuelementowych itemsetów wynika z empirycznej obserwacji że bardziej złożone reguły występują rzadko i nie wnoszą wartości biznesowej proporcjonalnej do kosztów obliczeniowych ich generowania.
+
+Po trzecie, znaczenie optymalizacji wydajnościowych okazało się kluczowe dla praktycznej użyteczności systemu. Naiwne implementacje algorytmów charakteryzowały się nieakceptowalnymi czasami wykonania uniemożliwiającymi zastosowanie produkcyjne. Dopiero zastosowanie zaawansowanych technik optymalizacji takich jak bitmap pruning dla algorytmu Apriori, mechanizmy cache'owania dla Collaborative Filtering, operacje wsadowe bulk\_create oraz bulk\_update dla zapisu do bazy danych, właściwe indeksowanie tabel relacyjnych oraz wykorzystanie wektoryzowanych operacji biblioteki NumPy przyspieszyło działanie systemu dziesięciokrotnie do stukrotnie, umożliwiając obsługę rzeczywistych obciążeń produkcyjnych.
+
+Po czwarte, trade-off między interpretowalnością a dokładnością predykcji wymaga świadomego wyboru odpowiedniego do kontekstu zastosowania. Dla niniejszej pracy priorytetem była interpretowalność umożliwiająca głębokie zrozumienie mechanizmów oraz łatwiejsze debugowanie, co przełożyło się na wybór metody lexicon-based dla analizy sentymentu zamiast modeli Deep Learning, które prawdopodobnie osiągnęłyby wyższą dokładność kosztem całkowitej nieprzejrzystości procesu decyzyjnego.
+
+System SmartRecommender stanowi solidną platformę dla dalszych badań oraz rozwoju. Możliwe kierunki przyszłych prac obejmują implementację metod Deep Learning takich jak Neural Collaborative Filtering wykorzystujący wielowarstwowe sieci neuronowe do modelowania nieliniowych interakcji między użytkownikami a produktami, transformery typu BERT4Rec dla sekwencyjnego modelowania historii zakupów uwzględniającego kolejność czasową oraz kontekst transakcji, a także fine-tunowanie przedtrenowanych modeli językowych typu BERT lub RoBERTa na polskich opiniach e-commerce dla znacząco ulepszonej analizy sentymentu rozumiejącej negację, ironię oraz kontekst aspektowy.
+
+Dalsze prace mogłyby również objąć implementację real-time recommendations z online learning aktualizującym model w czasie rzeczywistym po każdej interakcji użytkownika nie ograniczając się jedynie do zakupów ale uwzględniając kliknięcia, dodania do koszyka, czas przeglądania czy porzucenia koszyka. Framework A/B testingu umożliwiłby systematyczną optymalizację systemu w środowisku produkcyjnym poprzez kontrolowane eksperymenty porównujące skuteczność różnych algorytmów mierzoną metrykami biznesowymi.
+
+Wartość dydaktyczna pracy polega na zdobyciu kompleksowego doświadczenia obejmującego projektowanie oraz implementację systemów Machine Learning, optymalizację algorytmów dla wymagań produkcyjnych, architekturę aplikacji webowych, full-stack development łączący backend Django z frontendem React, projektowanie oraz optymalizację relacyjnych baz danych PostgreSQL, a także zarządzanie cyklem życia projektu inżynierskiego od analizy wymagań przez implementację i testowanie aż po dokumentację techniczną.
+
+Podsumowując, niniejsza praca w pełni zrealizowała postawione cele poprzez stworzenie funkcjonalnego systemu rekomendacji łączącego trzy metody Machine Learning, optymalizację wydajności do poziomów umożliwiających wdrożenie produkcyjne, oraz dostarczenie szczegółowej dokumentacji technicznej procesu implementacji. System jest gotowy do zastosowania w rzeczywistych środowiskach e-commerce oraz stanowi solidną bazę dla dalszych badań w dziedzinie personalizacji doświadczeń zakupowych użytkowników platform sprzedażowych.
+
+\newpage
+\section*{Streszczenie}
+\addcontentsline{toc}{section}{Streszczenie}
+
+\noindent
+\textbf{Tytuł pracy w języku polskim:}\\
+System rekomendacji produktów oparty na filtracji współpracy, analizie sentymentu i regułach asocjacyjnych
+
+\noindent
+\textbf{Streszczenie:}\\
+Niniejsza praca inżynierska przedstawia kompleksowy system rekomendacji produktów dla platform e-commerce, łączący trzy zaawansowane metody Machine Learning: Collaborative Filtering, analizę sentymentu oraz reguły asocjacyjne.
+
+Głównym celem pracy było zaprojektowanie i implementacja funkcjonalnego systemu rekomendacji "od zera", z głębokim zrozumieniem mechanizmów działania poszczególnych algorytmów oraz ich optymalizacją dla wymagań wydajnościowych systemów produkcyjnych.
+
+Pierwsza metoda, Collaborative Filtering, wykorzystuje Item-Based CF z Adjusted Cosine Similarity (Sarwar et al. 2001) do odkrywania podobieństw między produktami na podstawie historii zakupów użytkowników. Implementacja zawiera mechanizmy cache'owania (24h timeout), operacje wsadowe oraz automatyczną aktualizację macierzy podobieństw po każdym zamówieniu.
+
+Druga metoda, analiza sentymentu, implementuje wieloźródłową agregację (Liu 2012) analizującą 5 źródeł informacji: opinie klientów (40\%), opis produktu (25\%), nazwa (15\%), specyfikacje (12\%), kategorie (8\%). Podejście to rozwiązuje problem zimnego startu dla produktów bez opinii poprzez wykorzystanie pozostałych źródeł.
+
+Trzecia metoda, reguły asocjacyjne, wykorzystuje algorytm Apriori (Agrawal \& Srikant 1994) z optymalizacją bitmap pruning (Zaki 2000) do odkrywania wzorców zakupowych typu "Frequently Bought Together". Implementacja z NumPy osiąga przyspieszenie 19x względem naiwnego podejścia.
+
+System został zbudowany na stosie technologicznym Django REST Framework (backend), React 18 (frontend), PostgreSQL (baza danych) oraz biblioteki NumPy/scikit-learn (operacje ML). Implementacja zawiera zaawansowane mechanizmy optymalizacji: indeksowanie bazy danych (100-160x przyspieszenie), bulk operations (50-100x), cache DatabaseCache (redukcja czasu odpowiedzi 100x).
+
+Wyniki eksperymentów dla zbioru 1000 produktów i 10000 zamówień: CF generuje macierz podobieństw w 5-10s (cache miss), 50-100ms (cache hit); Apriori generuje reguły w 2.5s (vs 47s naiwnie); analiza sentymentu przetwarza produkt w 100-300ms.
+
+Wartość naukowa pracy: Implementacja "od zera" pozwoliła na głębokie zrozumienie algorytmów oraz ich dostosowanie do specyficznych wymagań e-commerce (ograniczenie do 2-itemsetów, wieloźródłowa agregacja sentymentu). Praca stanowi kompleksowy przegląd tematyki systemów rekomendacji, przydatny zarówno dla celów akademickich, jak i praktycznych wdrożeń.
+
+\noindent
+\textbf{Słowa kluczowe:}\\
+systemy rekomendacji, collaborative filtering, analiza sentymentu, reguły asocjacyjne, algorytm Apriori, machine learning, e-commerce, Django, React
+
+\vspace{1cm}
+
+\noindent
+\textbf{Title in English:}\\
+Product Recommendation System Based on Collaborative Filtering, Sentiment Analysis and Association Rules
+
+\noindent
+\textbf{Abstract:}\\
+This engineering thesis presents a comprehensive product recommendation system for e-commerce platforms, combining three advanced Machine Learning methods: Collaborative Filtering, sentiment analysis, and association rules.
+
+The main objective was to design and implement a functional recommendation system "from scratch", with deep understanding of algorithm mechanisms and optimization for production system performance requirements.
+
+The first method, Collaborative Filtering, uses Item-Based CF with Adjusted Cosine Similarity (Sarwar et al. 2001) to discover product similarities based on user purchase history. Implementation includes caching mechanisms (24h timeout), bulk operations, and automatic similarity matrix updates after each order.
+
+The second method, sentiment analysis, implements multi-source aggregation (Liu 2012) analyzing 5 information sources: customer opinions (40\%), product description (25\%), name (15\%), specifications (12\%), categories (8\%). This approach solves the cold start problem for products without reviews by utilizing remaining sources.
+
+The third method, association rules, utilizes Apriori algorithm (Agrawal \& Srikant 1994) with bitmap pruning optimization (Zaki 2000) to discover "Frequently Bought Together" purchase patterns. NumPy implementation achieves 19x speedup compared to naive approach.
+
+The system was built on Django REST Framework (backend), React 18 (frontend), PostgreSQL (database), and NumPy/scikit-learn libraries (ML operations). Implementation contains advanced optimization mechanisms: database indexing (100-160x speedup), bulk operations (50-100x), DatabaseCache caching (100x response time reduction).
+
+Experimental results for dataset of 1000 products and 10000 orders: CF generates similarity matrix in 5-10s (cache miss), 50-100ms (cache hit); Apriori generates rules in 2.5s (vs 47s naively); sentiment analysis processes product in 100-300ms.
+
+Scientific value: "From scratch" implementation enabled deep algorithm understanding and adaptation to e-commerce specific requirements (2-itemset limitation, multi-source sentiment aggregation). The work provides comprehensive review of recommender systems, useful for both academic and practical industry deployments.
+
+\noindent
+\textbf{Keywords:}\\
+recommender systems, collaborative filtering, sentiment analysis, association rules, Apriori algorithm, machine learning, e-commerce, Django, React
+
+\newpage
+\renewcommand{\refname}{} 
+\section*{Literatura}
+\addcontentsline{toc}{section}{Literatura}
+
+\begin{thebibliography}{9}
+\bibitem{agrawal1994}
+Rakesh Agrawal, Ramakrishnan Srikant,
+\textit{Fast Algorithms for Mining Association Rules},
+Proceedings of the 20th International Conference on Very Large Data Bases, 1994.
+
+\bibitem{liu2012}
+Bing Liu,
+\textit{Sentiment Analysis and Opinion Mining},
+Morgan \& Claypool Publishers, 2012.
+
+\bibitem{resnick1997}
+Paul Resnick, Hal R. Varian,
+\textit{Recommender Systems},
+Communications of the ACM, Vol. 40, No. 3, 1997.
+
+\bibitem{sarwar2001}
+Badrul Sarwar, George Karypis, Joseph Konstan, John Riedl,
+\textit{Item-based Collaborative Filtering Recommendation Algorithms},
+Proceedings of the 10th International Conference on World Wide Web, 2001.
+
+\bibitem{zaki2000}
+Mohammed J. Zaki,
+\textit{Scalable Algorithms for Association Mining},
+IEEE Transactions on Knowledge and Data Engineering, 2000.
+
+\end{thebibliography}
+
+\newpage
+
+%\begin{figure}[H]
+    %\centering
+    %\includegraphics[width=\textwidth]{Oświadczenie.pdf}
+%\end{figure}
+\end{document}
 \item Analiza produktu (20 opinii + 5 źródeł): 100-300ms
 \item Wyszukiwanie z sortowaniem sentymentu (50 produktów): 5-8s
 \item Złożoność: O(n · m · w) gdzie n=produkty, m=opinie per produkt, w=średnia długość opinii (słowa)
@@ -744,91 +802,6 @@ System SmartRecommender stanowi solidną podstawę dla dalszego rozwoju w nastę
 \end{itemize}
 
 \newpage
-
-\newpage
-
-\section*{Zako\'nczenie}
-\addcontentsline{toc}{section}{Zakończenie}
-
-Niniejsza praca inżynierska przedstawiła kompleksowy system rekomendacji produktów SmartRecommender, łączący trzy zaawansowane metody Machine Learning: Collaborative Filtering, analizę sentymentu oraz reguły asocjacyjne. System został w pełni zaimplementowany i wdrożony jako funkcjonalna aplikacja webowa wykorzystująca Django REST Framework oraz React 18.
-
-Głównym osiągnięciem pracy jest udana implementacja trzech różnych paradygmatów rekomendacji, z których każdy wnosi unikalne wartości do systemu. Collaborative Filtering odkrywa wzorce zakupowe na podstawie zachowań użytkowników o podobnych preferencjach, analiza sentymentu wykorzystuje opinie klientów do identyfikacji produktów wysokiej jakości, podczas gdy reguły asocjacyjne odkrywają komplementarne produkty często kupowane razem.
-
-Kluczowe wnioski z przeprowadzonych prac:
-
-\textbf{1. Komplementarność metod}: Trzy zaimplementowane metody są komplementarne i adresują różne aspekty problemu rekomendacji. CF odkrywa nieoczywiste podobieństwa produktów na podstawie historii zakupów, analiza sentymentu wykorzystuje feedback użytkowników dla oceny jakości, a reguły asocjacyjne identyfikują produkty komplementarne. Połączenie tych metod w systemie hybrydowym tworzy synergię przekraczającą możliwości pojedynczych metod.
-
-\textbf{2. Wartość implementacji "od zera"}: Implementacja algorytmów bez użycia gotowych bibliotek (poza NumPy/scikit-learn dla operacji podstawowych) pozwoliła na głębokie zrozumienie mechanizmów działania algorytmów oraz ich dostosowanie do specyficznych wymagań systemów e-commerce. Przykładowo, ograniczenie reguł asocjacyjnych do 2-itemsetów oraz wieloźródłowa agregacja sentymentu to innowacje wynikające z głębokiego zrozumienia problemu.
-
-\textbf{3. Znaczenie optymalizacji}: Naiwne implementacje algorytmów (Apriori: 47s, CF bez cache: 10s per query) są nieakceptowalne dla systemów produkcyjnych. Zastosowanie technik optymalizacji (bitmap pruning, bulk operations, indeksowanie, cache) redukowało czasy wykonania 10-100x, umożliwiając obsługę rzeczywistych obciążeń.
-
-\textbf{4. Problem zimnego startu}: Jest to fundamentalne wyzwanie dla wszystkich metod rekomendacji opartych na historycznych danych. Wieloźródłowa agregacja sentymentu stanowi częściowe rozwiązanie, generując sensowne rekomendacje dla nowych produktów na podstawie opisów i specyfikacji, nawet bez opinii użytkowników.
-
-\textbf{5. Interpretowalność vs wydajność}: Wybór między metodami interpretowalnymi (reguły asocjacyjne, lexicon-based sentiment) a czarnoskrzynkowymi (Deep Learning) wymaga trade-offu. Dla niniejszej pracy wybrano interpretowalność, co umożliwiło głębokie zrozumienie mechanizmów oraz łatwiejsze debugowanie, kosztem potencjalnie niższej dokładności w porównaniu do modeli Deep Learning.
-
-System SmartRecommender stanowi solidną podstawę dla dalszego rozwoju. Możliwe kierunki rozwoju obejmują implementację Deep Learning (Neural CF, BERT dla sentymentu), real-time recommendations z online learning, personalized ranking z Learning to Rank, oraz framework A/B testingu dla ciągłej optymalizacji w środowisku produkcyjnym.
-
-Wartość naukowa i dydaktyczna pracy: Implementacja systemów rekomendacji "od zera" pozwoliła na zdobycie głębokiej wiedzy teoretycznej oraz praktycznych umiejętności inżynierskich w zakresie Machine Learning, optymalizacji algorytmów, architektury systemów webowych oraz full-stack development (Django + React). Praca stanowi kompleksowy przegląd tematyki systemów rekomendacji, przydatny zarówno dla celów akademickich, jak i praktycznych wdrożeń w branży e-commerce.
-
-Podsumowując, cele pracy zostały w pełni zrealizowane: stworzono funkcjonalny system rekomendacji łączący trzy metody ML, zoptymalizowano wydajność do poziomów produkcyjnych, oraz dostarczono szczegółową dokumentację techniczną procesu implementacji. System jest gotowy do wdrożenia w rzeczywistych środowiskach e-commerce oraz stanowi solidną platformę dla dalszych badań i rozwoju w dziedzinie personalizacji doświadczeń zakupowych użytkowników.
-
-\newpage
-\section*{Streszczenie}
-\addcontentsline{toc}{section}{Streszczenie}
-
-\noindent
-\textbf{Tytuł pracy w języku polskim:}\\
-System rekomendacji produktów oparty na filtracji współpracy, analizie sentymentu i regułach asocjacyjnych
-
-\noindent
-\textbf{Streszczenie:}\\
-Niniejsza praca inżynierska przedstawia kompleksowy system rekomendacji produktów dla platform e-commerce, łączący trzy zaawansowane metody Machine Learning: Collaborative Filtering, analizę sentymentu oraz reguły asocjacyjne.
-
-Głównym celem pracy było zaprojektowanie i implementacja funkcjonalnego systemu rekomendacji "od zera", z głębokim zrozumieniem mechanizmów działania poszczególnych algorytmów oraz ich optymalizacją dla wymagań wydajnościowych systemów produkcyjnych.
-
-Pierwsza metoda, Collaborative Filtering, wykorzystuje Item-Based CF z Adjusted Cosine Similarity (Sarwar et al. 2001) do odkrywania podobieństw między produktami na podstawie historii zakupów użytkowników. Implementacja zawiera mechanizmy cache'owania (24h timeout), operacje wsadowe oraz automatyczną aktualizację macierzy podobieństw po każdym zamówieniu.
-
-Druga metoda, analiza sentymentu, implementuje wieloźródłową agregację (Liu 2012) analizującą 5 źródeł informacji: opinie klientów (40\%), opis produktu (25\%), nazwa (15\%), specyfikacje (12\%), kategorie (8\%). Podejście to rozwiązuje problem zimnego startu dla produktów bez opinii poprzez wykorzystanie pozostałych źródeł.
-
-Trzecia metoda, reguły asocjacyjne, wykorzystuje algorytm Apriori (Agrawal \& Srikant 1994) z optymalizacją bitmap pruning (Zaki 2000) do odkrywania wzorców zakupowych typu "Frequently Bought Together". Implementacja z NumPy osiąga przyspieszenie 19x względem naiwnego podejścia.
-
-System został zbudowany na stosie technologicznym Django REST Framework (backend), React 18 (frontend), PostgreSQL (baza danych) oraz biblioteki NumPy/scikit-learn (operacje ML). Implementacja zawiera zaawansowane mechanizmy optymalizacji: indeksowanie bazy danych (100-160x przyspieszenie), bulk operations (50-100x), cache DatabaseCache (redukcja czasu odpowiedzi 100x).
-
-Wyniki eksperymentów dla zbioru 1000 produktów i 10000 zamówień: CF generuje macierz podobieństw w 5-10s (cache miss), 50-100ms (cache hit); Apriori generuje reguły w 2.5s (vs 47s naiwnie); analiza sentymentu przetwarza produkt w 100-300ms.
-
-Wartość naukowa pracy: Implementacja "od zera" pozwoliła na głębokie zrozumienie algorytmów oraz ich dostosowanie do specyficznych wymagań e-commerce (ograniczenie do 2-itemsetów, wieloźródłowa agregacja sentymentu). Praca stanowi kompleksowy przegląd tematyki systemów rekomendacji, przydatny zarówno dla celów akademickich, jak i praktycznych wdrożeń.
-
-\noindent
-\textbf{Słowa kluczowe:}\\
-systemy rekomendacji, collaborative filtering, analiza sentymentu, reguły asocjacyjne, algorytm Apriori, machine learning, e-commerce, Django, React
-
-\vspace{1cm}
-
-\noindent
-\textbf{Title in English:}\\
-Product Recommendation System Based on Collaborative Filtering, Sentiment Analysis and Association Rules
-
-\noindent
-\textbf{Abstract:}\\
-This engineering thesis presents a comprehensive product recommendation system for e-commerce platforms, combining three advanced Machine Learning methods: Collaborative Filtering, sentiment analysis, and association rules.
-
-The main objective was to design and implement a functional recommendation system "from scratch", with deep understanding of algorithm mechanisms and optimization for production system performance requirements.
-
-The first method, Collaborative Filtering, uses Item-Based CF with Adjusted Cosine Similarity (Sarwar et al. 2001) to discover product similarities based on user purchase history. Implementation includes caching mechanisms (24h timeout), bulk operations, and automatic similarity matrix updates after each order.
-
-The second method, sentiment analysis, implements multi-source aggregation (Liu 2012) analyzing 5 information sources: customer opinions (40\%), product description (25\%), name (15\%), specifications (12\%), categories (8\%). This approach solves the cold start problem for products without reviews by utilizing remaining sources.
-
-The third method, association rules, utilizes Apriori algorithm (Agrawal \& Srikant 1994) with bitmap pruning optimization (Zaki 2000) to discover "Frequently Bought Together" purchase patterns. NumPy implementation achieves 19x speedup compared to naive approach.
-
-The system was built on Django REST Framework (backend), React 18 (frontend), PostgreSQL (database), and NumPy/scikit-learn libraries (ML operations). Implementation contains advanced optimization mechanisms: database indexing (100-160x speedup), bulk operations (50-100x), DatabaseCache caching (100x response time reduction).
-
-Experimental results for dataset of 1000 products and 10000 orders: CF generates similarity matrix in 5-10s (cache miss), 50-100ms (cache hit); Apriori generates rules in 2.5s (vs 47s naively); sentiment analysis processes product in 100-300ms.
-
-Scientific value: "From scratch" implementation enabled deep algorithm understanding and adaptation to e-commerce specific requirements (2-itemset limitation, multi-source sentiment aggregation). The work provides comprehensive review of recommender systems, useful for both academic and practical industry deployments.
-
-\noindent
-\textbf{Keywords:}\\
-recommender systems, collaborative filtering, sentiment analysis, association rules, Apriori algorithm, machine learning, e-commerce, Django, React
 
 \newpage
 \renewcommand{\refname}{} 
