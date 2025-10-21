@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Code, Brain, MessageSquare, Link2 } from "lucide-react";
+import { Code, Brain, MessageSquare, Link2, Grid } from "lucide-react";
 import config from "../../config/config";
 import { toast } from "react-toastify";
 import "./AdminPanel.scss";
@@ -12,6 +12,7 @@ const AdminDebug = () => {
   const [sentimentDebugData, setSentimentDebugData] = useState(null);
   const [sentimentDetailData, setSentimentDetailData] = useState(null);
   const [associationDebugData, setAssociationDebugData] = useState(null);
+  const [contentBasedDebugData, setContentBasedDebugData] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,11 +25,14 @@ const AdminDebug = () => {
     setSelectedProductId("");
     setSentimentDetailData(null);
     setAssociationDebugData(null);
+    setContentBasedDebugData(null);
 
     if (activeMethod === "collaborative") {
       fetchCFDebug();
     } else if (activeMethod === "sentiment") {
       fetchSentimentDebug();
+    } else if (activeMethod === "content") {
+      fetchContentBasedDebug();
     }
   }, [activeMethod]);
 
@@ -122,6 +126,25 @@ const AdminDebug = () => {
     }
   };
 
+  const fetchContentBasedDebug = async (productId = null) => {
+    setLoading(true);
+    const token = localStorage.getItem("access");
+    try {
+      const url = productId
+        ? `${config.apiUrl}/api/content-based-debug/?product_id=${productId}`
+        : `${config.apiUrl}/api/content-based-debug/`;
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setContentBasedDebugData(res.data);
+    } catch (err) {
+      console.error("Error fetching Content-Based debug:", err);
+      toast.error("Failed to fetch Content-Based Filtering debug data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleProductSelect = (e) => {
     const productId = e.target.value;
     setSelectedProductId(productId);
@@ -130,6 +153,8 @@ const AdminDebug = () => {
         fetchSentimentDetailDebug(productId);
       } else if (activeMethod === "association") {
         fetchAssociationDebug(productId);
+      } else if (activeMethod === "content") {
+        fetchContentBasedDebug(productId);
       }
     }
   };
@@ -145,7 +170,7 @@ const AdminDebug = () => {
           Debug Tools - ML Methods Inspector
         </h1>
         <p className="debug-description">
-          Inspect internal workings of all 3 machine learning methods used in
+          Inspect internal workings of all 4 machine learning methods used in
           SmartRecommender.
         </p>
       </motion.div>
@@ -178,6 +203,14 @@ const AdminDebug = () => {
           onClick={() => setActiveMethod("association")}>
           <Link2 className="tab-icon" />
           Association Rules
+        </button>
+        <button
+          className={`method-tab ${
+            activeMethod === "content" ? "active" : ""
+          }`}
+          onClick={() => setActiveMethod("content")}>
+          <Grid className="tab-icon" />
+          Content-Based
         </button>
       </motion.div>
 
@@ -1364,6 +1397,321 @@ const AdminDebug = () => {
                   <div className="debug-card">
                     <p className="no-data">
                       Please select a product to view its association rules.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeMethod === "content" && (
+              <div className="debug-section cb-debug">
+                <h2 className="section-title">
+                  Content-Based Filtering Debug Information
+                </h2>
+
+                <div className="product-selector-card">
+                  <label htmlFor="product-select">
+                    Select Product to Analyze:
+                  </label>
+                  <select
+                    id="product-select"
+                    value={selectedProductId}
+                    onChange={handleProductSelect}
+                    className="product-dropdown">
+                    <option value="">-- Select a Product --</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name} (ID: {product.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {contentBasedDebugData ? (
+                  <>
+                    <div className="debug-card">
+                      <h3>Algorithm</h3>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">Name:</span>
+                          <span className="value">
+                            {contentBasedDebugData.algorithm}
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Formula:</span>
+                          <span className="value">
+                            {contentBasedDebugData.formula}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="debug-card">
+                      <h3>Database Statistics</h3>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">Total Products:</span>
+                          <span className="value">
+                            {contentBasedDebugData.database_stats.total_products}
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Saved Similarities:</span>
+                          <span className="value">
+                            {contentBasedDebugData.database_stats.saved_similarities}
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Percentage Saved:</span>
+                          <span className="value">
+                            {contentBasedDebugData.database_stats.percentage_saved}%
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Threshold:</span>
+                          <span className="value">
+                            {contentBasedDebugData.database_stats.threshold * 100}%
+                          </span>
+                        </div>
+                      </div>
+                      <p className="description">
+                        {contentBasedDebugData.database_stats.description}
+                      </p>
+                    </div>
+
+                    <div className="debug-card">
+                      <h3>Feature Weights</h3>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">Category:</span>
+                          <span className="value">
+                            {contentBasedDebugData.feature_weights.category * 100}%
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Tag:</span>
+                          <span className="value">
+                            {contentBasedDebugData.feature_weights.tag * 100}%
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Price:</span>
+                          <span className="value">
+                            {contentBasedDebugData.feature_weights.price * 100}%
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Keywords:</span>
+                          <span className="value">
+                            {contentBasedDebugData.feature_weights.keywords * 100}%
+                          </span>
+                        </div>
+                      </div>
+                      <p className="description">
+                        {contentBasedDebugData.feature_weights.description}
+                      </p>
+                    </div>
+
+                    {contentBasedDebugData.selected_product && (
+                      <>
+                        <div className="debug-card">
+                          <h3>Selected Product</h3>
+                          <div className="debug-info">
+                            <div className="info-row">
+                              <span className="label">Name:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.name}
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="label">ID:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.id}
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="label">Price:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.price} PLN
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="label">Price Category:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.price_category}
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="label">Categories:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.categories.join(", ")}
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="label">Tags:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.tags.join(", ")}
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="label">Keywords:</span>
+                              <span className="value">
+                                {contentBasedDebugData.selected_product.keywords.join(", ")}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="debug-card">
+                          <h3>
+                            Feature Vector ({contentBasedDebugData.feature_vector.vector_length} features)
+                          </h3>
+                          <div className="debug-info">
+                            {Object.entries(contentBasedDebugData.feature_vector.features).map(([key, value]) => (
+                              <div key={key} className="info-row">
+                                <span className="label">{key}:</span>
+                                <span className="value">{value.toFixed(3)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {contentBasedDebugData.similar_products && contentBasedDebugData.similar_products.count > 0 && (
+                          <div className="debug-card">
+                            <h3>
+                              Top {contentBasedDebugData.similar_products.count} Similar Products
+                            </h3>
+                            <div className="table-container">
+                              <table className="debug-table">
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Product Name</th>
+                                    <th>Similarity Score</th>
+                                    <th>Price</th>
+                                    <th>Categories</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {contentBasedDebugData.similar_products.top_10.map((sim, idx) => (
+                                    <tr key={idx}>
+                                      <td>{idx + 1}</td>
+                                      <td>{sim.product_2.name}</td>
+                                      <td>
+                                        <strong>{(sim.similarity_score * 100).toFixed(2)}%</strong>
+                                      </td>
+                                      <td>{sim.product_2.price} PLN</td>
+                                      <td>{sim.product_2.categories.join(", ")}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+
+                            <div className="calculations-section">
+                              <h4>Similarity Calculations</h4>
+                              {contentBasedDebugData.similar_products.top_10.slice(0, 3).map((sim, idx) => (
+                                <div key={idx} className="calculation-card">
+                                  <h5>
+                                    #{idx + 1} {sim.product_2.name}
+                                  </h5>
+                                  <div className="calculation-info">
+                                    <p className="formula-text">{sim.calculation.formula}</p>
+                                    <div className="calculation-details">
+                                      <span>Dot Product: {sim.calculation.dot_product}</span>
+                                      <span>Norm 1: {sim.calculation.norm_product1}</span>
+                                      <span>Norm 2: {sim.calculation.norm_product2}</span>
+                                    </div>
+                                    <p className={`verification ${sim.calculation.stored_vs_calculated.match ? 'success' : 'error'}`}>
+                                      Stored: {sim.calculation.stored_vs_calculated.stored} |
+                                      Calculated: {sim.calculation.stored_vs_calculated.calculated}
+                                      {sim.calculation.stored_vs_calculated.match ? ' ✓ Match' : ' ✗ Mismatch'}
+                                    </p>
+                                    {Object.keys(sim.common_features).length > 0 && (
+                                      <div className="common-features-section">
+                                        <p>
+                                          <strong>Common Features ({sim.common_features_count} total):</strong>
+                                        </p>
+                                        <div className="features-list">
+                                          {Object.entries(sim.common_features).map(([feat, vals]) => (
+                                            <span key={feat} className="feature-badge">
+                                              {feat}: {vals.product1_value} ↔ {vals.product2_value}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {!selectedProductId && contentBasedDebugData.top_10_global_similarities && (
+                      <div className="debug-card">
+                        <h3>Top 10 Global Similarities</h3>
+                        <div className="table-container">
+                          <table className="debug-table">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Product 1</th>
+                                <th>Product 2</th>
+                                <th>Similarity Score</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {contentBasedDebugData.top_10_global_similarities.map((sim, idx) => (
+                                <tr key={idx}>
+                                  <td>{idx + 1}</td>
+                                  <td>
+                                    {sim.product1_name}
+                                    <span className="id-badge">ID: {sim.product1_id}</span>
+                                  </td>
+                                  <td>
+                                    {sim.product2_name}
+                                    <span className="id-badge">ID: {sim.product2_id}</span>
+                                  </td>
+                                  <td>
+                                    <strong>{(sim.score * 100).toFixed(2)}%</strong>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="debug-card">
+                      <h3>Computation Status</h3>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">Can Compute:</span>
+                          <span className={`value ${contentBasedDebugData.computation_status.can_compute ? 'success' : 'error'}`}>
+                            {contentBasedDebugData.computation_status.can_compute ? '✅ Yes' : '❌ No'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="issues-list">
+                        {contentBasedDebugData.computation_status.issues.map((issue, idx) => (
+                          <p key={idx} className={issue.includes('✅') ? 'success' : 'warning'}>
+                            {issue}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="debug-card">
+                    <p className="no-data">
+                      {loading
+                        ? "Loading content-based debug data..."
+                        : "No content-based debug data available."}
                     </p>
                   </div>
                 )}

@@ -30,11 +30,7 @@ class RecommendationSettingsView(APIView):
     def get(self, request):
         settings = RecommendationSettings.objects.first()
         return Response(
-            {
-                "active_algorithm": (
-                    settings.active_algorithm if settings else None 
-                )
-            }
+            {"active_algorithm": (settings.active_algorithm if settings else None)}
         )
 
     def post(self, request):
@@ -47,8 +43,7 @@ class RecommendationSettingsView(APIView):
             settings.save()
         else:
             settings = RecommendationSettings.objects.create(
-                user=request.user,
-                active_algorithm=algorithm
+                user=request.user, active_algorithm=algorithm
             )
 
         RecommendationSettings.objects.exclude(id=settings.id).update(
@@ -96,15 +91,17 @@ class ProcessRecommendationsView(APIView):
     def process_collaborative_filtering(self):
         cache_key = "collaborative_similarity_matrix"
         cached_result = cache.get(cache_key)
-        
+
         if cached_result:
             print("Using cached collaborative filtering results")
             return cached_result
-        
+
         users = User.objects.all()
         products = Product.objects.all()
-        
-        print(f"Processing collaborative filtering for {users.count()} users and {products.count()} products")
+
+        print(
+            f"Processing collaborative filtering for {users.count()} users and {products.count()} products"
+        )
 
         user_product_matrix = defaultdict(dict)
         for order in OrderProduct.objects.select_related("order", "product").all():
@@ -125,13 +122,15 @@ class ProcessRecommendationsView(APIView):
             matrix.append(row)
 
         matrix = np.array(matrix, dtype=np.float32)
-        
-        print("Applying mean-centering (Adjusted Cosine Similarity - Sarwar et al. 2001)")
+
+        print(
+            "Applying mean-centering (Adjusted Cosine Similarity - Sarwar et al. 2001)"
+        )
         normalized_matrix = np.zeros_like(matrix, dtype=np.float32)
-        
+
         for i, user_row in enumerate(matrix):
             purchased_items = user_row[user_row > 0]
-            
+
             if len(purchased_items) > 0:
                 user_mean = np.mean(purchased_items)
 
@@ -139,20 +138,20 @@ class ProcessRecommendationsView(APIView):
                     if val > 0:
                         normalized_matrix[i][j] = val - user_mean
                     else:
-                        normalized_matrix[i][j] = 0  
+                        normalized_matrix[i][j] = 0
             else:
                 normalized_matrix[i] = user_row
 
         if normalized_matrix.shape[0] > 1 and normalized_matrix.shape[1] > 1:
             product_similarity = cosine_similarity(normalized_matrix.T)
-            
+
             ProductSimilarity.objects.filter(similarity_type="collaborative").delete()
-            
+
             similarities_to_create = []
             similarity_count = 0
-            
-            similarity_threshold = 0.5 
-            
+
+            similarity_threshold = 0.5
+
             for i, product1_id in enumerate(product_ids):
                 for j, product2_id in enumerate(product_ids):
                     if i != j and product_similarity[i][j] > similarity_threshold:
@@ -161,24 +160,32 @@ class ProcessRecommendationsView(APIView):
                                 product1_id=product1_id,
                                 product2_id=product2_id,
                                 similarity_type="collaborative",
-                                similarity_score=float(product_similarity[i][j])
+                                similarity_score=float(product_similarity[i][j]),
                             )
                         )
                         similarity_count += 1
-                        
+
                         if len(similarities_to_create) >= 1000:
-                            ProductSimilarity.objects.bulk_create(similarities_to_create)
+                            ProductSimilarity.objects.bulk_create(
+                                similarities_to_create
+                            )
                             similarities_to_create = []
-                            
+
             if similarities_to_create:
                 ProductSimilarity.objects.bulk_create(similarities_to_create)
-            
-            print(f"Created {similarity_count} collaborative similarities using Adjusted Cosine Similarity (Sarwar et al. 2001) with threshold {similarity_threshold}")
-            
-            cache.set(cache_key, similarity_count, timeout=getattr(settings, 'CACHE_TIMEOUT_LONG', 7200))
-            
+
+            print(
+                f"Created {similarity_count} collaborative similarities using Adjusted Cosine Similarity (Sarwar et al. 2001) with threshold {similarity_threshold}"
+            )
+
+            cache.set(
+                cache_key,
+                similarity_count,
+                timeout=getattr(settings, "CACHE_TIMEOUT_LONG", 7200),
+            )
+
             return similarity_count
-        
+
         return 0
 
     def process_content_based_filtering(self):
@@ -200,7 +207,7 @@ class RecommendationPreviewView(APIView):
             from home.fuzzy_logic_engine import (
                 FuzzyMembershipFunctions,
                 FuzzyUserProfile,
-                SimpleFuzzyInference
+                SimpleFuzzyInference,
             )
             from home.models import Product
             from django.db.models import Count, Avg
@@ -211,24 +218,38 @@ class RecommendationPreviewView(APIView):
                 fuzzy_engine = SimpleFuzzyInference(membership_functions, user_profile)
 
                 products_query = Product.objects.all().annotate(
-                    review_count=Count('opinion'),
-                    avg_rating=Avg('opinion__rating'),
-                    order_count=Count('orderproduct', distinct=True)
+                    review_count=Count("opinion"),
+                    avg_rating=Avg("opinion__rating"),
+                    order_count=Count("orderproduct", distinct=True),
                 )[:100]
 
                 scored_products = []
                 for product in products_query:
                     product_categories = [cat.name for cat in product.categories.all()]
-                    category_match = max([user_profile.fuzzy_category_match(cat) for cat in product_categories] or [0.0])
+                    category_match = max(
+                        [
+                            user_profile.fuzzy_category_match(cat)
+                            for cat in product_categories
+                        ]
+                        or [0.0]
+                    )
 
                     product_data = {
-                        'price': float(product.price),
-                        'rating': float(product.avg_rating) if product.avg_rating else 3.0,
-                        'view_count': product.order_count if hasattr(product, 'order_count') else 0
+                        "price": float(product.price),
+                        "rating": (
+                            float(product.avg_rating) if product.avg_rating else 3.0
+                        ),
+                        "view_count": (
+                            product.order_count
+                            if hasattr(product, "order_count")
+                            else 0
+                        ),
                     }
 
-                    fuzzy_result = fuzzy_engine.evaluate_product(product_data, category_match)
-                    scored_products.append((product, fuzzy_result['fuzzy_score']))
+                    fuzzy_result = fuzzy_engine.evaluate_product(
+                        product_data, category_match
+                    )
+                    scored_products.append((product, fuzzy_result["fuzzy_score"]))
 
                 scored_products.sort(key=lambda x: x[1], reverse=True)
                 products = [p[0] for p in scored_products[:6]]
@@ -239,6 +260,7 @@ class RecommendationPreviewView(APIView):
             except Exception as e:
                 print(f"Error in fuzzy logic preview: {e}")
                 import traceback
+
                 traceback.print_exc()
                 products = list(Product.objects.all()[:6])
                 serializer = ProductSerializer(products, many=True)
@@ -270,22 +292,24 @@ class GenerateUserRecommendationsView(APIView):
 
     def post(self, request):
         algorithm = request.data.get("algorithm", "collaborative")
-        
+
         cache_key = f"user_recommendations_{request.user.id}_{algorithm}"
         cached_result = cache.get(cache_key)
-        
+
         if cached_result:
-            return Response({
-                "success": True,
-                "message": f"User recommendations loaded from cache for {algorithm} algorithm",
-                "recommendations_count": cached_result,
-                "implementation": (
-                    "Custom Manual Implementation"
-                    if algorithm == "content_based"
-                    else "Collaborative Filtering"
-                ),
-                "cached": True
-            })
+            return Response(
+                {
+                    "success": True,
+                    "message": f"User recommendations loaded from cache for {algorithm} algorithm",
+                    "recommendations_count": cached_result,
+                    "implementation": (
+                        "Custom Manual Implementation"
+                        if algorithm == "content_based"
+                        else "Collaborative Filtering"
+                    ),
+                    "cached": True,
+                }
+            )
 
         user_products = []
 
@@ -315,16 +339,22 @@ class GenerateUserRecommendationsView(APIView):
                 user=request.user,
                 product_id=product_id,
                 recommendation_type=algorithm,
-                defaults={"score": score}
+                defaults={"score": score},
             )
             if not created and recommendation.score != score:
                 recommendation.score = score
                 recommendations_to_update.append(recommendation)
-                
-        if recommendations_to_update:
-            UserProductRecommendation.objects.bulk_update(recommendations_to_update, ['score'])
 
-        cache.set(cache_key, len(recommendations), timeout=getattr(settings, 'CACHE_TIMEOUT_MEDIUM', 1800))
+        if recommendations_to_update:
+            UserProductRecommendation.objects.bulk_update(
+                recommendations_to_update, ["score"]
+            )
+
+        cache.set(
+            cache_key,
+            len(recommendations),
+            timeout=getattr(settings, "CACHE_TIMEOUT_MEDIUM", 1800),
+        )
 
         return Response(
             {
@@ -336,7 +366,7 @@ class GenerateUserRecommendationsView(APIView):
                     if algorithm == "content_based"
                     else "Collaborative Filtering"
                 ),
-                "cached": False
+                "cached": False,
             }
         )
 
@@ -429,140 +459,401 @@ class CollaborativeFilteringDebugView(APIView):
     Debug endpoint dla Collaborative Filtering - pokazuje szczegóły macierzy,
     cache, statystyki i potencjalne błędy
     """
-    permission_classes = [] 
+
+    permission_classes = []
 
     def get(self, request):
         try:
             users = User.objects.all()
             products = Product.objects.all()
             orders = OrderProduct.objects.all()
-            
+
             users_count = users.count()
             products_count = products.count()
             orders_count = orders.count()
-            
+
             cache_key = "collaborative_similarity_matrix"
             cached_result = cache.get(cache_key)
-            cache_status = "HIT (dane w cache)" if cached_result else "MISS (brak danych)"
-            
+            cache_status = (
+                "HIT (dane w cache)" if cached_result else "MISS (brak danych)"
+            )
+
             user_product_matrix = defaultdict(dict)
             for order in orders.select_related("order", "product"):
-                user_product_matrix[order.order.user_id][order.product_id] = order.quantity
-            
+                user_product_matrix[order.order.user_id][
+                    order.product_id
+                ] = order.quantity
+
             users_with_purchases = len(user_product_matrix.keys())
-            total_purchases = sum(len(products) for products in user_product_matrix.values())
-            
+            total_purchases = sum(
+                len(products) for products in user_product_matrix.values()
+            )
+
             matrix_shape = f"({users_with_purchases}, {products_count})"
             total_cells = users_with_purchases * products_count
-            sparsity = ((total_cells - total_purchases) / total_cells * 100) if total_cells > 0 else 0
-            
-            cf_similarities = ProductSimilarity.objects.filter(similarity_type="collaborative")
+            sparsity = (
+                ((total_cells - total_purchases) / total_cells * 100)
+                if total_cells > 0
+                else 0
+            )
+
+            cf_similarities = ProductSimilarity.objects.filter(
+                similarity_type="collaborative"
+            )
             cf_count = cf_similarities.count()
-            
+
             total_possible_pairs = products_count * (products_count - 1)
-            percentage_saved = (cf_count / total_possible_pairs * 100) if total_possible_pairs > 0 else 0
-            
-            top_10 = cf_similarities.order_by('-similarity_score')[:10]
+            percentage_saved = (
+                (cf_count / total_possible_pairs * 100)
+                if total_possible_pairs > 0
+                else 0
+            )
+
+            top_10 = cf_similarities.order_by("-similarity_score")[:10]
             top_similarities = [
                 {
                     "product1_id": sim.product1_id,
                     "product1_name": sim.product1.name,
                     "product2_id": sim.product2_id,
                     "product2_name": sim.product2.name,
-                    "score": float(sim.similarity_score)
+                    "score": float(sim.similarity_score),
                 }
                 for sim in top_10
             ]
-            
+
             sample_user_vector = None
             if user_product_matrix:
                 first_user_id = list(user_product_matrix.keys())[0]
                 user_purchases = user_product_matrix[first_user_id]
-                
-                product_ids = list(products.values_list('id', flat=True))
+
+                product_ids = list(products.values_list("id", flat=True))
                 vector = [user_purchases.get(pid, 0) for pid in product_ids[:20]]
-                
+
                 sample_user_vector = {
                     "user_id": first_user_id,
                     "total_purchases": len(user_purchases),
                     "vector_sample": vector,
-                    "vector_length": len(product_ids)
+                    "vector_length": len(product_ids),
                 }
-            
+
             can_compute = users_with_purchases >= 2 and products_count >= 2
-            
+
             issues = []
             if cf_count == 0:
-                issues.append("⚠️ BRAK podobieństw collaborative w bazie - uruchom algorytm!")
+                issues.append(
+                    "⚠️ BRAK podobieństw collaborative w bazie - uruchom algorytm!"
+                )
             if users_with_purchases < 2:
-                issues.append(f"⚠️ Za mało użytkowników z zakupami ({users_with_purchases} < 2)")
+                issues.append(
+                    f"⚠️ Za mało użytkowników z zakupami ({users_with_purchases} < 2)"
+                )
             if total_purchases < 10:
                 issues.append(f"⚠️ Za mało zakupów w systemie ({total_purchases} < 10)")
             if not can_compute:
-                issues.append("❌ Niewystarczające dane do obliczeń collaborative filtering")
-                
-            return Response({
+                issues.append(
+                    "❌ Niewystarczające dane do obliczeń collaborative filtering"
+                )
+
+            return Response(
+                {
+                    "status": "success",
+                    "algorithm": "Collaborative Filtering (Item-Based, Sarwar et al. 2001)",
+                    "formula": "Adjusted Cosine Similarity with Mean-Centering",
+                    "database_stats": {
+                        "total_users": users_count,
+                        "total_products": products_count,
+                        "total_order_items": orders_count,
+                        "users_with_purchases": users_with_purchases,
+                        "total_purchases": total_purchases,
+                    },
+                    "matrix_info": {
+                        "shape": matrix_shape,
+                        "total_cells": total_cells,
+                        "non_zero_cells": total_purchases,
+                        "sparsity_percentage": round(sparsity, 2),
+                        "description": f"Macierz {matrix_shape} gdzie każdy wiersz = użytkownik, każda kolumna = produkt",
+                    },
+                    "similarity_matrix_info": {
+                        "expected_shape": f"({products_count}, {products_count})",
+                        "total_possible_pairs": total_possible_pairs,
+                        "saved_similarities": cf_count,
+                        "percentage_saved": round(percentage_saved, 2),
+                        "threshold": 0.3,
+                        "description": "Tylko podobieństwa > 0.3 są zapisywane do bazy",
+                    },
+                    "cache_info": {
+                        "cache_key": cache_key,
+                        "status": cache_status,
+                        "cached_value": cached_result,
+                        "timeout": "7200 sekund (2 godziny)",
+                    },
+                    "top_10_similarities": top_similarities,
+                    "sample_user_vector": sample_user_vector,
+                    "computation_status": {
+                        "can_compute": can_compute,
+                        "issues": (
+                            issues
+                            if issues
+                            else ["✅ Wszystko OK - można obliczyć podobieństwa"]
+                        ),
+                    },
+                    "how_to_fix": {
+                        "if_zero_similarities": [
+                            "1. Przejdź do Admin Panel → Statistics",
+                            "2. Wybierz 'Collaborative Filtering'",
+                            "3. Kliknij 'Apply Algorithm'",
+                            "4. Poczekaj ~30 sekund na obliczenia",
+                            "5. Odśwież tę stronę aby zobaczyć wyniki",
+                        ],
+                        "manual_trigger": 'POST /api/process-recommendations/ with {"algorithm": "collaborative"}',
+                    },
+                }
+            )
+
+        except Exception as e:
+            import traceback
+
+            return Response(
+                {
+                    "status": "error",
+                    "message": str(e),
+                    "traceback": traceback.format_exc(),
+                },
+                status=500,
+            )
+
+
+class ContentBasedDebugView(APIView):
+    """
+    Debug endpoint dla Content-Based Filtering - pokazuje wektory cech,
+    podobieństwa i obliczenia cosine similarity
+    """
+
+    permission_classes = []
+
+    def get(self, request):
+        try:
+            from home.custom_recommendation_engine import CustomContentBasedFilter
+            from home.models import ProductSimilarity
+            import math
+
+            product_id = request.GET.get("product_id")
+
+            products = Product.objects.all()
+            products_count = products.count()
+
+            cb_similarities = ProductSimilarity.objects.filter(
+                similarity_type="content_based"
+            )
+            cb_count = cb_similarities.count()
+
+            cache_key = "content_based_similarity_matrix"
+            cached_result = cache.get(cache_key)
+            cache_status = (
+                "HIT (dane w cache)" if cached_result else "MISS (brak danych)"
+            )
+
+            total_possible_pairs = products_count * (products_count - 1)
+            percentage_saved = (
+                (cb_count / total_possible_pairs * 100)
+                if total_possible_pairs > 0
+                else 0
+            )
+
+            response_data = {
                 "status": "success",
-                "algorithm": "Collaborative Filtering (Item-Based, Sarwar et al. 2001)",
-                "formula": "Adjusted Cosine Similarity with Mean-Centering",
-                
+                "algorithm": "Content-Based Filtering (Cosine Similarity)",
+                "formula": "cos(θ) = (A·B) / (||A|| × ||B||)",
                 "database_stats": {
-                    "total_users": users_count,
                     "total_products": products_count,
-                    "total_order_items": orders_count,
-                    "users_with_purchases": users_with_purchases,
-                    "total_purchases": total_purchases
-                },
-                
-                "matrix_info": {
-                    "shape": matrix_shape,
-                    "total_cells": total_cells,
-                    "non_zero_cells": total_purchases,
-                    "sparsity_percentage": round(sparsity, 2),
-                    "description": f"Macierz {matrix_shape} gdzie każdy wiersz = użytkownik, każda kolumna = produkt"
-                },
-                
-                "similarity_matrix_info": {
-                    "expected_shape": f"({products_count}, {products_count})",
+                    "saved_similarities": cb_count,
                     "total_possible_pairs": total_possible_pairs,
-                    "saved_similarities": cf_count,
                     "percentage_saved": round(percentage_saved, 2),
-                    "threshold": 0.3,
-                    "description": "Tylko podobieństwa > 0.3 są zapisywane do bazy"
+                    "threshold": 0.2,
+                    "description": "Tylko podobieństwa > 20% są zapisywane",
                 },
-                
                 "cache_info": {
                     "cache_key": cache_key,
                     "status": cache_status,
                     "cached_value": cached_result,
-                    "timeout": "7200 sekund (2 godziny)"
+                    "timeout": "7200 sekund (2 godziny)",
                 },
-                
-                "top_10_similarities": top_similarities,
-                
-                "sample_user_vector": sample_user_vector,
-                
-                "computation_status": {
-                    "can_compute": can_compute,
-                    "issues": issues if issues else ["✅ Wszystko OK - można obliczyć podobieństwa"]
+                "feature_weights": {
+                    "category": 0.40,
+                    "tag": 0.30,
+                    "price": 0.20,
+                    "keywords": 0.10,
+                    "description": "Wagi używane do budowy wektora cech produktu",
                 },
-                
-                "how_to_fix": {
-                    "if_zero_similarities": [
-                        "1. Przejdź do Admin Panel → Statistics",
-                        "2. Wybierz 'Collaborative Filtering'",
-                        "3. Kliknij 'Apply Algorithm'",
-                        "4. Poczekaj ~30 sekund na obliczenia",
-                        "5. Odśwież tę stronę aby zobaczyć wyniki"
-                    ],
-                    "manual_trigger": "POST /api/process-recommendations/ with {\"algorithm\": \"collaborative\"}"
+            }
+
+            if product_id:
+                try:
+                    product = Product.objects.prefetch_related(
+                        "categories", "tags", "specification_set"
+                    ).get(id=product_id)
+                except Product.DoesNotExist:
+                    return Response(
+                        {"error": f"Product {product_id} not found"}, status=404
+                    )
+
+                cb_filter = CustomContentBasedFilter()
+                features = cb_filter._extract_weighted_features(product)
+
+                price_category = cb_filter._get_price_category(product.price)
+
+                keywords = cb_filter._extract_keywords(product.description or "")[:5]
+
+                response_data["selected_product"] = {
+                    "id": product.id,
+                    "name": product.name,
+                    "price": float(product.price),
+                    "price_category": price_category,
+                    "categories": [cat.name for cat in product.categories.all()],
+                    "tags": [tag.name for tag in product.tags.all()],
+                    "keywords": keywords,
                 }
-            })
-            
+
+                response_data["feature_vector"] = {
+                    "features": features,
+                    "vector_length": len(features),
+                    "example_explanation": {
+                        "category_components": "40% wagi za kategorię 'Components'",
+                        "tag_gaming": "30% wagi za tag 'Gaming'",
+                        "price_high": "20% wagi za przedział cenowy 'high'",
+                        "keyword_processor": "2% wagi za słowo kluczowe 'processor'",
+                    },
+                }
+
+                similar_products = (
+                    ProductSimilarity.objects.filter(
+                        product1_id=product_id, similarity_type="content_based"
+                    )
+                    .select_related("product2")
+                    .order_by("-similarity_score")[:10]
+                )
+
+                similarities_details = []
+                for sim in similar_products:
+                    product2 = sim.product2
+                    features2 = cb_filter._extract_weighted_features(product2)
+
+                    all_features = set(features.keys()) | set(features2.keys())
+                    dot_product = sum(
+                        features.get(f, 0.0) * features2.get(f, 0.0)
+                        for f in all_features
+                    )
+                    norm1 = math.sqrt(
+                        sum(features.get(f, 0.0) ** 2 for f in all_features)
+                    )
+                    norm2 = math.sqrt(
+                        sum(features2.get(f, 0.0) ** 2 for f in all_features)
+                    )
+
+                    calculated_similarity = (
+                        dot_product / (norm1 * norm2)
+                        if (norm1 > 0 and norm2 > 0)
+                        else 0.0
+                    )
+
+                    common_features = {
+                        f: (features.get(f, 0.0), features2.get(f, 0.0))
+                        for f in all_features
+                        if features.get(f, 0.0) > 0 and features2.get(f, 0.0) > 0
+                    }
+
+                    similarities_details.append(
+                        {
+                            "product_2": {
+                                "id": product2.id,
+                                "name": product2.name,
+                                "price": float(product2.price),
+                                "categories": [
+                                    cat.name for cat in product2.categories.all()
+                                ],
+                                "tags": [tag.name for tag in product2.tags.all()],
+                            },
+                            "similarity_score": round(float(sim.similarity_score), 4),
+                            "calculation": {
+                                "dot_product": round(dot_product, 4),
+                                "norm_product1": round(norm1, 4),
+                                "norm_product2": round(norm2, 4),
+                                "formula": f"{round(dot_product, 4)} / ({round(norm1, 4)} × {round(norm2, 4)}) = {round(calculated_similarity, 4)}",
+                                "stored_vs_calculated": {
+                                    "stored": round(float(sim.similarity_score), 4),
+                                    "calculated": round(calculated_similarity, 4),
+                                    "match": abs(
+                                        float(sim.similarity_score)
+                                        - calculated_similarity
+                                    )
+                                    < 0.01,
+                                },
+                            },
+                            "common_features": {
+                                feature: {
+                                    "product1_value": round(vals[0], 2),
+                                    "product2_value": round(vals[1], 2),
+                                }
+                                for feature, vals in list(common_features.items())[:5]
+                            },
+                            "common_features_count": len(common_features),
+                        }
+                    )
+
+                response_data["similar_products"] = {
+                    "count": len(similarities_details),
+                    "top_10": similarities_details,
+                }
+            else:
+                top_10 = cb_similarities.order_by("-similarity_score")[:10]
+                response_data["top_10_global_similarities"] = [
+                    {
+                        "product1_id": sim.product1_id,
+                        "product1_name": sim.product1.name,
+                        "product2_id": sim.product2_id,
+                        "product2_name": sim.product2.name,
+                        "score": round(float(sim.similarity_score), 4),
+                    }
+                    for sim in top_10
+                ]
+
+            issues = []
+            if cb_count == 0:
+                issues.append(
+                    "⚠️ BRAK podobieństw content-based w bazie - uruchom algorytm!"
+                )
+            if products_count < 2:
+                issues.append(f"⚠️ Za mało produktów ({products_count} < 2)")
+
+            response_data["computation_status"] = {
+                "can_compute": products_count >= 2,
+                "issues": (
+                    issues
+                    if issues
+                    else ["✅ Wszystko OK - można obliczyć podobieństwa"]
+                ),
+            }
+
+            response_data["how_to_fix"] = {
+                "if_zero_similarities": [
+                    "1. Przejdź do Admin Panel → Statistics",
+                    "2. Wybierz 'Content-Based Filtering'",
+                    "3. Kliknij 'Apply Algorithm'",
+                    "4. Poczekaj ~1-2 minuty na obliczenia",
+                    "5. Odśwież tę stronę aby zobaczyć wyniki",
+                ]
+            }
+
+            return Response(response_data)
+
         except Exception as e:
             import traceback
-            return Response({
-                "status": "error",
-                "message": str(e),
-                "traceback": traceback.format_exc()
-            }, status=500)
+
+            return Response(
+                {
+                    "status": "error",
+                    "message": str(e),
+                    "traceback": traceback.format_exc(),
+                },
+                status=500,
+            )
