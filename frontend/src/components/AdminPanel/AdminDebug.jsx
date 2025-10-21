@@ -1667,43 +1667,70 @@ const AdminDebug = () => {
                               </table>
                             </div>
 
-                            <div className="calculations-section">
-                              <h4>Similarity Calculations</h4>
-                              {contentBasedDebugData.similar_products.top_10.slice(0, 3).map((sim, idx) => (
-                                <div key={idx} className="calculation-card">
-                                  <h5>
-                                    #{idx + 1} {sim.product_2.name}
-                                  </h5>
-                                  <div className="calculation-info">
-                                    <p className="formula-text">{sim.calculation.formula}</p>
-                                    <div className="calculation-details">
-                                      <span>Dot Product: {sim.calculation.dot_product}</span>
-                                      <span>Norm 1: {sim.calculation.norm_product1}</span>
-                                      <span>Norm 2: {sim.calculation.norm_product2}</span>
-                                    </div>
-                                    <p className={`verification ${sim.calculation.stored_vs_calculated.match ? 'success' : 'error'}`}>
+                            <h4 style={{ marginTop: "2rem", marginBottom: "1rem" }}>
+                              Detailed Calculations (Top 3)
+                            </h4>
+                            {contentBasedDebugData.similar_products.top_10.slice(0, 3).map((sim, idx) => (
+                              <div key={idx} className="debug-card" style={{ marginBottom: "1rem" }}>
+                                <h3>
+                                  #{idx + 1} {sim.product_2.name}
+                                </h3>
+                                <div className="debug-info">
+                                  <div className="info-row">
+                                    <span className="label">Formula:</span>
+                                    <span className="value">{sim.calculation.formula}</span>
+                                  </div>
+                                  <div className="info-row">
+                                    <span className="label">Dot Product:</span>
+                                    <span className="value">{sim.calculation.dot_product}</span>
+                                  </div>
+                                  <div className="info-row">
+                                    <span className="label">Norm Product 1:</span>
+                                    <span className="value">{sim.calculation.norm_product1}</span>
+                                  </div>
+                                  <div className="info-row">
+                                    <span className="label">Norm Product 2:</span>
+                                    <span className="value">{sim.calculation.norm_product2}</span>
+                                  </div>
+                                  <div className="info-row">
+                                    <span className="label">Verification:</span>
+                                    <span className={`value ${sim.calculation.stored_vs_calculated.match ? 'success' : 'error'}`}>
                                       Stored: {sim.calculation.stored_vs_calculated.stored} |
                                       Calculated: {sim.calculation.stored_vs_calculated.calculated}
-                                      {sim.calculation.stored_vs_calculated.match ? ' ✓ Match' : ' ✗ Mismatch'}
-                                    </p>
-                                    {Object.keys(sim.common_features).length > 0 && (
-                                      <div className="common-features-section">
-                                        <p>
-                                          <strong>Common Features ({sim.common_features_count} total):</strong>
-                                        </p>
-                                        <div className="features-list">
-                                          {Object.entries(sim.common_features).map(([feat, vals]) => (
-                                            <span key={feat} className="feature-badge">
-                                              {feat}: {vals.product1_value} ↔ {vals.product2_value}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
+                                      {sim.calculation.stored_vs_calculated.match ? ' ✓' : ' ✗'}
+                                    </span>
                                   </div>
                                 </div>
-                              ))}
-                            </div>
+
+                                {Object.keys(sim.common_features).length > 0 && (
+                                  <>
+                                    <h4 style={{ marginTop: "1rem", marginBottom: "0.5rem" }}>
+                                      Common Features ({sim.common_features_count} total)
+                                    </h4>
+                                    <div className="table-container">
+                                      <table className="debug-table">
+                                        <thead>
+                                          <tr>
+                                            <th>Feature</th>
+                                            <th>Product 1 Value</th>
+                                            <th>Product 2 Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {Object.entries(sim.common_features).map(([feat, vals]) => (
+                                            <tr key={feat}>
+                                              <td><strong>{feat}</strong></td>
+                                              <td>{vals.product1_value}</td>
+                                              <td>{vals.product2_value}</td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         )}
                       </>
