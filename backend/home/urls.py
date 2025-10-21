@@ -57,6 +57,8 @@ from .sentiment_views import (
     FuzzyLogicRecommendationsAPIView,
 )
 
+from .fuzzy_debug_view import FuzzyLogicDebugView
+
 from .association_views import (
     AssociationRulesListAPI,
     FrequentlyBoughtTogetherAPI,
@@ -232,6 +234,11 @@ urlpatterns = [
         "api/content-based-debug/",
         ContentBasedDebugView.as_view(),
         name="content-based-debug",
+    ),
+    path(
+        "api/fuzzy-logic-debug/",
+        FuzzyLogicDebugView.as_view(),
+        name="fuzzy-logic-debug",
     ),
     path(
         "api/frequently-bought-together/",

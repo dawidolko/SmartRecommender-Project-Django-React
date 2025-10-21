@@ -298,18 +298,19 @@ Stopniowe przejście, brak sztucznych granic.
 **Lokalizacja:** `backend/home/fuzzy_logic_engine.py`, linie 176-189
 
 ```python
-def mu_popularity_medium(self, view_count):
+def mu_popularity_medium(self, order_count):
     """
     Trapezoidalna funkcja przynależności dla 'średniej' popularności.
 
+    Popularność mierzona przez liczbę zamówień (order_count).
     Pełna przynależność przy pop_low do pop_mid, potem maleje do pop_high.
     """
-    if view_count < self.pop_low:
+    if order_count < self.pop_low:
         return 0.0
-    elif view_count <= self.pop_mid:
+    elif order_count <= self.pop_mid:
         return 1.0
-    elif view_count < self.pop_high:
-        return (self.pop_high - view_count) / (self.pop_high - self.pop_mid)
+    elif order_count < self.pop_high:
+        return (self.pop_high - order_count) / (self.pop_high - self.pop_mid)
     else:
         return 0.0
 ```
@@ -655,7 +656,7 @@ Implementuje **wnioskowanie w stylu Mamdani** (Mamdani, 1975).
 │                    WEJŚCIE (Input)                       │
 │  • Cena produktu (price)                                 │
 │  • Ocena produktu (rating)                               │
-│  • Popularność (view_count)                              │
+│  • Popularność (order_count) - liczba zamówień           │
 │  • Dopasowanie kategorii (category_match)                │
 └──────────────────┬───────────────────────────────────────┘
                    │
@@ -747,7 +748,7 @@ def _define_rules(self):
             "eval": lambda p, cat_match: min(
                 cat_match,
                 max(
-                    self.mf.mu_popularity_medium(p.get("view_count", 0)),
+                    self.mf.mu_popularity_medium(p.get("view_count", 0)),  # view_count = order_count
                     self.mf.mu_popularity_high(p.get("view_count", 0))
                 )
             ),
@@ -863,7 +864,7 @@ def evaluate_product(self, product_data, category_match=0.0):
     Ewaluuje produkt używając wnioskowania rozmytego.
 
     Args:
-        product_data: dict z kluczami: 'price', 'rating', 'view_count', etc.
+        product_data: dict z kluczami: 'price', 'rating', 'view_count' (order_count), etc.
         category_match: rozmyty stopień dopasowania kategorii [0.0, 1.0]
 
     Returns:
@@ -931,7 +932,7 @@ fuzzy_score = 2.09 / 4.6 = 0.454 = 45.4%
 AMD Ryzen 7 5800X3D
   price: 1899 PLN
   rating: 4.8
-  view_count: 8 zamówień
+  order_count: 8 zamówień (popularność)
   kategoria: "Components.Processors"
 ```
 
@@ -1213,7 +1214,7 @@ class FuzzyLogicRecommendationsView(APIView):
             product_data = {
                 'price': float(product.price),
                 'rating': float(product.avg_rating) if product.avg_rating else 3.0,
-                'view_count': product.order_count if hasattr(product, 'order_count') else 0
+                'view_count': product.order_count if hasattr(product, 'order_count') else 0  # Popularity = liczba zamówień
             }
 
             # Ewaluuj produkt

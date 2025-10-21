@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Code, Brain, MessageSquare, Link2, Grid } from "lucide-react";
+import { Code, Brain, MessageSquare, Link2, Grid, Sparkles } from "lucide-react";
 import config from "../../config/config";
 import { toast } from "react-toastify";
 import "./AdminPanel.scss";
@@ -13,19 +13,25 @@ const AdminDebug = () => {
   const [sentimentDetailData, setSentimentDetailData] = useState(null);
   const [associationDebugData, setAssociationDebugData] = useState(null);
   const [contentBasedDebugData, setContentBasedDebugData] = useState(null);
+  const [fuzzyLogicDebugData, setFuzzyLogicDebugData] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchProducts();
+    fetchUsers();
   }, []);
 
   useEffect(() => {
     setSelectedProductId("");
+    setSelectedUserId("");
     setSentimentDetailData(null);
     setAssociationDebugData(null);
     setContentBasedDebugData(null);
+    setFuzzyLogicDebugData(null);
 
     if (activeMethod === "collaborative") {
       fetchCFDebug();
@@ -33,6 +39,8 @@ const AdminDebug = () => {
       fetchSentimentDebug();
     } else if (activeMethod === "content") {
       fetchContentBasedDebug();
+    } else if (activeMethod === "fuzzy") {
+      fetchFuzzyLogicDebug();
     }
   }, [activeMethod]);
 
@@ -45,6 +53,18 @@ const AdminDebug = () => {
       setProducts(res.data.results || res.data || []);
     } catch (err) {
       console.error("Error fetching products:", err);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("access");
+      const res = await axios.get(`${config.apiUrl}/api/users/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(res.data || []);
+    } catch (err) {
+      console.error("Error fetching users:", err);
     }
   };
 
@@ -145,6 +165,26 @@ const AdminDebug = () => {
     }
   };
 
+  const fetchFuzzyLogicDebug = async (productId = null, userId = null) => {
+    setLoading(true);
+    const token = localStorage.getItem("access");
+    try {
+      let url = `${config.apiUrl}/api/fuzzy-logic-debug/?`;
+      if (productId) url += `product_id=${productId}&`;
+      if (userId) url += `user_id=${userId}`;
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFuzzyLogicDebugData(res.data);
+    } catch (err) {
+      console.error("Error fetching Fuzzy Logic debug:", err);
+      toast.error("Failed to fetch Fuzzy Logic debug data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleProductSelect = (e) => {
     const productId = e.target.value;
     setSelectedProductId(productId);
@@ -155,7 +195,17 @@ const AdminDebug = () => {
         fetchAssociationDebug(productId);
       } else if (activeMethod === "content") {
         fetchContentBasedDebug(productId);
+      } else if (activeMethod === "fuzzy") {
+        fetchFuzzyLogicDebug(productId, selectedUserId);
       }
+    }
+  };
+
+  const handleUserSelect = (e) => {
+    const userId = e.target.value;
+    setSelectedUserId(userId);
+    if (activeMethod === "fuzzy") {
+      fetchFuzzyLogicDebug(selectedProductId, userId);
     }
   };
 
@@ -211,6 +261,14 @@ const AdminDebug = () => {
           onClick={() => setActiveMethod("content")}>
           <Grid className="tab-icon" />
           Content-Based
+        </button>
+        <button
+          className={`method-tab ${
+            activeMethod === "fuzzy" ? "active" : ""
+          }`}
+          onClick={() => setActiveMethod("fuzzy")}>
+          <Sparkles className="tab-icon" />
+          Fuzzy Logic
         </button>
       </motion.div>
 
@@ -1718,6 +1776,440 @@ const AdminDebug = () => {
               </div>
             )}
           </>
+        )}
+
+        {activeMethod === "fuzzy" && (
+          <div className="debug-section fuzzy-debug">
+            <h2 className="section-title">
+              Fuzzy Logic Inference System Debug
+            </h2>
+
+            <div className="product-selector-card">
+              <label>Select User Profile:</label>
+              <select
+                value={selectedUserId}
+                onChange={handleUserSelect}
+                className="product-select">
+                <option value="">Default Profile (Guest)</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.username} (ID: {user.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="product-selector-card">
+              <label>Select Product to Analyze (Optional):</label>
+              <select
+                value={selectedProductId}
+                onChange={handleProductSelect}
+                className="product-select">
+                <option value="">None (Show Top 10 Products)</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {fuzzyLogicDebugData ? (
+              <>
+                <div className="debug-card">
+                  <h3>Algorithm Information</h3>
+                  <div className="debug-info">
+                    <div className="info-row">
+                      <span className="label">Name:</span>
+                      <span className="value">{fuzzyLogicDebugData.algorithm}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="label">Description:</span>
+                      <span className="value">{fuzzyLogicDebugData.description}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {fuzzyLogicDebugData.user_profile && (
+                  <div className="debug-card">
+                    <h3>User Profile</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">User:</span>
+                        <span className="value">
+                          {fuzzyLogicDebugData.user_profile.username}
+                          {fuzzyLogicDebugData.user_profile.user_id && (
+                            <span className="id-badge">
+                              ID: {fuzzyLogicDebugData.user_profile.user_id}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Profile Type:</span>
+                        <span className="value">
+                          {fuzzyLogicDebugData.user_profile.profile_type}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Price Sensitivity:</span>
+                        <span className="value">
+                          {fuzzyLogicDebugData.user_profile.price_sensitivity} -{" "}
+                          {fuzzyLogicDebugData.user_profile.price_sensitivity_label}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Tracked Categories:</span>
+                        <span className="value">
+                          {fuzzyLogicDebugData.user_profile.total_categories_tracked}
+                        </span>
+                      </div>
+                    </div>
+
+                    <h4 style={{ marginTop: "1rem" }}>Category Interests</h4>
+                    <div className="debug-info">
+                      {Object.entries(fuzzyLogicDebugData.user_profile.category_interests || {}).map(
+                        ([cat, interest]) => (
+                          <div className="info-row" key={cat}>
+                            <span className="label">{cat}:</span>
+                            <span className="value">{interest}</span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {fuzzyLogicDebugData.membership_functions && (
+                  <div className="debug-card">
+                    <h3>Membership Functions</h3>
+
+                    <h4>Price Functions</h4>
+                    <div className="debug-info">
+                      {Object.entries(fuzzyLogicDebugData.membership_functions.price).map(
+                        ([key, func]) => (
+                          <div key={key} style={{ marginBottom: "0.8rem" }}>
+                            <div className="info-row">
+                              <span className="label">{key.toUpperCase()}:</span>
+                              <span className="value">{func.range}</span>
+                            </div>
+                            <p className="description">{func.description}</p>
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    <h4 style={{ marginTop: "1rem" }}>Quality Functions</h4>
+                    <div className="debug-info">
+                      {Object.entries(fuzzyLogicDebugData.membership_functions.quality).map(
+                        ([key, func]) => (
+                          <div key={key} style={{ marginBottom: "0.8rem" }}>
+                            <div className="info-row">
+                              <span className="label">{key.toUpperCase()}:</span>
+                              <span className="value">{func.range}</span>
+                            </div>
+                            <p className="description">{func.description}</p>
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    <h4 style={{ marginTop: "1rem" }}>Popularity Functions</h4>
+                    <div className="debug-info">
+                      {Object.entries(fuzzyLogicDebugData.membership_functions.popularity).map(
+                        ([key, func]) => (
+                          <div key={key} style={{ marginBottom: "0.8rem" }}>
+                            <div className="info-row">
+                              <span className="label">{key.toUpperCase()}:</span>
+                              <span className="value">{func.range}</span>
+                            </div>
+                            <p className="description">{func.description}</p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {fuzzyLogicDebugData.fuzzy_rules && (
+                  <div className="debug-card">
+                    <h3>Fuzzy Rule Base ({fuzzyLogicDebugData.fuzzy_rules.length} rules)</h3>
+                    {fuzzyLogicDebugData.fuzzy_rules.map((rule, idx) => (
+                      <div key={idx} className="calculation-card" style={{ marginBottom: "1rem" }}>
+                        <h5>{rule.name}</h5>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Condition:</span>
+                            <span className="value">{rule.condition}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Consequence:</span>
+                            <span className="value">{rule.consequence}</span>
+                          </div>
+                          <p className="description">{rule.interpretation}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {fuzzyLogicDebugData.selected_product && (
+                  <>
+                    <div className="debug-card">
+                      <h3>Selected Product</h3>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">ID:</span>
+                          <span className="value">{fuzzyLogicDebugData.selected_product.id}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Name:</span>
+                          <span className="value">{fuzzyLogicDebugData.selected_product.name}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Price:</span>
+                          <span className="value">{fuzzyLogicDebugData.selected_product.price} PLN</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Rating:</span>
+                          <span className="value">{fuzzyLogicDebugData.selected_product.rating}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">View Count:</span>
+                          <span className="value">{fuzzyLogicDebugData.selected_product.view_count}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Categories:</span>
+                          <span className="value">
+                            {fuzzyLogicDebugData.selected_product.categories.join(", ")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {fuzzyLogicDebugData.fuzzification && (
+                      <div className="debug-card">
+                        <h3>Fuzzification - Membership Degrees</h3>
+
+                        <h4>Price: {fuzzyLogicDebugData.fuzzification.price.value} PLN</h4>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Cheap:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.price.cheap}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Medium:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.price.medium}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Expensive:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.price.expensive}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Dominant:</span>
+                            <span className="value success">
+                              <strong>{fuzzyLogicDebugData.fuzzification.price.dominant.toUpperCase()}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <h4 style={{ marginTop: "1rem" }}>Quality: {fuzzyLogicDebugData.fuzzification.quality.value}</h4>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Low:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.quality.low}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Medium:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.quality.medium}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">High:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.quality.high}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Dominant:</span>
+                            <span className="value success">
+                              <strong>{fuzzyLogicDebugData.fuzzification.quality.dominant.toUpperCase()}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <h4 style={{ marginTop: "1rem" }}>Popularity: {fuzzyLogicDebugData.fuzzification.popularity.value} views</h4>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Low:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.popularity.low}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Medium:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.popularity.medium}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">High:</span>
+                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.popularity.high}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Dominant:</span>
+                            <span className="value success">
+                              <strong>{fuzzyLogicDebugData.fuzzification.popularity.dominant.toUpperCase()}</strong>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {fuzzyLogicDebugData.category_matching && (
+                      <div className="debug-card">
+                        <h3>Category Matching</h3>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Max Match:</span>
+                            <span className="value success">
+                              <strong>{fuzzyLogicDebugData.category_matching.max_match}</strong>
+                            </span>
+                          </div>
+                        </div>
+                        <p className="description">{fuzzyLogicDebugData.category_matching.explanation}</p>
+
+                        <h4 style={{ marginTop: "1rem" }}>Category Details</h4>
+                        <div className="debug-info">
+                          {Object.entries(fuzzyLogicDebugData.category_matching.category_details || {}).map(
+                            ([cat, match]) => (
+                              <div className="info-row" key={cat}>
+                                <span className="label">{cat}:</span>
+                                <span className="value">{match}</span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {fuzzyLogicDebugData.inference && (
+                      <div className="debug-card">
+                        <h3>Fuzzy Inference - Rule Activations</h3>
+                        <div className="debug-info">
+                          {Object.entries(fuzzyLogicDebugData.inference.rule_activations || {}).map(
+                            ([rule, activation]) => (
+                              <div className="info-row" key={rule}>
+                                <span className="label">{rule}:</span>
+                                <span className="value">
+                                  <strong>{activation}</strong>
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+
+                        <h4 style={{ marginTop: "1.5rem" }}>Defuzzification</h4>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Method:</span>
+                            <span className="value">{fuzzyLogicDebugData.inference.defuzzification_method}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Final Fuzzy Score:</span>
+                            <span className="value success">
+                              <strong>{fuzzyLogicDebugData.inference.final_fuzzy_score}</strong>
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Percentage:</span>
+                            <span className="value success">
+                              <strong>{fuzzyLogicDebugData.inference.final_percentage}%</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="description" style={{ marginTop: "1rem" }}>
+                          {fuzzyLogicDebugData.inference.calculation.description}
+                        </p>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Weighted Sum:</span>
+                            <span className="value">{fuzzyLogicDebugData.inference.calculation.weighted_sum}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Weight Sum:</span>
+                            <span className="value">{fuzzyLogicDebugData.inference.calculation.weight_sum}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {fuzzyLogicDebugData.top_products && !selectedProductId && (
+                  <div className="debug-card">
+                    <h3>Top {fuzzyLogicDebugData.top_products.count} Products by Fuzzy Score</h3>
+                    <p className="description">{fuzzyLogicDebugData.top_products.description}</p>
+
+                    <div className="table-container">
+                      <table className="debug-table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Fuzzy Score</th>
+                            <th>Percentage</th>
+                            <th>Category Match</th>
+                            <th>Categories</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {fuzzyLogicDebugData.top_products.products.map((prod, idx) => (
+                            <tr key={prod.id}>
+                              <td>{idx + 1}</td>
+                              <td>{prod.name}</td>
+                              <td>{prod.price} PLN</td>
+                              <td>{prod.rating}</td>
+                              <td><strong>{prod.fuzzy_score}</strong></td>
+                              <td><strong>{prod.fuzzy_percentage}%</strong></td>
+                              <td>{prod.category_match}</td>
+                              <td>{prod.categories.join(", ")}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {fuzzyLogicDebugData.system_stats && (
+                  <div className="debug-card">
+                    <h3>System Statistics</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">Total Products:</span>
+                        <span className="value">{fuzzyLogicDebugData.system_stats.total_products}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Total Rules:</span>
+                        <span className="value">{fuzzyLogicDebugData.system_stats.total_rules}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Membership Function Types:</span>
+                        <span className="value">{fuzzyLogicDebugData.system_stats.membership_function_types}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Defuzzification Method:</span>
+                        <span className="value">{fuzzyLogicDebugData.system_stats.defuzzification_method}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="debug-card">
+                <p className="no-data">
+                  {loading ? "Loading fuzzy logic debug data..." : "No fuzzy logic debug data available."}
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </motion.div>
     </div>
