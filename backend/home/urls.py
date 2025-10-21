@@ -59,6 +59,8 @@ from .sentiment_views import (
 
 from .fuzzy_debug_view import FuzzyLogicDebugView
 
+from .probabilistic_debug_view import ProbabilisticDebugView
+
 from .association_views import (
     AssociationRulesListAPI,
     FrequentlyBoughtTogetherAPI,
@@ -239,6 +241,11 @@ urlpatterns = [
         "api/fuzzy-logic-debug/",
         FuzzyLogicDebugView.as_view(),
         name="fuzzy-logic-debug",
+    ),
+    path(
+        "api/probabilistic-debug/",
+        ProbabilisticDebugView.as_view(),
+        name="probabilistic-debug",
     ),
     path(
         "api/frequently-bought-together/",

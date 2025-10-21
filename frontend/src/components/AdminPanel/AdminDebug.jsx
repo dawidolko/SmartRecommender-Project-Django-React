@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Code, Brain, MessageSquare, Link2, Grid, Sparkles } from "lucide-react";
+import { Code, Brain, MessageSquare, Link2, Grid, Sparkles, TrendingUp } from "lucide-react";
 import config from "../../config/config";
 import { toast } from "react-toastify";
 import "./AdminPanel.scss";
@@ -14,6 +14,7 @@ const AdminDebug = () => {
   const [associationDebugData, setAssociationDebugData] = useState(null);
   const [contentBasedDebugData, setContentBasedDebugData] = useState(null);
   const [fuzzyLogicDebugData, setFuzzyLogicDebugData] = useState(null);
+  const [probabilisticDebugData, setProbabilisticDebugData] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [users, setUsers] = useState([]);
@@ -32,6 +33,7 @@ const AdminDebug = () => {
     setAssociationDebugData(null);
     setContentBasedDebugData(null);
     setFuzzyLogicDebugData(null);
+    setProbabilisticDebugData(null);
 
     if (activeMethod === "collaborative") {
       fetchCFDebug();
@@ -41,6 +43,8 @@ const AdminDebug = () => {
       fetchContentBasedDebug();
     } else if (activeMethod === "fuzzy") {
       fetchFuzzyLogicDebug();
+    } else if (activeMethod === "probabilistic") {
+      fetchProbabilisticDebug();
     }
   }, [activeMethod]);
 
@@ -185,6 +189,26 @@ const AdminDebug = () => {
     }
   };
 
+  const fetchProbabilisticDebug = async (productId = null, userId = null) => {
+    setLoading(true);
+    const token = localStorage.getItem("access");
+    try {
+      let url = `${config.apiUrl}/api/probabilistic-debug/?`;
+      if (productId) url += `product_id=${productId}&`;
+      if (userId) url += `user_id=${userId}`;
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProbabilisticDebugData(res.data);
+    } catch (err) {
+      console.error("Error fetching Probabilistic debug:", err);
+      toast.error("Failed to fetch Probabilistic Models debug data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleProductSelect = (e) => {
     const productId = e.target.value;
     setSelectedProductId(productId);
@@ -197,6 +221,8 @@ const AdminDebug = () => {
         fetchContentBasedDebug(productId);
       } else if (activeMethod === "fuzzy") {
         fetchFuzzyLogicDebug(productId, selectedUserId);
+      } else if (activeMethod === "probabilistic") {
+        fetchProbabilisticDebug(productId, selectedUserId);
       }
     }
   };
@@ -206,6 +232,8 @@ const AdminDebug = () => {
     setSelectedUserId(userId);
     if (activeMethod === "fuzzy") {
       fetchFuzzyLogicDebug(selectedProductId, userId);
+    } else if (activeMethod === "probabilistic") {
+      fetchProbabilisticDebug(selectedProductId, userId);
     }
   };
 
@@ -220,7 +248,7 @@ const AdminDebug = () => {
           Debug Tools - ML Methods Inspector
         </h1>
         <p className="debug-description">
-          Inspect internal workings of all 4 machine learning methods used in
+          Inspect internal workings of all 7 machine learning methods used in
           SmartRecommender.
         </p>
       </motion.div>
@@ -269,6 +297,14 @@ const AdminDebug = () => {
           onClick={() => setActiveMethod("fuzzy")}>
           <Sparkles className="tab-icon" />
           Fuzzy Logic
+        </button>
+        <button
+          className={`method-tab ${
+            activeMethod === "probabilistic" ? "active" : ""
+          }`}
+          onClick={() => setActiveMethod("probabilistic")}>
+          <TrendingUp className="tab-icon" />
+          Probabilistic
         </button>
       </motion.div>
 
@@ -2233,6 +2269,387 @@ const AdminDebug = () => {
               <div className="debug-card">
                 <p className="no-data">
                   {loading ? "Loading fuzzy logic debug data..." : "No fuzzy logic debug data available."}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeMethod === "probabilistic" && (
+          <div className="debug-section probabilistic-debug">
+            <h2 className="section-title">
+              Probabilistic Models Debug Information
+            </h2>
+
+            <div className="product-selector-card">
+              <label>Select User to Analyze:</label>
+              <select
+                value={selectedUserId}
+                onChange={handleUserSelect}
+                className="product-select">
+                <option value="">Select User...</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.username} (ID: {user.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="product-selector-card">
+              <label>Select Product to Analyze (Optional):</label>
+              <select
+                value={selectedProductId}
+                onChange={handleProductSelect}
+                className="product-select">
+                <option value="">None</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {probabilisticDebugData ? (
+              <>
+                <div className="debug-card">
+                  <h3>Algorithm Information</h3>
+                  <div className="debug-info">
+                    <div className="info-row">
+                      <span className="label">Name:</span>
+                      <span className="value">{probabilisticDebugData.algorithm}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="label">Description:</span>
+                      <span className="value">{probabilisticDebugData.description}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {probabilisticDebugData.markov_chain && (
+                  <div className="debug-card">
+                    <h3>Markov Chain Model</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">Order:</span>
+                        <span className="value">{probabilisticDebugData.markov_chain.order}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Total States (Categories):</span>
+                        <span className="value">{probabilisticDebugData.markov_chain.total_states}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Total Transitions:</span>
+                        <span className="value">{probabilisticDebugData.markov_chain.total_transitions}</span>
+                      </div>
+                    </div>
+
+                    <h4 style={{ marginTop: "1.5rem" }}>Top 10 Transitions</h4>
+                    <div className="similarities-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>From Category</th>
+                            <th>To Category</th>
+                            <th>Probability</th>
+                            <th>Count</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {probabilisticDebugData.markov_chain.top_transitions.map((trans, idx) => (
+                            <tr key={idx}>
+                              <td>{idx + 1}</td>
+                              <td>{trans.from}</td>
+                              <td>{trans.to}</td>
+                              <td><strong>{(trans.probability * 100).toFixed(2)}%</strong></td>
+                              <td>{trans.count}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {probabilisticDebugData.naive_bayes_purchase && (
+                  <div className="debug-card">
+                    <h3>Naive Bayes - Purchase Prediction</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">Trained:</span>
+                        <span className={`value ${probabilisticDebugData.naive_bayes_purchase.trained ? 'success' : 'error'}`}>
+                          {probabilisticDebugData.naive_bayes_purchase.trained ? '✅ Yes' : '❌ No'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Number of Features:</span>
+                        <span className="value">{probabilisticDebugData.naive_bayes_purchase.num_features}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Classes:</span>
+                        <span className="value">{probabilisticDebugData.naive_bayes_purchase.classes.join(", ")}</span>
+                      </div>
+                    </div>
+
+                    <h4 style={{ marginTop: "1rem" }}>Class Priors</h4>
+                    <div className="debug-info">
+                      {Object.entries(probabilisticDebugData.naive_bayes_purchase.class_priors).map(([cls, prob]) => (
+                        <div className="info-row" key={cls}>
+                          <span className="label">Class {cls}:</span>
+                          <span className="value">{prob}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {probabilisticDebugData.naive_bayes_churn && (
+                  <div className="debug-card">
+                    <h3>Naive Bayes - Churn Prediction</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">Trained:</span>
+                        <span className={`value ${probabilisticDebugData.naive_bayes_churn.trained ? 'success' : 'error'}`}>
+                          {probabilisticDebugData.naive_bayes_churn.trained ? '✅ Yes' : '❌ No'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Number of Features:</span>
+                        <span className="value">{probabilisticDebugData.naive_bayes_churn.num_features}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Classes:</span>
+                        <span className="value">{probabilisticDebugData.naive_bayes_churn.classes.join(", ")}</span>
+                      </div>
+                    </div>
+
+                    <h4 style={{ marginTop: "1rem" }}>Class Priors</h4>
+                    <div className="debug-info">
+                      {Object.entries(probabilisticDebugData.naive_bayes_churn.class_priors).map(([cls, prob]) => (
+                        <div className="info-row" key={cls}>
+                          <span className="label">Class {cls}:</span>
+                          <span className="value">{prob}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {probabilisticDebugData.user_analysis && !probabilisticDebugData.user_analysis.error && (
+                  <>
+                    <div className="debug-card">
+                      <h3>User Analysis</h3>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">User:</span>
+                          <span className="value">
+                            {probabilisticDebugData.user_analysis.username}
+                            <span className="id-badge">ID: {probabilisticDebugData.user_analysis.user_id}</span>
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Total Orders:</span>
+                          <span className="value">{probabilisticDebugData.user_analysis.total_orders}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Total Spent:</span>
+                          <span className="value">{probabilisticDebugData.user_analysis.total_spent} PLN</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Avg Order Value:</span>
+                          <span className="value">{probabilisticDebugData.user_analysis.avg_order_value} PLN</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Days Since Last Order:</span>
+                          <span className="value">{probabilisticDebugData.user_analysis.days_since_last_order}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Last Category Purchased:</span>
+                          <span className="value">{probabilisticDebugData.user_analysis.last_category}</span>
+                        </div>
+                      </div>
+
+                      <h4 style={{ marginTop: "1rem" }}>Purchase Sequence (Last 10)</h4>
+                      <p className="description">
+                        {probabilisticDebugData.user_analysis.purchase_sequence.join(" → ")}
+                      </p>
+                    </div>
+
+                    {probabilisticDebugData.user_analysis.markov_predictions && probabilisticDebugData.user_analysis.markov_predictions.length > 0 && (
+                      <div className="debug-card">
+                        <h3>Next Purchase Predictions (Markov Chain)</h3>
+                        <div className="similarities-table">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Predicted Category</th>
+                                <th>Probability</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {probabilisticDebugData.user_analysis.markov_predictions.map((pred, idx) => (
+                                <tr key={idx}>
+                                  <td>{idx + 1}</td>
+                                  <td>{pred.category}</td>
+                                  <td><strong>{(pred.probability * 100).toFixed(2)}%</strong></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="debug-card">
+                      <h3>User Behavior Predictions (Naive Bayes)</h3>
+
+                      <h4>Purchase Probability</h4>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">Active Buyer:</span>
+                          <span className="value success">
+                            <strong>{(probabilisticDebugData.user_analysis.purchase_probability.active_buyer * 100).toFixed(2)}%</strong>
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Inactive:</span>
+                          <span className="value">
+                            {(probabilisticDebugData.user_analysis.purchase_probability.inactive * 100).toFixed(2)}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <h4 style={{ marginTop: "1.5rem" }}>Churn Probability</h4>
+                      <div className="debug-info">
+                        <div className="info-row">
+                          <span className="label">Will Churn:</span>
+                          <span className={`value ${probabilisticDebugData.user_analysis.churn_probability.will_churn > 0.5 ? 'error' : ''}`}>
+                            <strong>{(probabilisticDebugData.user_analysis.churn_probability.will_churn * 100).toFixed(2)}%</strong>
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="label">Will Stay:</span>
+                          <span className={`value ${probabilisticDebugData.user_analysis.churn_probability.will_stay > 0.5 ? 'success' : ''}`}>
+                            {(probabilisticDebugData.user_analysis.churn_probability.will_stay * 100).toFixed(2)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {probabilisticDebugData.product_analysis && !probabilisticDebugData.product_analysis.error && (
+                  <div className="debug-card">
+                    <h3>Product Analysis</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">Product:</span>
+                        <span className="value">
+                          {probabilisticDebugData.product_analysis.product_name}
+                          <span className="id-badge">ID: {probabilisticDebugData.product_analysis.product_id}</span>
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Category:</span>
+                        <span className="value">{probabilisticDebugData.product_analysis.category}</span>
+                      </div>
+                    </div>
+
+                    <h4 style={{ marginTop: "1.5rem" }}>Next Likely Categories</h4>
+                    <div className="similarities-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Category</th>
+                            <th>Probability</th>
+                            <th>Count</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {probabilisticDebugData.product_analysis.next_likely_categories.map((cat, idx) => (
+                            <tr key={idx}>
+                              <td>{idx + 1}</td>
+                              <td>{cat.category}</td>
+                              <td><strong>{(cat.probability * 100).toFixed(2)}%</strong></td>
+                              <td>{cat.count}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {probabilisticDebugData.product_analysis.predicted_next_products && probabilisticDebugData.product_analysis.predicted_next_products.length > 0 && (
+                      <>
+                        <h4 style={{ marginTop: "1.5rem" }}>Predicted Next Products</h4>
+                        <div className="similarities-table">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Transition Probability</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {probabilisticDebugData.product_analysis.predicted_next_products.map((prod, idx) => (
+                                <tr key={idx}>
+                                  <td>{prod.name}</td>
+                                  <td>{prod.category}</td>
+                                  <td>{prod.price} PLN</td>
+                                  <td><strong>{(prod.transition_probability * 100).toFixed(2)}%</strong></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {probabilisticDebugData.system_stats && (
+                  <div className="debug-card">
+                    <h3>System Statistics</h3>
+                    <div className="debug-info">
+                      <div className="info-row">
+                        <span className="label">Total Users Analyzed:</span>
+                        <span className="value">{probabilisticDebugData.system_stats.total_users_analyzed}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Total Categories:</span>
+                        <span className="value">{probabilisticDebugData.system_stats.total_categories}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Markov Chain Trained:</span>
+                        <span className={`value ${probabilisticDebugData.system_stats.markov_trained ? 'success' : 'error'}`}>
+                          {probabilisticDebugData.system_stats.markov_trained ? '✅ Yes' : '❌ No'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Naive Bayes Purchase Trained:</span>
+                        <span className={`value ${probabilisticDebugData.system_stats.naive_bayes_purchase_trained ? 'success' : 'error'}`}>
+                          {probabilisticDebugData.system_stats.naive_bayes_purchase_trained ? '✅ Yes' : '❌ No'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">Naive Bayes Churn Trained:</span>
+                        <span className={`value ${probabilisticDebugData.system_stats.naive_bayes_churn_trained ? 'success' : 'error'}`}>
+                          {probabilisticDebugData.system_stats.naive_bayes_churn_trained ? '✅ Yes' : '❌ No'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="debug-card">
+                <p className="no-data">
+                  {loading ? "Loading probabilistic debug data..." : "No probabilistic debug data available."}
                 </p>
               </div>
             )}
