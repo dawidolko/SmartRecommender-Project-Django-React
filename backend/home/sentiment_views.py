@@ -1,3 +1,20 @@
+"""
+Sentiment Analysis API Views for Product Search and Recommendations.
+
+Authors: Dawid Olko & Piotr Smoła
+Date: 2025-11-02
+Version: 2.0
+
+This module implements sentiment-based product search using lexicon-based
+sentiment analysis and fuzzy logic for handling uncertainty in user queries.
+
+Key Features:
+    - Sentiment-based product ranking
+    - Multi-source sentiment aggregation (opinions, descriptions, specs)
+    - Fuzzy logic search for natural language queries
+    - Cached sentiment summaries for performance
+"""
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny

@@ -1,3 +1,55 @@
+/**
+ * NewProducts Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Homepage component displaying personalized product recommendations or
+ * random products for non-authenticated users.
+ *
+ * Features:
+ *   - Personalized recommendations for logged-in users
+ *   - Random products for guests
+ *   - Multiple recommendation algorithms:
+ *     * Collaborative Filtering - Based on similar users
+ *     * Content-Based Filtering - Based on product attributes
+ *     * Fuzzy Logic - Based on fuzzy user profile
+ *   - Algorithm name display in section title
+ *   - Animated entrance with Framer Motion
+ *   - Intersection Observer (appears when scrolled into view)
+ *   - Loading skeleton/state
+ *   - Navigation to shop page
+ *
+ * Algorithm Selection:
+ *   1. Checks user's active algorithm preference from settings
+ *   2. Falls back to collaborative filtering if not set
+ *   3. For guests: displays random products
+ *
+ * API Endpoints:
+ *   - GET /api/recommendation-settings/ - Get user's algorithm preference
+ *   - GET /api/recommendation-preview/?algorithm={alg} - Get personalized recommendations
+ *   - GET /api/random-products/ - Get random products for guests
+ *
+ * State Management:
+ *   - randomProducts: Array of products to display (recommendations or random)
+ *   - currentAlgorithm: Active recommendation algorithm name
+ *   - isLoading: Loading state for async fetch
+ *   - isInView: Boolean from Intersection Observer (for animation trigger)
+ *
+ * Display Logic:
+ *   - Authenticated user with valid recommendations → Show recommended products
+ *   - Authenticated user without recommendations → Show random products
+ *   - Guest user → Show random products
+ *
+ * Animation:
+ *   - Uses Framer Motion's useInView hook
+ *   - Triggers animation when component scrolls into viewport
+ *   - once: true - Animation plays only once
+ *
+ * @component
+ * @returns {React.ReactElement} Product recommendation section for homepage
+ */
 import { useState, useEffect, useRef } from "react";
 import ShopProduct from "../ShopContent/ShopProduct";
 import { useNavigate } from "react-router-dom";

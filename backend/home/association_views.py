@@ -12,6 +12,29 @@ from .custom_recommendation_engine import CustomAssociationRules
 
 
 class FrequentlyBoughtTogetherAPI(APIView):
+    """
+    API endpoint for 'Frequently Bought Together' product recommendations.
+    
+    Returns products commonly purchased with items in user's cart based on
+    association rules computed using Apriori algorithm.
+    
+    Algorithm: Association Rules (Market Basket Analysis)
+    Ranking: Sorted by Lift then Confidence
+    
+    Query Parameters:
+        product_ids[]: List of product IDs in cart
+        max_recommendations: Maximum results to return (default: 5)
+    
+    Returns:
+        List of recommended products with metrics:
+            - confidence: Probability of buying together
+            - lift: Correlation strength (>1 = positive correlation)
+            - support: Frequency in transactions
+    
+    Example:
+        GET /api/frequently-bought-together/?product_ids[]=123&product_ids[]=456&max_recommendations=5
+    """
+    
     def get(self, request):
         cart_product_ids = request.GET.getlist("product_ids[]")
         if not cart_product_ids:
@@ -75,6 +98,37 @@ class FrequentlyBoughtTogetherAPI(APIView):
 
 
 class UpdateAssociationRulesAPI(APIView):
+    """
+    API endpoint to trigger association rules computation using Apriori algorithm.
+    
+    Computes product association rules from order history using Market Basket Analysis.
+    Uses bitmap pruning optimization for efficient frequent itemset mining.
+    
+    Algorithm: Apriori (Agrawal & Srikant 1994)
+    Optimization: Bitmap operations (Zaki 2000)
+    
+    POST Parameters:
+        min_support (float): Minimum frequency threshold (default: 0.005 = 0.5%)
+        min_confidence (float): Minimum certainty threshold (default: 0.05 = 5%)
+        min_lift (float): Minimum correlation strength (default: 1.0)
+    
+    Process:
+        1. Load transactions (orders with 2+ products)
+        2. Run Apriori algorithm
+        3. Filter by lift threshold
+        4. Store in ProductAssociation model
+        5. Clear cache
+    
+    Performance:
+        - Processes up to 2000 orders
+        - Creates up to 1000 rules
+        - Batch inserts (200 at a time)
+        - Cache lock prevents concurrent execution
+    
+    Returns:
+        JSON with statistics and configuration details
+    """
+    
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -208,6 +262,27 @@ class UpdateAssociationRulesAPI(APIView):
 
 
 class AssociationRulesListAPI(APIView):
+    """
+    API endpoint to retrieve all computed association rules.
+    
+    Returns paginated list of association rules sorted by lift (correlation strength).
+    Results are cached for 30 minutes to improve performance.
+    
+    Query Parameters:
+        all (bool): If 'true', return all rules; otherwise return top 20
+    
+    Returns:
+        JSON with:
+            - rules: List of rule objects with products and metrics
+            - total_rules: Count of returned rules
+            - implementation: Algorithm details
+            - cached: Whether result was served from cache
+    
+    Caching:
+        - Top 20 rules: 30 minutes
+        - All rules: 30 minutes
+    """
+    
     def get(self, request):
         fetch_all = request.GET.get("all", "").lower() == "true"
         
@@ -260,6 +335,24 @@ class AssociationRulesListAPI(APIView):
 
 
 class AssociationRulesAnalysisAPI(APIView):
+    """
+    API endpoint for association rules statistical analysis.
+    
+    Returns top 5 rules for each metric to help understand
+    different aspects of product associations:
+        - Support: Most frequent product pairs
+        - Confidence: Highest purchase probability
+        - Lift: Strongest correlations
+    
+    Use Cases:
+        - Identify best product bundles (high lift)
+        - Find common pairings (high support)
+        - Discover strong recommendations (high confidence)
+    
+    Returns:
+        JSON with top rules by each metric and total rule count
+    """
+    
     permission_classes = [IsAuthenticated]
 
     def get(self, request):

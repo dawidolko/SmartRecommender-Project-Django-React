@@ -1,3 +1,43 @@
+"""
+Django REST Framework Views for SmartRecommender E-commerce System.
+
+This module contains all API endpoints for:
+    - User authentication (JWT tokens with custom claims)
+    - Product management (CRUD operations with image uploads)
+    - Shopping cart and orders
+    - User reviews and complaints
+    - Category browsing
+    - Admin panel operations
+
+API Architecture:
+    - RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
+    - JWT authentication with SimpleJWT
+    - Permission classes (IsAuthenticated, IsAdminUser, AllowAny)
+    - Django REST Framework generic views for CRUD operations
+
+Authentication Flow:
+    1. User sends email + password to /api/login/
+    2. Server validates credentials
+    3. Server returns JWT access + refresh tokens
+    4. Client includes token in Authorization header: "Bearer <token>"
+    5. Server validates token on each request
+
+View Types:
+    - APIView: Custom logic views (login, register, category list)
+    - ListCreateAPIView: GET all + POST new (products, orders, complaints)
+    - RetrieveUpdateDestroyAPIView: GET one + PUT/PATCH + DELETE
+    - RetrieveAPIView: GET one (read-only)
+
+Permission Levels:
+    - AllowAny: Public endpoints (login, register, product browsing)
+    - IsAuthenticated: Logged-in users (cart, orders, reviews)
+    - IsAdminUser: Admin-only (user management, product CRUD)
+
+Authors: Dawid Olko & Piotr Smoła
+Date: 2025-11-02
+Version: 2.0
+"""
+
 from django.db.models import Count, Q, Sum, F, FloatField
 from django.db.models.functions import TruncMonth
 from django.forms import ValidationError
@@ -78,11 +118,63 @@ from django.db.models import Avg
 
 User = get_user_model()
 
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Custom JWT token serializer that uses email as username field.
+    
+    Standard JWT authentication uses 'username' field, but this serializer
+    allows login with 'email' instead for better UX.
+    
+    Attributes:
+        username_field (str): Changed from 'username' to 'email'
+    
+    Returns:
+        dict: JWT tokens + user data:
+            {
+                "access": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                "user": {
+                    "id": 1,
+                    "email": "user@example.com",
+                    "role": "client",
+                    "first_name": "John",
+                    "last_name": "Doe"
+                }
+            }
+    
+    Example Request:
+        POST /api/token/
+        {
+            "email": "user@example.com",
+            "password": "password123"
+        }
+    
+    Validation:
+        1. Verify email exists in database
+        2. Check password hash matches
+        3. Generate JWT access + refresh tokens
+        4. Add custom user data to response
+    """
     username_field = "email"
 
     def validate(self, attrs):
+        """
+        Validate credentials and add custom user data to token response.
+        
+        Args:
+            attrs (dict): Request data {"email": "...", "password": "..."}
+        
+        Returns:
+            dict: Token data with added user information
+        
+        Raises:
+            AuthenticationFailed: If email or password is invalid
+        """
+        # Validate credentials using parent class (checks email + password)
         data = super().validate(attrs)
+        
+        # Add custom user data to response
         user = self.user
         data["user"] = {
             "id": user.id,
@@ -93,23 +185,144 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    JWT token endpoint using custom serializer with email authentication.
+    
+    Endpoint: POST /api/token/
+    
+    Request Body:
+        {
+            "email": "user@example.com",
+            "password": "password123"
+        }
+    
+    Response (200 OK):
+        {
+            "access": "eyJ0eXAiOiJKV1QiLCJhbGc...",  // Expires in 15 minutes
+            "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",  // Expires in 7 days
+            "user": {
+                "id": 1,
+                "email": "user@example.com",
+                "role": "client",
+                "first_name": "John",
+                "last_name": "Doe"
+            }
+        }
+    
+    Response (401 Unauthorized):
+        {
+            "detail": "No active account found with the given credentials"
+        }
+    
+    Usage:
+        1. Send email + password to this endpoint
+        2. Receive access and refresh tokens
+        3. Store tokens in localStorage/cookies
+        4. Include access token in Authorization header:
+           "Authorization: Bearer <access_token>"
+        5. When access expires, use refresh token to get new access token
+    """
     serializer_class = CustomTokenObtainPairSerializer
 
+
 class MyTokenObtainPairView(TokenObtainPairView):
+    """
+    Alternative JWT token endpoint (legacy/compatibility).
+    
+    Uses MyTokenObtainPairSerializer (similar to CustomTokenObtainPairSerializer).
+    Kept for backwards compatibility with existing frontend code.
+    """
     serializer_class = MyTokenObtainPairSerializer
 
+
 class CategoriesAPIView(APIView):
+    """
+    API endpoint to retrieve all product categories.
+    
+    Endpoint: GET /api/categories/
+    Permission: AllowAny (public access)
+    
+    Response (200 OK):
+        [
+            {"name": "Electronics"},
+            {"name": "Clothing"},
+            {"name": "Books"}
+        ]
+    
+    Usage:
+        Used to populate category dropdown/filter in shop frontend.
+        No authentication required.
+    
+    Database Query:
+        Category.objects.values("name")
+        Returns only 'name' field (optimized query)
+    """
     permission_classes = [AllowAny]
 
     def get(self, request):
+        """Retrieve all category names."""
         categories = Category.objects.values("name")
         return Response(categories)
 
+
 class ProductsAPIView(APIView):
+    """
+    API endpoint to retrieve all products with optional filtering and search.
+    
+    Endpoint: GET /api/products/?search=laptop&category=Electronics
+    Permission: AllowAny (public access)
+    
+    Query Parameters:
+        - search (str, optional): Search in product name or description
+        - category (str, optional): Filter by category name
+    
+    Response (200 OK):
+        [
+            {
+                "id": 1,
+                "name": "Gaming Laptop",
+                "description": "High-performance laptop",
+                "price": "1299.99",
+                "category": "Electronics",
+                "photos": [{"photo": "/media/products/laptop.jpg"}],
+                "avg_rating": 4.5,
+                "reviews_count": 12
+            },
+            ...
+        ]
+    
+    Search Functionality:
+        Uses Django Q objects with icontains (case-insensitive):
+        Q(name__icontains=search) | Q(description__icontains=search)
+        
+        Example: search="gaming" matches:
+        - "Gaming Laptop"
+        - "Mouse for gaming"
+        - "Description: Best gaming experience"
+    
+    Filtering:
+        category="Electronics" matches Product.category.name == "Electronics"
+    
+    Database Optimization:
+        - select_related('category'): One query instead of N+1
+        - prefetch_related('photos'): Batch load photos
+        - annotate(avg_rating): Calculate average in database
+        - annotate(reviews_count): Count reviews in database
+    """
     permission_classes = [AllowAny]
 
     def get(self, request):
+        """
+        Retrieve products with optional search and category filter.
+        
+        Args:
+            request: HTTP GET request with query params
+        
+        Returns:
+            Response: List of products with serialized data
+        """
         products = Product.objects.prefetch_related(
             "categories", "photoproduct_set"
         ).all()

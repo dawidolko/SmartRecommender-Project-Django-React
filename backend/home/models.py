@@ -2,6 +2,23 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
+    """
+    Custom User model extending Django's AbstractUser.
+    
+    Supports role-based access control (RBAC) with two roles:
+        - admin: Full system access
+        - client: Standard customer access
+    
+    Uses email as primary authentication field instead of username.
+    
+    Fields:
+        role (str): User role ('admin' or 'client')
+        email (str): Unique email address (used for login)
+        
+    Inherited from AbstractUser:
+        username, password, first_name, last_name, is_staff, is_active, date_joined
+    """
+    
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('client', 'Client'),
@@ -65,6 +82,31 @@ class Tag(models.Model):
         verbose_name_plural = "Tags"
 
 class Product(models.Model):
+    """
+    Product model representing items in the e-commerce catalog.
+    
+    Core entity for recommendation system - used in:
+        - Content-Based Filtering (via categories, tags, description)
+        - Collaborative Filtering (via user purchase history)
+        - Association Rules (via co-purchase patterns)
+        - Sentiment Analysis (via product opinions)
+    
+    Fields:
+        name (str): Product name (max 100 chars)
+        price (Decimal): Current price
+        old_price (Decimal): Previous price (for sale display)
+        description (str): Product description (used for TF-IDF keyword extraction)
+        sale (FK): Active sale/discount if applicable
+        categories (M2M): Product categories (primary classification)
+        tags (M2M): Product tags (secondary descriptors)
+    
+    Related Models:
+        - PhotoProduct: Product images
+        - Specification: Technical specifications
+        - Opinion: Customer reviews
+        - ProductSimilarity: Computed similarities to other products
+    """
+    
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -241,6 +283,38 @@ class UserInteraction(models.Model):
 
 
 class ProductSimilarity(models.Model):
+    """
+    Stores computed product-product similarities for recommendation algorithms.
+    
+    This model caches similarity computations to avoid recalculating on every request.
+    Similarities are bidirectional (if A~B, then both A→B and B→A are stored).
+    
+    Similarity Types:
+        1. collaborative: Item-based Collaborative Filtering
+           - Based on user co-purchase patterns
+           - Formula: Adjusted Cosine Similarity (Sarwar et al. 2001)
+           - Example: Users who bought A also bought B
+        
+        2. content_based: Content-Based Filtering
+           - Based on product features (categories, tags, keywords)
+           - Formula: Weighted Cosine Similarity
+           - Example: Products with similar attributes
+    
+    Fields:
+        product1 (FK): Source product
+        product2 (FK): Target product
+        similarity_type (str): Algorithm used ('collaborative' or 'content_based')
+        similarity_score (float): Similarity value [0.0, 1.0]
+        created_at (datetime): Computation timestamp
+    
+    Indexes:
+        - (product1, similarity_type): Fast lookup for recommendations
+        - (similarity_score): Sort by relevance
+    
+    Note:
+        Threshold pruning: Only similarities > 0.2 are typically stored
+    """
+    
     SIMILARITY_TYPES = [
         ('collaborative', 'Collaborative Filtering'),
         ('content_based', 'Content Based'),
@@ -286,6 +360,34 @@ class RecommendationSettings(models.Model):
         unique_together = ('user', 'active_algorithm')
 
 class ProductAssociation(models.Model):
+    """
+    Stores association rules from Market Basket Analysis (Apriori algorithm).
+    
+    Association Rule: product_1 → product_2
+    Meaning: "Customers who buy product_1 are likely to also buy product_2"
+    
+    Metrics (Agrawal & Srikant 1994):
+        1. Support: Frequency of (product_1, product_2) pair
+           Formula: Support(A,B) = count(A∩B) / total_transactions
+           Example: 0.05 = 5% of transactions contain both products
+        
+        2. Confidence: Conditional probability
+           Formula: Confidence(A→B) = Support(A,B) / Support(A)
+           Example: 0.75 = 75% of customers who buy A also buy B
+        
+        3. Lift: Correlation strength
+           Formula: Lift(A→B) = Confidence(A→B) / Support(B)
+           Interpretation:
+               - Lift > 1: Positive correlation (bought together more than random)
+               - Lift = 1: Independence
+               - Lift < 1: Negative correlation
+    
+    Use Cases:
+        - Product bundling
+        - "Frequently bought together" recommendations
+        - Cross-sell optimization
+    """
+    
     product_1 = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='associations_from')
     product_2 = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='associations_to')
     support = models.FloatField()
@@ -299,6 +401,29 @@ class ProductAssociation(models.Model):
         unique_together = ('product_1', 'product_2')
 
 class PurchaseProbability(models.Model):
+    """
+    Stores probabilistic purchase predictions from Naive Bayes classifier.
+    
+    Predicts likelihood that a specific user will purchase a specific product
+    based on user features and historical behavior patterns.
+    
+    Algorithm: Multinomial Naive Bayes
+    Formula: P(purchase | user_features) = P(features | purchase) × P(purchase) / P(features)
+    
+    Fields:
+        user (FK): Target user
+        product (FK): Target product
+        probability (Decimal): Purchase likelihood [0.000, 1.000]
+        confidence_level (Decimal): Prediction confidence [0.000, 1.000]
+        last_updated (datetime): Last recalculation timestamp
+    
+    Use Cases:
+        - Personalized email campaigns (target high-probability users)
+        - Dynamic pricing (adjust for demand prediction)
+        - Inventory optimization (stock high-probability products)
+        - Churn prevention (identify low-engagement users)
+    """
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     probability = models.DecimalField(max_digits=5, decimal_places=3)

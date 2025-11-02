@@ -1,3 +1,49 @@
+/**
+ * CartContent Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Shopping cart page component that displays cart items, calculates totals,
+ * and provides product recommendations based on cart contents.
+ *
+ * Features:
+ *   - Display all items in shopping cart
+ *   - Quantity management (increase/decrease/remove)
+ *   - Real-time total amount calculation
+ *   - Cart persistence in localStorage
+ *   - "Frequently Bought Together" recommendations (Association Rules)
+ *   - Image enlargement modal for product images
+ *   - Checkout navigation
+ *   - Empty cart state
+ *
+ * Recommendation Algorithm:
+ *   - Uses Apriori Association Rules (backend)
+ *   - Analyzes products currently in cart
+ *   - Suggests products frequently bought together
+ *   - Formula: If {A, B} in cart → Recommend {C} with confidence > 0.5
+ *
+ * State Management:
+ *   - items: Cart items from CartContext (id → quantity mapping)
+ *   - shopData: Full product catalog for displaying recommendations
+ *   - recommendations: Products suggested based on cart contents
+ *   - recommendationsLoading: Loading state for recommendations API
+ *   - enlargedImage: Currently viewed enlarged product image
+ *   - totalAmount: Calculated from CartContext
+ *
+ * API Endpoints:
+ *   - GET /api/products/ - Fetch all products for recommendations
+ *   - GET /api/frequently-bought-together/?product_ids[]={ids} - Get recommendations
+ *
+ * Cart Persistence:
+ *   - Saves to localStorage on every cart change
+ *   - Format: {"productId": quantity, ...}
+ *   - Restores on component mount
+ *
+ * @component
+ * @returns {React.ReactElement} Shopping cart page with recommendations
+ */
 /* eslint-disable react-hooks/exhaustive-deps */
 import "./CartContent.scss";
 import { useContext, useEffect, useState } from "react";

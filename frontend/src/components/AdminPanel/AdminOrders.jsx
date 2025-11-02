@@ -1,3 +1,56 @@
+/**
+ * AdminOrders Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Admin panel component for order management and monitoring in the e-commerce system.
+ * Provides comprehensive order tracking, status updates, and analytics dashboard.
+ *
+ * Features:
+ *   - Real-time order list with status tracking
+ *   - Order status management (Pending → Shipped → Delivered)
+ *   - Search functionality (by order ID, status, date)
+ *   - Sorting by multiple fields (ID, date, status, total)
+ *   - Pagination (10 orders per page)
+ *   - Order statistics dashboard:
+ *     * Total orders count
+ *     * Pending orders count
+ *     * Shipped orders count
+ *     * Delivered orders count
+ *   - Order details view (expandable rows)
+ *   - Product list per order
+ *   - Order total calculation
+ *   - Date formatting and display
+ *
+ * Order Status Flow:
+ *   1. Pending - Initial state when order is created
+ *   2. Shipped - Order has been dispatched
+ *   3. Delivered - Order has been delivered to customer
+ *
+ * State Management:
+ *   - orders: Array of all orders from database
+ *   - stats: Dashboard statistics (total, pending, shipped, delivered)
+ *   - filteredOrders: Orders after search/filter/sort operations
+ *   - searchTerm: Current search query
+ *   - sortField: Active sorting field (id, date_order, status, total)
+ *   - sortDirection: Sort direction ('asc' or 'desc')
+ *   - currentPage: Active pagination page
+ *   - loading: Loading state for async operations
+ *
+ * API Endpoints:
+ *   - GET /api/orders/ - Fetch all orders (admin only)
+ *   - PUT /api/orders/:id/ - Update order status
+ *   - DELETE /api/orders/:id/ - Delete order
+ *
+ * Calculations:
+ *   - Order Total: Σ(product_price × quantity) for all products in order
+ *   - Statistics: Real-time count aggregation by status
+ *
+ * @component
+ * @returns {React.ReactElement} Admin orders management page with dashboard
+ */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";

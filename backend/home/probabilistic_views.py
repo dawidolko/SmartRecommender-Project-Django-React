@@ -38,6 +38,35 @@ class IsAdminRole(BasePermission):
 
 
 class MarkovRecommendationsAPI(APIView):
+    """
+    API endpoint for Markov Chain-based sequential purchase recommendations.
+    
+    Uses first-order Markov Chain to predict next product category based on
+    user's last purchase. Trained on historical purchase sequences.
+    
+    Algorithm: Discrete-Time Markov Chain
+    Formula: P(X_t+1 = j | X_t = i) = P_ij (transition probability)
+    
+    Features:
+        - Predicts next category from last purchase
+        - Returns top products from predicted categories
+        - Calculates purchase probability using Naive Bayes
+        - Estimates days to next purchase from intervals
+    
+    Model Training:
+        - Markov Chain: User purchase sequences → category transitions
+        - Naive Bayes: User features → purchase probability
+    
+    Returns:
+        JSON with:
+            - predicted_products: Top 6 products from likely categories
+            - next_purchase_probability: Likelihood of next purchase
+            - expected_days_to_next_purchase: Estimated time interval
+            - sequence_analysis: Common purchase patterns
+    
+    No authentication required - uses first user as demo.
+    """
+    
     permission_classes = [AllowAny]
 
     def get(self, request):

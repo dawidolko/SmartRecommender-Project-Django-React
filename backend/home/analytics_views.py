@@ -1,3 +1,24 @@
+"""
+Predictive Analytics API Views for SmartRecommender E-commerce System.
+
+Authors: Dawid Olko & Piotr Smoła
+Date: 2025-11-02
+Version: 2.0
+
+This module contains REST API views for advanced analytics including:
+    - Risk dashboard (churn prediction, fraud detection)
+    - Sales forecasting (ARIMA-inspired time series)
+    - Purchase probability prediction (Naive Bayes)
+    - Product demand forecasting for inventory management
+    - User purchase pattern analysis (RFM segmentation)
+
+Key Features:
+    - Real-time predictive analytics
+    - Personalized insights for users
+    - Admin dashboard with comprehensive metrics
+    - Machine learning-based forecasting
+"""
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status

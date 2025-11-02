@@ -1,3 +1,64 @@
+/**
+ * AdminUsers Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Admin panel component for comprehensive user management (CRUD operations).
+ * Manages customer accounts, roles, and displays user statistics.
+ *
+ * Features:
+ *   - User CRUD operations (Create, Read, Update, Delete)
+ *   - Role management (admin/client)
+ *   - User search and filtering
+ *   - Sorting by multiple fields (ID, email, username, role)
+ *   - Pagination (10 users per page)
+ *   - User statistics dashboard:
+ *     * Total opinions/reviews count
+ *     * Average rating
+ *     * Top product category
+ *     * Top product tag
+ *   - Confirmation modals for destructive actions
+ *   - Form validation
+ *   - Loading states
+ *
+ * User Fields:
+ *   - Email (required, unique, validated)
+ *   - Username (required, unique)
+ *   - First Name (optional)
+ *   - Last Name (optional)
+ *   - Role (admin/client)
+ *
+ * State Management:
+ *   - customers: Array of all users
+ *   - stats: User-related statistics
+ *   - Form states: newEmail, newUsername, newFirstName, newLastName, newRole
+ *   - Edit states: Separate state variables for editing mode
+ *   - UI states: searchTerm, sortField, sortDirection, currentPage, loading
+ *   - Modal states: Delete, add, and edit confirmation modals
+ *
+ * API Endpoints:
+ *   - GET /api/users/ - Fetch all users (admin only)
+ *   - POST /api/users/ - Create new user
+ *   - PUT /api/users/:id/ - Update user
+ *   - DELETE /api/users/:id/ - Delete user
+ *   - GET /api/admin-stats/ - Fetch user statistics
+ *
+ * Validation:
+ *   - Required fields: email, username
+ *   - Email format validation
+ *   - Unique email and username constraints
+ *   - Role selection (admin/client only)
+ *
+ * Security:
+ *   - Admin authentication required
+ *   - JWT token validation
+ *   - Confirmation modals for delete operations
+ *
+ * @component
+ * @returns {React.ReactElement} Admin user management page with dashboard
+ */
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {

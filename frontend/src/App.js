@@ -1,3 +1,70 @@
+/**
+ * App Component - Main Application Entry Point
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Root component of the SmartRecommender e-commerce React application.
+ * Configures routing, authentication, context providers, and global UI elements.
+ *
+ * Features:
+ *   - React Router v6 routing configuration
+ *   - Protected routes with authentication
+ *   - Role-based access control (client vs admin)
+ *   - Global context providers (Auth, Cart, Favorites)
+ *   - Animated page transitions (Framer Motion)
+ *   - Toast notifications (React Toastify)
+ *   - Accessibility toolbar
+ *   - Scroll restoration on navigation
+ *   - Conditional navbar/footer rendering
+ *
+ * Route Structure:
+ *   Public Routes:
+ *     - /home - Landing page
+ *     - /shop - Product catalog
+ *     - /shop/:category - Category filtered products
+ *     - /product/:id - Product detail page
+ *     - /search/:query - Search results
+ *     - /about - About page
+ *     - /blog - Blog listing
+ *     - /blog/:id - Blog article
+ *     - /faq - FAQ page
+ *     - /contact - Contact form
+ *     - /login - Login page (public route, redirects if authenticated)
+ *     - /register - Registration page
+ *
+ *   Protected Routes (requires authentication):
+ *     - /cart - Shopping cart
+ *     - /favorites - Saved products
+ *     - /client/* - Client panel routes
+ *     - /admin/* - Admin panel routes (admin role required)
+ *
+ * Context Providers:
+ *   1. AuthContext - User authentication state
+ *   2. ShopContext (CartContext) - Shopping cart management
+ *   3. FavoritesProvider - Favorites management
+ *
+ * Global Components:
+ *   - Navbar - Main navigation (hidden on admin/client panels)
+ *   - Footer - Footer (hidden on admin/client panels)
+ *   - AccessibilityToolbar - WCAG compliance tools
+ *   - ToastContainer - Global notifications
+ *   - ScrollToTop - Scroll restoration utility
+ *
+ * Authentication Flow:
+ *   1. PrivateRoute checks for user in AuthContext
+ *   2. If no user, redirects to /login
+ *   3. PublicRoute redirects authenticated users away from login/register
+ *
+ * Animation:
+ *   - AnimatePresence wraps Routes for page transitions
+ *   - mode="sync" - Smooth transitions between pages
+ *   - key={location.pathname} - Unique key for each route
+ *
+ * @component
+ * @returns {React.ReactElement} Complete application with routing and providers
+ */
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer } from "react-toastify";

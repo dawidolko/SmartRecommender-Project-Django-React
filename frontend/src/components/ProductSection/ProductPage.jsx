@@ -1,3 +1,62 @@
+/**
+ * ProductPage Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Detailed product page component displaying comprehensive product information,
+ * images, specifications, reviews, and personalized recommendations.
+ *
+ * Features:
+ *   - Product image gallery with enlargement modal
+ *   - Image carousel navigation (left/right arrows)
+ *   - Add to cart functionality
+ *   - Add to favorites (heart icon toggle)
+ *   - Product specifications table
+ *   - User reviews and ratings
+ *   - Average rating calculation with star display
+ *   - Similar products carousel (same category)
+ *   - Tabbed interface (Description, Specifications, Reviews)
+ *   - User interaction tracking (view, add_to_cart, favorite)
+ *   - Breadcrumb navigation
+ *   - Stock status indicator
+ *   - Price display with old price strikethrough
+ *
+ * Interaction Tracking:
+ *   - Sends analytics events to backend for recommendation algorithms
+ *   - Types: 'view', 'add_to_cart', 'favorite'
+ *   - Used by Collaborative Filtering and User Profiling
+ *
+ * Similar Products Algorithm:
+ *   - Fetches products from same main category
+ *   - Excludes current product
+ *   - Displays in carousel format
+ *   - Helps users discover related products
+ *
+ * State Management:
+ *   - product: Full product details from API
+ *   - loading: Loading state for product data
+ *   - favorite: Boolean indicating if product is in favorites
+ *   - currentIndex: Active image in gallery
+ *   - isImageEnlarged: Modal state for enlarged image view
+ *   - similarProducts: Array of related products
+ *   - activeTab: Current tab (description/specifications/reviews)
+ *   - items: Cart items from CartContext
+ *
+ * API Endpoints:
+ *   - GET /api/product/:id/ - Fetch product details
+ *   - GET /api/products/?category={category} - Fetch similar products
+ *   - POST /api/interaction/ - Log user interaction
+ *
+ * Reviews Calculation:
+ *   - Average Rating = Σ(ratings) / count(reviews)
+ *   - Star Display: Full stars, half stars, empty stars
+ *   - Review Count: Total number of opinions
+ *
+ * @component
+ * @returns {React.ReactElement} Product detail page with gallery and recommendations
+ */
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../ShopContext/ShopContext";

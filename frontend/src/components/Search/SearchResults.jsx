@@ -1,3 +1,39 @@
+/**
+ * SearchResults Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Displays search results for product queries entered by users in the search bar.
+ * Fetches filtered products from backend API based on search query parameter.
+ *
+ * Features:
+ *   - Real-time product search via API
+ *   - Loading state during data fetch
+ *   - Empty state when no results found
+ *   - Reuses ShopProduct component for consistent UI
+ *   - URL-based search query (deep linking support)
+ *
+ * Search Algorithm (Backend):
+ *   - Searches in product names and descriptions
+ *   - Case-insensitive matching
+ *   - Returns partial matches
+ *
+ * API Endpoint:
+ *   - GET /api/products/search/?q={query}
+ *
+ * URL Format:
+ *   - /search/:query (e.g., /search/laptop)
+ *
+ * State Management:
+ *   - products: Array of matching products from API
+ *   - isLoading: Loading state for async fetch
+ *   - query: Search query from URL params
+ *
+ * @component
+ * @returns {React.ReactElement} Search results page with product grid
+ */
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "../ShopContent/ShopContent.scss";

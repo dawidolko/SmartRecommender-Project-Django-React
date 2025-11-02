@@ -1,3 +1,62 @@
+/**
+ * AdminProducts Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Admin panel component for comprehensive product management in the e-commerce system.
+ * Provides CRUD operations, statistics visualization, and image upload functionality.
+ *
+ * Features:
+ *   - Product CRUD operations (Create, Read, Update, Delete)
+ *   - Multi-image upload with preview
+ *   - Product search and filtering
+ *   - Sorting by name/price (ascending/descending)
+ *   - Pagination (10 products per page)
+ *   - Real-time statistics dashboard:
+ *     * Total products count
+ *     * Total sales revenue
+ *     * Top selling product
+ *     * Low stock alerts
+ *   - Sales trend chart visualization
+ *   - Category distribution pie chart
+ *   - Confirmation modals for destructive actions
+ *   - Tag and category management
+ *
+ * State Management:
+ *   - products: Array of all products
+ *   - stats: Dashboard statistics object
+ *   - Form states: name, price, oldPrice, description, tags, category, uploadedImages
+ *   - Edit states: Separate state variables for editing mode
+ *   - UI states: searchTerm, currentPage, sortField, sortDirection, loading
+ *   - Modal states: Delete, add, and edit confirmation modals
+ *
+ * API Endpoints:
+ *   - GET /api/products/ - Fetch all products
+ *   - POST /api/products/ - Create new product
+ *   - PUT /api/products/:id/ - Update product
+ *   - DELETE /api/products/:id/ - Delete product
+ *   - POST /api/products/:id/upload-images/ - Upload product images
+ *   - GET /api/admin-stats/ - Fetch dashboard statistics
+ *   - GET /api/categories/ - Fetch available categories
+ *   - GET /api/tags/ - Fetch available tags
+ *
+ * Image Upload:
+ *   - Supports multiple images per product
+ *   - Preview before upload
+ *   - Automatic upload after product creation
+ *   - Format: multipart/form-data
+ *
+ * Validation:
+ *   - Required fields: name, price, description
+ *   - Price must be numeric
+ *   - At least one category required
+ *   - Image file type validation
+ *
+ * @component
+ * @returns {React.ReactElement} Admin product management page with dashboard
+ */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";

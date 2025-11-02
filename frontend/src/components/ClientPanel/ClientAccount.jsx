@@ -1,3 +1,69 @@
+/**
+ * ClientAccount Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Client panel component for managing user account settings and profile information.
+ * Allows users to update their personal information and change password.
+ *
+ * Features:
+ *   - Profile information editing (first name, last name, email)
+ *   - Password change functionality
+ *   - Form validation with error messages
+ *   - Success notifications
+ *   - Unsaved changes detection
+ *   - Loading states during save
+ *   - Email format validation
+ *   - Password strength requirements
+ *   - Password confirmation matching
+ *   - Auto-fill from current user data
+ *
+ * Validation Rules:
+ *   First Name:
+ *     - Required field
+ *     - Only letters allowed
+ *     - Max 50 characters
+ *
+ *   Last Name:
+ *     - Required field
+ *     - Only letters allowed
+ *     - Max 50 characters
+ *
+ *   Email:
+ *     - Required field
+ *     - Valid email format (regex)
+ *     - Unique in system
+ *
+ *   Password (optional):
+ *     - Min 8 characters
+ *     - At least one uppercase letter
+ *     - At least one lowercase letter
+ *     - At least one digit
+ *     - Must match confirmation field
+ *
+ * State Management:
+ *   - initialData: Original user data (for detecting changes)
+ *   - formData: Current form values {first_name, last_name, email, password, confirm_password}
+ *   - errorMessage: Validation or API error message
+ *   - loading: Save operation loading state
+ *   - user: Current user from AuthContext
+ *
+ * API Endpoints:
+ *   - PUT /api/me/ - Update user profile
+ *
+ * Success Flow:
+ *   1. Validate form data
+ *   2. Send PUT request with changes
+ *   3. Update AuthContext user state
+ *   4. Update localStorage
+ *   5. Show success toast notification
+ *   6. Reload page (optional)
+ *
+ * @component
+ * @returns {React.ReactElement} Account settings page with profile form
+ */
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";

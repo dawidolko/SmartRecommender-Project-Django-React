@@ -1,3 +1,64 @@
+/**
+ * ClientOrders Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Client panel component for viewing order history and managing product reviews.
+ * Displays user's orders with detailed information and review submission functionality.
+ *
+ * Features:
+ *   - Order history list with status tracking
+ *   - Search functionality (by order ID, status, date)
+ *   - Sorting by date, status, total amount
+ *   - Pagination (10 orders per page)
+ *   - Order details modal with product list
+ *   - Product review submission
+ *   - Star rating system
+ *   - Status color coding
+ *   - Date formatting
+ *   - Total amount calculation per order
+ *   - Expandable order items view
+ *
+ * Order Status Types:
+ *   - Pending - Order created, awaiting processing
+ *   - Processing - Order being prepared
+ *   - Shipped - Order dispatched
+ *   - Delivered - Order received by customer
+ *   - Cancelled - Order cancelled
+ *
+ * Review System:
+ *   - 5-star rating scale
+ *   - Text review (optional)
+ *   - One review per product per user
+ *   - Submit from order details modal
+ *
+ * State Management:
+ *   - orders: Array of user's orders
+ *   - filteredOrders: Orders after search/filter/sort
+ *   - sortKey: Field to sort by (date, status, total)
+ *   - sortOrder: Sort direction ('asc' or 'desc')
+ *   - searchTerm: Current search query
+ *   - currentPage: Active pagination page
+ *   - isModalOpen: Order details modal visibility
+ *   - isReviewModalOpen: Review submission modal visibility
+ *   - selectedOrder: Order currently viewed in modal
+ *   - selectedProduct: Product selected for review
+ *   - loading: Loading state for async operations
+ *
+ * API Endpoints:
+ *   - GET /api/orders/ - Fetch user's orders
+ *   - GET /api/client/orders/:id/ - Fetch specific order details
+ *   - POST /api/products/:id/reviews/ - Submit product review
+ *
+ * Calculations:
+ *   - Order Total = Σ(product_price × quantity) for all products
+ *   - Date Formatting: "MMM dd, yyyy" format
+ *
+ * @component
+ * @returns {React.ReactElement} Client orders page with history and reviews
+ */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import axios from "axios";

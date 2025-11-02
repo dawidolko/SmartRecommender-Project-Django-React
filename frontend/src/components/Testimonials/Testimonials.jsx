@@ -1,3 +1,58 @@
+/**
+ * Testimonials Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Product recommendations carousel component displayed on homepage.
+ * Shows personalized recommendations using configurable algorithms.
+ *
+ * Features:
+ *   - Responsive carousel slider (react-slick)
+ *   - Dynamic algorithm selection (Collaborative, Content-Based, Fuzzy Logic)
+ *   - Real-time algorithm switching with localStorage sync
+ *   - Fallback to random products for guests
+ *   - Loading states and error handling
+ *   - Automatic slide rotation
+ *   - Touch/swipe support on mobile
+ *   - Responsive breakpoints:
+ *     * Desktop: 4 products
+ *     * Laptop: 3 products
+ *     * Tablet: 2 products
+ *     * Mobile: 1 product
+ *
+ * Recommendation Algorithms:
+ *   1. Collaborative Filtering - Based on similar users' purchases
+ *   2. Content-Based Filtering - Based on product attributes similarity
+ *   3. Fuzzy Logic - Based on fuzzy user profile preferences
+ *
+ * State Management:
+ *   - productsState: {
+ *       currentAlgorithm: Active recommendation algorithm
+ *       products: Array of recommended products
+ *       isLoading: Loading state
+ *     }
+ *
+ * Event Listeners:
+ *   - storage event - Syncs algorithm changes across browser tabs
+ *   - algorithmChanged custom event - Real-time algorithm updates
+ *
+ * API Endpoints:
+ *   - GET /api/recommendation-settings/ - Get user's algorithm preference
+ *   - GET /api/recommendation-preview/?algorithm={alg} - Get recommendations
+ *   - GET /api/random-products/ - Fallback for guests
+ *
+ * Slider Configuration:
+ *   - autoplay: true (5 second intervals)
+ *   - infinite loop
+ *   - dots navigation
+ *   - arrows navigation
+ *   - pauseOnHover
+ *
+ * @component
+ * @returns {React.ReactElement} Recommendations carousel slider
+ */
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Slider from "react-slick";

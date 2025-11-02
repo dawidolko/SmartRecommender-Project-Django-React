@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Line, Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,12 +13,10 @@ import {
 } from "chart.js";
 import {
   TrendingUp,
-  AlertTriangle,
   Package,
   Users,
   BarChart2,
-  ChevronLeft,
-  ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import config from "../../config/config";
@@ -56,22 +54,47 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   );
 };
 
+/**
+ * AdminProbabilistic Component
+ *
+ * Dashboard for probabilistic models and forecasting analytics.
+ *
+ * Probabilistic Models:
+ *   1. Markov Chain - Sequential purchase prediction
+ *      Formula: P(X_t+1 | X_t) = transition probability matrix
+ *
+ *   2. Naive Bayes - Purchase/Churn probability
+ *      Formula: P(A|B) = P(B|A)P(A) / P(B)
+ *
+ *   3. Time Series Forecasting - Sales prediction
+ *      Methods: Moving average, exponential smoothing
+ *
+ * Features:
+ *   - Sales forecasting with trend visualization
+ *   - Product demand prediction
+ *   - Risk assessment dashboard
+ *   - Purchase probability analysis
+ *   - Interactive charts (Chart.js)
+ *   - Modal views for detailed insights
+ *
+ * Tabs:
+ *   - forecast: Sales trend forecasts
+ *   - demand: Product-level demand prediction
+ *   - markov: Sequential purchase patterns
+ *   - naive_bayes: Classification probabilities
+ *
+ * @component
+ * @returns {React.ReactElement} Probabilistic analytics dashboard
+ */
 const AdminProbabilistic = () => {
   const [activeTab, setActiveTab] = useState("forecast");
   const [salesForecasts, setSalesForecasts] = useState([]);
-  const [riskData, setRiskData] = useState({
-    high_risk_alerts: [],
-    risk_overview: {},
-  });
   const [demandForecasts, setDemandForecasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalContent, setModalContent] = useState(null);
   const [modalTitle, setModalTitle] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
@@ -101,24 +124,12 @@ const AdminProbabilistic = () => {
           probabilisticData.markov_predictions?.user_predictions || []
         );
         setChartData(probabilisticData.predictive_charts?.forecast_data || []);
-        setRiskData(
-          probabilisticData.risk_analysis || {
-            high_risk_alerts: [],
-            risk_overview: {},
-          }
-        );
         setDemandForecasts(
           probabilisticData.bayesian_insights?.product_insights || []
         );
       } else {
-        const [forecastRes, riskRes, demandRes] = await Promise.all([
+        const [forecastRes, demandRes] = await Promise.all([
           fetch(`${config.apiUrl}/api/sales-forecast/`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }).catch(() => null),
-          fetch(`${config.apiUrl}/api/risk-dashboard/`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -133,12 +144,10 @@ const AdminProbabilistic = () => {
         ]);
 
         const forecast = forecastRes?.ok ? await forecastRes.json() : {};
-        const risk = riskRes?.ok ? await riskRes.json() : {};
         const demand = demandRes?.ok ? await demandRes.json() : {};
 
         setSalesForecasts(forecast.forecasts || []);
         setChartData(forecast.chart_data || []);
-        setRiskData(risk || { high_risk_alerts: [], risk_overview: {} });
         setDemandForecasts(demand.demand_forecasts || []);
       }
 
@@ -288,45 +297,6 @@ const AdminProbabilistic = () => {
           },
         },
       },
-    };
-  };
-
-  const getRiskChartData = () => {
-    if (
-      !riskData.risk_overview ||
-      Object.keys(riskData.risk_overview).length === 0
-    ) {
-      return {
-        labels: ["No Data"],
-        datasets: [
-          {
-            label: "Risk Items",
-            data: [0],
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
-          },
-        ],
-      };
-    }
-
-    const riskTypes = Object.keys(riskData.risk_overview || {});
-    const riskCounts = riskTypes.map(
-      (type) => riskData.risk_overview[type]?.length || 0
-    );
-
-    return {
-      labels: riskTypes.map((type) => type.replace("_", " ").toUpperCase()),
-      datasets: [
-        {
-          label: "Risk Items",
-          data: riskCounts,
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.5)",
-            "rgba(54, 162, 235, 0.5)",
-            "rgba(255, 206, 86, 0.5)",
-            "rgba(75, 192, 192, 0.5)",
-          ],
-        },
-      ],
     };
   };
 
@@ -588,19 +558,6 @@ const AdminProbabilistic = () => {
     }
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentAlerts = riskData.high_risk_alerts?.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-
-  const totalPages = Math.ceil(
-    (riskData.high_risk_alerts?.length || 0) / itemsPerPage
-  );
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   if (loading) {
     return <div className="loading-spinner"></div>;
   }
@@ -622,7 +579,6 @@ const AdminProbabilistic = () => {
       <div className="probabilistic-tabs">
         <TabButton id="forecast" label="Markov Analysis" icon={TrendingUp} />
         <TabButton id="demand" label="Bayesian Insights" icon={Package} />
-        <TabButton id="risk" label="Risk Dashboard" icon={AlertTriangle} />
         <TabButton id="insights" label="User Predictions" icon={Users} />
       </div>
 
@@ -795,115 +751,6 @@ const AdminProbabilistic = () => {
                   )}
                 </tbody>
               </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "risk" && (
-          <div className="risk-section">
-            <div className="risk-overview">
-              <h2>Risk Dashboard</h2>
-              <div className="risk-summary">
-                <div className="risk-stat">
-                  <h3>Total Risk Items</h3>
-                  <p>{riskData.high_risk_alerts?.length || 0}</p>
-                </div>
-                <div className="risk-stat">
-                  <h3>Critical Risks</h3>
-                  <p>
-                    {riskData.high_risk_alerts?.filter(
-                      (r) => r.risk_score > 0.8
-                    ).length || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="risk-charts">
-              <div className="chart-container">
-                <Bar data={getRiskChartData()} options={{ responsive: true }} />
-              </div>
-            </div>
-
-            <div className="risk-alerts">
-              <h3>High Risk Alerts</h3>
-              <div className="alerts-list">
-                {currentAlerts?.length > 0 ? (
-                  currentAlerts.map((alert, index) => (
-                    <div key={index} className="alert-item">
-                      <div className="alert-header">
-                        <span className="alert-type">{alert.risk_type}</span>
-                        <span
-                          className={`risk-score score-${Math.floor(
-                            alert.risk_score * 10
-                          )}`}>
-                          Risk: {(alert.risk_score * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                      <div className="alert-body">
-                        <p>
-                          <strong>Entity:</strong> {alert.entity_name}
-                        </p>
-                        <p>
-                          <strong>Mitigation:</strong> {alert.mitigation}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-data">No high risk alerts</div>
-                )}
-              </div>
-
-              {riskData.high_risk_alerts?.length > itemsPerPage && (
-                <div className="pagination-container">
-                  <div className="pagination-info">
-                    <p className="pagination-text2">
-                      Displaying {indexOfFirstItem + 1} to{" "}
-                      {Math.min(
-                        indexOfLastItem,
-                        riskData.high_risk_alerts.length
-                      )}{" "}
-                      of {riskData.high_risk_alerts.length} alerts
-                    </p>
-                  </div>
-                  <div className="pagination-controls">
-                    <button
-                      onClick={() => paginate(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className={`pagination-button ${
-                        currentPage === 1 ? "disabled" : ""
-                      }`}>
-                      <ChevronLeft size={16} />
-                      <span>&lt;</span>
-                    </button>
-                    {Array.from({ length: totalPages })
-                      .map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => paginate(index + 1)}
-                          className={`pagination-number ${
-                            currentPage === index + 1 ? "active" : ""
-                          }`}>
-                          {index + 1}
-                        </button>
-                      ))
-                      .slice(
-                        Math.max(0, currentPage - 3),
-                        Math.min(totalPages, currentPage + 2)
-                      )}
-                    <button
-                      onClick={() => paginate(currentPage + 1)}
-                      disabled={currentPage >= totalPages}
-                      className={`pagination-button ${
-                        currentPage >= totalPages ? "disabled" : ""
-                      }`}>
-                      <ChevronRight size={16} />
-                      <span>&gt;</span>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}

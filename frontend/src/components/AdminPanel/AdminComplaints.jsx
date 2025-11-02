@@ -1,3 +1,57 @@
+/**
+ * AdminComplaints Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Admin panel component for managing customer complaints and support tickets.
+ * Provides complaint tracking, status management, and resolution workflow.
+ *
+ * Features:
+ *   - Complaint list with detailed information
+ *   - Status management (Pending → Resolved/Rejected)
+ *   - Search functionality (by ID, order, cause, status)
+ *   - Sorting by multiple fields (ID, order, status, date)
+ *   - Pagination (10 complaints per page)
+ *   - Complaint statistics dashboard:
+ *     * Total complaints count
+ *     * Pending complaints count
+ *     * Resolved complaints count
+ *     * Rejected complaints count
+ *   - Expandable complaint details
+ *   - Bulk status updates
+ *   - Delete functionality
+ *   - Date formatting
+ *
+ * Complaint Status Flow:
+ *   1. Pending - Initial state when complaint is created
+ *   2. Resolved - Complaint has been successfully addressed
+ *   3. Rejected - Complaint was deemed invalid or rejected
+ *
+ * State Management:
+ *   - complaints: Array of all complaints from database
+ *   - filteredComplaints: Complaints after search/filter operations
+ *   - statusChanges: Object tracking status updates {complaintId: newStatus}
+ *   - searchTerm: Current search query
+ *   - sortField: Active sorting field (id, order, status, date_complaint)
+ *   - sortDirection: Sort direction ('asc' or 'desc')
+ *   - currentPage: Active pagination page
+ *   - stats: Dashboard statistics (total, pending, resolved, rejected)
+ *   - loading: Loading state for async operations
+ *
+ * API Endpoints:
+ *   - GET /api/complaints/ - Fetch all complaints (admin only)
+ *   - PUT /api/complaints/:id/ - Update complaint status
+ *   - DELETE /api/complaints/:id/ - Delete complaint
+ *
+ * Calculations:
+ *   - Statistics: Real-time count aggregation by status
+ *   - Filtering: Case-insensitive search across multiple fields
+ *
+ * @component
+ * @returns {React.ReactElement} Admin complaints management page with dashboard
+ */
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {

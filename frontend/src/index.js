@@ -27,7 +27,8 @@ if (window.location.hostname === "localhost") {
         (msg.includes('Each child in a list should have a unique "key" prop') ||
           msg.includes(
             'Warning: Each child in a list should have a unique "key" prop'
-          ))
+          ) ||
+          msg.includes("Encountered two children with the same key"))
       ) {
         return;
       }

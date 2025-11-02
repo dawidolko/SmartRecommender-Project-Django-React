@@ -1,3 +1,43 @@
+/**
+ * ContactContent Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Contact page component with contact information boxes and inquiry form.
+ * Provides multiple ways for users to reach the company.
+ *
+ * Features:
+ *   - Contact information boxes (phone, email, address, hours)
+ *   - Contact form for inquiries
+ *   - Responsive layout
+ *   - Icon-based contact cards
+ *   - Form validation
+ *
+ * Contact Methods:
+ *   1. Phone - Direct call link
+ *   2. Email - Mailto link
+ *   3. Address - Google Maps integration
+ *   4. Business Hours - Office availability
+ *
+ * Components:
+ *   - ContactBox: Individual contact info card with icon
+ *   - ContactForm: Form component for user inquiries
+ *
+ * Form Fields:
+ *   - Name (required)
+ *   - Email (required, validated)
+ *   - Subject (required)
+ *   - Message (required, textarea)
+ *
+ * Data Source:
+ *   - BoxData.js - Array of contact information objects
+ *   - Each box: {id, icon, title, content, link}
+ *
+ * @component
+ * @returns {React.ReactElement} Contact page with info boxes and form
+ */
 import "./ContactContent.scss";
 import boxData from "./BoxData";
 import ContactBox from "./ContactBox";

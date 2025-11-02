@@ -1,5 +1,9 @@
 """
-Fuzzy Logic Engine for Product Recommendations
+Fuzzy Logic Engine for Product Recommendations.
+
+Authors: Dawid Olko & Piotr Smoła
+Date: 2025-11-02
+Version: 2.0
 
 Implementation of fuzzy logic system for modeling uncertainty in user preferences.
 Based on:

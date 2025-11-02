@@ -1,3 +1,47 @@
+/**
+ * Footer Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Website footer component with company information, navigation links,
+ * contact details, and social media links.
+ *
+ * Features:
+ *   - Company branding and description
+ *   - Quick navigation links (About, FAQ, Blog, Contact)
+ *   - Office hours display
+ *   - Contact information (address, email, phone)
+ *   - Social media icons with links
+ *   - Newsletter subscription
+ *   - Copyright information
+ *   - Responsive grid layout
+ *
+ * Sections:
+ *   1. Company Info - Logo and mission statement
+ *   2. Useful Links - Internal navigation
+ *   3. Office Hours - Business hours
+ *   4. Contact - Address, email, phone with icons
+ *   5. Newsletter - Email subscription form
+ *   6. Social Media - Facebook, Twitter, Instagram, YouTube
+ *   7. Copyright - Legal text
+ *
+ * Icons Used:
+ *   - FaLocationArrow - Address icon
+ *   - AiFillMail - Email icon
+ *   - AiFillPhone - Phone icon
+ *   - FaFacebookF, FaTwitter, FaInstagram, FaYoutube - Social icons
+ *
+ * External Links:
+ *   - Google Maps for address
+ *   - Email mailto link
+ *   - Phone tel link
+ *   - Social media profiles
+ *
+ * @component
+ * @returns {React.ReactElement} Footer with company info and navigation
+ */
 import "./Footer.scss";
 import { Link } from "react-router-dom";
 import { AiFillPhone, AiFillMail } from "react-icons/ai";

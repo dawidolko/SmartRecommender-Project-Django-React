@@ -20,6 +20,31 @@ import config from "../../config/config";
 import { toast } from "react-toastify";
 import "./AdminPanel.scss";
 
+/**
+ * AdminStatistics Component
+ *
+ * Main statistics and algorithm management dashboard for SmartRecommender admin panel.
+ *
+ * Features:
+ *   - Overview statistics (products, sales, users, ratings)
+ *   - Recommendation algorithm selection and testing
+ *   - Association rules management (Apriori algorithm)
+ *   - Real-time algorithm status monitoring
+ *   - Algorithm performance preview
+ *
+ * Algorithms Supported:
+ *   1. Collaborative Filtering - Item-based recommendations
+ *   2. Content-Based Filtering - TF-IDF similarity
+ *   3. Fuzzy Logic - Membership functions
+ *
+ * Association Rules (Apriori Algorithm):
+ *   - Computes "Frequently Bought Together" patterns
+ *   - Metrics: Support, Confidence, Lift
+ *   - Configurable thresholds (min_support, min_confidence, min_lift)
+ *
+ * @component
+ * @returns {React.ReactElement} Statistics dashboard with algorithm controls
+ */
 const AdminStatistics = () => {
   const [stats, setStats] = useState({
     totalProducts: 0,

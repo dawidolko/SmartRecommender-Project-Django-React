@@ -1,3 +1,43 @@
+/**
+ * ShopContent Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Main shop page component that displays product catalog with category filtering,
+ * pagination, and responsive sidebar navigation.
+ *
+ * Features:
+ *   - Hierarchical category filtering (main categories + subcategories)
+ *   - Product grid with pagination (30 products per page)
+ *   - Responsive sidebar (collapsible on mobile)
+ *   - Dynamic icon mapping for categories
+ *   - URL-based category selection (deep linking)
+ *   - Loading states for better UX
+ *   - Expandable category groups
+ *
+ * Category Structure:
+ *   - Main categories (e.g., "Electronics")
+ *   - Subcategories (e.g., "Electronics.Laptops")
+ *   - URL format: /shop/:category (e.g., /shop/Electronics.Laptops)
+ *
+ * State Management:
+ *   - selectedMainCategory: Current main category filter
+ *   - selectedSubCategory: Current subcategory filter
+ *   - products: Array of all products from API
+ *   - categories: Array of available category names
+ *   - currentPage: Active pagination page number
+ *   - isSidebarOpen: Sidebar visibility toggle (responsive)
+ *   - expandedCategories: List of expanded category groups
+ *
+ * API Endpoints:
+ *   - GET /api/categories/ - Fetch all categories
+ *   - GET /api/products/ - Fetch all products
+ *
+ * @component
+ * @returns {React.ReactElement} Shop page with category sidebar and product grid
+ */
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";

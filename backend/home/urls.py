@@ -1,3 +1,138 @@
+"""
+URL Configuration for SmartRecommender E-commerce API.
+
+This module defines all HTTP endpoints for the Django REST Framework API.
+The system uses a RESTful architecture with JWT authentication.
+
+API Structure Overview:
+======================
+
+1. AUTHENTICATION & USER MANAGEMENT (7 endpoints)
+   /api/login/ - JWT token generation (email + password)
+   /api/token/ - Alternative token endpoint
+   /api/token/refresh/ - Refresh expired access tokens
+   /api/register/ - New user registration
+   /api/me/ - Get/update current user profile
+   /api/user/ - Current user details
+   /api/users/ - Admin: list all users
+   /api/users/<id>/ - Admin: CRUD operations on specific user
+
+2. PRODUCT CATALOG (10 endpoints)
+   /api/products/ - List all products, create new (admin)
+   /api/products/<id>/ - Get/Update/Delete product
+   /api/products/search/ - Search products by name/description
+   /api/product/<id>/ - Product details (public)
+   /api/random-products/ - Random product selection for homepage
+   /api/categories/ - List all categories
+   /api/tags/ - List all product tags
+   /api/products/<id>/upload-images/ - Upload product photos
+   /api/products/<id>/reviews/ - Product reviews list
+   /api/recommended-products/ - Personalized recommendations
+
+3. SHOPPING CART & ORDERS (6 endpoints)
+   /cart/preview/ - View cart contents
+   /cart/update/<id>/ - Update cart item quantity
+   /cart/remove/<id>/ - Remove item from cart
+   /api/orders/ - List orders (client), create new order
+   /api/orders/<id>/ - Admin: update/delete order
+   /api/client/orders/<id>/ - Client: view own order details
+
+4. CUSTOMER SERVICE (2 endpoints)
+   /api/complaints/ - List/create complaints
+   /api/complaints/<id>/ - Update/delete complaint
+
+5. RECOMMENDATION SYSTEMS (12 endpoints)
+   /api/recommendation-settings/ - User recommendation preferences
+   /api/process-recommendations/ - Trigger recommendation generation
+   /api/interaction/ - Log user-product interaction
+   /api/recommendation-preview/ - Preview recommendations before saving
+   /api/generate-user-recommendations/ - Generate personalized recs
+   /api/admin/update-product-similarity/ - Regenerate similarity matrices
+   /api/recommendation-algorithm-status/ - Check algorithm processing status
+   /api/collaborative-filtering-debug/ - Debug CF algorithm
+   /api/all-collaborative-similarities/ - View all CF similarities
+   /api/content-based-debug/ - Debug CB algorithm
+   /api/fuzzy-logic-debug/ - Debug fuzzy logic system
+   /api/probabilistic-debug/ - Debug probabilistic models
+
+6. ASSOCIATION RULES (APRIORI ALGORITHM) (5 endpoints)
+   /api/frequently-bought-together/ - Products often bought together
+   /api/update-association-rules/ - Regenerate Apriori rules
+   /api/association-rules/ - List all association rules
+   /api/association-rules-analysis/ - Statistical analysis of rules
+   /api/product-association-debug/ - Debug association generation
+
+7. PROBABILISTIC ANALYTICS (3 endpoints)
+   /api/markov-recommendations/ - Markov chain next-purchase prediction
+   /api/bayesian-insights/ - Bayesian probability insights
+   /api/admin/probabilistic-analysis/ - Admin probabilistic dashboard
+
+8. PREDICTIVE ANALYTICS (10 endpoints)
+   /api/purchase-prediction/ - Predict user's next purchase
+   /api/risk-dashboard/ - Churn risk assessment
+   /api/sales-forecast/ - Product sales forecasting (ARIMA)
+   /api/product-demand/ - Demand forecasting for inventory
+   /api/user-purchase-patterns/ - User's RFM analysis
+   /api/admin-purchase-patterns/ - All users' purchase patterns
+   /api/admin-product-recommendations/ - Admin recommendation insights
+   /api/admin-churn-prediction/ - Admin churn prediction dashboard
+   /api/my-shopping-insights/ - User's personalized insights
+   /api/seasonal-trends/ - Seasonal shopping trend analysis
+
+9. SENTIMENT ANALYSIS (5 endpoints)
+   /api/sentiment-search/ - Search products by sentiment
+   /api/sentiment-analysis-debug/ - Debug sentiment analysis
+   /api/sentiment-product-debug/ - Product sentiment debugging
+   /api/fuzzy-search/ - Fuzzy logic sentiment search
+   /api/fuzzy-logic-recommendations/ - Fuzzy logic recommendations
+
+10. ADMIN DASHBOARDS (3 endpoints)
+    /api/admin-stats/ - General admin statistics
+    /api/admin-dashboard-stats/ - Comprehensive dashboard data
+    /api/client-stats/ - Client-specific statistics
+
+HTTP Methods by Endpoint:
+========================
+- GET: Retrieve data (public or authenticated)
+- POST: Create new resource (authenticated)
+- PUT/PATCH: Update existing resource (authenticated, owner or admin)
+- DELETE: Remove resource (admin only)
+
+Authentication Requirements:
+===========================
+- AllowAny: Public endpoints (login, register, product browsing)
+- IsAuthenticated: Logged-in users (cart, orders, reviews)
+- IsAdminUser: Admin-only (user management, product CRUD, analytics)
+
+URL Pattern Examples:
+====================
+1. List all products:
+   GET /api/products/
+   
+2. Get product by ID:
+   GET /api/products/42/
+   
+3. Search products:
+   GET /api/products/search/?q=laptop
+   
+4. Create order:
+   POST /api/orders/
+   Body: {"products": [{"id": 1, "quantity": 2}]}
+   
+5. Get recommendations:
+   GET /api/recommended-products/
+   Header: Authorization: Bearer <jwt_token>
+
+Media Files:
+===========
+Static files served at: /media/
+Root directory: settings.MEDIA_ROOT
+
+Authors: Dawid Olko & Piotr Smoła
+Date: 2025-11-02
+Version: 2.0
+"""
+
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
@@ -46,6 +181,7 @@ from .recommendation_views import (
     UpdateProductSimilarityView,
     RecommendationAlgorithmStatusView,
     CollaborativeFilteringDebugView,
+    AllCollaborativeSimilaritiesView,
     ContentBasedDebugView,
 )
 
@@ -231,6 +367,11 @@ urlpatterns = [
         "api/collaborative-filtering-debug/",
         CollaborativeFilteringDebugView.as_view(),
         name="collaborative-filtering-debug",
+    ),
+    path(
+        "api/all-collaborative-similarities/",
+        AllCollaborativeSimilaritiesView.as_view(),
+        name="all-collaborative-similarities",
     ),
     path(
         "api/content-based-debug/",

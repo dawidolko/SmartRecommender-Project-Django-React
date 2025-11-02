@@ -1,3 +1,75 @@
+/**
+ * ClientDashboard Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Client panel dashboard displaying personalized analytics, statistics,
+ * and product recommendations based on user's purchase history.
+ *
+ * Features:
+ *   - Purchase statistics (total items, complaints, orders this month)
+ *   - Average order value calculation
+ *   - Order trends line chart (monthly spending)
+ *   - Category distribution pie chart (spending by category)
+ *   - Personalized product recommendations (3 algorithms)
+ *   - Algorithm selection preview:
+ *     * Collaborative Filtering - Based on similar users
+ *     * Content-Based Filtering - Based on product attributes
+ *     * Fuzzy Logic - Based on fuzzy user profile
+ *   - Animated counters (CountUp effect)
+ *   - Responsive chart sizing
+ *   - Product quick view and navigation
+ *
+ * Dashboard Metrics:
+ *   1. Purchased Items Count - Total products bought by user
+ *   2. Complaints Count - Total complaints filed
+ *   3. Orders This Month - Number of orders in current month
+ *   4. Average Order Value - Mean spending per order
+ *
+ * Charts:
+ *   1. Order Trends (Line Chart):
+ *      - X-axis: Months (formatted as "MMM yyyy")
+ *      - Y-axis: Total spending (PLN)
+ *      - Shows spending patterns over time
+ *
+ *   2. Category Distribution (Pie Chart):
+ *      - Shows percentage of spending per category
+ *      - Helps users understand their purchase preferences
+ *      - Color-coded segments
+ *
+ * Recommendations:
+ *   - Fetches user's active algorithm preference
+ *   - Displays top 6 recommended products
+ *   - Shows algorithm name in title
+ *   - Clicking product navigates to detail page
+ *
+ * State Management:
+ *   - purchasedItems: Total items purchased
+ *   - complaints: Complaint count
+ *   - orderSummary: {ordersThisMonth, avgOrderValue}
+ *   - orderTrendsData: Chart.js data for line chart
+ *   - categoryDistributionData: Chart.js data for pie chart
+ *   - recommendedProducts: Array of product recommendations
+ *   - currentAlgorithm: Active recommendation algorithm
+ *   - loading: Loading state for async operations
+ *   - error: Error message if API fails
+ *
+ * API Endpoints:
+ *   - GET /api/orders/ - Fetch user's orders
+ *   - GET /api/client-stats/ - Fetch dashboard statistics
+ *   - GET /api/recommendation-settings/ - Get user's algorithm preference
+ *   - GET /api/recommendation-preview/?algorithm={alg} - Get recommendations
+ *
+ * Calculations:
+ *   - Average Order Value = Σ(order totals) / count(orders)
+ *   - Category Spending = Σ(product prices) grouped by category
+ *   - Monthly Trends = Σ(order values) grouped by month
+ *
+ * @component
+ * @returns {React.ReactElement} Client dashboard with analytics and recommendations
+ */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";

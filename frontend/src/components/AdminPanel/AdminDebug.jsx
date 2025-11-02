@@ -1,31 +1,135 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Code, Brain, MessageSquare, Link2, Grid, Sparkles, TrendingUp } from "lucide-react";
+import {
+  Code,
+  Brain,
+  MessageSquare,
+  Link2,
+  Grid,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import config from "../../config/config";
 import { toast } from "react-toastify";
 import "./AdminPanel.scss";
 
+/**
+ * AdminDebug Component
+ *
+ * Comprehensive debugging interface for SmartRecommender's recommendation algorithms.
+ * Provides detailed diagnostic information, performance metrics, and algorithm visualization
+ * for all recommendation strategies implemented in the system.
+ *
+ * Supported Algorithms:
+ *   1. Collaborative Filtering (CF) - Adjusted Cosine Similarity (Sarwar et al., 2001)
+ *      Formula: sim(i,j) = Σ(R_u,i - R̄_u)(R_u,j - R̄_u) / √[Σ(R_u,i - R̄_u)² × Σ(R_u,j - R̄_u)²]
+ *
+ *   2. Sentiment Analysis - TextBlob polarity scoring
+ *      Formula: sentiment = (positive_words - negative_words) / total_words
+ *
+ *   3. Content-Based Filtering - TF-IDF + Cosine Similarity
+ *      Formula: cos(θ) = (A · B) / (||A|| × ||B||)
+ *
+ *   4. Association Rules - Apriori Algorithm (Agrawal & Srikant, 1994)
+ *      Metrics: Support, Confidence, Lift
+ *
+ *   5. Fuzzy Logic - Membership functions + Defuzzification
+ *      Methods: Triangular, Trapezoidal, Gaussian membership
+ *
+ *   6. Probabilistic Models - Naive Bayes, Markov Chains
+ *      Formulas: P(A|B) = P(B|A)P(A) / P(B)
+ *
+ * Features:
+ *   - Real-time algorithm diagnostics
+ *   - Matrix visualization and statistics
+ *   - Performance metrics tracking
+ *   - Cache monitoring
+ *   - Interactive debugging tools
+ *   - Modal views for detailed data
+ *   - Pagination for large datasets
+ *
+ * @component
+ * @returns {React.ReactElement} Admin debug dashboard with tabbed interface
+ */
 const AdminDebug = () => {
+  // ============================================================================
+  // STATE MANAGEMENT
+  // ============================================================================
+
+  /** @type {[string, Function]} Active debugging tab/method */
   const [activeMethod, setActiveMethod] = useState("collaborative");
+
+  /** @type {[Object|null, Function]} Collaborative filtering debug data */
   const [cfDebugData, setCfDebugData] = useState(null);
+
+  /** @type {[Object|null, Function]} Sentiment analysis debug data */
   const [sentimentDebugData, setSentimentDebugData] = useState(null);
+
+  /** @type {[Object|null, Function]} Detailed sentiment data for specific product */
   const [sentimentDetailData, setSentimentDetailData] = useState(null);
+
+  /** @type {[Object|null, Function]} Association rules debug data */
   const [associationDebugData, setAssociationDebugData] = useState(null);
+
+  /** @type {[Object|null, Function]} Content-based filtering debug data */
   const [contentBasedDebugData, setContentBasedDebugData] = useState(null);
+
+  /** @type {[Object|null, Function]} Fuzzy logic debug data */
   const [fuzzyLogicDebugData, setFuzzyLogicDebugData] = useState(null);
+
+  /** @type {[Object|null, Function]} Probabilistic models debug data */
   const [probabilisticDebugData, setProbabilisticDebugData] = useState(null);
+
+  /** @type {[string, Function]} Selected product ID for detail views */
   const [selectedProductId, setSelectedProductId] = useState("");
+
+  /** @type {[string, Function]} Selected user ID for detail views */
   const [selectedUserId, setSelectedUserId] = useState("");
+
+  /** @type {[Array, Function]} List of all products */
   const [users, setUsers] = useState([]);
+
+  /** @type {[Array, Function]} List of all users */
   const [products, setProducts] = useState([]);
+
+  /** @type {[boolean, Function]} Loading state for async operations */
   const [loading, setLoading] = useState(false);
 
+  // Modal state for all similarities view
+  /** @type {[boolean, Function]} Modal visibility toggle */
+  const [showAllSimilaritiesModal, setShowAllSimilaritiesModal] =
+    useState(false);
+
+  /** @type {[Array, Function]} All CF similarities data */
+  const [allSimilarities, setAllSimilarities] = useState([]);
+
+  /** @type {[boolean, Function]} Loading state for similarities fetch */
+  const [allSimilaritiesLoading, setAllSimilaritiesLoading] = useState(false);
+
+  /** @type {[number, Function]} Current page number for pagination */
+  const [similaritiesPage, setSimilaritiesPage] = useState(1);
+
+  /** @const {number} Items per page in similarities modal */
+  const similaritiesPerPage = 50;
+
+  // ============================================================================
+  // LIFECYCLE HOOKS
+  // ============================================================================
+
+  /**
+   * Initialize component by fetching reference data (products and users).
+   * Runs once on component mount.
+   */
   useEffect(() => {
     fetchProducts();
     fetchUsers();
   }, []);
 
+  /**
+   * Handle tab switching and fetch appropriate debug data.
+   * Resets selections and fetches new data when active method changes.
+   */
   useEffect(() => {
     setSelectedProductId("");
     setSelectedUserId("");
@@ -48,6 +152,18 @@ const AdminDebug = () => {
     }
   }, [activeMethod]);
 
+  // ============================================================================
+  // DATA FETCHING FUNCTIONS
+  // ============================================================================
+
+  /**
+   * Fetch all products from the database.
+   * Used for dropdown selections and reference data.
+   *
+   * @async
+   * @function fetchProducts
+   * @returns {Promise<void>}
+   */
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem("access");
@@ -60,6 +176,14 @@ const AdminDebug = () => {
     }
   };
 
+  /**
+   * Fetch all users from the database.
+   * Used for dropdown selections and reference data.
+   *
+   * @async
+   * @function fetchUsers
+   * @returns {Promise<void>}
+   */
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("access");
@@ -72,6 +196,23 @@ const AdminDebug = () => {
     }
   };
 
+  /**
+   * Fetch Collaborative Filtering debug information.
+   *
+   * Retrieves detailed CF algorithm diagnostics including:
+   *   - User-product interaction matrix statistics
+   *   - Similarity computation results
+   *   - Top 10 similar product pairs
+   *   - Cache status
+   *   - System health indicators
+   *
+   * Algorithm: Adjusted Cosine Similarity (Sarwar et al., 2001)
+   * Formula: sim(i,j) = Σ_u∈U(R_u,i - R̄_u)(R_u,j - R̄_u) / √[Σ_u∈U(R_u,i - R̄_u)² × Σ_u∈U(R_u,j - R̄_u)²]
+   *
+   * @async
+   * @function fetchCFDebug
+   * @returns {Promise<void>}
+   */
   const fetchCFDebug = async () => {
     setLoading(true);
     const token = localStorage.getItem("access");
@@ -89,6 +230,87 @@ const AdminDebug = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * Fetch all Collaborative Filtering similarities from database.
+   *
+   * Retrieves complete list of product-product similarities computed using
+   * Adjusted Cosine Similarity algorithm. Used for detailed analysis and
+   * modal view with pagination.
+   *
+   * Features:
+   *   - Fetches up to 10,000 similarity records
+   *   - Formats data for modal table display
+   *   - Handles empty results gracefully
+   *   - Provides user feedback via toasts
+   *
+   * @async
+   * @function fetchAllSimilarities
+   * @returns {Promise<void>}
+   */
+  const fetchAllSimilarities = async () => {
+    setAllSimilaritiesLoading(true);
+    const token = localStorage.getItem("access");
+    try {
+      // Fetch all collaborative filtering similarities from dedicated endpoint
+      const res = await axios.get(
+        `${config.apiUrl}/api/all-collaborative-similarities/?limit=10000`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Format data for modal table structure
+      const formattedSimilarities = res.data.results
+        ? res.data.results.map((sim) => ({
+            product1_id: sim.product1?.id,
+            product1_name: sim.product1?.name || "Unknown Product",
+            product2_id: sim.product2?.id,
+            product2_name: sim.product2?.name || "Unknown Product",
+            score: sim.similarity_score,
+          }))
+        : [];
+
+      setAllSimilarities(formattedSimilarities);
+
+      if (formattedSimilarities.length === 0) {
+        toast.info("No collaborative similarities found in database.");
+      }
+    } catch (err) {
+      console.error("Error fetching all similarities:", err);
+      toast.error("Failed to fetch all similarities.");
+      setAllSimilarities([]);
+    } finally {
+      setAllSimilaritiesLoading(false);
+    }
+  };
+
+  /**
+   * Open modal displaying all CF similarities.
+   *
+   * Triggers data fetch if not already loaded. Modal displays paginated
+   * table of all product-product similarity scores.
+   *
+   * @function openAllSimilaritiesModal
+   * @returns {void}
+   */
+  const openAllSimilaritiesModal = () => {
+    setShowAllSimilaritiesModal(true);
+    if (allSimilarities.length === 0) {
+      fetchAllSimilarities();
+    }
+  };
+
+  /**
+   * Close similarities modal and reset pagination.
+   *
+   * @function closeAllSimilaritiesModal
+   * @returns {void}
+   */
+  const closeAllSimilaritiesModal = () => {
+    setShowAllSimilaritiesModal(false);
+    setSimilaritiesPage(1);
   };
 
   const fetchSentimentDebug = async () => {
@@ -283,17 +505,13 @@ const AdminDebug = () => {
           Association Rules
         </button>
         <button
-          className={`method-tab ${
-            activeMethod === "content" ? "active" : ""
-          }`}
+          className={`method-tab ${activeMethod === "content" ? "active" : ""}`}
           onClick={() => setActiveMethod("content")}>
           <Grid className="tab-icon" />
           Content-Based
         </button>
         <button
-          className={`method-tab ${
-            activeMethod === "fuzzy" ? "active" : ""
-          }`}
+          className={`method-tab ${activeMethod === "fuzzy" ? "active" : ""}`}
           onClick={() => setActiveMethod("fuzzy")}>
           <Sparkles className="tab-icon" />
           Fuzzy Logic
@@ -527,6 +745,12 @@ const AdminDebug = () => {
                               </tbody>
                             </table>
                           </div>
+                          <button
+                            className="view-all-btn"
+                            onClick={openAllSimilaritiesModal}
+                            style={{ marginTop: "10px" }}>
+                            View All Similarities
+                          </button>
                         </div>
                       )}
 
@@ -1547,25 +1771,37 @@ const AdminDebug = () => {
                         <div className="info-row">
                           <span className="label">Total Products:</span>
                           <span className="value">
-                            {contentBasedDebugData.database_stats.total_products}
+                            {
+                              contentBasedDebugData.database_stats
+                                .total_products
+                            }
                           </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Saved Similarities:</span>
                           <span className="value">
-                            {contentBasedDebugData.database_stats.saved_similarities}
+                            {
+                              contentBasedDebugData.database_stats
+                                .saved_similarities
+                            }
                           </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Percentage Saved:</span>
                           <span className="value">
-                            {contentBasedDebugData.database_stats.percentage_saved}%
+                            {
+                              contentBasedDebugData.database_stats
+                                .percentage_saved
+                            }
+                            %
                           </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Threshold:</span>
                           <span className="value">
-                            {contentBasedDebugData.database_stats.threshold * 100}%
+                            {contentBasedDebugData.database_stats.threshold *
+                              100}
+                            %
                           </span>
                         </div>
                       </div>
@@ -1580,7 +1816,9 @@ const AdminDebug = () => {
                         <div className="info-row">
                           <span className="label">Category:</span>
                           <span className="value">
-                            {contentBasedDebugData.feature_weights.category * 100}%
+                            {contentBasedDebugData.feature_weights.category *
+                              100}
+                            %
                           </span>
                         </div>
                         <div className="info-row">
@@ -1598,7 +1836,9 @@ const AdminDebug = () => {
                         <div className="info-row">
                           <span className="label">Keywords:</span>
                           <span className="value">
-                            {contentBasedDebugData.feature_weights.keywords * 100}%
+                            {contentBasedDebugData.feature_weights.keywords *
+                              100}
+                            %
                           </span>
                         </div>
                       </div>
@@ -1627,31 +1867,41 @@ const AdminDebug = () => {
                             <div className="info-row">
                               <span className="label">Price:</span>
                               <span className="value">
-                                {contentBasedDebugData.selected_product.price} PLN
+                                {contentBasedDebugData.selected_product.price}{" "}
+                                PLN
                               </span>
                             </div>
                             <div className="info-row">
                               <span className="label">Price Category:</span>
                               <span className="value">
-                                {contentBasedDebugData.selected_product.price_category}
+                                {
+                                  contentBasedDebugData.selected_product
+                                    .price_category
+                                }
                               </span>
                             </div>
                             <div className="info-row">
                               <span className="label">Categories:</span>
                               <span className="value">
-                                {contentBasedDebugData.selected_product.categories.join(", ")}
+                                {contentBasedDebugData.selected_product.categories.join(
+                                  ", "
+                                )}
                               </span>
                             </div>
                             <div className="info-row">
                               <span className="label">Tags:</span>
                               <span className="value">
-                                {contentBasedDebugData.selected_product.tags.join(", ")}
+                                {contentBasedDebugData.selected_product.tags.join(
+                                  ", "
+                                )}
                               </span>
                             </div>
                             <div className="info-row">
                               <span className="label">Keywords:</span>
                               <span className="value">
-                                {contentBasedDebugData.selected_product.keywords.join(", ")}
+                                {contentBasedDebugData.selected_product.keywords.join(
+                                  ", "
+                                )}
                               </span>
                             </div>
                           </div>
@@ -1659,171 +1909,267 @@ const AdminDebug = () => {
 
                         <div className="debug-card">
                           <h3>
-                            Feature Vector ({contentBasedDebugData.feature_vector.vector_length} features)
+                            Feature Vector (
+                            {contentBasedDebugData.feature_vector.vector_length}{" "}
+                            features)
                           </h3>
                           <div className="debug-info">
-                            {Object.entries(contentBasedDebugData.feature_vector.features).map(([key, value]) => (
+                            {Object.entries(
+                              contentBasedDebugData.feature_vector.features
+                            ).map(([key, value]) => (
                               <div key={key} className="info-row">
                                 <span className="label">{key}:</span>
-                                <span className="value">{value.toFixed(3)}</span>
+                                <span className="value">
+                                  {value.toFixed(3)}
+                                </span>
                               </div>
                             ))}
                           </div>
                         </div>
 
-                        {contentBasedDebugData.similar_products && contentBasedDebugData.similar_products.count > 0 && (
-                          <div className="debug-card">
-                            <h3>
-                              Top {contentBasedDebugData.similar_products.count} Similar Products
-                            </h3>
-                            <div className="table-container">
-                              <table className="debug-table">
-                                <thead>
-                                  <tr>
-                                    <th>#</th>
-                                    <th>Product Name</th>
-                                    <th>Similarity Score</th>
-                                    <th>Price</th>
-                                    <th>Categories</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {contentBasedDebugData.similar_products.top_10.map((sim, idx) => (
-                                    <tr key={idx}>
-                                      <td>{idx + 1}</td>
-                                      <td>{sim.product_2.name}</td>
-                                      <td>
-                                        <strong>{(sim.similarity_score * 100).toFixed(2)}%</strong>
-                                      </td>
-                                      <td>{sim.product_2.price} PLN</td>
-                                      <td>{sim.product_2.categories.join(", ")}</td>
+                        {contentBasedDebugData.similar_products &&
+                          contentBasedDebugData.similar_products.count > 0 && (
+                            <div className="debug-card">
+                              <h3>
+                                Top{" "}
+                                {contentBasedDebugData.similar_products.count}{" "}
+                                Similar Products
+                              </h3>
+                              <div className="table-container">
+                                <table className="debug-table">
+                                  <thead>
+                                    <tr>
+                                      <th>#</th>
+                                      <th>Product Name</th>
+                                      <th>Similarity Score</th>
+                                      <th>Price</th>
+                                      <th>Categories</th>
                                     </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-
-                            <h4 style={{ marginTop: "2rem", marginBottom: "1rem" }}>
-                              Detailed Calculations (Top 3)
-                            </h4>
-                            {contentBasedDebugData.similar_products.top_10.slice(0, 3).map((sim, idx) => (
-                              <div key={idx} className="debug-card" style={{ marginBottom: "1rem" }}>
-                                <h3>
-                                  #{idx + 1} {sim.product_2.name}
-                                </h3>
-                                <div className="debug-info">
-                                  <div className="info-row">
-                                    <span className="label">Formula:</span>
-                                    <span className="value">{sim.calculation.formula}</span>
-                                  </div>
-                                  <div className="info-row">
-                                    <span className="label">Dot Product:</span>
-                                    <span className="value">{sim.calculation.dot_product}</span>
-                                  </div>
-                                  <div className="info-row">
-                                    <span className="label">Norm Product 1:</span>
-                                    <span className="value">{sim.calculation.norm_product1}</span>
-                                  </div>
-                                  <div className="info-row">
-                                    <span className="label">Norm Product 2:</span>
-                                    <span className="value">{sim.calculation.norm_product2}</span>
-                                  </div>
-                                  <div className="info-row">
-                                    <span className="label">Verification:</span>
-                                    <span className={`value ${sim.calculation.stored_vs_calculated.match ? 'success' : 'error'}`}>
-                                      Stored: {sim.calculation.stored_vs_calculated.stored} |
-                                      Calculated: {sim.calculation.stored_vs_calculated.calculated}
-                                      {sim.calculation.stored_vs_calculated.match ? ' ✓' : ' ✗'}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {Object.keys(sim.common_features).length > 0 && (
-                                  <>
-                                    <h4 style={{ marginTop: "1rem", marginBottom: "0.5rem" }}>
-                                      Common Features ({sim.common_features_count} total)
-                                    </h4>
-                                    <div className="table-container">
-                                      <table className="debug-table">
-                                        <thead>
-                                          <tr>
-                                            <th>Feature</th>
-                                            <th>Product 1 Value</th>
-                                            <th>Product 2 Value</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          {Object.entries(sim.common_features).map(([feat, vals]) => (
-                                            <tr key={feat}>
-                                              <td><strong>{feat}</strong></td>
-                                              <td>{vals.product1_value}</td>
-                                              <td>{vals.product2_value}</td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </>
-                                )}
+                                  </thead>
+                                  <tbody>
+                                    {contentBasedDebugData.similar_products.top_10.map(
+                                      (sim, idx) => (
+                                        <tr key={idx}>
+                                          <td>{idx + 1}</td>
+                                          <td>{sim.product_2.name}</td>
+                                          <td>
+                                            <strong>
+                                              {(
+                                                sim.similarity_score * 100
+                                              ).toFixed(2)}
+                                              %
+                                            </strong>
+                                          </td>
+                                          <td>{sim.product_2.price} PLN</td>
+                                          <td>
+                                            {sim.product_2.categories.join(
+                                              ", "
+                                            )}
+                                          </td>
+                                        </tr>
+                                      )
+                                    )}
+                                  </tbody>
+                                </table>
                               </div>
-                            ))}
-                          </div>
-                        )}
+
+                              <h4
+                                style={{
+                                  marginTop: "2rem",
+                                  marginBottom: "1rem",
+                                }}>
+                                Detailed Calculations (Top 3)
+                              </h4>
+                              {contentBasedDebugData.similar_products.top_10
+                                .slice(0, 3)
+                                .map((sim, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="debug-card"
+                                    style={{ marginBottom: "1rem" }}>
+                                    <h3>
+                                      #{idx + 1} {sim.product_2.name}
+                                    </h3>
+                                    <div className="debug-info">
+                                      <div className="info-row">
+                                        <span className="label">Formula:</span>
+                                        <span className="value">
+                                          {sim.calculation.formula}
+                                        </span>
+                                      </div>
+                                      <div className="info-row">
+                                        <span className="label">
+                                          Dot Product:
+                                        </span>
+                                        <span className="value">
+                                          {sim.calculation.dot_product}
+                                        </span>
+                                      </div>
+                                      <div className="info-row">
+                                        <span className="label">
+                                          Norm Product 1:
+                                        </span>
+                                        <span className="value">
+                                          {sim.calculation.norm_product1}
+                                        </span>
+                                      </div>
+                                      <div className="info-row">
+                                        <span className="label">
+                                          Norm Product 2:
+                                        </span>
+                                        <span className="value">
+                                          {sim.calculation.norm_product2}
+                                        </span>
+                                      </div>
+                                      <div className="info-row">
+                                        <span className="label">
+                                          Verification:
+                                        </span>
+                                        <span
+                                          className={`value ${
+                                            sim.calculation.stored_vs_calculated
+                                              .match
+                                              ? "success"
+                                              : "error"
+                                          }`}>
+                                          Stored:{" "}
+                                          {
+                                            sim.calculation.stored_vs_calculated
+                                              .stored
+                                          }{" "}
+                                          | Calculated:{" "}
+                                          {
+                                            sim.calculation.stored_vs_calculated
+                                              .calculated
+                                          }
+                                          {sim.calculation.stored_vs_calculated
+                                            .match
+                                            ? " ✓"
+                                            : " ✗"}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {Object.keys(sim.common_features).length >
+                                      0 && (
+                                      <>
+                                        <h4
+                                          style={{
+                                            marginTop: "1rem",
+                                            marginBottom: "0.5rem",
+                                          }}>
+                                          Common Features (
+                                          {sim.common_features_count} total)
+                                        </h4>
+                                        <div className="table-container">
+                                          <table className="debug-table">
+                                            <thead>
+                                              <tr>
+                                                <th>Feature</th>
+                                                <th>Product 1 Value</th>
+                                                <th>Product 2 Value</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {Object.entries(
+                                                sim.common_features
+                                              ).map(([feat, vals]) => (
+                                                <tr key={feat}>
+                                                  <td>
+                                                    <strong>{feat}</strong>
+                                                  </td>
+                                                  <td>{vals.product1_value}</td>
+                                                  <td>{vals.product2_value}</td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
                       </>
                     )}
 
-                    {!selectedProductId && contentBasedDebugData.top_10_global_similarities && (
-                      <div className="debug-card">
-                        <h3>Top 10 Global Similarities</h3>
-                        <div className="table-container">
-                          <table className="debug-table">
-                            <thead>
-                              <tr>
-                                <th>#</th>
-                                <th>Product 1</th>
-                                <th>Product 2</th>
-                                <th>Similarity Score</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {contentBasedDebugData.top_10_global_similarities.map((sim, idx) => (
-                                <tr key={idx}>
-                                  <td>{idx + 1}</td>
-                                  <td>
-                                    {sim.product1_name}
-                                    <span className="id-badge">ID: {sim.product1_id}</span>
-                                  </td>
-                                  <td>
-                                    {sim.product2_name}
-                                    <span className="id-badge">ID: {sim.product2_id}</span>
-                                  </td>
-                                  <td>
-                                    <strong>{(sim.score * 100).toFixed(2)}%</strong>
-                                  </td>
+                    {!selectedProductId &&
+                      contentBasedDebugData.top_10_global_similarities && (
+                        <div className="debug-card">
+                          <h3>Top 10 Global Similarities</h3>
+                          <div className="table-container">
+                            <table className="debug-table">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Product 1</th>
+                                  <th>Product 2</th>
+                                  <th>Similarity Score</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {contentBasedDebugData.top_10_global_similarities.map(
+                                  (sim, idx) => (
+                                    <tr key={idx}>
+                                      <td>{idx + 1}</td>
+                                      <td>
+                                        {sim.product1_name}
+                                        <span className="id-badge">
+                                          ID: {sim.product1_id}
+                                        </span>
+                                      </td>
+                                      <td>
+                                        {sim.product2_name}
+                                        <span className="id-badge">
+                                          ID: {sim.product2_id}
+                                        </span>
+                                      </td>
+                                      <td>
+                                        <strong>
+                                          {(sim.score * 100).toFixed(2)}%
+                                        </strong>
+                                      </td>
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     <div className="debug-card">
                       <h3>Computation Status</h3>
                       <div className="debug-info">
                         <div className="info-row">
                           <span className="label">Can Compute:</span>
-                          <span className={`value ${contentBasedDebugData.computation_status.can_compute ? 'success' : 'error'}`}>
-                            {contentBasedDebugData.computation_status.can_compute ? '✅ Yes' : '❌ No'}
+                          <span
+                            className={`value ${
+                              contentBasedDebugData.computation_status
+                                .can_compute
+                                ? "success"
+                                : "error"
+                            }`}>
+                            {contentBasedDebugData.computation_status
+                              .can_compute
+                              ? "✅ Yes"
+                              : "❌ No"}
                           </span>
                         </div>
                       </div>
                       <div className="issues-list">
-                        {contentBasedDebugData.computation_status.issues.map((issue, idx) => (
-                          <p key={idx} className={issue.includes('✅') ? 'success' : 'warning'}>
-                            {issue}
-                          </p>
-                        ))}
+                        {contentBasedDebugData.computation_status.issues.map(
+                          (issue, idx) => (
+                            <p
+                              key={idx}
+                              className={
+                                issue.includes("✅") ? "success" : "warning"
+                              }>
+                              {issue}
+                            </p>
+                          )
+                        )}
                       </div>
                     </div>
                   </>
@@ -1884,11 +2230,15 @@ const AdminDebug = () => {
                   <div className="debug-info">
                     <div className="info-row">
                       <span className="label">Name:</span>
-                      <span className="value">{fuzzyLogicDebugData.algorithm}</span>
+                      <span className="value">
+                        {fuzzyLogicDebugData.algorithm}
+                      </span>
                     </div>
                     <div className="info-row">
                       <span className="label">Description:</span>
-                      <span className="value">{fuzzyLogicDebugData.description}</span>
+                      <span className="value">
+                        {fuzzyLogicDebugData.description}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1918,27 +2268,34 @@ const AdminDebug = () => {
                         <span className="label">Price Sensitivity:</span>
                         <span className="value">
                           {fuzzyLogicDebugData.user_profile.price_sensitivity} -{" "}
-                          {fuzzyLogicDebugData.user_profile.price_sensitivity_label}
+                          {
+                            fuzzyLogicDebugData.user_profile
+                              .price_sensitivity_label
+                          }
                         </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Tracked Categories:</span>
                         <span className="value">
-                          {fuzzyLogicDebugData.user_profile.total_categories_tracked}
+                          {
+                            fuzzyLogicDebugData.user_profile
+                              .total_categories_tracked
+                          }
                         </span>
                       </div>
                     </div>
 
                     <h4 style={{ marginTop: "1rem" }}>Category Interests</h4>
                     <div className="debug-info">
-                      {Object.entries(fuzzyLogicDebugData.user_profile.category_interests || {}).map(
-                        ([cat, interest]) => (
-                          <div className="info-row" key={cat}>
-                            <span className="label">{cat}:</span>
-                            <span className="value">{interest}</span>
-                          </div>
-                        )
-                      )}
+                      {Object.entries(
+                        fuzzyLogicDebugData.user_profile.category_interests ||
+                          {}
+                      ).map(([cat, interest]) => (
+                        <div className="info-row" key={cat}>
+                          <span className="label">{cat}:</span>
+                          <span className="value">{interest}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -1949,56 +2306,62 @@ const AdminDebug = () => {
 
                     <h4>Price Functions</h4>
                     <div className="debug-info">
-                      {Object.entries(fuzzyLogicDebugData.membership_functions.price).map(
-                        ([key, func]) => (
-                          <div key={key} style={{ marginBottom: "0.8rem" }}>
-                            <div className="info-row">
-                              <span className="label">{key.toUpperCase()}:</span>
-                              <span className="value">{func.range}</span>
-                            </div>
-                            <p className="description">{func.description}</p>
+                      {Object.entries(
+                        fuzzyLogicDebugData.membership_functions.price
+                      ).map(([key, func]) => (
+                        <div key={key} style={{ marginBottom: "0.8rem" }}>
+                          <div className="info-row">
+                            <span className="label">{key.toUpperCase()}:</span>
+                            <span className="value">{func.range}</span>
                           </div>
-                        )
-                      )}
+                          <p className="description">{func.description}</p>
+                        </div>
+                      ))}
                     </div>
 
                     <h4 style={{ marginTop: "1rem" }}>Quality Functions</h4>
                     <div className="debug-info">
-                      {Object.entries(fuzzyLogicDebugData.membership_functions.quality).map(
-                        ([key, func]) => (
-                          <div key={key} style={{ marginBottom: "0.8rem" }}>
-                            <div className="info-row">
-                              <span className="label">{key.toUpperCase()}:</span>
-                              <span className="value">{func.range}</span>
-                            </div>
-                            <p className="description">{func.description}</p>
+                      {Object.entries(
+                        fuzzyLogicDebugData.membership_functions.quality
+                      ).map(([key, func]) => (
+                        <div key={key} style={{ marginBottom: "0.8rem" }}>
+                          <div className="info-row">
+                            <span className="label">{key.toUpperCase()}:</span>
+                            <span className="value">{func.range}</span>
                           </div>
-                        )
-                      )}
+                          <p className="description">{func.description}</p>
+                        </div>
+                      ))}
                     </div>
 
                     <h4 style={{ marginTop: "1rem" }}>Popularity Functions</h4>
                     <div className="debug-info">
-                      {Object.entries(fuzzyLogicDebugData.membership_functions.popularity).map(
-                        ([key, func]) => (
-                          <div key={key} style={{ marginBottom: "0.8rem" }}>
-                            <div className="info-row">
-                              <span className="label">{key.toUpperCase()}:</span>
-                              <span className="value">{func.range}</span>
-                            </div>
-                            <p className="description">{func.description}</p>
+                      {Object.entries(
+                        fuzzyLogicDebugData.membership_functions.popularity
+                      ).map(([key, func]) => (
+                        <div key={key} style={{ marginBottom: "0.8rem" }}>
+                          <div className="info-row">
+                            <span className="label">{key.toUpperCase()}:</span>
+                            <span className="value">{func.range}</span>
                           </div>
-                        )
-                      )}
+                          <p className="description">{func.description}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {fuzzyLogicDebugData.fuzzy_rules && (
                   <div className="debug-card">
-                    <h3>Fuzzy Rule Base ({fuzzyLogicDebugData.fuzzy_rules.length} rules)</h3>
+                    <h3>
+                      Fuzzy Rule Base ({fuzzyLogicDebugData.fuzzy_rules.length}{" "}
+                      rules)
+                    </h3>
                     {fuzzyLogicDebugData.fuzzy_rules.map((rule, idx) => (
-                      <div key={idx} className="calculation-card" style={{ marginBottom: "1rem" }}>
+                      <div
+                        key={idx}
+                        className="calculation-card"
+                        style={{ marginBottom: "1rem" }}>
                         <h5>{rule.name}</h5>
                         <div className="debug-info">
                           <div className="info-row">
@@ -2023,28 +2386,40 @@ const AdminDebug = () => {
                       <div className="debug-info">
                         <div className="info-row">
                           <span className="label">ID:</span>
-                          <span className="value">{fuzzyLogicDebugData.selected_product.id}</span>
+                          <span className="value">
+                            {fuzzyLogicDebugData.selected_product.id}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Name:</span>
-                          <span className="value">{fuzzyLogicDebugData.selected_product.name}</span>
+                          <span className="value">
+                            {fuzzyLogicDebugData.selected_product.name}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Price:</span>
-                          <span className="value">{fuzzyLogicDebugData.selected_product.price} PLN</span>
+                          <span className="value">
+                            {fuzzyLogicDebugData.selected_product.price} PLN
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Rating:</span>
-                          <span className="value">{fuzzyLogicDebugData.selected_product.rating}</span>
+                          <span className="value">
+                            {fuzzyLogicDebugData.selected_product.rating}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="label">View Count:</span>
-                          <span className="value">{fuzzyLogicDebugData.selected_product.view_count}</span>
+                          <span className="value">
+                            {fuzzyLogicDebugData.selected_product.view_count}
+                          </span>
                         </div>
                         <div className="info-row">
                           <span className="label">Categories:</span>
                           <span className="value">
-                            {fuzzyLogicDebugData.selected_product.categories.join(", ")}
+                            {fuzzyLogicDebugData.selected_product.categories.join(
+                              ", "
+                            )}
                           </span>
                         </div>
                       </div>
@@ -2054,68 +2429,120 @@ const AdminDebug = () => {
                       <div className="debug-card">
                         <h3>Fuzzification - Membership Degrees</h3>
 
-                        <h4>Price: {fuzzyLogicDebugData.fuzzification.price.value} PLN</h4>
+                        <h4>
+                          Price: {fuzzyLogicDebugData.fuzzification.price.value}{" "}
+                          PLN
+                        </h4>
                         <div className="debug-info">
                           <div className="info-row">
                             <span className="label">Cheap:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.price.cheap}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {fuzzyLogicDebugData.fuzzification.price.cheap}
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Medium:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.price.medium}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {fuzzyLogicDebugData.fuzzification.price.medium}
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Expensive:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.price.expensive}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {
+                                fuzzyLogicDebugData.fuzzification.price
+                                  .expensive
+                              }
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Dominant:</span>
                             <span className="value success">
-                              <strong>{fuzzyLogicDebugData.fuzzification.price.dominant.toUpperCase()}</strong>
+                              <strong>
+                                {fuzzyLogicDebugData.fuzzification.price.dominant.toUpperCase()}
+                              </strong>
                             </span>
                           </div>
                         </div>
 
-                        <h4 style={{ marginTop: "1rem" }}>Quality: {fuzzyLogicDebugData.fuzzification.quality.value}</h4>
+                        <h4 style={{ marginTop: "1rem" }}>
+                          Quality:{" "}
+                          {fuzzyLogicDebugData.fuzzification.quality.value}
+                        </h4>
                         <div className="debug-info">
                           <div className="info-row">
                             <span className="label">Low:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.quality.low}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {fuzzyLogicDebugData.fuzzification.quality.low}
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Medium:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.quality.medium}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {fuzzyLogicDebugData.fuzzification.quality.medium}
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">High:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.quality.high}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {fuzzyLogicDebugData.fuzzification.quality.high}
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Dominant:</span>
                             <span className="value success">
-                              <strong>{fuzzyLogicDebugData.fuzzification.quality.dominant.toUpperCase()}</strong>
+                              <strong>
+                                {fuzzyLogicDebugData.fuzzification.quality.dominant.toUpperCase()}
+                              </strong>
                             </span>
                           </div>
                         </div>
 
-                        <h4 style={{ marginTop: "1rem" }}>Popularity: {fuzzyLogicDebugData.fuzzification.popularity.value} views</h4>
+                        <h4 style={{ marginTop: "1rem" }}>
+                          Popularity:{" "}
+                          {fuzzyLogicDebugData.fuzzification.popularity.value}{" "}
+                          views
+                        </h4>
                         <div className="debug-info">
                           <div className="info-row">
                             <span className="label">Low:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.popularity.low}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {fuzzyLogicDebugData.fuzzification.popularity.low}
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Medium:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.popularity.medium}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {
+                                fuzzyLogicDebugData.fuzzification.popularity
+                                  .medium
+                              }
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">High:</span>
-                            <span className="value">μ = {fuzzyLogicDebugData.fuzzification.popularity.high}</span>
+                            <span className="value">
+                              μ ={" "}
+                              {
+                                fuzzyLogicDebugData.fuzzification.popularity
+                                  .high
+                              }
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Dominant:</span>
                             <span className="value success">
-                              <strong>{fuzzyLogicDebugData.fuzzification.popularity.dominant.toUpperCase()}</strong>
+                              <strong>
+                                {fuzzyLogicDebugData.fuzzification.popularity.dominant.toUpperCase()}
+                              </strong>
                             </span>
                           </div>
                         </div>
@@ -2129,22 +2556,30 @@ const AdminDebug = () => {
                           <div className="info-row">
                             <span className="label">Max Match:</span>
                             <span className="value success">
-                              <strong>{fuzzyLogicDebugData.category_matching.max_match}</strong>
+                              <strong>
+                                {
+                                  fuzzyLogicDebugData.category_matching
+                                    .max_match
+                                }
+                              </strong>
                             </span>
                           </div>
                         </div>
-                        <p className="description">{fuzzyLogicDebugData.category_matching.explanation}</p>
+                        <p className="description">
+                          {fuzzyLogicDebugData.category_matching.explanation}
+                        </p>
 
                         <h4 style={{ marginTop: "1rem" }}>Category Details</h4>
                         <div className="debug-info">
-                          {Object.entries(fuzzyLogicDebugData.category_matching.category_details || {}).map(
-                            ([cat, match]) => (
-                              <div className="info-row" key={cat}>
-                                <span className="label">{cat}:</span>
-                                <span className="value">{match}</span>
-                              </div>
-                            )
-                          )}
+                          {Object.entries(
+                            fuzzyLogicDebugData.category_matching
+                              .category_details || {}
+                          ).map(([cat, match]) => (
+                            <div className="info-row" key={cat}>
+                              <span className="label">{cat}:</span>
+                              <span className="value">{match}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -2153,49 +2588,77 @@ const AdminDebug = () => {
                       <div className="debug-card">
                         <h3>Fuzzy Inference - Rule Activations</h3>
                         <div className="debug-info">
-                          {Object.entries(fuzzyLogicDebugData.inference.rule_activations || {}).map(
-                            ([rule, activation]) => (
-                              <div className="info-row" key={rule}>
-                                <span className="label">{rule}:</span>
-                                <span className="value">
-                                  <strong>{activation}</strong>
-                                </span>
-                              </div>
-                            )
-                          )}
+                          {Object.entries(
+                            fuzzyLogicDebugData.inference.rule_activations || {}
+                          ).map(([rule, activation]) => (
+                            <div className="info-row" key={rule}>
+                              <span className="label">{rule}:</span>
+                              <span className="value">
+                                <strong>{activation}</strong>
+                              </span>
+                            </div>
+                          ))}
                         </div>
 
                         <h4 style={{ marginTop: "1.5rem" }}>Defuzzification</h4>
                         <div className="debug-info">
                           <div className="info-row">
                             <span className="label">Method:</span>
-                            <span className="value">{fuzzyLogicDebugData.inference.defuzzification_method}</span>
+                            <span className="value">
+                              {
+                                fuzzyLogicDebugData.inference
+                                  .defuzzification_method
+                              }
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Final Fuzzy Score:</span>
                             <span className="value success">
-                              <strong>{fuzzyLogicDebugData.inference.final_fuzzy_score}</strong>
+                              <strong>
+                                {
+                                  fuzzyLogicDebugData.inference
+                                    .final_fuzzy_score
+                                }
+                              </strong>
                             </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Percentage:</span>
                             <span className="value success">
-                              <strong>{fuzzyLogicDebugData.inference.final_percentage}%</strong>
+                              <strong>
+                                {fuzzyLogicDebugData.inference.final_percentage}
+                                %
+                              </strong>
                             </span>
                           </div>
                         </div>
 
-                        <p className="description" style={{ marginTop: "1rem" }}>
-                          {fuzzyLogicDebugData.inference.calculation.description}
+                        <p
+                          className="description"
+                          style={{ marginTop: "1rem" }}>
+                          {
+                            fuzzyLogicDebugData.inference.calculation
+                              .description
+                          }
                         </p>
                         <div className="debug-info">
                           <div className="info-row">
                             <span className="label">Weighted Sum:</span>
-                            <span className="value">{fuzzyLogicDebugData.inference.calculation.weighted_sum}</span>
+                            <span className="value">
+                              {
+                                fuzzyLogicDebugData.inference.calculation
+                                  .weighted_sum
+                              }
+                            </span>
                           </div>
                           <div className="info-row">
                             <span className="label">Weight Sum:</span>
-                            <span className="value">{fuzzyLogicDebugData.inference.calculation.weight_sum}</span>
+                            <span className="value">
+                              {
+                                fuzzyLogicDebugData.inference.calculation
+                                  .weight_sum
+                              }
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -2205,8 +2668,13 @@ const AdminDebug = () => {
 
                 {fuzzyLogicDebugData.top_products && !selectedProductId && (
                   <div className="debug-card">
-                    <h3>Top {fuzzyLogicDebugData.top_products.count} Products by Fuzzy Score</h3>
-                    <p className="description">{fuzzyLogicDebugData.top_products.description}</p>
+                    <h3>
+                      Top {fuzzyLogicDebugData.top_products.count} Products by
+                      Fuzzy Score
+                    </h3>
+                    <p className="description">
+                      {fuzzyLogicDebugData.top_products.description}
+                    </p>
 
                     <div className="table-container">
                       <table className="debug-table">
@@ -2223,18 +2691,24 @@ const AdminDebug = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {fuzzyLogicDebugData.top_products.products.map((prod, idx) => (
-                            <tr key={prod.id}>
-                              <td>{idx + 1}</td>
-                              <td>{prod.name}</td>
-                              <td>{prod.price} PLN</td>
-                              <td>{prod.rating}</td>
-                              <td><strong>{prod.fuzzy_score}</strong></td>
-                              <td><strong>{prod.fuzzy_percentage}%</strong></td>
-                              <td>{prod.category_match}</td>
-                              <td>{prod.categories.join(", ")}</td>
-                            </tr>
-                          ))}
+                          {fuzzyLogicDebugData.top_products.products.map(
+                            (prod, idx) => (
+                              <tr key={prod.id}>
+                                <td>{idx + 1}</td>
+                                <td>{prod.name}</td>
+                                <td>{prod.price} PLN</td>
+                                <td>{prod.rating}</td>
+                                <td>
+                                  <strong>{prod.fuzzy_score}</strong>
+                                </td>
+                                <td>
+                                  <strong>{prod.fuzzy_percentage}%</strong>
+                                </td>
+                                <td>{prod.category_match}</td>
+                                <td>{prod.categories.join(", ")}</td>
+                              </tr>
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -2247,19 +2721,35 @@ const AdminDebug = () => {
                     <div className="debug-info">
                       <div className="info-row">
                         <span className="label">Total Products:</span>
-                        <span className="value">{fuzzyLogicDebugData.system_stats.total_products}</span>
+                        <span className="value">
+                          {fuzzyLogicDebugData.system_stats.total_products}
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Total Rules:</span>
-                        <span className="value">{fuzzyLogicDebugData.system_stats.total_rules}</span>
+                        <span className="value">
+                          {fuzzyLogicDebugData.system_stats.total_rules}
+                        </span>
                       </div>
                       <div className="info-row">
-                        <span className="label">Membership Function Types:</span>
-                        <span className="value">{fuzzyLogicDebugData.system_stats.membership_function_types}</span>
+                        <span className="label">
+                          Membership Function Types:
+                        </span>
+                        <span className="value">
+                          {
+                            fuzzyLogicDebugData.system_stats
+                              .membership_function_types
+                          }
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Defuzzification Method:</span>
-                        <span className="value">{fuzzyLogicDebugData.system_stats.defuzzification_method}</span>
+                        <span className="value">
+                          {
+                            fuzzyLogicDebugData.system_stats
+                              .defuzzification_method
+                          }
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2268,7 +2758,9 @@ const AdminDebug = () => {
             ) : (
               <div className="debug-card">
                 <p className="no-data">
-                  {loading ? "Loading fuzzy logic debug data..." : "No fuzzy logic debug data available."}
+                  {loading
+                    ? "Loading fuzzy logic debug data..."
+                    : "No fuzzy logic debug data available."}
                 </p>
               </div>
             )}
@@ -2318,11 +2810,15 @@ const AdminDebug = () => {
                   <div className="debug-info">
                     <div className="info-row">
                       <span className="label">Name:</span>
-                      <span className="value">{probabilisticDebugData.algorithm}</span>
+                      <span className="value">
+                        {probabilisticDebugData.algorithm}
+                      </span>
                     </div>
                     <div className="info-row">
                       <span className="label">Description:</span>
-                      <span className="value">{probabilisticDebugData.description}</span>
+                      <span className="value">
+                        {probabilisticDebugData.description}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -2333,15 +2829,26 @@ const AdminDebug = () => {
                     <div className="debug-info">
                       <div className="info-row">
                         <span className="label">Order:</span>
-                        <span className="value">{probabilisticDebugData.markov_chain.order}</span>
+                        <span className="value">
+                          {probabilisticDebugData.markov_chain.order}
+                        </span>
                       </div>
                       <div className="info-row">
-                        <span className="label">Total States (Categories):</span>
-                        <span className="value">{probabilisticDebugData.markov_chain.total_states}</span>
+                        <span className="label">
+                          Total States (Categories):
+                        </span>
+                        <span className="value">
+                          {probabilisticDebugData.markov_chain.total_states}
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Total Transitions:</span>
-                        <span className="value">{probabilisticDebugData.markov_chain.total_transitions}</span>
+                        <span className="value">
+                          {
+                            probabilisticDebugData.markov_chain
+                              .total_transitions
+                          }
+                        </span>
                       </div>
                     </div>
 
@@ -2358,15 +2865,21 @@ const AdminDebug = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {probabilisticDebugData.markov_chain.top_transitions.map((trans, idx) => (
-                            <tr key={idx}>
-                              <td>{idx + 1}</td>
-                              <td>{trans.from}</td>
-                              <td>{trans.to}</td>
-                              <td><strong>{(trans.probability * 100).toFixed(2)}%</strong></td>
-                              <td>{trans.count}</td>
-                            </tr>
-                          ))}
+                          {probabilisticDebugData.markov_chain.top_transitions.map(
+                            (trans, idx) => (
+                              <tr key={idx}>
+                                <td>{idx + 1}</td>
+                                <td>{trans.from}</td>
+                                <td>{trans.to}</td>
+                                <td>
+                                  <strong>
+                                    {(trans.probability * 100).toFixed(2)}%
+                                  </strong>
+                                </td>
+                                <td>{trans.count}</td>
+                              </tr>
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -2379,23 +2892,41 @@ const AdminDebug = () => {
                     <div className="debug-info">
                       <div className="info-row">
                         <span className="label">Trained:</span>
-                        <span className={`value ${probabilisticDebugData.naive_bayes_purchase.trained ? 'success' : 'error'}`}>
-                          {probabilisticDebugData.naive_bayes_purchase.trained ? '✅ Yes' : '❌ No'}
+                        <span
+                          className={`value ${
+                            probabilisticDebugData.naive_bayes_purchase.trained
+                              ? "success"
+                              : "error"
+                          }`}>
+                          {probabilisticDebugData.naive_bayes_purchase.trained
+                            ? "✅ Yes"
+                            : "❌ No"}
                         </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Number of Features:</span>
-                        <span className="value">{probabilisticDebugData.naive_bayes_purchase.num_features}</span>
+                        <span className="value">
+                          {
+                            probabilisticDebugData.naive_bayes_purchase
+                              .num_features
+                          }
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Classes:</span>
-                        <span className="value">{probabilisticDebugData.naive_bayes_purchase.classes.join(", ")}</span>
+                        <span className="value">
+                          {probabilisticDebugData.naive_bayes_purchase.classes.join(
+                            ", "
+                          )}
+                        </span>
                       </div>
                     </div>
 
                     <h4 style={{ marginTop: "1rem" }}>Class Priors</h4>
                     <div className="debug-info">
-                      {Object.entries(probabilisticDebugData.naive_bayes_purchase.class_priors).map(([cls, prob]) => (
+                      {Object.entries(
+                        probabilisticDebugData.naive_bayes_purchase.class_priors
+                      ).map(([cls, prob]) => (
                         <div className="info-row" key={cls}>
                           <span className="label">Class {cls}:</span>
                           <span className="value">{prob}</span>
@@ -2411,23 +2942,41 @@ const AdminDebug = () => {
                     <div className="debug-info">
                       <div className="info-row">
                         <span className="label">Trained:</span>
-                        <span className={`value ${probabilisticDebugData.naive_bayes_churn.trained ? 'success' : 'error'}`}>
-                          {probabilisticDebugData.naive_bayes_churn.trained ? '✅ Yes' : '❌ No'}
+                        <span
+                          className={`value ${
+                            probabilisticDebugData.naive_bayes_churn.trained
+                              ? "success"
+                              : "error"
+                          }`}>
+                          {probabilisticDebugData.naive_bayes_churn.trained
+                            ? "✅ Yes"
+                            : "❌ No"}
                         </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Number of Features:</span>
-                        <span className="value">{probabilisticDebugData.naive_bayes_churn.num_features}</span>
+                        <span className="value">
+                          {
+                            probabilisticDebugData.naive_bayes_churn
+                              .num_features
+                          }
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Classes:</span>
-                        <span className="value">{probabilisticDebugData.naive_bayes_churn.classes.join(", ")}</span>
+                        <span className="value">
+                          {probabilisticDebugData.naive_bayes_churn.classes.join(
+                            ", "
+                          )}
+                        </span>
                       </div>
                     </div>
 
                     <h4 style={{ marginTop: "1rem" }}>Class Priors</h4>
                     <div className="debug-info">
-                      {Object.entries(probabilisticDebugData.naive_bayes_churn.class_priors).map(([cls, prob]) => (
+                      {Object.entries(
+                        probabilisticDebugData.naive_bayes_churn.class_priors
+                      ).map(([cls, prob]) => (
                         <div className="info-row" key={cls}>
                           <span className="label">Class {cls}:</span>
                           <span className="value">{prob}</span>
@@ -2437,180 +2986,296 @@ const AdminDebug = () => {
                   </div>
                 )}
 
-                {probabilisticDebugData.user_analysis && !probabilisticDebugData.user_analysis.error && (
-                  <>
+                {probabilisticDebugData.user_analysis &&
+                  !probabilisticDebugData.user_analysis.error && (
+                    <>
+                      <div className="debug-card">
+                        <h3>User Analysis</h3>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">User:</span>
+                            <span className="value">
+                              {probabilisticDebugData.user_analysis.username}
+                              <span className="id-badge">
+                                ID:{" "}
+                                {probabilisticDebugData.user_analysis.user_id}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Total Orders:</span>
+                            <span className="value">
+                              {
+                                probabilisticDebugData.user_analysis
+                                  .total_orders
+                              }
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Total Spent:</span>
+                            <span className="value">
+                              {probabilisticDebugData.user_analysis.total_spent}{" "}
+                              PLN
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Avg Order Value:</span>
+                            <span className="value">
+                              {
+                                probabilisticDebugData.user_analysis
+                                  .avg_order_value
+                              }{" "}
+                              PLN
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">
+                              Days Since Last Order:
+                            </span>
+                            <span className="value">
+                              {
+                                probabilisticDebugData.user_analysis
+                                  .days_since_last_order
+                              }
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">
+                              Last Category Purchased:
+                            </span>
+                            <span className="value">
+                              {
+                                probabilisticDebugData.user_analysis
+                                  .last_category
+                              }
+                            </span>
+                          </div>
+                        </div>
+
+                        <h4 style={{ marginTop: "1rem" }}>
+                          Purchase Sequence (Last 10)
+                        </h4>
+                        <p className="description">
+                          {probabilisticDebugData.user_analysis.purchase_sequence.join(
+                            " → "
+                          )}
+                        </p>
+                      </div>
+
+                      {probabilisticDebugData.user_analysis
+                        .markov_predictions &&
+                        probabilisticDebugData.user_analysis.markov_predictions
+                          .length > 0 && (
+                          <div className="debug-card">
+                            <h3>Next Purchase Predictions (Markov Chain)</h3>
+                            <div className="similarities-table">
+                              <table>
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Predicted Category</th>
+                                    <th>Probability</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {probabilisticDebugData.user_analysis.markov_predictions.map(
+                                    (pred, idx) => (
+                                      <tr key={idx}>
+                                        <td>{idx + 1}</td>
+                                        <td>{pred.category}</td>
+                                        <td>
+                                          <strong>
+                                            {(pred.probability * 100).toFixed(
+                                              2
+                                            )}
+                                            %
+                                          </strong>
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+
+                      <div className="debug-card">
+                        <h3>User Behavior Predictions (Naive Bayes)</h3>
+
+                        <h4>Purchase Probability</h4>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Active Buyer:</span>
+                            <span className="value success">
+                              <strong>
+                                {(
+                                  probabilisticDebugData.user_analysis
+                                    .purchase_probability.active_buyer * 100
+                                ).toFixed(2)}
+                                %
+                              </strong>
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Inactive:</span>
+                            <span className="value">
+                              {(
+                                probabilisticDebugData.user_analysis
+                                  .purchase_probability.inactive * 100
+                              ).toFixed(2)}
+                              %
+                            </span>
+                          </div>
+                        </div>
+
+                        <h4 style={{ marginTop: "1.5rem" }}>
+                          Churn Probability
+                        </h4>
+                        <div className="debug-info">
+                          <div className="info-row">
+                            <span className="label">Will Churn:</span>
+                            <span
+                              className={`value ${
+                                probabilisticDebugData.user_analysis
+                                  .churn_probability.will_churn > 0.5
+                                  ? "error"
+                                  : ""
+                              }`}>
+                              <strong>
+                                {(
+                                  probabilisticDebugData.user_analysis
+                                    .churn_probability.will_churn * 100
+                                ).toFixed(2)}
+                                %
+                              </strong>
+                            </span>
+                          </div>
+                          <div className="info-row">
+                            <span className="label">Will Stay:</span>
+                            <span
+                              className={`value ${
+                                probabilisticDebugData.user_analysis
+                                  .churn_probability.will_stay > 0.5
+                                  ? "success"
+                                  : ""
+                              }`}>
+                              {(
+                                probabilisticDebugData.user_analysis
+                                  .churn_probability.will_stay * 100
+                              ).toFixed(2)}
+                              %
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                {probabilisticDebugData.product_analysis &&
+                  !probabilisticDebugData.product_analysis.error && (
                     <div className="debug-card">
-                      <h3>User Analysis</h3>
+                      <h3>Product Analysis</h3>
                       <div className="debug-info">
                         <div className="info-row">
-                          <span className="label">User:</span>
+                          <span className="label">Product:</span>
                           <span className="value">
-                            {probabilisticDebugData.user_analysis.username}
-                            <span className="id-badge">ID: {probabilisticDebugData.user_analysis.user_id}</span>
+                            {
+                              probabilisticDebugData.product_analysis
+                                .product_name
+                            }
+                            <span className="id-badge">
+                              ID:{" "}
+                              {
+                                probabilisticDebugData.product_analysis
+                                  .product_id
+                              }
+                            </span>
                           </span>
                         </div>
                         <div className="info-row">
-                          <span className="label">Total Orders:</span>
-                          <span className="value">{probabilisticDebugData.user_analysis.total_orders}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Total Spent:</span>
-                          <span className="value">{probabilisticDebugData.user_analysis.total_spent} PLN</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Avg Order Value:</span>
-                          <span className="value">{probabilisticDebugData.user_analysis.avg_order_value} PLN</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Days Since Last Order:</span>
-                          <span className="value">{probabilisticDebugData.user_analysis.days_since_last_order}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Last Category Purchased:</span>
-                          <span className="value">{probabilisticDebugData.user_analysis.last_category}</span>
+                          <span className="label">Category:</span>
+                          <span className="value">
+                            {probabilisticDebugData.product_analysis.category}
+                          </span>
                         </div>
                       </div>
 
-                      <h4 style={{ marginTop: "1rem" }}>Purchase Sequence (Last 10)</h4>
-                      <p className="description">
-                        {probabilisticDebugData.user_analysis.purchase_sequence.join(" → ")}
-                      </p>
-                    </div>
-
-                    {probabilisticDebugData.user_analysis.markov_predictions && probabilisticDebugData.user_analysis.markov_predictions.length > 0 && (
-                      <div className="debug-card">
-                        <h3>Next Purchase Predictions (Markov Chain)</h3>
-                        <div className="similarities-table">
-                          <table>
-                            <thead>
-                              <tr>
-                                <th>#</th>
-                                <th>Predicted Category</th>
-                                <th>Probability</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {probabilisticDebugData.user_analysis.markov_predictions.map((pred, idx) => (
+                      <h4 style={{ marginTop: "1.5rem" }}>
+                        Next Likely Categories
+                      </h4>
+                      <div className="similarities-table">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>#</th>
+                              <th>Category</th>
+                              <th>Probability</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {probabilisticDebugData.product_analysis.next_likely_categories.map(
+                              (cat, idx) => (
                                 <tr key={idx}>
                                   <td>{idx + 1}</td>
-                                  <td>{pred.category}</td>
-                                  <td><strong>{(pred.probability * 100).toFixed(2)}%</strong></td>
+                                  <td>{cat.category}</td>
+                                  <td>
+                                    <strong>
+                                      {(cat.probability * 100).toFixed(2)}%
+                                    </strong>
+                                  </td>
+                                  <td>{cat.count}</td>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="debug-card">
-                      <h3>User Behavior Predictions (Naive Bayes)</h3>
-
-                      <h4>Purchase Probability</h4>
-                      <div className="debug-info">
-                        <div className="info-row">
-                          <span className="label">Active Buyer:</span>
-                          <span className="value success">
-                            <strong>{(probabilisticDebugData.user_analysis.purchase_probability.active_buyer * 100).toFixed(2)}%</strong>
-                          </span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Inactive:</span>
-                          <span className="value">
-                            {(probabilisticDebugData.user_analysis.purchase_probability.inactive * 100).toFixed(2)}%
-                          </span>
-                        </div>
+                              )
+                            )}
+                          </tbody>
+                        </table>
                       </div>
 
-                      <h4 style={{ marginTop: "1.5rem" }}>Churn Probability</h4>
-                      <div className="debug-info">
-                        <div className="info-row">
-                          <span className="label">Will Churn:</span>
-                          <span className={`value ${probabilisticDebugData.user_analysis.churn_probability.will_churn > 0.5 ? 'error' : ''}`}>
-                            <strong>{(probabilisticDebugData.user_analysis.churn_probability.will_churn * 100).toFixed(2)}%</strong>
-                          </span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Will Stay:</span>
-                          <span className={`value ${probabilisticDebugData.user_analysis.churn_probability.will_stay > 0.5 ? 'success' : ''}`}>
-                            {(probabilisticDebugData.user_analysis.churn_probability.will_stay * 100).toFixed(2)}%
-                          </span>
-                        </div>
-                      </div>
+                      {probabilisticDebugData.product_analysis
+                        .predicted_next_products &&
+                        probabilisticDebugData.product_analysis
+                          .predicted_next_products.length > 0 && (
+                          <>
+                            <h4 style={{ marginTop: "1.5rem" }}>
+                              Predicted Next Products
+                            </h4>
+                            <div className="similarities-table">
+                              <table>
+                                <thead>
+                                  <tr>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Transition Probability</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {probabilisticDebugData.product_analysis.predicted_next_products.map(
+                                    (prod, idx) => (
+                                      <tr key={idx}>
+                                        <td>{prod.name}</td>
+                                        <td>{prod.category}</td>
+                                        <td>{prod.price} PLN</td>
+                                        <td>
+                                          <strong>
+                                            {(
+                                              prod.transition_probability * 100
+                                            ).toFixed(2)}
+                                            %
+                                          </strong>
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </>
+                        )}
                     </div>
-                  </>
-                )}
-
-                {probabilisticDebugData.product_analysis && !probabilisticDebugData.product_analysis.error && (
-                  <div className="debug-card">
-                    <h3>Product Analysis</h3>
-                    <div className="debug-info">
-                      <div className="info-row">
-                        <span className="label">Product:</span>
-                        <span className="value">
-                          {probabilisticDebugData.product_analysis.product_name}
-                          <span className="id-badge">ID: {probabilisticDebugData.product_analysis.product_id}</span>
-                        </span>
-                      </div>
-                      <div className="info-row">
-                        <span className="label">Category:</span>
-                        <span className="value">{probabilisticDebugData.product_analysis.category}</span>
-                      </div>
-                    </div>
-
-                    <h4 style={{ marginTop: "1.5rem" }}>Next Likely Categories</h4>
-                    <div className="similarities-table">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>Category</th>
-                            <th>Probability</th>
-                            <th>Count</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {probabilisticDebugData.product_analysis.next_likely_categories.map((cat, idx) => (
-                            <tr key={idx}>
-                              <td>{idx + 1}</td>
-                              <td>{cat.category}</td>
-                              <td><strong>{(cat.probability * 100).toFixed(2)}%</strong></td>
-                              <td>{cat.count}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {probabilisticDebugData.product_analysis.predicted_next_products && probabilisticDebugData.product_analysis.predicted_next_products.length > 0 && (
-                      <>
-                        <h4 style={{ marginTop: "1.5rem" }}>Predicted Next Products</h4>
-                        <div className="similarities-table">
-                          <table>
-                            <thead>
-                              <tr>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Transition Probability</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {probabilisticDebugData.product_analysis.predicted_next_products.map((prod, idx) => (
-                                <tr key={idx}>
-                                  <td>{prod.name}</td>
-                                  <td>{prod.category}</td>
-                                  <td>{prod.price} PLN</td>
-                                  <td><strong>{(prod.transition_probability * 100).toFixed(2)}%</strong></td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
+                  )}
 
                 {probabilisticDebugData.system_stats && (
                   <div className="debug-card">
@@ -2618,28 +3283,64 @@ const AdminDebug = () => {
                     <div className="debug-info">
                       <div className="info-row">
                         <span className="label">Total Users Analyzed:</span>
-                        <span className="value">{probabilisticDebugData.system_stats.total_users_analyzed}</span>
+                        <span className="value">
+                          {
+                            probabilisticDebugData.system_stats
+                              .total_users_analyzed
+                          }
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Total Categories:</span>
-                        <span className="value">{probabilisticDebugData.system_stats.total_categories}</span>
+                        <span className="value">
+                          {probabilisticDebugData.system_stats.total_categories}
+                        </span>
                       </div>
                       <div className="info-row">
                         <span className="label">Markov Chain Trained:</span>
-                        <span className={`value ${probabilisticDebugData.system_stats.markov_trained ? 'success' : 'error'}`}>
-                          {probabilisticDebugData.system_stats.markov_trained ? '✅ Yes' : '❌ No'}
+                        <span
+                          className={`value ${
+                            probabilisticDebugData.system_stats.markov_trained
+                              ? "success"
+                              : "error"
+                          }`}>
+                          {probabilisticDebugData.system_stats.markov_trained
+                            ? "✅ Yes"
+                            : "❌ No"}
                         </span>
                       </div>
                       <div className="info-row">
-                        <span className="label">Naive Bayes Purchase Trained:</span>
-                        <span className={`value ${probabilisticDebugData.system_stats.naive_bayes_purchase_trained ? 'success' : 'error'}`}>
-                          {probabilisticDebugData.system_stats.naive_bayes_purchase_trained ? '✅ Yes' : '❌ No'}
+                        <span className="label">
+                          Naive Bayes Purchase Trained:
+                        </span>
+                        <span
+                          className={`value ${
+                            probabilisticDebugData.system_stats
+                              .naive_bayes_purchase_trained
+                              ? "success"
+                              : "error"
+                          }`}>
+                          {probabilisticDebugData.system_stats
+                            .naive_bayes_purchase_trained
+                            ? "✅ Yes"
+                            : "❌ No"}
                         </span>
                       </div>
                       <div className="info-row">
-                        <span className="label">Naive Bayes Churn Trained:</span>
-                        <span className={`value ${probabilisticDebugData.system_stats.naive_bayes_churn_trained ? 'success' : 'error'}`}>
-                          {probabilisticDebugData.system_stats.naive_bayes_churn_trained ? '✅ Yes' : '❌ No'}
+                        <span className="label">
+                          Naive Bayes Churn Trained:
+                        </span>
+                        <span
+                          className={`value ${
+                            probabilisticDebugData.system_stats
+                              .naive_bayes_churn_trained
+                              ? "success"
+                              : "error"
+                          }`}>
+                          {probabilisticDebugData.system_stats
+                            .naive_bayes_churn_trained
+                            ? "✅ Yes"
+                            : "❌ No"}
                         </span>
                       </div>
                     </div>
@@ -2649,13 +3350,102 @@ const AdminDebug = () => {
             ) : (
               <div className="debug-card">
                 <p className="no-data">
-                  {loading ? "Loading probabilistic debug data..." : "No probabilistic debug data available."}
+                  {loading
+                    ? "Loading probabilistic debug data..."
+                    : "No probabilistic debug data available."}
                 </p>
               </div>
             )}
           </div>
         )}
       </motion.div>
+
+      {showAllSimilaritiesModal && (
+        <div className="modal-overlay" onClick={closeAllSimilaritiesModal}>
+          <div
+            className="modal-content-large"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>All Product Similarities ({allSimilarities.length})</h2>
+              <button
+                className="common-modal-close modal-close"
+                onClick={closeAllSimilaritiesModal}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body-rules">
+              {allSimilaritiesLoading ? (
+                <div className="loading-spinner"></div>
+              ) : (
+                <>
+                  <div className="rules-table-container">
+                    <table className="rules-table">
+                      <thead>
+                        <tr>
+                          <th>Rank</th>
+                          <th>Product 1</th>
+                          <th>Product 2</th>
+                          <th>Similarity Score</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allSimilarities
+                          .slice(
+                            (similaritiesPage - 1) * similaritiesPerPage,
+                            similaritiesPage * similaritiesPerPage
+                          )
+                          .map((sim, index) => (
+                            <tr
+                              key={`sim-${index}-${sim.product1_name}-${sim.product2_name}`}>
+                              <td>
+                                {(similaritiesPage - 1) * similaritiesPerPage +
+                                  index +
+                                  1}
+                              </td>
+                              <td>{sim.product1_name}</td>
+                              <td>{sim.product2_name}</td>
+                              <td>{sim.score.toFixed(4)}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="pagination">
+                    <button
+                      onClick={() =>
+                        setSimilaritiesPage((p) => Math.max(1, p - 1))
+                      }
+                      disabled={similaritiesPage === 1}>
+                      Previous
+                    </button>
+                    <span>
+                      Page {similaritiesPage} of{" "}
+                      {Math.ceil(allSimilarities.length / similaritiesPerPage)}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setSimilaritiesPage((p) =>
+                          Math.min(
+                            Math.ceil(
+                              allSimilarities.length / similaritiesPerPage
+                            ),
+                            p + 1
+                          )
+                        )
+                      }
+                      disabled={
+                        similaritiesPage >=
+                        Math.ceil(allSimilarities.length / similaritiesPerPage)
+                      }>
+                      Next
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

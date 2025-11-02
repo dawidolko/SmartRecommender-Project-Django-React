@@ -1,3 +1,61 @@
+/**
+ * Navbar Component
+ *
+ * Authors: Dawid Olko & Piotr Smoła
+ * Date: 2025-11-02
+ * Version: 2.0
+ *
+ * Main navigation bar component with responsive design, user authentication,
+ * and dynamic category menu.
+ *
+ * Features:
+ *   - Responsive hamburger menu for mobile devices
+ *   - Dynamic background color on scroll
+ *   - User authentication state display
+ *   - User dropdown menu (Profile/Admin Panel/Logout)
+ *   - Shopping cart preview with item count
+ *   - Favorites counter with heart icon
+ *   - Search modal integration
+ *   - Category dropdown menu
+ *   - Sticky navigation on scroll
+ *   - Role-based menu items (client vs admin)
+ *
+ * Navigation Links:
+ *   - Home - Main landing page
+ *   - Shop - Product catalog with categories
+ *   - About - Company information
+ *   - Blog - Articles and news
+ *   - FAQ - Frequently asked questions
+ *   - Contact - Contact form
+ *   - Cart - Shopping cart page
+ *   - Favorites - Saved products
+ *
+ * User Menu (Authenticated):
+ *   - Client Panel - Order history, recommendations, insights
+ *   - Admin Panel - Product/order/user management (admin only)
+ *   - Logout - Clear session and redirect
+ *
+ * State Management:
+ *   - isOpen: Mobile menu toggle state
+ *   - navBgc: Background color change on scroll
+ *   - showUserDropdown: User menu dropdown visibility
+ *   - categories: Product categories from API
+ *   - searchModalOpen: Search modal visibility
+ *   - user: Current authenticated user from AuthContext
+ *   - favorites: Favorites count from FavoritesContext
+ *   - cart items: From CartContext
+ *
+ * API Endpoints:
+ *   - GET /api/categories/ - Fetch product categories
+ *
+ * Authentication:
+ *   - Reads user from localStorage on mount
+ *   - Displays login/register or user icon based on auth state
+ *   - Logout clears access token and user data
+ *
+ * @component
+ * @returns {React.ReactElement} Navigation bar with responsive menu
+ */
 import "./Navbar.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";

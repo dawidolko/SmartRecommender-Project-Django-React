@@ -2,8 +2,47 @@ import { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import config from "../config/config";
 
+/**
+ * AuthContext - Authentication state management for SmartRecommender
+ *
+ * Provides global authentication state using React Context API.
+ * Manages JWT tokens, user session, and authentication lifecycle.
+ *
+ * Features:
+ *   - JWT token management with expiration checking
+ *   - Automatic token validation on mount
+ *   - User data persistence in localStorage
+ *   - Automatic logout on token expiration
+ *   - User profile fetching from API
+ *
+ * Context Values:
+ *   - user: Current user object (decoded JWT + API data)
+ *   - token: JWT access token
+ *   - login(token): Store token and authenticate user
+ *   - logout(): Clear session and remove tokens
+ *   - setUser(user): Update user state manually
+ *
+ * Token Structure (JWT):
+ *   - exp: Expiration timestamp
+ *   - user_id: User database ID
+ *   - email: User email address
+ *   - role: User role ('admin' or 'client')
+ *
+ * @context
+ */
 export const AuthContext = createContext();
 
+/**
+ * AuthProvider Component
+ *
+ * Wraps application with authentication context provider.
+ * Automatically validates JWT tokens and manages user session.
+ *
+ * @component
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components
+ * @returns {React.ReactElement} Context provider with auth state
+ */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("loggedUser");
