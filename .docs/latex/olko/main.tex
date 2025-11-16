@@ -158,9 +158,6 @@ Praca składa się z sześciu rozdziałów. Rozdział 1 przedstawia podstawy teo
 \subsection*{1.1 Historia i ewolucja systemów rekomendacyjnych}
 \addcontentsline{toc}{subsection}{1.1 Historia i ewolucja systemów rekomendacyjnych}
 
-\subsection*{1.1 Historia i ewolucja systemów rekomendacyjnych}
-\addcontentsline{toc}{subsection}{1.1 Historia i ewolucja systemów rekomendacyjnych}
-
 Systemy rekomendacyjne powstały jako odpowiedź na problem wyboru spośród tysięcy produktów w sklepach internetowych. Pierwsze prace naukowe pojawiły się w latach 90., gdy Resnick i Varian (1997) wprowadzili termin "Recommender Systems" \cite{resnick1997recommender}.
 
 Amazon.com wdrożył pierwszy komercyjny system w 1998 roku \cite{linden2003amazon}. Przełomowa była także praca Sarwar et al. (2001) wprowadzająca Item-Based Collaborative Filtering z Adjusted Cosine Similarity \cite{sarwar2001item}, który stał się standardem przemysłowym.
@@ -313,7 +310,7 @@ Rekomendacje powstają na podstawie wcześniej obliczonej macierzy podobieństw.
 
 \textbf{Krok 1: Identyfikacja produktów zakupionych przez użytkownika}
 
-Pobieram wszystkie produkty z zakończonych zamówień użytkownika (\texttt{status='completed'}).
+Pobieram wszystkie produkty z zakończonych zamówień użytkownika (\texttt{status=\allowbreak'completed'}).
 
 \textbf{Krok 2: Wyszukanie podobnych produktów}
 
@@ -367,10 +364,10 @@ System oferuje zaawansowane narzędzia debugowania pozwalające administratorowi
 
 Pierwszy widok (Rysunek \ref{fig:cf_debug1}) prezentuje podstawowe metryki algorytmu:
 \begin{itemize}
-\item Szczegóły algorytmu (nazwa, formuła Adjusted Cosine Similarity, status)
-\item Statystyki bazy danych (liczba użytkowników, produktów, zamówień)
-\item Analiza macierzy użytkownik-produkt (wymiary, wypełnienie, sparsity)
-\item Statystyki macierzy podobieństw (wymiar oczekiwany, zapisane podobieństwa, procent obliczony)
+\item Szczegóły algorytmu (nazwa, formuła Adjusted Cosine Similarity, status),
+\item Statystyki bazy danych (liczba użytkowników, produktów, zamówień),
+\item Analiza macierzy użytkownik-produkt (wymiary, wypełnienie, sparsity),
+\item Statystyki macierzy podobieństw (wymiar oczekiwany, zapisane podobieństwa, procent obliczony).
 \end{itemize}
 
 \begin{figure}[h!]
@@ -382,10 +379,10 @@ Pierwszy widok (Rysunek \ref{fig:cf_debug1}) prezentuje podstawowe metryki algor
 
 Drugi widok (Rysunek \ref{fig:cf_debug2}) zawiera szczegółową tabelę z konkretnymi rekomendacjami dla poszczególnych produktów, pokazując:
 \begin{itemize}
-\item Produkt źródłowy i produkty rekomendowane
-\item Wartości similarity\_score dla każdej pary produktów
-\item Liczbę użytkowników, którzy kupili oba produkty
-\item Timestamp ostatniego przeliczenia podobieństw
+\item Produkt źródłowy i produkty rekomendowane,
+\item Wartości similarity\_score dla każdej pary produktów,
+\item Liczbę użytkowników, którzy kupili oba produkty,
+\item Timestamp ostatniego przeliczenia podobieństw.
 \end{itemize}
 
 \begin{figure}[h!]
@@ -397,11 +394,11 @@ Drugi widok (Rysunek \ref{fig:cf_debug2}) zawiera szczegółową tabelę z konkr
 
 Panel debugowania umożliwia administratorowi:
 \begin{itemize}
-\item Monitorowanie wydajności algorytmu (czas generowania macierzy, wykorzystanie cache)
-\item Identyfikację problemów z rzadką macierzą (sparsity > 90\%)
-\item Walidację pokrycia rekomendacji (ile produktów ma przynajmniej jedno podobieństwo)
-\item Ręczne wyzwalanie przeliczenia macierzy podobieństw
-\item Eksport danych do formatu CSV dla analizy offline
+\item Monitorowanie wydajności algorytmu (czas generowania macierzy, wykorzystanie cache),
+\item Identyfikację problemów z rzadką macierzą (sparsity > 90\%),
+\item Walidację pokrycia rekomendacji (ile produktów ma przynajmniej jedno podobieństwo),
+\item Ręczne wyzwalanie przeliczenia macierzy podobieństw,
+\item Eksport danych do formatu CSV dla analizy offline.
 \end{itemize}
 
 \subsection*{2.5 Mechanizmy optymalizacyjne}
@@ -432,10 +429,10 @@ System opinii jest zintegrowany w dwóch kluczowych miejscach interfejsu użytko
 
 Rysunek \ref{fig:opinion_view1} przedstawia sekcję dodawania opinii na karcie produktu. Użytkownik może:
 \begin{itemize}
-\item Wystawić ocenę gwiazdkową (1-5 gwiazdek)
-\item Napisać szczegółową recenzję tekstową
-\item Dodać zdjęcia produktu (opcjonalne)
-\item Oznaczyć czy jest to zakup zweryfikowany (verified purchase)
+\item wystawić ocenę gwiazdkową (1-5 gwiazdek),
+\item napisać szczegółową recenzję tekstową,
+\item dodać zdjęcia produktu (opcjonalne),
+\item oznaczyć czy jest to zakup zweryfikowany (verified purchase).
 \end{itemize}
 
 \begin{figure}[h!]
@@ -447,11 +444,11 @@ Rysunek \ref{fig:opinion_view1} przedstawia sekcję dodawania opinii na karcie p
 
 Po dodaniu opinii przez użytkownika, system automatycznie:
 \begin{itemize}
-\item Przetwarza tekst opinii algorytmem analizy sentymentu
-\item Oblicza sentiment\_score w zakresie [-1, 1]
-\item Klasyfikuje opinię jako positive/neutral/negative
-\item Aktualizuje zagregowane statystyki sentymentu produktu w tabeli \texttt{ProductSentimentSummary}
-\item Odświeża ranking produktów w wyszukiwarce (jeśli sortowanie ustawione na "sentiment\_desc")
+\item Przetwarza tekst opinii algorytmem analizy sentymentu,
+\item Oblicza sentiment\_score w zakresie [-1, 1],
+\item Klasyfikuje opinię jako positive/neutral/negative,
+\item Aktualizuje statystyki sentymentu produktu w \texttt{ProductSentimentSummary},
+\item Odświeża ranking produktów w wyszukiwarce (jeśli sortowanie ustawione na "sentiment\_desc").
 \end{itemize}
 
 Rysunek \ref{fig:opinion_view2} pokazuje listę wszystkich opinii dla danego produktu. Każda opinia wyświetla:
@@ -504,15 +501,15 @@ products = Product.objects.filter(
 ).annotate(
     sentiment=F('sentiment_summary__average_sentiment_score')
 ).filter(
-    sentiment__gte=0.3  # Tylko produkty z pozytywnym sentymentem
+    sentiment__gte=0.3
 ).order_by('-sentiment', '-created_at')[:50]
 \end{lstlisting}
 
 Przykładowe wyniki dla zapytania "laptop":
 Sortowanie według sentymentu jest szczególnie użyteczne dla użytkowników poszukujących produktów najwyższej jakości, gotowych zapłacić więcej za lepiej oceniane artykuły.
 
-\subsection*{3.2 Slowniki i implementacja}
-\addcontentsline{toc}{subsection}{3.2 Slowniki i implementacja}
+\subsection*{3.2 Słowniki i implementacja}
+\addcontentsline{toc}{subsection}{3.2 Słowniki i implementacja}
 
 Analiza sentymentu w aplikacji opiera się na słownikach zoptymalizowanych dla polskiego e-commerce, zawierających pozytywne i negatywne słowa kluczowe charakterystyczne dla opinii o produktach.
 
@@ -560,8 +557,8 @@ Wynik: (1 - 0) / 7 = +0.14
 
 Średni czas przetwarzania opinii o długości 50-100 słów wynosi 5-15 milisekund, co pozwala na analizę tysięcy opinii w ciągu kilku sekund.
 
-\subsection*{3.3 Wielozrodlowa agregacja}
-\addcontentsline{toc}{subsection}{3.3 Wielozrodlowa agregacja}
+\subsection*{3.3 Wieloźródłowa agregacja}
+\addcontentsline{toc}{subsection}{3.3 Wieloźródłowa agregacja}
 
 Kluczową innowacją systemu jest wieloźródłowa agregacja sentymentu, która analizuje produkty z pięciu niezależnych źródeł tekstowych. Podejście to rozwiązuje fundamentalny problem systemów rekomendacyjnych zwany "zimnym startem" — sytuację gdy nowe produkty nie posiadają jeszcze opinii klientów, co uniemożliwia tradycyjną analizę sentymentu opartą wyłącznie na recenzjach.
 
@@ -569,15 +566,13 @@ Kluczową innowacją systemu jest wieloźródłowa agregacja sentymentu, która 
 
 Analizuję następujące źródła z empirycznie zoptymalizowanymi wagami:
 
-\textit{1. Opinie klientów (40\%)}: Najważniejsze źródło. Średnio 15-25 opinii po 30-150 słów. Przykład: "Świetny smartfon, gorąco polecam! Bateria trzyma 2 dni."
-
-\textit{2. Opis produktu (25\%)}: Profesjonalny opis sprzedawcy, 200-400 słów.
-
-\textit{3. Nazwa produktu (15\%)}: Krótka nazwa z marką. Przykład: "Samsung Galaxy S21 Premium". Słowa "Premium", "Pro" wskazują wysoką jakość.
-
-\textit{4. Specyfikacje (12\%)}: Parametry techniczne.
-
-\textit{5. Kategorie (8\%)}: Hierarchia kategorii produktu.
+\begin{itemize}
+\item \textbf{Opinie klientów (40\%)}: najważniejsze źródło, średnio 15-25 opinii po 30-150 słów. Przykład: "Świetny smartfon, gorąco polecam! Bateria trzyma 2 dni",
+\item \textbf{Opis produktu (25\%)}: profesjonalny opis sprzedawcy, 200-400 słów,
+\item \textbf{Nazwa produktu (15\%)}: krótka nazwa z marką. Przykład: "Samsung Galaxy S21 Premium". Słowa "Premium", "Pro" wskazują wysoką jakość,
+\item \textbf{Specyfikacje (12\%)}: parametry techniczne,
+\item \textbf{Kategorie (8\%)}: hierarchia kategorii produktu.
+\end{itemize}
 
 \textbf{Formuła agregacji}
 
@@ -621,11 +616,11 @@ Wynik numeryczny $S_{final} \in [-1, 1]$ jest konwertowany do kategorii tekstowe
 
 Przykładowa dystrybucja dla katalogu 1000 produktów:
 
-\begin{verbatim}
-Positive:  687 produktów (68.7%)
-Neutral:   241 produktów (24.1%)
-Negative:   72 produkty  (7.2%)
-\end{verbatim}
+\begin{itemize}
+\item Positive: 687 produktów (68.7\%),
+\item Neutral: 241 produktów (24.1\%),
+\item Negative: 72 produkty (7.2\%).
+\end{itemize}
 
 Rozkład ten wskazuje, że większość produktów w katalogu jest wysokiej jakości, co jest typowe dla platform e-commerce dbających o reputację.
 
@@ -1130,6 +1125,7 @@ Hybrid (CF + Apriori)   |    0.35      |   0.25    |  0.29  |
 
 Precision@10 rzędu 24-35\% jest uznawana za dobry wynik w literaturze systemów rekomendacji e-commerce (Amazon.com raportuje precision ~30\% dla swojego systemu).
 
+\newpage
 \textbf{Porównanie z baseline}:
 
 \begin{verbatim}
@@ -1288,7 +1284,7 @@ Wszystkie endpointy zwracają dane w formacie JSON, wykorzystują paginację dla
 
 Frontend aplikacji został zbudowany jako Single Page Application (SPA) w React 18, zapewniając płynne doświadczenie użytkownika bez przeładowywania strony. Struktura komponentów jest hierarchiczna i modułowa, umożliwiając łatwą rozbudowę oraz testowanie poszczególnych części interfejsu.
 
-\textbf{Główne komponenty aplikacji}
+\textbf{Główne komponenty aplikacji:}
 
 \begin{itemize}
 \item \textbf{App.js} – główny komponent aplikacji, zarządzający routingiem React Router v6 oraz globalnym stanem poprzez Context API. Definiuje strukturę tras (routes) oraz layouty dla różnych typów stron (publiczne, chronione, administracyjne).
@@ -1348,17 +1344,26 @@ Aplikacja wykorzystuje deklaratywny routing React Router v6 z zagnieżdżonymi t
 
 \textbf{Zarządzanie stanem - Context API}
 
-Aplikacja wykorzystuje Context API zamiast Redux dla prostszego zarządzania stanem globalnym. \texttt{AuthContext} przechowuje dane zalogowanego użytkownika i token JWT. \texttt{CartContext} zarządza stanem koszyka zakupowego.
+Aplikacja wykorzystuje Context API zamiast Redux dla prostszego zarządzania stanem globalnym:
+\begin{itemize}
+\item \texttt{AuthContext} przechowuje dane zalogowanego użytkownika i token JWT,
+\item \texttt{CartContext} zarządza stanem koszyka zakupowego.
+\end{itemize}
 
 \textbf{Komunikacja z API - Axios}
 
-Wszystkie zapytania HTTP obsługiwane przez Axios z globalną konfiguracją. Interceptor automatycznie dodaje token JWT do nagłówka Authorization każdego zapytania oraz obsługuje błędy 401 Unauthorized.
+Wszystkie zapytania HTTP obsługiwane przez Axios z globalną konfiguracją:
+\begin{itemize}
+\item Interceptor automatycznie dodaje token JWT do nagłówka Authorization każdego zapytania,
+\item obsługuje błędy 401 Unauthorized z automatycznym przekierowaniem do logowania.
+\end{itemize}
 
 \textbf{Animacje - Framer Motion}
 
 Płynne przejścia między stronami oraz animacje komponentów realizowane przez Framer Motion z efektami fade-in, slide-up i scroll-driven.
 
-\textbf{Interfejs głównej strony sklepu e-commerce} przedstawia kompleksową implementację systemu rekomendacyjnego. Widoczne elementy: (1) Nawigacja górna z dynamiczną wyszukiwarką wykorzystującą SentimentSearch API, funkcją logowania/rejestracji z JWT authentication, ikoną koszyka z licznikiem produktów w czasie rzeczywistym (CartContext React). (2) Slider kategorii z ikonami reprezentującymi 15 głównych kategorii produktowych: Power Supplies, Accessories, Peripherals, Electronics, Laptops, Monitors - każda kategoria jest klinkalna i kieruje do filtrowanej strony /shop?category=X. (3) Sekcja "Our Latest Products" wyświetlająca kafelki produktów w responsive grid layout (CSS Grid 4 kolumny desktop, 2 tablet, 1 mobile). Każdy kafelek zawiera: zdjęcie produktu (lazy loading), nazwę, cenę przekreśloną i aktualną (promocje), badge kategorii, przyciski "ADD TO CART" z obsługą CartContext, ikony dodania do ulubionych (FavoritesContext) oraz szybkiego podglądu (Modal). (4) Sekcja "Category Distribution" z interaktywnym wykresem kołowym (Chart.js via react-chartjs-2) pokazującym rozkład 500 produktów pomiędzy 15 kategorii - administrator może monitorować balance katalogu. (5) Sekcja "Recommended For You (Collaborative Filtering)" dynamicznie generowana dla zalogowanych użytkowników - prezentuje 4-6 produktów podobnych do wcześniej zakupionych na podstawie Item-Based CF z Adjusted Cosine Similarity. Rekomendacje aktualizują się automatycznie po każdym zamówieniu. Cały interfejs wykorzystuje Framer Motion dla płynnych animacji przejść między produktami (fade-in, slide-up) oraz responsywny layout zapewniający optymalne doświadczenie na urządzeniach mobilnych, tabletach i desktop.
+\subsection*{5.6 Interfejsy użytkownika systemu rekomendacyjnego}
+\addcontentsline{toc}{subsection}{5.6 Interfejsy użytkownika systemu rekomendacyjnego}
 
 \begin{figure}[h!]
   \centering
@@ -1367,17 +1372,38 @@ Płynne przejścia między stronami oraz animacje komponentów realizowane przez
   \label{fig:gui_shop}
 \end{figure}
 
-Rysunek \ref{fig:gui_shop} przedstawia główną stronę sklepu z kluczowymi elementami interfejsu użytkownika. Widoczny jest slider kategorii pozwalający na szybką nawigację między działami sklepu (Electronics, Laptops, Monitors, Accessories, Power Supplies). Każda kategoria ma dedykowaną ikonę oraz badge z liczbą produktów. Kliknięcie kategorii kieruje użytkownika do strony \texttt{/shop} z parametrem filtru \texttt{?category=electronics}, gdzie wyświetlane są tylko produkty z wybranej kategorii.
+Rysunek \ref{fig:gui_shop} przedstawia interfejs głównej strony sklepu e-commerce z kompleksową implementacją systemu rekomendacyjnego. Widoczne elementy:
+\begin{itemize}
+\item \textbf{Nawigacja górna} z dynamiczną wyszukiwarką wykorzystującą Sentiment Search API, funkcją logowania/rejestracji z JWT authentication, ikoną koszyka z licznikiem produktów w czasie rzeczywistym (CartContext React),
+\item \textbf{Slider kategorii} z ikonami reprezentującymi 15 głównych kategorii produktowych (Power Supplies, Accessories, Peripherals, Electronics, Laptops, Monitors). Każda kategoria jest klikalna i kieruje do filtrowanej strony \texttt{/shop?category=X},
+\item \textbf{Sekcja "Our Latest Products"} wyświetlająca kafelki produktów w responsive grid layout (CSS Grid: 4 kolumny desktop, 2 tablet, 1 mobile). Każdy kafelek zawiera: zdjęcie produktu (lazy loading), nazwę, cenę przekreśloną i aktualną (promocje), badge kategorii, przyciski "ADD TO CART" z obsługą CartContext, ikony dodania do ulubionych (FavoritesContext) oraz szybkiego podglądu (Modal),
+\item \textbf{Sekcja "Category Distribution"} z interaktywnym wykresem kołowym (Chart.js via react-chartjs-2) pokazującym rozkład 500 produktów pomiędzy 15 kategorii - administrator może monitorować balance katalogu,
+\item \textbf{Sekcja "Recommended For You"} dynamicznie generowana dla zalogowanych użytkowników - prezentuje 4-6 produktów podobnych do wcześniej zakupionych na podstawie Item-Based CF z Adjusted Cosine Similarity. Rekomendacje aktualizują się automatycznie po każdym zamówieniu.
+\end{itemize}
 
-\textbf{Strona szczegółów produktu} prezentuje zaawansowaną integrację trzech systemów rekomendacyjnych (na przykładzie Belkin 20000mAh Powerbank). Architektura widoku: (1) Galeria zdjęć produktu z głównym obrazem high-resolution oraz miniaturkami thumbnail (slider react-slick z lazy loading obrazów), (2) Sekcja informacji produktu zawierająca nazwę z dynamicznymi badge'ami kategorii (Budget, Portable, Fast Charging) generowanymi z relacji ManyToMany Product-Category, (3) System cenowy wyświetlający cenę przekreśloną (\$90.99) i aktualną (\$79.99) - automatyczna kalkulacja rabatu w procentach, status dostępności z quantity check w czasie rzeczywistym, (4) Przycisk "ADD TO CART" z walidacją dostępności i obsługą stanu koszyka (CartContext + localStorage persistence), (5) Zakładki Description/Specifications/Reviews(5) z dynamiczną zmianą zawartości bez przeładowania strony (React state management). Zakładka Reviews integruje SentimentAnalysis - każda opinia ma badge (positive/neutral/negative) oraz sentiment\_score wyświetlany jako progress bar. (6) Sekcja "You May Also Like" prezentująca 3-4 produkty podobne (Baseus mini 20000mAh \$29.88, JoyRoom Powerbank 9000mAh \$18.99, Silver Monkey Kabel HDMI 2.1 \$23.99) - rekomendacje generowane przez Collaborative Filtering z Adjusted Cosine Similarity. System analizuje macierz użytkownik-produkt i zwraca produkty z similarity\_score > 0.1 sortowane malejąco. (7) Na dole strony sekcja "Frequently Bought Together" prezentująca produkty komplementarne (ładowarka, kabel USB-C, etui) często kupowane razem - reguły asocjacyjne Apriori z metrykami confidence > 0.3 i lift > 1.2. System oferuje bundle discount przy dodaniu zestawu do koszyka. Cała strona wykorzystuje Intersection Observer API dla lazy loading obrazów i komponentów, React Query dla cache'owania danych API, oraz Framer Motion dla animacji scroll-driven.
-
-Rysunek \ref{fig:gui_product1} przedstawia górną część strony produktu z galerią zdjęć, podstawowymi informacjami oraz przyciskiem dodania do koszyka. Widoczne są również zakładki Description, Specifications i Reviews umożliwiające nawigację między różnymi sekcjami informacji o produkcie.
+Cały interfejs wykorzystuje Framer Motion dla płynnych animacji przejść między produktami (fade-in, slide-up) oraz responsywny layout zapewniający optymalne doświadczenie na urządzeniach mobilnych, tabletach i desktop.
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cardProduct1.jpg}
   \caption{Strona produktu (część górna) - galeria zdjęć, informacje podstawowe, cena, przycisk dodania do koszyka.}
   \label{fig:gui_product1}
+\end{figure}
+
+Rysunek \ref{fig:gui_product1} przedstawia stronę szczegółów produktu z zaawansowaną integracją systemów rekomendacyjnych (przykład: Belkin 20000mAh Powerbank). Widoczne elementy:
+\begin{itemize}
+\item \textbf{Galeria zdjęć} z głównym obrazem high-resolution oraz miniaturkami thumbnail (slider react-slick z lazy loading),
+\item \textbf{Informacje produktu} z dynamicznymi badge'ami kategorii (Budget, Portable, Fast Charging) generowanymi z relacji ManyToMany,
+\item \textbf{System cenowy} wyświetlający cenę przekreśloną (\$90.99) i aktualną (\$79.99) z automatyczną kalkulacją rabatu oraz status dostępności,
+\item \textbf{Przycisk "ADD TO CART"} z walidacją dostępności i obsługą CartContext + localStorage,
+\item \textbf{Zakładki} Description/Specifications/Reviews z dynamiczną zmianą zawartości (React state management). Zakładka Reviews integruje Sentiment Analysis - każda opinia ma badge (positive/neutral/negative).
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/cardProduct2.jpg}
+  \caption{Strona produktu (część dolna) - sekcje rekomendacji "You May Also Like" (CF) i "Frequently Bought Together" (Apriori).}
+  \label{fig:gui_product2}
 \end{figure}
 
 Rysunek \ref{fig:gui_product2} przedstawia dolną część strony produktu zawierającą dwie kluczowe sekcje rekomendacji ML:
@@ -1406,8 +1432,6 @@ Obie sekcje rekomendacji są generowane dynamicznie przez backend Django wykorzy
 
 Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdopodobieństwo konwersji poprzez: \textbf{Exploration} - CF pokazuje alternatywne produkty (up-selling) oraz \textbf{Exploitation} - Apriori pokazuje produkty komplementarne (cross-selling). Strategia ta zwiększa średnią wartość zamówienia (AOV) o 20-35\% względem braku rekomendacji.
 
-\textbf{Panel debugowania Collaborative Filtering} w zaawansowanym interfejsie administratora przedstawia kompleksową analizę algorytmu CF z kluczowymi metrykami wydajności i jakości: (1) Nagłówek "Collaborative Filtering Debug Information" z zakładkami nawigacyjnymi CF/Sentiment/Association umożliwiającymi przełączanie między algorytmami, (2) Sekcja "Algorithm" prezentująca szczegóły techniczne: Name - Collaborative Filtering (Item-Based, Sarwar et al. 2001), Formula - Adjusted Cosine Similarity with Mean-Centering eliminująca bias użytkowników kupujących różne ilości produktów, Status - success z zielonym badge wskazującym prawidłowe działanie, (3) Sekcja "Database Statistics" z metrykami działającej aplikacji: Total Users: 19 (5 admin + 14 klientów), Total Products: 500 (15 kategorii, 48 podkategorii), Total Order Items: 569 pozycji w zamówieniach, Users with Purchases: 19 (100\% penetracja - każdy użytkownik ma historię), Total Purchases: 565 zakończone transakcje status='completed', (4) Sekcja "User-Product Matrix" ujawniająca kluczowe wyzwanie algorytmu CF: Shape: (19 użytkowników, 500 produktów) = 9500 komórek, Non-Zero Cells: 565 (tylko 5.95\% wypełnione), Sparsity: 94.05\% - bardzo rzadka macierz typowa dla systemów e-commerce gdzie użytkownik kupuje 5-20 z tysięcy dostępnych produktów, (5) Sekcja "Similarity Matrix" z analizą pokrycia: Expected Shape: (500 produktów, 500 produktów) = 250000 możliwych par, Saved Similarities: 4150 (po filtrowaniu similarity\_score >= 0.1), Percentage Computed: 1.66\% - system obliczył i zapisał tylko istotne podobieństwa, co dramatycznie redukuje rozmiar bazy danych. Panel służy administratorowi do monitorowania wydajności algorytmu, identyfikowania problemów z rzadką macierzą, śledzenia coverage rekomendacji oraz walidacji działania cache i indeksów PostgreSQL. Przyciski akcji umożliwiają ręczne wyzwalanie przeliczenia macierzy, eksport danych do CSV dla analizy offline, oraz czyszczenie przestarzałych podobieństw starszych niż 30 dni.
-
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cfDebug1.jpg}
@@ -1415,7 +1439,16 @@ Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdo
   \label{fig:admin_debug_cf}
 \end{figure}
 
-\textbf{Panel debugowania Sentiment Analysis} w interfejsie administratora prezentuje kluczowe metryki: (1) "Sentiment Analysis Debug Information" z zakładką aktywną na Sentiment Analysis, (2) "Algorithm Details" - Method: Lexicon-based Multi-source Aggregation (Liu 2012), Sources: 5 (Opinions 40\%, Description 25\%, Name 15\%, Specs 12\%, Categories 8\%), Optimization: Grid Search (r=0.73 correlation with user ratings), Status: success, (3) "Database Statistics" - Total Products: 500, Products with Opinions: 487, Products without Opinions: 13, Average Opinions per Product: 8.2, Total Sentiment Scores Computed: 500, (4) "Sentiment Distribution" - Positive (score > 0.3): 312 products (62.4\%), Neutral (0.3 >= score >= -0.3): 156 products (31.2\%), Negative (score < -0.3): 32 products (6.4\%), (5) "Top Sentiment Keywords" - Positive: excellent(89), great(76), recommend(54); Negative: poor(12), disappointed(8), broken(6). Panel pokazuje, że wieloźródłowa agregacja działa dla wszystkich 500 produktów, w tym 13 bez opinii (dzięki analizie opisu/nazwy/specs). Metryki potwierdzają skuteczność rozwiązania problemu zimnego startu - produkty bez recenzji również otrzymują ocenę jakości na podstawie pozostałych źródeł tekstowych. Wykresy słupkowe wizualizują rozkład sentymentu oraz najczęściej występujące słowa kluczowe w opiniach pozytywnych i negatywnych.
+Rysunek \ref{fig:admin_debug_cf} przedstawia panel debugowania Collaborative Filtering w zaawansowanym interfejsie administratora z kompleksową analizą algorytmu:
+\begin{itemize}
+\item \textbf{Nagłówek}: "Collaborative Filtering Debug Information" z zakładkami nawigacyjnymi CF/Sentiment/Association umożliwiającymi przełączanie między algorytmami,
+\item \textbf{Algorithm Details}: Name - Collaborative Filtering (Item-Based, Sarwar et al. 2001), Formula - Adjusted Cosine Similarity with Mean-Centering eliminująca bias użytkowników kupujących różne ilości produktów, Status - success z zielonym badge,
+\item \textbf{Database Statistics}: Total Users: 19 (5 admin + 14 klientów), Total Products: 500 (15 kategorii, 48 podkategorii), Total Order Items: 569 pozycji, Users with Purchases: 19 (100\% penetracja), Total Purchases: 565 zakończone transakcje,
+\item \textbf{User-Product Matrix}: Shape: (19 użytkowników, 500 produktów) = 9500 komórek, Non-Zero Cells: 565 (tylko 5.95\% wypełnione), Sparsity: 94.05\% - bardzo rzadka macierz typowa dla e-commerce gdzie użytkownik kupuje 5-20 z tysięcy dostępnych produktów,
+\item \textbf{Similarity Matrix}: Expected Shape: (500 produktów, 500 produktów) = 250000 możliwych par, Saved Similarities: 4150 (po filtrowaniu similarity\_score $\geq$ 0.1), Percentage Computed: 1.66\% - system obliczył i zapisał tylko istotne podobieństwa, dramatycznie redukując rozmiar bazy danych.
+\end{itemize}
+
+Panel służy administratorowi do monitorowania wydajności algorytmu, identyfikowania problemów z rzadką macierzą, śledzenia coverage rekomendacji oraz walidacji działania cache i indeksów PostgreSQL. Przyciski akcji umożliwiają ręczne wyzwalanie przeliczenia macierzy, eksport danych do CSV dla analizy offline oraz czyszczenie przestarzałych podobieństw.
 
 \begin{figure}[h!]
   \centering
@@ -1424,7 +1457,15 @@ Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdo
   \label{fig:admin_debug_sentiment}
 \end{figure}
 
-\textbf{Panel debugowania Association Rules (Apriori)} w interfejsie administratora zawiera: (1) "Association Rules Debug Information" z aktywną zakładką Association Rules, (2) "Algorithm Details" - Method: Apriori with Bitmap Pruning (Agrawal \& Srikant 1994, Zaki 2000), Min Support: 2 transactions, Min Confidence: 0.3, Min Lift: 1.0, Status: success, (3) "Transaction Statistics" - Total Orders: 265, Unique Products in Orders: 487 (z 500), Average Products per Order: 2.14, Total Product Pairs in Baskets: 284, (4) "Generated Rules" - Total Rules: 178, Rules with Lift > 1.5: 89 (strong positive correlation), Rules with Lift > 2.0: 34 (very strong correlation), Average Confidence: 0.56, Average Lift: 1.82, (5) "Performance Metrics" - Bitmap Pruning Speed-up: 19x faster, Candidates Pruned: 82\%, Time to Generate Rules: 1.23s (na 500 produktów). Panel pokazuje skuteczność bitmap pruning - 82\% potencjalnych par zostało odrzuconych przed kosztownymi obliczeniami confidence/lift, co przełożyło się na 19x przyspieszenie. Tabela prezentuje top 10 najsilniejszych reguł asocjacyjnych z kolumnami: Antecedent (produkt A), Consequent (produkt B), Support, Confidence, Lift. Administrator może filtrować reguły według różnych kryteriów oraz eksportować dane do dalszej analizy biznesowej.
+Rysunek \ref{fig:admin_debug_sentiment} przedstawia panel debugowania Sentiment Analysis z metrykami:
+\begin{itemize}
+\item \textbf{Algorithm Details}: Method - Lexicon-based Multi-source Aggregation (Liu 2012), Sources: 5 (Opinions 40\%, Description 25\%, Name 15\%, Specs 12\%, Categories 8\%), Optimization - Grid Search (r=0.73 correlation),
+\item \textbf{Database Statistics}: Total Products: 500, Products with Opinions: 487, Products without Opinions: 13, Average Opinions per Product: 8.2,
+\item \textbf{Sentiment Distribution}: Positive (score > 0.3): 312 products (62.4\%), Neutral: 156 products (31.2\%), Negative: 32 products (6.4\%),
+\item \textbf{Top Keywords}: Positive - excellent(89), great(76), recommend(54); Negative - poor(12), disappointed(8), broken(6).
+\end{itemize}
+
+Panel pokazuje, że wieloźródłowa agregacja działa dla wszystkich 500 produktów, w tym 13 bez opinii (dzięki analizie opisu/nazwy/specs), rozwiązując problem zimnego startu.
 
 \begin{figure}[h!]
   \centering
@@ -1433,7 +1474,33 @@ Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdo
   \label{fig:admin_debug_apriori}
 \end{figure}
 
-\textbf{Panel klienta z dashboard} prezentuje personalizowane rekomendacje z trzech metod ML. Widoczne sekcje: (1) "Witaj, [username]" - powitanie spersonalizowane, (2) "Twoje ostatnie zamówienia" - historia 3-5 ostatnich transakcji z datami, statusami i kwotami, (3) "Rekomendowane dla Ciebie" (Collaborative Filtering) - 4-6 produktów podobnych do wcześniej zakupionych z cenami i przyciskami "Dodaj do koszyka", (4) "Produkty które mogą Cię zainteresować" (Sentiment Analysis) - top-rated produkty z kategorii przeglądanych przez użytkownika, (5) "Często kupowane razem" (Association Rules) - zestawy produktów komplementarnych z discountem przy zakupie bundle. System wykorzystuje wszystkie 3 metody ML do maksymalizacji trafności rekomendacji i wartości Customer Lifetime Value (CLV). React Context API zarządza stanem personalizacji między sesjami. Każda sekcja jest dynamicznie aktualizowana w czasie rzeczywistym po interakcjach użytkownika (kliknięcia, dodanie do koszyka, zakup). Panel dostarcza również statystyk zakupowych: łączna wartość zamówień, ulubione kategorie, punkty lojalnościowe. Interfejs wykorzystuje responsywny design dostosowujący się do urządzeń mobilnych oraz desktop, z płynnymi animacjami Framer Motion przy przejściach między sekcjami.
+Rysunek \ref{fig:admin_debug_apriori} przedstawia panel debugowania Association Rules (Apriori):
+\begin{itemize}
+\item \textbf{Algorithm Details}: Method - Apriori with Bitmap Pruning (Agrawal \& Srikant 1994, Zaki 2000), Min Support: 2 transactions, Min Confidence: 0.3, Min Lift: 1.0,
+\item \textbf{Transaction Statistics}: Total Orders: 265, Unique Products in Orders: 487 (z 500), Average Products per Order: 2.14, Total Product Pairs: 284,
+\item \textbf{Generated Rules}: Total Rules: 178, Rules with Lift > 1.5: 89 (strong correlation), Rules with Lift > 2.0: 34 (very strong), Average Confidence: 0.56, Average Lift: 1.82,
+\item \textbf{Performance Metrics}: Bitmap Pruning Speed-up: 19x faster, Candidates Pruned: 82\%, Time to Generate Rules: 1.23s.
+\end{itemize}
+
+Panel pokazuje skuteczność bitmap pruning - 82\% potencjalnych par zostało odrzuconych przed kosztownymi obliczeniami, co przełożyło się na 19x przyspieszenie.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/dashboardClient1.jpg}
+  \caption{Panel klienta z personalizowanymi rekomendacjami z trzech metod ML.}
+  \label{fig:client_dashboard}
+\end{figure}
+
+Rysunek \ref{fig:client_dashboard} przedstawia panel klienta z dashboard zawierający personalizowane rekomendacje z trzech metod ML:
+\begin{itemize}
+\item \textbf{"Witaj, [username]"}: powitanie spersonalizowane,
+\item \textbf{"Twoje ostatnie zamówienia"}: historia 3-5 ostatnich transakcji z datami, statusami i kwotami,
+\item \textbf{"Rekomendowane dla Ciebie" (Collaborative Filtering)}: 4-6 produktów podobnych do wcześniej zakupionych z cenami i przyciskami "Dodaj do koszyka",
+\item \textbf{"Produkty które mogą Cię zainteresować" (Sentiment Analysis)}: top-rated produkty z kategorii przeglądanych przez użytkownika,
+\item \textbf{"Często kupowane razem" (Association Rules)}: zestawy produktów komplementarnych z discountem przy zakupie bundle.
+\end{itemize}
+
+System wykorzystuje wszystkie 3 metody ML do maksymalizacji trafności rekomendacji i wartości Customer Lifetime Value (CLV). React Context API zarządza stanem personalizacji między sesjami. Każda sekcja jest dynamicznie aktualizowana w czasie rzeczywistym po interakcjach użytkownika (kliknięcia, dodanie do koszyka, zakup). Panel dostarcza również statystyk zakupowych: łączna wartość zamówień, ulubione kategorie, punkty lojalnościowe. Interfejs wykorzystuje responsywny design z płynnymi animacjami Framer Motion.
 
 \textbf{Autentykacja użytkownika}
 
@@ -1571,43 +1638,45 @@ Administrator ma dostęp do zaawansowanego panelu zarządzania przedstawionego n
 
 Dashboard administratora składa się z następujących zakładek:
 
-\textit{1. Overview}: Podsumowanie kluczowych metryk biznesowych:
 \begin{itemize}
-\item Total Revenue (last 30 days): przychody z ostatnich 30 dni
-\item Active Users: liczba aktywnych użytkowników (logowanie w ciągu 7 dni)
-\item Pending Orders: liczba zamówień oczekujących na realizację
-\item Low Stock Products: produkty z ilością < 10 sztuk (wymagają uzupełnienia magazynu)
-\item ML Models Status: status działania trzech algorytmów (CF, Sentiment, Apriori) z timestampem ostatniego przeliczenia
-\end{itemize}
+\item \textbf{Overview}: Podsumowanie kluczowych metryk biznesowych:
+  \begin{itemize}
+  \item Total Revenue (last 30 days): przychody z ostatnich 30 dni,
+  \item Active Users: liczba aktywnych użytkowników (logowanie w ciągu 7 dni),
+  \item Pending Orders: liczba zamówień oczekujących na realizację,
+  \item Low Stock Products: produkty z ilością < 10 sztuk (wymagają uzupełnienia magazynu),
+  \item ML Models Status: status działania trzech algorytmów (CF, Sentiment, Apriori) z timestampem ostatniego przeliczenia.
+  \end{itemize}
 
-\textit{2. Products}: Zarządzanie produktami z funkcjami:
-\begin{itemize}
-\item Tabela wszystkich produktów z filtrowaniem i sortowaniem
-\item Przycisk "Add New Product" otwierający formularz dodawania
-\item Akcje per produkt: Edit, Delete, Activate/Deactivate, View Details
-\item Bulk actions: aktywacja/deaktywacja wielu produktów jednocześnie
-\item Eksport do CSV
-\end{itemize}
+\item \textbf{Products}: Zarządzanie produktami z funkcjami:
+  \begin{itemize}
+  \item Tabela wszystkich produktów z filtrowaniem i sortowaniem,
+  \item Przycisk "Add New Product" otwierający formularz dodawania,
+  \item Akcje per produkt: Edit, Delete, Activate/Deactivate, View Details,
+  \item Bulk actions: aktywacja/deaktywacja wielu produktów jednocześnie,
+  \item Eksport do CSV.
+  \end{itemize}
 
-\textit{3. Orders}: Zarządzanie zamówieniami:
-\begin{itemize}
-\item Tabela zamówień z filtrowaniem po statusie (all/pending/completed/cancelled)
-\item Szczegóły zamówienia: lista produktów, dane klienta, adres dostawy
-\item Zmiana statusu zamówienia (pending → completed/cancelled)
-\item Generowanie faktury PDF
-\item Wysyłka powiadomienia e-mail do klienta
-\end{itemize}
+\item \textbf{Orders}: Zarządzanie zamówieniami:
+  \begin{itemize}
+  \item Tabela zamówień z filtrowaniem po statusie (all/pending/completed/cancelled),
+  \item Szczegóły zamówienia: lista produktów, dane klienta, adres dostawy,
+  \item Zmiana statusu zamówienia (pending → completed/cancelled),
+  \item Generowanie faktury PDF,
+  \item Wysyłka powiadomienia e-mail do klienta.
+  \end{itemize}
 
-\textit{4. Users}: Zarządzanie użytkownikami:
-\begin{itemize}
-\item Tabela użytkowników z rolami (customer/staff/admin)
-\item Nadawanie/odbieranie uprawnień staff/superuser
-\item Banowanie użytkowników (is\_active=False)
-\item Statystyki per użytkownik: liczba zamówień, łączna wartość, ostatnie logowanie
-\item Resetowanie hasła użytkownika
-\end{itemize}
+\item \textbf{Users}: Zarządzanie użytkownikami:
+  \begin{itemize}
+  \item Tabela użytkowników z rolami (customer/staff/admin),
+  \item Nadawanie/odbieranie uprawnień staff/superuser,
+  \item Banowanie użytkowników (is\_active=False),
+  \item Statystyki per użytkownik: liczba zamówień, łączna wartość, ostatnie logowanie,
+  \item Resetowanie hasła użytkownika.
+  \end{itemize}
 
-\textit{5. Statistics}: Zaawansowane statystyki biznesowe przedstawione na rysunkach \ref{fig:statistics_admin1}, \ref{fig:statistics_admin2} i \ref{fig:statistics_admin3}.
+\item \textbf{Statistics}: Zaawansowane statystyki biznesowe przedstawione na rysunkach \ref{fig:statistics_admin1}, \ref{fig:statistics_admin2} i \ref{fig:statistics_admin3}.
+\end{itemize}
 
 \begin{figure}[h!]
   \centering
@@ -1618,10 +1687,10 @@ Dashboard administratora składa się z następujących zakładek:
 
 Pierwszy widok statystyk administratora (Rysunek \ref{fig:statistics_admin1}) zawiera:
 \begin{itemize}
-\item \textbf{Revenue Chart} - wykres słupkowy przychodów per miesiąc za ostatni rok
-\item \textbf{Sales by Category} - wykres kołowy pokazujący udział poszczególnych kategorii w całkowitej sprzedaży
-\item \textbf{Top Selling Products} - ranking 10 najlepiej sprzedających się produktów (ilość + wartość)
-\item \textbf{Customer Acquisition} - wykres liniowy nowych rejestracji użytkowników w czasie
+\item \textbf{Revenue Chart}: wykres słupkowy przychodów per miesiąc za ostatni rok,
+\item \textbf{Sales by Category}: wykres kołowy pokazujący udział poszczególnych kategorii w całkowitej sprzedaży,
+\item \textbf{Top Selling Products}: ranking 10 najlepiej sprzedających się produktów (ilość + wartość),
+\item \textbf{Customer Acquisition}: wykres liniowy nowych rejestracji użytkowników w czasie.
 \end{itemize}
 
 \begin{figure}[h!]
@@ -1911,7 +1980,7 @@ Wartość: Implementacja od podstaw pozwoliła świadomie dostosować algorytmy 
 \textbf{Słowa kluczowe:}\\
 systemy rekomendacji, collaborative filtering, analiza sentymentu, algorytm Apriori, machine learning, e-commerce, Django, React
 
-\vspace{1cm}
+\clearpage
 
 \noindent
 \textbf{Title:}\\
