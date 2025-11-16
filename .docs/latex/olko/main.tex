@@ -121,8 +121,6 @@ W mojej pracy zaimplementowałem trzy metody rekomendacji dla platformy e-commer
 
 \textbf{3. Reguły asocjacyjne (Apriori)} — algorytm Agrawal \& Srikant (1994) z optymalizacją bitmap pruning (Zaki 2000) odkrywający produkty często kupowane razem. Implementacja w NumPy osiąga przyspieszenie 19x względem naiwnego podejścia. Wspiera strategie cross-sellingu ("Klienci kupujący X często wybierają także Y").
 
-Podkreślam: tylko te trzy metody są moim autorskim wkładem w projekcie. Nie implementowałem innych technik rekomendacyjnych — praca koncentruje się wyłącznie na CF, analizie sentymentu i Apriori.
-
 \subsection*{Dane i środowisko testowe}
 
 System został przetestowany na rzeczywistych danych z aplikacji e-commerce:
@@ -335,16 +333,6 @@ System wyklucha produkty już zakupione przez użytkownika (klauzula \texttt{exc
 
 Przykładowy wynik dla użytkownika, który kupił smartfon Samsung Galaxy S21, ładowarkę szybką oraz etui:
 
-\begin{verbatim}
-Top 10 rekomendacji:
-1. Szkło hartowane Samsung (score=2.4)
-2. Powerbank 20000mAh (score=2.1)
-3. Uchwyt samochodowy (score=1.9)
-4. Słuchawki bezprzewodowe Samsung (score=1.7)
-5. Kabel USB-C 2m (score=1.5)
-...
-\end{verbatim}
-
 Rekomendacje są prezentowane w sekcji "Polecane dla Ciebie" interfejsu użytkownika oraz w panelu klienta. System automatycznie aktualizuje rekomendacje po każdym nowym zamówieniu, zapewniając ich aktualność względem zmieniających się preferencji użytkownika.
 
 \textbf{Dynamiczne sekcje produktów na stronie głównej}
@@ -359,14 +347,14 @@ Administrator ma możliwość konfiguracji metody sortowania produktów wyświet
 
 Wybór algorytmu odbywa się w panelu administracyjnym i natychmiast wpływa na kolejność wyświetlania produktów dla wszystkich użytkowników. Rysunek \ref{fig:main_section_view} przedstawia dwie różne konfiguracje sortowania - pierwsza pokazuje produkty sortowane według CF, druga według sentiment analysis.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/mainSectionView1.jpg}
   \caption{Sekcja "Our Latest Products" - sortowanie Collaborative Filtering.}
   \label{fig:main_section_view1}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/mainSectionView2.jpg}
   \caption{Sekcja "Our Latest Products" - sortowanie Sentiment Analysis.}
@@ -385,7 +373,7 @@ Pierwszy widok (Rysunek \ref{fig:cf_debug1}) prezentuje podstawowe metryki algor
 \item Statystyki macierzy podobieństw (wymiar oczekiwany, zapisane podobieństwa, procent obliczony)
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cfDebug1.jpg}
   \caption{Panel debugowania CF - podstawowe metryki algorytmu.}
@@ -400,7 +388,7 @@ Drugi widok (Rysunek \ref{fig:cf_debug2}) zawiera szczegółową tabelę z konkr
 \item Timestamp ostatniego przeliczenia podobieństw
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cfDebug2.jpg}
   \caption{Panel debugowania CF - szczegółowa tabela rekomendacji z wartościami similarity\_score.}
@@ -421,7 +409,7 @@ Panel debugowania umożliwia administratorowi:
 
 System wykorzystuje cache'owanie macierzy podobieństwa (24h timeout, automatyczne unieważnienie po zamówieniu), operacje wsadowe dla zapisu danych, indeksowanie bazy danych oraz próg podobieństwa 0.1 eliminujący szum.
 
-\newpage
+\clearpage
 
 \section*{Rozdzia\l{} 3}
 \addcontentsline{toc}{section}{Rozdział 3: Analiza Sentymentu}
@@ -450,7 +438,7 @@ Rysunek \ref{fig:opinion_view1} przedstawia sekcję dodawania opinii na karcie p
 \item Oznaczyć czy jest to zakup zweryfikowany (verified purchase)
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/opinionView.jpg}
   \caption{Formularz dodawania opinii na stronie produktu z oceną gwiazdkową i recenzją tekstową.}
@@ -475,7 +463,7 @@ Rysunek \ref{fig:opinion_view2} pokazuje listę wszystkich opinii dla danego pro
 \item Badge "Verified Purchase" dla zweryfikowanych zakupów
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/opinionView2.jpg}
   \caption{Lista opinii produktu z badge'ami sentymentu i systemem głosowania pomocności.}
@@ -492,7 +480,7 @@ System opinii jest kluczowy dla dwóch aspektów aplikacji:
 
 Wyszukiwarka produktów (Rysunek \ref{fig:search_sentiment}) oferuje zaawansowane opcje sortowania wyników, w tym sortowanie według zagregowanego wyniku sentymentu. Funkcjonalność ta pozwala użytkownikom szybko znaleźć produkty o najlepszych opiniach.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/searchSentimentView.jpg}
   \caption{Wyszukiwarka z sortowaniem według analizy sentymentu - najlepiej oceniane produkty na górze.}
@@ -521,14 +509,6 @@ products = Product.objects.filter(
 \end{lstlisting}
 
 Przykładowe wyniki dla zapytania "laptop":
-\begin{verbatim}
-1. Lenovo ThinkPad X1 Carbon (sentiment: +0.82, 24 opinie)
-2. Dell XPS 15 (sentiment: +0.78, 31 opinii)
-3. HP Pavilion 15 (sentiment: +0.71, 18 opinii)
-4. Asus VivoBook (sentiment: +0.65, 12 opinii)
-...
-\end{verbatim}
-
 Sortowanie według sentymentu jest szczególnie użyteczne dla użytkowników poszukujących produktów najwyższej jakości, gotowych zapłacić więcej za lepiej oceniane artykuły.
 
 \subsection*{3.2 Slowniki i implementacja}
@@ -536,31 +516,9 @@ Sortowanie według sentymentu jest szczególnie użyteczne dla użytkowników po
 
 Analiza sentymentu w aplikacji opiera się na słownikach zoptymalizowanych dla polskiego e-commerce, zawierających pozytywne i negatywne słowa kluczowe charakterystyczne dla opinii o produktach.
 
-\textbf{Słownik pozytywny} zawiera 237 słów i wyrażeń wskazujących na pozytywny sentyment:
+\textbf{Słownik pozytywny} zawiera 237 słów i wyrażeń wskazujących na pozytywny sentyment, takich jak: 'excellent', 'great', 'wonderful', 'amazing', 'recommend', 'highly recommend', 'super', 'fantastic', 'ideal', 'perfect', 'worth the price', 'premium quality', 'solid', 'reliable', 'functional', 'ergonomic', 'intuitive', 'easy to use', 'fast delivery', 'well made', 'very good', 'best'.
 
-\begin{verbatim}
-POSITIVE_WORDS = {
-    'excellent', 'great', 'wonderful', 'amazing', 'recommend',
-    'highly recommend', 'super', 'fantastic', 'ideal', 'perfect',
-    'worth the price', 'premium quality', 'solid', 'reliable',
-    'functional', 'ergonomic', 'intuitive', 'easy to use',
-    'fast delivery', 'well made', 'very good', 'best',
-    ...
-}
-\end{verbatim}
-
-\textbf{Słownik negatywny} zawiera 214 słów i wyrażeń wskazujących na negatywny sentyment:
-
-\begin{verbatim}
-NEGATIVE_WORDS = {
-    'poor', 'terrible', 'horrible', 'awful', 'not recommend',
-    'avoid', 'disappointment', 'disappointing', 'bad', 'mediocre',
-    'inaccurate', 'defective', 'damaged', 'broken', 'poor quality',
-    'does not work', 'stopped working', 'problems', 'failure',
-    'unreliable', 'not durable', 'not holding up', 'falling apart',
-    ...
-}
-\end{verbatim}
+\textbf{Słownik negatywny} zawiera 214 słów i wyrażeń wskazujących na negatywny sentyment, takich jak: 'poor', 'terrible', 'horrible', 'awful', 'not recommend', 'avoid', 'disappointment', 'disappointing', 'bad', 'mediocre', 'inaccurate', 'defective', 'damaged', 'broken', 'poor quality', 'does not work', 'stopped working', 'problems', 'failure', 'unreliable', 'not durable', 'not holding up', 'falling apart'.
 
 \textbf{Algorytm analizy sentymentu pojedynczego tekstu}
 
@@ -706,7 +664,7 @@ Pierwszy widok (Rysunek \ref{fig:sentiment_debug1}) prezentuje kluczowe metryki 
 \item \textbf{Top słowa kluczowe} - najczęściej występujące słowa pozytywne i negatywne w opiniach
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/sentimentDebug1.jpg}
   \caption{Panel debugowania Sentiment Analysis - metryki algorytmu i rozkład sentymentu.}
@@ -714,28 +672,35 @@ Pierwszy widok (Rysunek \ref{fig:sentiment_debug1}) prezentuje kluczowe metryki 
 \end{figure}
 
 Przykładowe metryki z działającej aplikacji:
-\begin{verbatim}
-Total Products: 500
-Products with Opinions: 487 (97.4%)
-Products without Opinions: 13 (2.6%)
-Average Opinions per Product: 8.2
-Total Sentiment Scores Computed: 500
 
-Sentiment Distribution:
-- Positive (score > 0.3): 312 products (62.4%)
-- Neutral (-0.3 <= score <= 0.3): 156 products (31.2%)
-- Negative (score < -0.3): 32 products (6.4%)
+\begin{itemize}
+\item \textbf{Total Products}: 500
+\item \textbf{Products with Opinions}: 487 (97.4\%)
+\item \textbf{Products without Opinions}: 13 (2.6\%)
+\item \textbf{Average Opinions per Product}: 8.2
+\item \textbf{Total Sentiment Scores Computed}: 500
+\end{itemize}
 
-Top Positive Keywords:
-1. excellent (89 occurrences)
-2. great (76 occurrences)
-3. recommend (54 occurrences)
+\textbf{Sentiment Distribution}:
+\begin{itemize}
+\item Positive (score > 0.3): 312 products (62.4\%)
+\item Neutral (-0.3 $\leq$ score $\leq$ 0.3): 156 products (31.2\%)
+\item Negative (score < -0.3): 32 products (6.4\%)
+\end{itemize}
 
-Top Negative Keywords:
-1. poor (12 occurrences)
-2. disappointed (8 occurrences)
-3. broken (6 occurrences)
-\end{verbatim}
+\textbf{Top Positive Keywords}:
+\begin{itemize}
+\item excellent (89 occurrences)
+\item great (76 occurrences)
+\item recommend (54 occurrences)
+\end{itemize}
+
+\textbf{Top Negative Keywords}:
+\begin{itemize}
+\item poor (12 occurrences)
+\item disappointed (8 occurrences)
+\item broken (6 occurrences)
+\end{itemize}
 
 Drugi widok (Rysunek \ref{fig:sentiment_debug2}) zawiera szczegółową tabelę z wynikami analizy sentymentu dla poszczególnych produktów:
 \begin{itemize}
@@ -747,7 +712,7 @@ Drugi widok (Rysunek \ref{fig:sentiment_debug2}) zawiera szczegółową tabelę 
 \item Timestamp ostatniego przeliczenia
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/sentimentDebug2.jpg}
   \caption{Panel debugowania Sentiment Analysis - szczegółowa tabela wyników dla produktów z rozbiciem na źródła.}
@@ -883,7 +848,7 @@ Reguły asocjacyjne są wykorzystywane w dwóch kluczowych miejscach interfejsu 
 
 Rysunek \ref{fig:cart_view} przedstawia koszyk zakupowy z aktywną sekcją rekomendacji opartych na regułach asocjacyjnych. Dla każdego produktu w koszyku, system generuje rekomendacje produktów komplementarnych często kupowanych razem.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cartView.jpg}
   \caption{Koszyk zakupowy z rekomendacjami "Frequently Bought Together" opartymi na regułach asocjacyjnych Apriori.}
@@ -898,7 +863,7 @@ Proces generowania rekomendacji w koszyku:
 
 \textbf{Krok 3}: Sortuj malejąco według lift i zwróć top 4-6 produktów.
 
-Przykład dla koszyka zawierającego [Laptop Dell XPS 15, Mysz Logitech MX Master]:
+Przykład dla koszyka zawierającego [Laptop Dell XPS 15, Mysz Logitech MX]:
 
 \begin{verbatim}
 Rekomendacje "Frequently Bought Together":
@@ -934,7 +899,7 @@ Pierwszy widok (Rysunek \ref{fig:association_debug1}) prezentuje kluczowe metryk
 \item \textbf{Metryki wydajności} - przyspieszenie bitmap pruning (19x), procent odrzuconych kandydatów (82\%), czas generowania reguł
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/associationDebug1.jpg}
   \caption{Panel debugowania Apriori - metryki algorytmu i wydajność bitmap pruning.}
@@ -976,7 +941,7 @@ Drugi widok (Rysunek \ref{fig:association_debug2}) zawiera szczegółową tabel�
 \item Opcje sortowania według różnych kolumn
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/associationDebug2.jpg}
   \caption{Panel debugowania Apriori - szczegółowa tabela reguł asocjacyjnych z metrykami.}
@@ -1395,7 +1360,7 @@ Płynne przejścia między stronami oraz animacje komponentów realizowane przez
 
 \textbf{Interfejs głównej strony sklepu e-commerce} przedstawia kompleksową implementację systemu rekomendacyjnego. Widoczne elementy: (1) Nawigacja górna z dynamiczną wyszukiwarką wykorzystującą SentimentSearch API, funkcją logowania/rejestracji z JWT authentication, ikoną koszyka z licznikiem produktów w czasie rzeczywistym (CartContext React). (2) Slider kategorii z ikonami reprezentującymi 15 głównych kategorii produktowych: Power Supplies, Accessories, Peripherals, Electronics, Laptops, Monitors - każda kategoria jest klinkalna i kieruje do filtrowanej strony /shop?category=X. (3) Sekcja "Our Latest Products" wyświetlająca kafelki produktów w responsive grid layout (CSS Grid 4 kolumny desktop, 2 tablet, 1 mobile). Każdy kafelek zawiera: zdjęcie produktu (lazy loading), nazwę, cenę przekreśloną i aktualną (promocje), badge kategorii, przyciski "ADD TO CART" z obsługą CartContext, ikony dodania do ulubionych (FavoritesContext) oraz szybkiego podglądu (Modal). (4) Sekcja "Category Distribution" z interaktywnym wykresem kołowym (Chart.js via react-chartjs-2) pokazującym rozkład 500 produktów pomiędzy 15 kategorii - administrator może monitorować balance katalogu. (5) Sekcja "Recommended For You (Collaborative Filtering)" dynamicznie generowana dla zalogowanych użytkowników - prezentuje 4-6 produktów podobnych do wcześniej zakupionych na podstawie Item-Based CF z Adjusted Cosine Similarity. Rekomendacje aktualizują się automatycznie po każdym zamówieniu. Cały interfejs wykorzystuje Framer Motion dla płynnych animacji przejść między produktami (fade-in, slide-up) oraz responsywny layout zapewniający optymalne doświadczenie na urządzeniach mobilnych, tabletach i desktop.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/categoryView.jpg}
   \caption{Interfejs głównej strony sklepu - slider kategorii, sekcja produktów z różnymi metodami sortowania (CF/CBF/Fuzzy), wykresy dystrybucji.}
@@ -1408,7 +1373,7 @@ Rysunek \ref{fig:gui_shop} przedstawia główną stronę sklepu z kluczowymi ele
 
 Rysunek \ref{fig:gui_product1} przedstawia górną część strony produktu z galerią zdjęć, podstawowymi informacjami oraz przyciskiem dodania do koszyka. Widoczne są również zakładki Description, Specifications i Reviews umożliwiające nawigację między różnymi sekcjami informacji o produkcie.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cardProduct1.jpg}
   \caption{Strona produktu (część górna) - galeria zdjęć, informacje podstawowe, cena, przycisk dodania do koszyka.}
@@ -1430,7 +1395,7 @@ Rysunek \ref{fig:gui_product2} przedstawia dolną część strony produktu zawie
   \end{itemize}
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cardProduct2.jpg}
   \caption{Strona produktu (część dolna) - rekomendacje CF ("You May Also Like") i Apriori ("Frequently Bought Together").}
@@ -1443,7 +1408,7 @@ Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdo
 
 \textbf{Panel debugowania Collaborative Filtering} w zaawansowanym interfejsie administratora przedstawia kompleksową analizę algorytmu CF z kluczowymi metrykami wydajności i jakości: (1) Nagłówek "Collaborative Filtering Debug Information" z zakładkami nawigacyjnymi CF/Sentiment/Association umożliwiającymi przełączanie między algorytmami, (2) Sekcja "Algorithm" prezentująca szczegóły techniczne: Name - Collaborative Filtering (Item-Based, Sarwar et al. 2001), Formula - Adjusted Cosine Similarity with Mean-Centering eliminująca bias użytkowników kupujących różne ilości produktów, Status - success z zielonym badge wskazującym prawidłowe działanie, (3) Sekcja "Database Statistics" z metrykami działającej aplikacji: Total Users: 19 (5 admin + 14 klientów), Total Products: 500 (15 kategorii, 48 podkategorii), Total Order Items: 569 pozycji w zamówieniach, Users with Purchases: 19 (100\% penetracja - każdy użytkownik ma historię), Total Purchases: 565 zakończone transakcje status='completed', (4) Sekcja "User-Product Matrix" ujawniająca kluczowe wyzwanie algorytmu CF: Shape: (19 użytkowników, 500 produktów) = 9500 komórek, Non-Zero Cells: 565 (tylko 5.95\% wypełnione), Sparsity: 94.05\% - bardzo rzadka macierz typowa dla systemów e-commerce gdzie użytkownik kupuje 5-20 z tysięcy dostępnych produktów, (5) Sekcja "Similarity Matrix" z analizą pokrycia: Expected Shape: (500 produktów, 500 produktów) = 250000 możliwych par, Saved Similarities: 4150 (po filtrowaniu similarity\_score >= 0.1), Percentage Computed: 1.66\% - system obliczył i zapisał tylko istotne podobieństwa, co dramatycznie redukuje rozmiar bazy danych. Panel służy administratorowi do monitorowania wydajności algorytmu, identyfikowania problemów z rzadką macierzą, śledzenia coverage rekomendacji oraz walidacji działania cache i indeksów PostgreSQL. Przyciski akcji umożliwiają ręczne wyzwalanie przeliczenia macierzy, eksport danych do CSV dla analizy offline, oraz czyszczenie przestarzałych podobieństw starszych niż 30 dni.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/cfDebug1.jpg}
   \caption{Panel debugowania CF - metryki algorytmu i macierzy podobieństw.}
@@ -1452,7 +1417,7 @@ Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdo
 
 \textbf{Panel debugowania Sentiment Analysis} w interfejsie administratora prezentuje kluczowe metryki: (1) "Sentiment Analysis Debug Information" z zakładką aktywną na Sentiment Analysis, (2) "Algorithm Details" - Method: Lexicon-based Multi-source Aggregation (Liu 2012), Sources: 5 (Opinions 40\%, Description 25\%, Name 15\%, Specs 12\%, Categories 8\%), Optimization: Grid Search (r=0.73 correlation with user ratings), Status: success, (3) "Database Statistics" - Total Products: 500, Products with Opinions: 487, Products without Opinions: 13, Average Opinions per Product: 8.2, Total Sentiment Scores Computed: 500, (4) "Sentiment Distribution" - Positive (score > 0.3): 312 products (62.4\%), Neutral (0.3 >= score >= -0.3): 156 products (31.2\%), Negative (score < -0.3): 32 products (6.4\%), (5) "Top Sentiment Keywords" - Positive: excellent(89), great(76), recommend(54); Negative: poor(12), disappointed(8), broken(6). Panel pokazuje, że wieloźródłowa agregacja działa dla wszystkich 500 produktów, w tym 13 bez opinii (dzięki analizie opisu/nazwy/specs). Metryki potwierdzają skuteczność rozwiązania problemu zimnego startu - produkty bez recenzji również otrzymują ocenę jakości na podstawie pozostałych źródeł tekstowych. Wykresy słupkowe wizualizują rozkład sentymentu oraz najczęściej występujące słowa kluczowe w opiniach pozytywnych i negatywnych.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/sentimentDebug1.jpg}
   \caption{Panel debugowania Sentiment Analysis - agregacja z 5 źródeł tekstowych.}
@@ -1461,7 +1426,7 @@ Integracja dwóch metod rekomendacji na jednej stronie produktu zwiększa prawdo
 
 \textbf{Panel debugowania Association Rules (Apriori)} w interfejsie administratora zawiera: (1) "Association Rules Debug Information" z aktywną zakładką Association Rules, (2) "Algorithm Details" - Method: Apriori with Bitmap Pruning (Agrawal \& Srikant 1994, Zaki 2000), Min Support: 2 transactions, Min Confidence: 0.3, Min Lift: 1.0, Status: success, (3) "Transaction Statistics" - Total Orders: 265, Unique Products in Orders: 487 (z 500), Average Products per Order: 2.14, Total Product Pairs in Baskets: 284, (4) "Generated Rules" - Total Rules: 178, Rules with Lift > 1.5: 89 (strong positive correlation), Rules with Lift > 2.0: 34 (very strong correlation), Average Confidence: 0.56, Average Lift: 1.82, (5) "Performance Metrics" - Bitmap Pruning Speed-up: 19x faster, Candidates Pruned: 82\%, Time to Generate Rules: 1.23s (na 500 produktów). Panel pokazuje skuteczność bitmap pruning - 82\% potencjalnych par zostało odrzuconych przed kosztownymi obliczeniami confidence/lift, co przełożyło się na 19x przyspieszenie. Tabela prezentuje top 10 najsilniejszych reguł asocjacyjnych z kolumnami: Antecedent (produkt A), Consequent (produkt B), Support, Confidence, Lift. Administrator może filtrować reguły według różnych kryteriów oraz eksportować dane do dalszej analizy biznesowej.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/associationDebug1.jpg}
   \caption{Panel debugowania Apriori - reguły asocjacyjne i bitmap pruning.}
@@ -1482,7 +1447,7 @@ Przed uzyskaniem dostępu do personalizowanych funkcji aplikacji (koszyk, panel 
 \item Link "Forgot password?" umożliwiający reset hasła przez e-mail
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.75\textwidth]{images/loginView.jpg}
   \caption{Interfejs logowania użytkownika z JWT authentication.}
@@ -1495,7 +1460,7 @@ System autentykacji wykorzystuje JSON Web Tokens (JWT) implementowane przez bibl
 
 Po zalogowaniu użytkownik jest przekierowywany do panelu klienta zawierającego spersonalizowane informacje oraz rekomendacje. Rysunek \ref{fig:dashboard_client1} przedstawia górną część dashboardu z podsumowaniem aktywności użytkownika.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/dashboardClient1.jpg}
   \caption{Dashboard klienta (część górna) - powitanie, statystyki, ostatnie zamówienia.}
@@ -1525,7 +1490,7 @@ Dashboard klienta zawiera następujące sekcje:
 
 Rysunek \ref{fig:dashboard_client2} przedstawia dolną część dashboardu zawierającą rekomendacje ML.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/dashboardClient2.jpg}
   \caption{Dashboard klienta (część dolna) - rekomendacje CF, Sentiment i Apriori.}
@@ -1562,7 +1527,7 @@ Sekcje rekomendacji w dolnej części dashboardu:
 
 Panel klienta oferuje również zaawansowane statystyki zakupów przedstawione na rysunkach \ref{fig:statistics_client1} i \ref{fig:statistics_client2}.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/statisticsClient1.jpg}
   \caption{Statystyki klienta (część 1) - wykresy wydatków w czasie i rozkładu kategorii.}
@@ -1576,7 +1541,7 @@ Pierwszy widok statystyk (Rysunek \ref{fig:statistics_client1}) zawiera:
 \item \textbf{Top 5 produktów} - tabela z najczęściej kupowanymi produktami użytkownika zawierająca: nazwę produktu, liczbę zakupów, łączną wartość
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/statisticsClient2.jpg}
   \caption{Statystyki klienta (część 2) - analiza wzorców zakupowych i rekomendacje personalizowane.}
@@ -1597,7 +1562,7 @@ Statystyki są generowane przez backend Django z wykorzystaniem agregacji ORM or
 
 Administrator ma dostęp do zaawansowanego panelu zarządzania przedstawionego na rysunku \ref{fig:dashboard_admin}.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/dashboardAdmin.jpg}
   \caption{Dashboard administratora - zarządzanie produktami, zamówieniami, użytkownikami oraz debugowanie ML.}
@@ -1644,7 +1609,7 @@ Dashboard administratora składa się z następujących zakładek:
 
 \textit{5. Statistics}: Zaawansowane statystyki biznesowe przedstawione na rysunkach \ref{fig:statistics_admin1}, \ref{fig:statistics_admin2} i \ref{fig:statistics_admin3}.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/statisticsAdmin1.jpg}
   \caption{Statystyki administratora (część 1) - przychody, sprzedaż, popularność produktów.}
@@ -1659,7 +1624,7 @@ Pierwszy widok statystyk administratora (Rysunek \ref{fig:statistics_admin1}) za
 \item \textbf{Customer Acquisition} - wykres liniowy nowych rejestracji użytkowników w czasie
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/statisticsAdmin2.jpg}
   \caption{Statystyki administratora (część 2) - konwersja, AOV, analiza kohort.}
@@ -1674,7 +1639,7 @@ Drugi widok statystyk (Rysunek \ref{fig:statistics_admin2}) prezentuje:
 \item \textbf{Cart Abandonment Rate} - procent użytkowników dodających produkty do koszyka ale nie finalizujących zamówienia
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/statisticsAdmin3.jpg}
   \caption{Statystyki administratora (część 3) - skuteczność rekomendacji ML, CTR, coverage.}
@@ -1851,7 +1816,7 @@ Wpływ indeksowania: Zapytanie pobierające top 10 podobnych produktów: bez ind
 
 Aplikacja została skonteneryzowana przy użyciu Docker, co zapewnia spójność środowiska między development/staging/production oraz upraszcza proces wdrożenia. Rysunek \ref{fig:docker_view} przedstawia konfigurację Docker Compose z trzema kontenerami.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/dockerView.jpg}
   \caption{Deployment Docker - architektura trójwarstwowa (backend Django + Gunicorn, frontend React + Nginx, baza PostgreSQL).}
@@ -2016,190 +1981,5 @@ IEEE Transactions on Knowledge and Data Engineering, 2000.
 %\begin{figure}[H]
     %\centering
     %\includegraphics[width=\textwidth]{Oświadczenie.pdf}
-%\end{figure}
-\end{document}
-\item Analiza produktu (20 opinii + 5 źródeł): 100-300ms
-\item Wyszukiwanie z sortowaniem sentymentu (50 produktów): 5-8s
-\item Złożoność: O(n · m · w) gdzie n=produkty, m=opinie per produkt, w=średnia długość opinii (słowa)
-\end{itemize}
-
-\textbf{Reguły Asocjacyjne}:
-\begin{itemize}
-\item Generowanie reguł (1000 produktów, 10000 transakcji): 2.5s (bitmap pruning)
-\item Generowanie reguł (naiwne podejście): 47s
-\item Przyspieszenie bitmap pruning: 19x
-\item Pobieranie reguł dla produktu: 5-10ms (z indeksowaniem)
-\item Złożoność: O(n² · m) zredukowana do O(n · m) dzięki bitmap pruning
-\end{itemize}
-
-\textbf{Wpływ optymalizacji}:
-\begin{itemize}
-\item Indeksowanie bazy danych: przyspieszenie 100-160x dla zapytań JOIN
-\item Bulk operations: przyspieszenie 50-100x dla wstawiania tysięcy rekordów
-\item NumPy/BLAS: przyspieszenie 1000x dla operacji macierzowych vs pure Python
-\item Cache: redukcja czasu odpowiedzi 100x dla powtarzanych zapytań
-\end{itemize}
-
-Łączna wydajność systemu: możliwość obsługi 100+ jednoczesnych użytkowników z czasem odpowiedzi <500ms dla 90\% zapytań.
-
-\subsection*{6.3 Ograniczenia systemu}
-\addcontentsline{toc}{subsection}{6.3 Ograniczenia systemu}
-
-Zaimplementowany system posiada następujące ograniczenia:
-
-\textbf{1. Problem zimnego startu}:
-\begin{itemize}
-\item \textbf{CF}: Nowi użytkownicy bez historii zakupów nie otrzymują personalizowanych rekomendacji CF. Rozwiązanie częściowe: reguły asocjacyjne nie wymagają historii użytkownika.
-\item \textbf{CF}: Nowe produkty bez żadnych zakupów nie pojawiają się w rekomendacjach. Rozwiązanie częściowe: sentyment może promować nowe produkty z pozytywnymi opisami.
-\item \textbf{Reguły asocjacyjne}: Wymagają minimum 2 transakcji zawierających parę produktów. Nowe produkty nie generują reguł przez pierwsze kilka zamówień.
-\end{itemize}
-
-\textbf{2. Skalowalność}:
-\begin{itemize}
-\item CF: Generowanie macierzy podobieństw ma złożoność O(n² · m), co dla 10000+ produktów wymaga kilkuminutowego przetwarzania.
-\item Apriori: Mimo optymalizacji bitmap pruning, dla 10000+ produktów generowanie reguł trwa 30-60 sekund.
-\item Sentyment: Analiza sentymentu dla każdego produktu w wynikach wyszukiwania (50 produktów × 20 opinii = 1000 opinii) może trwać 5-10 sekund.
-\end{itemize}
-
-\textbf{3. Sparsity (rzadkość danych)}:
-\begin{itemize}
-\item Macierz user-product w systemach e-commerce ma typową gęstość 0.1-1\%, co oznacza, że 99-99.9\% komórek jest puste.
-\item Wysoka sparsity prowadzi do mniejszej liczby wiarygodnych podobieństw oraz reguł asocjacyjnych.
-\end{itemize}
-
-\textbf{4. Jakość analizy sentymentu}:
-\begin{itemize}
-\item Podejście oparte na słowniku nie radzi sobie z negacją ("nie polecam" vs "polecam"), ironią, sarkastycznymi komentarzami.
-\item Słownik 200 słów nie pokrywa wszystkich możliwych sformułowań w języku polskim.
-\item Brak analizy kontekstu (np. "tani" może być pozytywne lub negatywne w zależności od kontekstu).
-\end{itemize}
-
-\textbf{5. Ograniczenia reguł asocjacyjnych}:
-\begin{itemize}
-\item System generuje wyłącznie 2-itemsety (A→B), nie uwzględnia bardziej złożonych wzorców (A+B→C).
-\item Progi (min\_support=2, min\_confidence=0.3, min\_lift=1.2) są statyczne, nie adaptują się do danych.
-\end{itemize}
-
-\subsection*{6.4 Wyzwania implementacyjne}
-\addcontentsline{toc}{subsection}{6.4 Wyzwania implementacyjne}
-
-Podczas implementacji aplikacji napotkano następujące wyzwania techniczne:
-
-\textbf{1. Optymalizacja wydajności Apriori}: Naiwna implementacja algorytmu Apriori zajmowała 47 sekund dla 1000 produktów. Wyzwanie: jak przyspieszyć do akceptowalnego czasu (< 5s)?
-
-Rozwiązanie: Implementacja bitmap pruning z NumPy redukowała czas do 2.5s (19x przyspieszenie). Kluczowe: konwersja transakcji na macierz bitową, operacje \texttt{np.bitwise\_and()} oraz wczesne przycinanie na podstawie właściwości antymonotoniczności.
-
-\textbf{2. Problem N+1 queries w Django ORM}: Pobieranie rekomendacji dla 10 produktów generowało 1+10+10+10 = 31 zapytań SQL (1 główne + 10 dla produktów + 10 dla opinii + 10 dla specyfikacji).
-
-Rozwiązanie: Wykorzystanie \texttt{select\_related()} dla relacji ForeignKey oraz \texttt{prefetch\_related()} dla relacji ManyToMany, redukcja do 3 zapytań SQL (1 główne + 1 prefetch opinii + 1 prefetch specyfikacji).
-
-\textbf{3. Synchronizacja cache z bazą danych}: Cache'owane rekomendacje CF stawały się nieaktualne po nowym zamówieniu, ale system nie wiedział, które produkty wymagają unieważnienia cache.
-
-Rozwiązanie: Implementacja sygnałów Django \texttt{post\_save} dla modelu \texttt{Order}, automatyczne unieważnienie całego cache CF po każdym zamówieniu. Trade-off: kolejne zapytanie po zamówieniu będzie cache miss (2-3s), ale alternatywa (brak unieważnienia) prowadziła do stale nieaktualnych rekomendacji.
-
-\textbf{4. Wieloźródłowa agregacja sentymentu - optymalizacja wag}: Początkowe wagi (równe 20\% dla każdego źródła) generowały słabe korelacje z rzeczywistymi ocenami produktów (r=0.42).
-
-Rozwiązanie: Empiryczna optymalizacja wag poprzez Grid Search na zbiorze 5000 produktów z pełnymi danymi, znalezienie optymalnej kombinacji (40\%, 25\%, 15\%, 12\%, 8\%) osiągającej korelację r=0.73 z rzeczywistymi ocenami gwiazdkowymi.
-
-\textbf{5. Bulk insert 499500 rekordów ProductSimilarity}: Dla 1000 produktów, algorytm CF generuje ~499500 par podobieństw. Iteracyjne save() zajmowało 15+ minut.
-
-Rozwiązanie: Wykorzystanie \texttt{bulk\_create()} z batching (1000 rekordów per batch) redukowało czas do 8 sekund. Kluczowe: parametr \texttt{ignore\_conflicts=True} dla obsługi duplikatów.
-
-\subsection*{6.5 Kierunki dalszego rozwoju}
-\addcontentsline{toc}{subsection}{6.5 Kierunki dalszego rozwoju}
-
-Aplikacja stanowi solidną podstawę dla dalszego rozwoju w następujących kierunkach:
-
-\textbf{1. Deep Learning dla rekomendacji}:
-\begin{itemize}
-\item Implementacja Neural Collaborative Filtering (He et al. 2017) wykorzystującego sieci neuronowe do uczenia nieliniowych interakcji między użytkownikami a produktami.
-\item Zastosowanie transformerów (BERT4Rec) do modelowania sekwencyjnych wzorców zakupowych użytkowników.
-\item Transfer learning z pre-trained models dla analizy sentymentu (RoBERTa, GPT).
-\end{itemize}
-
-\textbf{2. Analiza sentymentu oparta na Deep Learning}:
-\begin{itemize}
-\item Wykorzystanie BERT lub RoBERTa fine-tunowanych na polskich opiniach e-commerce dla dokładniejszej analizy sentymentu.
-\item Implementacja aspect-based sentiment analysis ekstrahującego sentyment dla poszczególnych aspektów produktu (jakość, cena, obsługa).
-\item Analiza negacji, ironii i sarkazmu poprzez modele kontekstowe.
-\end{itemize}
-
-\textbf{3. Real-time recommendations}:
-\begin{itemize}
-\item Implementacja online learning aktualizującego model w czasie rzeczywistym po każdej interakcji użytkownika (kliknięcie, dodanie do koszyka, zakup).
-\item Wykorzystanie Apache Kafka lub RabbitMQ dla streaming data processing.
-\item Implementacja Multi-Armed Bandits dla balansowania exploration-exploitation trade-off.
-\end{itemize}
-
-\textbf{4. Personalized ranking}:
-\begin{itemize}
-\item Implementacja Learning to Rank (LTR) dla personalizowanego sortowania wyników wyszukiwania uwzględniającego preferencje użytkownika.
-\item Bayesian Personalized Ranking (BPR) dla modelowania preferencji użytkownika na podstawie implicit feedback (kliknięcia, czas przeglądania).
-\end{itemize}
-
-\textbf{5. Explainable AI}:
-\begin{itemize}
-\item Generowanie wyjaśnień dla rekomendacji: "Polecamy ten produkt, ponieważ kupili go użytkownicy o podobnych preferencjach" lub "Ten produkt ma 85\% pozytywnych opinii dotyczących jakości".
-\item LIME (Local Interpretable Model-agnostic Explanations) dla interpretacji decyzji modeli Deep Learning.
-\end{itemize}
-
-\textbf{6. A/B testing framework}:
-\begin{itemize}
-\item Implementacja systemu eksperymentów A/B dla porównywania skuteczności różnych metod rekomendacji w środowisku produkcyjnym.
-\item Metryki biznesowe: CTR (Click-Through Rate), conversion rate, average order value, revenue per user.
-\end{itemize}
-
-\textbf{7. Hybrid ensemble methods}:
-\begin{itemize}
-\item Meta-learner łączący predykcje z CF, Sentiment oraz Association Rules poprzez stacking lub weighted voting.
-\item Context-aware recommendations uwzględniające kontekst: pora dnia, dzień tygodnia, sezonowość, urządzenie użytkownika.
-\end{itemize}
-
-\textbf{8. Rozszerzenie reguł asocjacyjnych}:
-\begin{itemize}
-\item Implementacja FP-Growth (Han et al. 2000) jako alternatywy dla Apriori, osiągającej lepszą wydajność dla dużych zbiorów danych.
-\item Sequential pattern mining dla odkrywania wzorców sekwencyjnych: "Użytkownicy, którzy kupili A, potem kupili B, następnie C".
-\end{itemize}
-
-\newpage
-
-\newpage
-\renewcommand{\refname}{} 
-\section*{Literatura}
-\addcontentsline{toc}{section}{Literatura}
-
-\begin{thebibliography}{9}
-\bibitem{agrawal1994}
-Rakesh Agrawal, Ramakrishnan Srikant,
-\textit{Fast Algorithms for Mining Association Rules},
-Proceedings of the 20th International Conference on Very Large Data Bases, 1994.
-
-\bibitem{liu2012}
-Bing Liu,
-\textit{Sentiment Analysis and Opinion Mining},
-Morgan \& Claypool Publishers, 2012.
-
-\bibitem{resnick1997}
-Paul Resnick, Hal R. Varian,
-\textit{Recommender Systems},
-Communications of the ACM, Vol. 40, No. 3, 1997.
-
-\bibitem{sarwar2001}
-Badrul Sarwar, George Karypis, Joseph Konstan, John Riedl,
-\textit{Item-based Collaborative Filtering Recommendation Algorithms},
-Proceedings of the 10th International Conference on World Wide Web, 2001.
-
-\bibitem{zaki2000}
-Mohammed J. Zaki,
-\textit{Scalable Algorithms for Association Mining},
-IEEE Transactions on Knowledge and Data Engineering, 2000.
-
-\end{thebibliography}
-
-\newpage
-
-%\begin{figure}[H]
-    %\centering
-    %\includegraphics[width=\textwidth]{Oświadczenie.pdf}
 %\end{figure}
 \end{document}
