@@ -49,6 +49,29 @@
   stringstyle=\color{red}
 }
 
+% Styl dla pseudokodu
+\lstdefinelanguage{Pseudocode}{
+  morekeywords={FUNKCJA, ZWROC, DLA, KAZDEGO, W, JEZELI, WTEDY, INACZEJ, KONIEC, LUB, I, NIE, DOPOKI, WYKONUJ, ORAZ, ZWRACA, GDZIE, OD, DO, KROK},
+  sensitive=false,
+  morecomment=[l]{//},
+  morestring=[b]"
+}
+
+\lstdefinestyle{pseudocode}{
+  language=Pseudocode,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries\color{blue},
+  commentstyle=\color{gray},
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  breaklines=true,
+  xleftmargin=2em,
+  framexleftmargin=1.5em,
+  literate={ą}{{\k{a}}}1 {ć}{{\'c}}1 {ę}{{\k{e}}}1 {ł}{{\l{}}}1 {ń}{{\'n}}1 {ó}{{\'o}}1 {ś}{{\'s}}1 {ź}{{\'z}}1 {ż}{{\.z}}1
+           {Ą}{{\k{A}}}1 {Ć}{{\'C}}1 {Ę}{{\k{E}}}1 {Ł}{{\L{}}}1 {Ń}{{\'N}}1 {Ó}{{\'O}}1 {Ś}{{\'S}}1 {Ź}{{\'Z}}1 {Ż}{{\.Z}}1
+}
+
 \begin{document}
 
 \begin{titlepage}
@@ -449,10 +472,10 @@ Reguła rozmyta ma postać:
 
 gdzie $A_1$, $A_2$, $B$ to zbiory rozmyte. W systemie rekomendacji przykładowa reguła:
 
-\begin{verbatim}
-IF quality IS high AND price IS cheap
-THEN recommendation IS strong
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI quality JEST high ORAZ price JEST cheap
+WTEDY recommendation JEST strong
+\end{lstlisting}
 
 \subsection*{1.3 Modele probabilistyczne — podstawy teoretyczne}
 \addcontentsline{toc}{subsection}{1.3 Modele probabilistyczne — podstawy teoretyczne}
@@ -625,31 +648,33 @@ System Content-Based Filtering został zaimplementowany w klasie \texttt{CustomC
 
 Metoda ekstrakcji cech buduje słownik cech z przypisanymi wagami. Algorytm w pseudokodzie:
 
-\begin{verbatim}
+\begin{lstlisting}[style=pseudocode]
 FUNKCJA ekstrahuj_cechy(produkt):
-    cechy = pusty_słownik
+    cechy = pusty_slownik
 
-    DLA KAŻDEJ kategorii W produkt.kategorie:
+    DLA KAZDEGO kategorii W produkt.kategorie:
         cechy["category_" + kategoria.nazwa] = 0.40
 
-    DLA KAŻDEGO tagu W produkt.tagi:
+    DLA KAZDEGO tagu W produkt.tagi:
         cechy["tag_" + tag.nazwa] = 0.30
 
-    JEŻELI produkt.cena < 100:
+    JEZELI produkt.cena < 100 WTEDY
         cechy["price_low"] = 0.20
-    W PRZECIWNYM RAZIE JEŻELI produkt.cena < 500:
+    INACZEJ JEZELI produkt.cena < 500 WTEDY
         cechy["price_medium"] = 0.20
-    W PRZECIWNYM RAZIE JEŻELI produkt.cena < 1500:
+    INACZEJ JEZELI produkt.cena < 1500 WTEDY
         cechy["price_high"] = 0.20
-    W PRZECIWNYM RAZIE:
+    INACZEJ
         cechy["price_premium"] = 0.20
+    KONIEC
 
-    słowa_kluczowe = ekstrahuj_słowa_kluczowe(produkt.opis)
-    DLA KAŻDEGO słowa W słowa_kluczowe[0:10]:
-        cechy["keyword_" + słowo] = 0.10 / długość(słowa_kluczowe)
+    slowa_kluczowe = ekstrahuj_slowa_kluczowe(produkt.opis)
+    DLA KAZDEGO slowa W slowa_kluczowe[0:5]:
+        cechy["keyword_" + slowo] = 0.10 / dlugosc(slowa_kluczowe)
 
-    ZWRÓĆ cechy
-\end{verbatim}
+    ZWROC cechy
+KONIEC FUNKCJA
+\end{lstlisting}
 
 \textbf{Ekstrakcja słów kluczowych}:
 
@@ -691,19 +716,21 @@ gdzie $F_1$, $F_2$ to zbiory cech produktów $p_1$ i $p_2$, $w_i(f)$ to waga cec
 
 \textbf{Implementacja dla wektorów rzadkich} w pseudokodzie:
 
-\begin{verbatim}
-FUNKCJA oblicz_podobieństwo(cechy1, cechy2):
-    wspólne_cechy = przecięcie(klucze(cechy1), klucze(cechy2))
-    iloczyn_skalarny = suma(cechy1[f] * cechy2[f] DLA f W wspólne_cechy)
+\begin{lstlisting}[style=pseudocode]
+FUNKCJA oblicz_podobienstwo(cechy1, cechy2):
+    wspolne_cechy = przeciecie(klucze(cechy1), klucze(cechy2))
+    iloczyn_skalarny = suma(cechy1[f] * cechy2[f] DLA f W wspolne_cechy)
 
-    norma1 = pierwiastek(suma(v^2 DLA v W wartości(cechy1)))
-    norma2 = pierwiastek(suma(v^2 DLA v W wartości(cechy2)))
+    norma1 = pierwiastek(suma(v^2 DLA v W wartosci(cechy1)))
+    norma2 = pierwiastek(suma(v^2 DLA v W wartosci(cechy2)))
 
-    JEŻELI norma1 = 0 LUB norma2 = 0:
-        ZWRÓĆ 0.0
+    JEZELI norma1 = 0 LUB norma2 = 0 WTEDY
+        ZWROC 0.0
+    KONIEC
 
-    ZWRÓĆ iloczyn_skalarny / (norma1 * norma2)
-\end{verbatim}
+    ZWROC iloczyn_skalarny / (norma1 * norma2)
+KONIEC FUNKCJA
+\end{lstlisting}
 
 \textbf{Optymalizacja dla wektorów rzadkich}:
 
@@ -735,15 +762,18 @@ Dla każdego produktu ekstrahujemy wektor cech i zapisujemy w słowniku, gdzie k
 
 Dla każdej pary produktów $(p_i, p_j)$ gdzie $i < j$ obliczamy podobieństwo kosinusowe. Algorytm w pseudokodzie:
 
-\begin{verbatim}
-DLA KAŻDEGO produktu1 W produkty:
-    DLA KAŻDEGO produktu2 W produkty[indeks(produkt1)+1:]:
-        podobieństwo = oblicz_podobieństwo(cechy[produkt1], cechy[produkt2])
+\begin{lstlisting}[style=pseudocode]
+DLA KAZDEGO produktu1 W produkty:
+    DLA KAZDEGO produktu2 W produkty[indeks(produkt1)+1:]:
+        podobienstwo = oblicz_podobienstwo(cechy[produkt1], cechy[produkt2])
 
-        JEŻELI podobieństwo > 0.2:
-            zapisz_podobieństwo(produkt1, produkt2, podobieństwo)
-            zapisz_podobieństwo(produkt2, produkt1, podobieństwo)
-\end{verbatim}
+        JEZELI podobienstwo > 0.2 WTEDY
+            zapisz_podobienstwo(produkt1, produkt2, podobienstwo)
+            zapisz_podobienstwo(produkt2, produkt1, podobienstwo)
+        KONIEC
+    KONIEC
+KONIEC
+\end{lstlisting}
 
 Zapisywane są oba kierunki relacji (symetryczne), co umożliwia szybkie wyszukiwanie produktów podobnych do dowolnego produktu.
 
@@ -1073,56 +1103,56 @@ System wykorzystuje 6 reguł rozmytych typu Mamdani. Każda reguła ma formę IF
 
 \textbf{R1: High Quality Bargain} (waga: 0.9)
 
-\begin{verbatim}
-IF quality IS high AND (price IS cheap OR price IS medium)
-THEN recommendation IS strong
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI quality JEST high ORAZ (price JEST cheap LUB price JEST medium)
+WTEDY recommendation JEST strong
+\end{lstlisting}
 
 Logika: Wysokiej jakości produkt w rozsądnej cenie to doskonała okazja. Najwyższa waga — ta reguła najsilniej wpływa na wynik.
 
 \textbf{R2: Popular in Category} (waga: 0.7)
 
-\begin{verbatim}
-IF category_match IS high AND (popularity IS medium OR popularity IS high)
-THEN recommendation IS medium-high
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI category_match JEST high ORAZ (popularity JEST medium LUB popularity JEST high)
+WTEDY recommendation JEST medium-high
+\end{lstlisting}
 
 Logika: Popularny produkt z kategorii interesującej użytkownika. Popularność = walidacja społeczna.
 
 \textbf{R3: Price Sensitive Match} (waga: 0.6)
 
-\begin{verbatim}
-IF user.price_sensitivity > 0.6 AND price IS cheap
-THEN recommendation IS moderate
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI user.price_sensitivity > 0.6 ORAZ price JEST cheap
+WTEDY recommendation JEST moderate
+\end{lstlisting}
 
 Logika: Dla użytkowników wrażliwych cenowo (kupujących tanie produkty) promuj tanie opcje.
 
 \textbf{R4: Category Quality Match} (waga: 0.85)
 
-\begin{verbatim}
-IF category_match IS high AND (quality IS medium OR quality IS high)
-THEN recommendation IS strong
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI category_match JEST high ORAZ (quality JEST medium LUB quality JEST high)
+WTEDY recommendation JEST strong
+\end{lstlisting}
 
 Logika: Dopasowanie do kategorii + dobra jakość. Wysoka waga — dopasowanie kategorii jest istotne.
 
 \textbf{R5: Premium Match} (waga: 0.8)
 
-\begin{verbatim}
-IF user.price_sensitivity < 0.4 AND price IS expensive AND quality IS high
-THEN recommendation IS strong
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI user.price_sensitivity < 0.4 ORAZ price JEST expensive ORAZ quality JEST high
+WTEDY recommendation JEST strong
+\end{lstlisting}
 
 Logika: Dla użytkowników premium (nieczułych cenowo) promuj drogie produkty wysokiej jakości.
 
 \textbf{R6: Quality-Price Balance} (waga: 0.75)
 
-\begin{verbatim}
-IF (quality IS high AND price IS reasonable) OR
-   (quality IS medium AND price IS cheap)
-THEN recommendation IS moderate
-\end{verbatim}
+\begin{lstlisting}[style=pseudocode]
+JEZELI (quality JEST high ORAZ price JEST reasonable) LUB
+       (quality JEST medium ORAZ price JEST cheap)
+WTEDY recommendation JEST moderate
+\end{lstlisting}
 
 Logika: Dobry stosunek jakości do ceny — "value for money".
 
@@ -1485,21 +1515,23 @@ System trenuje trzy komponenty:
 
 Algorytm generowania rekomendacji w pseudokodzie:
 
-\begin{verbatim}
-FUNKCJA generuj_rekomendacje(użytkownik, ostatnia_kategoria, k=10):
-    1. markov_predykcje = Markov.przewidz_następne(ostatnia_kategoria, top=5)
-    2. cechy_użytkownika = ekstrahuj_cechy(użytkownik)
-    3. p_zakupu = NB_zakup.predykcja(cechy_użytkownika)["will_purchase"]
+\begin{lstlisting}[style=pseudocode]
+FUNKCJA generuj_rekomendacje(uzytkownik, ostatnia_kategoria, k=10):
+    markov_predykcje = Markov.przewidz_nastepne(ostatnia_kategoria, top=5)
+    cechy_uzytkownika = ekstrahuj_cechy(uzytkownik)
+    p_zakupu = NB_zakup.predykcja(cechy_uzytkownika)["will_purchase"]
 
-    4. produkty = pobierz_produkty_z_kategorii(markov_predykcje)
+    produkty = pobierz_produkty_z_kategorii(markov_predykcje)
 
-    5. DLA KAŻDEGO produktu:
-        p_kategorii = maks(prawdopodobieństwo kategorii z Markova)
-        score = 0.6 × p_kategorii + 0.4 × p_zakupu
+    DLA KAZDEGO produktu W produkty:
+        p_kategorii = maks(prawdopodobienstwo kategorii z Markova)
+        score = 0.6 * p_kategorii + 0.4 * p_zakupu
         dodaj(produkt, score) do rekomendacji
+    KONIEC
 
-    6. ZWRÓĆ top_k(rekomendacje, k)
-\end{verbatim}
+    ZWROC top_k(rekomendacje, k)
+KONIEC FUNKCJA
+\end{lstlisting}
 
 Wagi agregacji (Markov 60\%, NB 40\%) zostały dobrane empirycznie — Markov Chain lepiej przewiduje następną kategorię, podczas gdy Naive Bayes moduluje wynik na podstawie ogólnego prawdopodobieństwa zakupu użytkownika.
 
@@ -1760,6 +1792,22 @@ Frontend wyświetla rekomendacje w kilku miejscach:
 
 \begin{figure}[h!]
   \centering
+  \includegraphics[width=0.92\textwidth]{images/mainSectionView2.jpg}
+  \caption{Strona główna - widok karty produktu z przyciskami akcji i informacjami o cenie.}
+  \label{fig:main_view2}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzySearch1.jpg}
+  \caption{Wyszukiwanie rozmyte - funkcjonalność pozwalająca na wyszukiwanie produktów z tolerancją na błędy i synonimy.}
+  \label{fig:fuzzy_search}
+\end{figure}
+
+Wyszukiwanie rozmyte (Fuzzy Search) wykorzystuje algorytm odległości Levensteina do wyszukiwania produktów z tolerancją na literówki i błędy pisowni. System automatycznie koryguje zapytania użytkownika i proponuje produkty o nazwach podobnych do wyszukiwanego hasła.
+
+\begin{figure}[h!]
+  \centering
   \includegraphics[width=0.92\textwidth]{images/dashboardClient1.jpg}
   \caption{Panel klienta - dashboard z rekomendacjami i statystykami zakupów.}
   \label{fig:dashboard_client}
@@ -1770,6 +1818,27 @@ Frontend wyświetla rekomendacje w kilku miejscach:
   \includegraphics[width=0.92\textwidth]{images/dashboardAdmin.jpg}
   \caption{Panel administratora - zarządzanie algorytmami rekomendacji i podgląd statystyk.}
   \label{fig:dashboard_admin}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/statisticsClient1.jpg}
+  \caption{Panel statystyk klienta - historia zakupów i analiza preferencji zakupowych użytkownika.}
+  \label{fig:statistics_client1}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/statisticsClient2.jpg}
+  \caption{Panel statystyk klienta - wykres rozkładu kategorii zakupowych i ulubione produkty.}
+  \label{fig:statistics_client2}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/opinionView.jpg}
+  \caption{Widok opinii o produkcie - lista recenzji klientów z ocenami wykorzystywanymi przez algorytmy rekomendacyjne.}
+  \label{fig:opinion_view}
 \end{figure}
 
 \subsection*{5.4 Diagram przypadków użycia}
@@ -1820,6 +1889,25 @@ Baza danych PostgreSQL zawiera następujące kluczowe tabele związane z systeme
 \end{itemize}
 
 \textbf{RecommendationSettings} — singleton przechowujący aktywny algorytm rekomendacji wybrany przez administratora (collaborative, content\_based, fuzzy\_logic).
+
+\subsection*{5.6 Wdrożenie aplikacji — Docker}
+\addcontentsline{toc}{subsection}{5.6 Wdrożenie aplikacji — Docker}
+
+Aplikacja jest skonteneryzowana z użyciem Docker i Docker Compose. Struktura kontenerów obejmuje:
+
+\begin{itemize}
+    \item \textbf{backend} — Django REST Framework z algorytmami rekomendacyjnymi
+    \item \textbf{frontend} — React 18 z Vite jako bundler
+    \item \textbf{db} — PostgreSQL 14 z danymi produktów i użytkowników
+    \item \textbf{nginx} — reverse proxy dla produkcji
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/dockerView.jpg}
+  \caption{Docker Desktop - widok uruchomionych kontenerów aplikacji SmartRecommender.}
+  \label{fig:docker_view}
+\end{figure}
 
 \newpage
 
