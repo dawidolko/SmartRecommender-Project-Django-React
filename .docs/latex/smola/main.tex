@@ -128,36 +128,6 @@
 
 \end{titlepage}
 
-\section*{Streszczenie}
-\addcontentsline{toc}{section}{Streszczenie}
-
-Niniejsza praca inżynierska przedstawia projekt i implementację systemu rekomendacji produktów dla platformy e-commerce, opartego na trzech zaawansowanych metodach uczenia maszynowego: filtracji opartej na treści (Content-Based Filtering), logice rozmytej (Fuzzy Logic) oraz modelach probabilistycznych (Markov Chain i Naive Bayes). Głównym celem pracy było opracowanie modułowego systemu rekomendacyjnego działającego bez zewnętrznych bibliotek uczenia maszynowego, zapewniającego pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
-
-W części teoretycznej przeanalizowano podstawy matematyczne i koncepcyjne systemów rekomendacyjnych. Metoda Content-Based Filtering wykorzystuje reprezentację produktów jako ważonych wektorów cech oraz miarę podobieństwa kosinusowego do identyfikacji artykułów o podobnych właściwościach technicznych. Logika rozmyta typu Mamdani operuje na funkcjach przynależności (trójkątnych i trapezoidalnych) oraz regułach wnioskowania IF-THEN, umożliwiając agregację nieprecyzyjnych preferencji użytkowników. Łańcuch Markowa pierwszego rzędu modeluje sekwencje zakupowe jako proces stochastyczny z macierzą przejść między kategoriami produktowymi, podczas gdy klasyfikator Naive Bayes wykorzystuje twierdzenie Bayesa do obliczania prawdopodobieństw zakupu warunkowanych historią transakcji. Przeprowadzono także weryfikację rozwiązań alternatywnych, analizując komercyjne platformy (Amazon Personalize, Google Recommendations AI) oraz biblioteki open-source (Apache Mahout, Surprise), co uzasadniło decyzję o implementacji własnych algorytmów ze względu na koszty, elastyczność oraz wymagania edukacyjne projektu.
-
-W części praktycznej zaprojektowano architekturę systemu jako aplikację webową trójwarstwową: backend Django 4.2 z REST API, frontend React 18 jako Single Page Application oraz baza danych PostgreSQL 14. Zaimplementowano trzy niezależne silniki rekomendacyjne, z których każdy może być aktywowany przez administratora w panelu konfiguracyjnym. Algorytm Content-Based Filtering (CBF) prekompiluje macierz podobieństw produktów i wykorzystuje indeksy bazodanowe do szybkiego wyszukiwania rekomendacji. System rozmyty buduje profile użytkowników agregujące trzy wymiary: wrażliwość cenową, preferencje kategorialne (przechowywane w formacie JSON) oraz preferencję jakości, a następnie stosuje silnik wnioskowania Mamdani z defuzyfikacją metodą środka ciężkości. Model probabilistyczny trenuje łańcuch Markowa na sekwencjach zakupowych oraz klasyfikator Naive Bayes na cechach produktów i użytkowników. Frontend oferuje responsywny interfejs z zaawansowaną wyszukiwarką rozmytą (algorytm Levenshteina), zarządzaniem stanem przez Context API oraz animacjami Framer Motion. Aplikacja została skonteneryzowana w Docker, co zapewnia powtarzalność, izolację i przenośność środowiska deweloperskiego i produkcyjnego.
-
-Przeprowadzona ewaluacja na rzeczywistych danych wykazała, że każda metoda ma specyficzne zastosowania: CBF skutecznie rozwiązuje problem zimnego startu dla nowych produktów, logika rozmyta oferuje najwyższą interpretowalność rekomendacji dla użytkowników biznesowych, a modele probabilistyczne zapewniają głęboką personalizację wykorzystującą pełną historię zakupową klientów. System umożliwia dynamiczne przełączanie algorytmów oraz oferuje zaawansowane narzędzia debugowania z wizualizacją wag cech, macierzy podobieństwa i macierzy przejść Markowa.
-
-\textbf{Słowa kluczowe}: systemy rekomendacyjne, filtracja oparta na treści, logika rozmyta, łańcuch Markowa, naiwny klasyfikator Bayesa, e-commerce, Django, React
-
-\newpage
-
-\section*{Abstract}
-\addcontentsline{toc}{section}{Abstract}
-
-This engineering thesis presents the design and implementation of a product recommendation system for an e-commerce platform, based on three advanced machine learning methods: Content-Based Filtering, Fuzzy Logic, and Probabilistic Models (Markov Chain and Naive Bayes). The main objective was to develop a modular recommendation system operating without external machine learning libraries, providing full control over algorithms and the ability to customize them for specific business requirements.
-
-In the theoretical part, the mathematical and conceptual foundations of recommender systems were analyzed. The Content-Based Filtering method uses product representation as weighted feature vectors and cosine similarity measure to identify items with similar technical properties. Mamdani-type Fuzzy Logic operates on membership functions (triangular and trapezoidal) and IF-THEN inference rules, enabling aggregation of imprecise user preferences. The first-order Markov Chain models purchase sequences as a stochastic process with a transition matrix between product categories, while the Naive Bayes classifier uses Bayes' theorem to calculate purchase probabilities conditioned on transaction history. Alternative solutions were also verified, analyzing commercial platforms (Amazon Personalize, Google Recommendations AI) and open-source libraries (Apache Mahout, Surprise), which justified the decision to implement custom algorithms due to costs, flexibility, and educational project requirements.
-
-In the practical part, the system architecture was designed as a three-tier web application: Django 4.2 backend with REST API, React 18 frontend as a Single Page Application, and PostgreSQL 14 database. Three independent recommendation engines were implemented, each activatable by the administrator in the configuration panel. The CBF algorithm precompiles the product similarity matrix and uses database indexes for fast recommendation retrieval. The fuzzy system builds user profiles aggregating three dimensions: price sensitivity, category preferences (stored in JSON format), and quality preference, then applies the Mamdani inference engine with center-of-gravity defuzzification. The probabilistic model trains the Markov Chain on purchase sequences and the Naive Bayes classifier on product and user features. The frontend offers a responsive interface with advanced fuzzy search (Levenshtein algorithm), state management through Context API, and Framer Motion animations. The application was containerized in Docker, ensuring repeatability, isolation, and portability of development and production environments.
-
-The evaluation conducted on real data demonstrated that each method has specific applications: CBF effectively solves the cold-start problem for new products, fuzzy logic offers the highest recommendation interpretability for business users, and probabilistic models provide deep personalization utilizing complete customer purchase history. The system enables dynamic algorithm switching and offers advanced debugging tools with visualization of feature weights, similarity matrices, and Markov transition matrices.
-
-\textbf{Keywords}: recommender systems, content-based filtering, fuzzy logic, Markov chain, Naive Bayes classifier, e-commerce, Django, React
-
-\newpage
-
 % Spis treści
 \tableofcontents
 \newpage
@@ -176,6 +146,8 @@ Problem rekomendacji w platformach e-commerce jest złożony i wieloaspektowy. P
 Istniejące rozwiązania komercyjne (Amazon Personalize, Google Recommendations AI) oferują zaawansowane mechanizmy rekomendacji, jednak działają jako czarne skrzynki (black-box), nie pozwalając na kontrolę nad algorytmami ani ich dostosowanie do specyficznych wymagań biznesowych. Biblioteki open-source (Apache Mahout, Surprise) rozwiązują problem kosztów, ale nie oferują implementacji logiki rozmytej ani zaawansowanych modeli probabilistycznych w jednym spójnym systemie.
 
 Niniejsza praca odpowiada na powyższe wyzwania poprzez zaprojektowanie i implementację modułowego systemu rekomendacyjnego łączącego trzy komplementarne podejścia: filtrację opartą na treści (Content-Based Filtering, CBF), logikę rozmytą (Fuzzy Logic) oraz modele probabilistyczne (łańcuchy Markowa i naiwny klasyfikator Bayesa). Każda z tych metod rozwiązuje inne aspekty problemu rekomendacji i oferuje unikalne możliwości personalizacji. System został zaimplementowany od podstaw, bez wykorzystania zewnętrznych bibliotek uczenia maszynowego, co zapewnia pełną kontrolę nad algorytmami oraz możliwość ich dostosowania do specyficznych wymagań platformy e-commerce.
+
+\newpage
 
 \subsection*{Cel i zakres pracy}
 \addcontentsline{toc}{subsection}{Cel i zakres pracy}
@@ -196,11 +168,6 @@ W ramach realizacji celu głównego zdefiniowano następujące cele szczegółow
 Zakres pracy obejmuje trzy główne obszary: podstawy teoretyczne metod rekomendacyjnych, projekt i implementację systemu oraz ewaluację jego działania. System został zintegrowany z aplikacją webową e-commerce, umożliwiającą weryfikację wszystkich zaimplementowanych algorytmów w warunkach zbliżonych do rzeczywistych.
 
 Praca koncentruje się na aspektach algorytmicznych i jakościowych systemów rekomendacji, z uwzględnieniem problemu zimnego startu, interpretowalności wyników oraz personalizacji doświadczenia użytkownika. Każda z trzech metod rozwiązuje inne wyzwania: Content-Based Filtering umożliwia rekomendacje dla nowych produktów, logika rozmyta oferuje przejrzystość decyzji algorytmu, a modele probabilistyczne przewidują zachowania zakupowe na podstawie historii transakcji.
-
-
-\subsection*{Struktura pracy}
-
-Praca składa się z siedmiu rozdziałów. Rozdział pierwszy przedstawia podstawy teoretyczne metod rekomendacyjnych. Rozdział drugi zawiera przegląd i analizę istniejących rozwiązań w obszarze systemów rekomendacyjnych. Rozdział trzeci opisuje projekt systemu z wykorzystaniem diagramów UML. Rozdział czwarty przedstawia wykorzystany stos technologiczny i architekturę aplikacji. Rozdział piąty opisuje implementację algorytmów rekomendacyjnych. Rozdział szósty dokumentuje funkcjonowanie systemu. Rozdział siódmy zawiera wyniki eksperymentów i analizę jakości rekomendacji. Pracę zamyka podsumowanie oraz wykaz wykorzystanej literatury.
 
 \newpage
 
@@ -694,11 +661,467 @@ Podsumowując, własna implementacja stanowi optymalne rozwiązanie dla celów p
 \newpage
 
 \section*{Rozdzia\l{} 3}
-\addcontentsline{toc}{section}{Rozdział 3: Content-Based Filtering}
-\section*{Content-Based Filtering — implementacja}
+\addcontentsline{toc}{section}{Rozdział 3: Projekt systemu rekomendacyjnego}
+\section*{Projekt systemu rekomendacyjnego}
 
-\subsection*{3.1 Architektura systemu CBF}
-\addcontentsline{toc}{subsection}{3.1 Architektura systemu CBF}
+\subsection*{3.1 Architektura wysokopoziomowa systemu}
+\addcontentsline{toc}{subsection}{3.1 Architektura wysokopoziomowa systemu}
+
+System rekomendacji produktów został zaprojektowany jako modułowa aplikacja webowa oparta na architekturze trójwarstwowej. Główne komponenty architektury to:
+
+\textbf{Warstwa prezentacji (Frontend)} — Single Page Application zbudowana w React 18, odpowiedzialna za interfejs użytkownika, wyświetlanie rekomendacji oraz interakcję z API.
+
+\textbf{Warstwa logiki biznesowej (Backend)} — Serwer aplikacyjny Django 4.2 z Django REST Framework, implementujący trzy niezależne silniki rekomendacyjne oraz udostępniający REST API.
+
+\textbf{Warstwa danych (Database)} — Relacyjna baza danych PostgreSQL 14 przechowująca dane produktów, użytkowników, zamówień oraz prekompilowane wyniki algorytmów (macierz podobieństw CBF, macierz przejść Markowa, profile rozmyte użytkowników).
+
+System został zaprojektowany zgodnie z zasadą separacji odpowiedzialności (Separation of Concerns), gdzie każdy moduł ma jasno zdefiniowaną rolę i komunikuje się z innymi modułami przez dobrze zdefiniowane interfejsy.
+
+\subsection*{3.2 Projekt modułów rekomendacyjnych}
+\addcontentsline{toc}{subsection}{3.2 Projekt modułów rekomendacyjnych}
+
+System składa się z trzech niezależnych modułów rekomendacyjnych, które mogą działać osobno lub być łączone w system hybrydowy:
+
+\textbf{Moduł Content-Based Filtering}
+
+Zadania modułu:
+\begin{itemize}
+    \item Ekstrakcja cech produktów (kategorie, tagi, przedział cenowy, słowa kluczowe z opisów)
+    \item Reprezentacja produktów jako wektorów w przestrzeni cech
+    \item Obliczanie podobieństwa kosinusowego między produktami
+    \item Generowanie macierzy podobieństw i jej persystencja w bazie danych
+    \item Zwracanie top-N produktów podobnych do danego produktu
+\end{itemize}
+
+Główne klasy:
+\begin{itemize}
+    \item \texttt{CustomContentBasedFilter} — główna klasa silnika CBF
+    \item \texttt{ProductSimilarity} (model Django) — przechowuje macierz podobieństw
+\end{itemize}
+
+\textbf{Moduł Fuzzy Logic}
+
+Zadania modułu:
+\begin{itemize}
+    \item Definicja funkcji przynależności dla zmiennych wejściowych (cena, jakość, popularność)
+    \item Budowa rozmytych profili użytkowników na podstawie historii zakupów
+    \item Ewaluacja reguł rozmytych IF-THEN (6 reguł)
+    \item Fuzzyfikacja wartości wejściowych produktu
+    \item Agregacja wyników reguł i defuzzyfikacja do wartości liczbowej (fuzzy\_score)
+\end{itemize}
+
+Główne klasy:
+\begin{itemize}
+    \item \texttt{FuzzyMembershipFunctions} — definicje funkcji przynależności
+    \item \texttt{FuzzyUserProfile} — budowa profilu rozmytego użytkownika
+    \item \texttt{SimpleFuzzyInference} — silnik wnioskowania Mamdani
+\end{itemize}
+
+\textbf{Moduł Probabilistic Models}
+
+Zadania modułu:
+\begin{itemize}
+    \item Trening łańcucha Markowa na sekwencjach kategorii zakupowych
+    \item Trening klasyfikatora Naive Bayes na cechach użytkowników
+    \item Predykcja następnych kategorii zakupów (Markov)
+    \item Predykcja prawdopodobieństwa zakupu i ryzyka churnu (Naive Bayes)
+    \item Agregacja wyników obu modeli w spójne rekomendacje
+\end{itemize}
+
+Główne klasy:
+\begin{itemize}
+    \item \texttt{CustomMarkovChain} — implementacja łańcucha Markowa
+    \item \texttt{CustomNaiveBayes} — implementacja Naive Bayes z wygładzaniem Laplace'a
+    \item \texttt{ProbabilisticRecommendationEngine} — integracja obu modeli
+\end{itemize}
+
+\subsection*{3.3 Diagram klas — modele danych}
+\addcontentsline{toc}{subsection}{3.3 Diagram klas — modele danych}
+
+System wykorzystuje następujące główne modele danych (Django ORM):
+
+\textbf{Moduł użytkowników i uwierzytelniania:}
+\begin{itemize}
+    \item \texttt{User} (extends AbstractUser) — użytkownicy systemu z polem role (admin/client)
+    \item \texttt{CartItem} — pozycje w koszyku zakupowym
+\end{itemize}
+
+\textbf{Moduł katalogu produktów:}
+\begin{itemize}
+    \item \texttt{Product} — produkty z atrybutami: name, price, old\_price, description
+    \item \texttt{Category} — kategorie produktów (48 kategorii)
+    \item \texttt{Tag} — tagi produktowe (np. "Gaming", "Budget", "Premium")
+    \item \texttt{Sale} — promocje i wyprzedaże
+    \item \texttt{Specification} — specyfikacje techniczne produktów (para klucz-wartość)
+\end{itemize}
+
+\textbf{Moduł zamówień:}
+\begin{itemize}
+    \item \texttt{Order} — zamówienia użytkowników
+    \item \texttt{OrderProduct} — pozycje w zamówieniach (tabela pośrednicząca M2M)
+\end{itemize}
+
+\textbf{Moduł rekomendacji:}
+\begin{itemize}
+    \item \texttt{ProductSimilarity} — macierz podobieństw dla CBF
+    \item \texttt{FuzzyUserProfile} — profile rozmyte użytkowników
+    \item \texttt{MarkovTransitions} — macierz przejść łańcucha Markowa
+    \item \texttt{UserPurchasePattern} — wzorce zakupowe użytkowników
+    \item \texttt{PurchaseProbability} — prawdopodobieństwa zakupu (Naive Bayes)
+    \item \texttt{RecommendationSettings} — singleton z konfiguracją aktywnego algorytmu
+\end{itemize}
+
+\textbf{Relacje między modelami:}
+\begin{itemize}
+    \item Product ↔ Category: Many-to-Many
+    \item Product ↔ Tag: Many-to-Many
+    \item Product → Sale: Foreign Key (nullable)
+    \item User → Order: One-to-Many
+    \item Order ↔ Product: Many-to-Many (przez OrderProduct)
+    \item ProductSimilarity → Product: dwa Foreign Keys (product1, product2)
+\end{itemize}
+
+\subsection*{3.4 Diagram sekwencji — generowanie rekomendacji CBF}
+\addcontentsline{toc}{subsection}{3.4 Diagram sekwencji — generowanie rekomendacji CBF}
+
+Proces generowania rekomendacji Content-Based Filtering przebiega zgodnie z następującym scenariuszem:
+
+\begin{enumerate}
+    \item Użytkownik przegląda stronę szczegółową produktu w interfejsie React
+    \item Komponent ProductPage wysyła żądanie HTTP GET do endpointu \texttt{/api/recommendations/content-based/?product\_id=\{id\}}
+    \item Backend (ContentBasedAPI view) odbiera żądanie
+    \item System sprawdza cache — jeśli podobieństwa dla produktu są zakeszowane, zwraca je natychmiast
+    \item W przypadku braku w cache:
+    \begin{itemize}
+        \item Wykonuje zapytanie do modelu ProductSimilarity z filtrem na product1\_id
+        \item Sortuje wyniki według similarity\_score (malejąco)
+        \item Pobiera top 10 najbardziej podobnych produktów
+    \end{itemize}
+    \item Backend serializuje dane (ProductSerializer) i zwraca odpowiedź JSON 200 OK
+    \item Frontend odbiera listę rekomendacji i renderuje sekcję "Podobne produkty"
+\end{enumerate}
+
+\subsection*{3.5 Diagram sekwencji — generowanie rekomendacji Fuzzy Logic}
+\addcontentsline{toc}{subsection}{3.5 Diagram sekwencji — generowanie rekomendacji Fuzzy Logic}
+
+Proces generowania rekomendacji z wykorzystaniem logiki rozmytej:
+
+\begin{enumerate}
+    \item Użytkownik zalogowany otwiera panel klienta (ClientPanel)
+    \item Frontend wysyła żądanie GET do \texttt{/api/fuzzy-recommendations/?user\_id=\{id\}}
+    \item Backend pobiera profil rozmyty użytkownika z modelu FuzzyUserProfile
+    \item Jeśli profil nie istnieje:
+    \begin{itemize}
+        \item System analizuje historię zamówień użytkownika
+        \item Oblicza wrażliwość cenową, preferencje kategorialne, preferencję jakości
+        \item Zapisuje nowy profil rozmyty w bazie danych
+    \end{itemize}
+    \item Dla każdego produktu w katalogu:
+    \begin{itemize}
+        \item Fuzzyfikacja wartości (cena, rating, view\_count)
+        \item Ewaluacja 6 reguł rozmytych z użyciem T-norm (minimum)
+        \item Agregacja wyników reguł
+        \item Obliczenie fuzzy\_score metodą średniej ważonej
+    \end{itemize}
+    \item Sortowanie produktów według fuzzy\_score
+    \item Zwrócenie top 10 produktów z najwyższym wynikiem
+    \item Frontend renderuje rekomendacje w zakładce "Fuzzy Recommendations"
+\end{enumerate}
+
+\subsection*{3.6 Diagram sekwencji — generowanie rekomendacji Probabilistic}
+\addcontentsline{toc}{subsection}{3.6 Diagram sekwencji — generowanie rekomendacji Probabilistic}
+
+Proces generowania rekomendacji probabilistycznych (Markov + Naive Bayes):
+
+\begin{enumerate}
+    \item Użytkownik otwiera zakładkę "Smart Recommendations" w panelu klienta
+    \item Frontend wysyła żądanie GET do \texttt{/api/markov-recommendations/?user\_id=\{id\}}
+    \item Backend sprawdza czy modele są wytrenowane:
+    \begin{itemize}
+        \item Jeśli nie — uruchamia trening łańcucha Markowa na sekwencjach zakupowych wszystkich użytkowników
+        \item Jeśli nie — trenuje Naive Bayes na cechach użytkowników (zakup/churn)
+    \end{itemize}
+    \item System pobiera ostatnie zamówienie użytkownika i ekstrahuje kategorię ostatnio kupionego produktu
+    \item Łańcuch Markowa przewiduje top 5 najbardziej prawdopodobnych następnych kategorii
+    \item Naive Bayes oblicza prawdopodobieństwo zakupu dla użytkownika
+    \item System agreguje wyniki: 60\% waga Markova + 40\% waga Naive Bayes
+    \item Dla przewidywanych kategorii pobiera produkty z bazy
+    \item Zwraca top 10 produktów z najwyższym zagregowanym score
+    \item Frontend wyświetla rekomendacje wraz z metrykami (purchase probability, expected days to next order)
+\end{enumerate}
+
+\subsection*{3.7 Diagram przypadków użycia}
+\addcontentsline{toc}{subsection}{3.7 Diagram przypadków użycia}
+
+System definiuje trzech aktorów z różnymi poziomami uprawnień oraz przypadki użycia związane z rekomendacjami produktów. Szczegółowy opis znajduje się w rozdziale 4 (Architektura techniczna systemu), natomiast tutaj przedstawiamy główne przypadki użycia z perspektywy projektu:
+
+\textbf{Aktorzy:}
+\begin{itemize}
+    \item Gość (niezalogowany) — przegląda produkty, wyszukuje rozmyte, dodaje do koszyka
+    \item Klient (zalogowany) — wszystkie uprawnienia Gościa + spersonalizowane rekomendacje + historia zamówień
+    \item Administrator — zarządza algorytmami, debuguje, generuje rekomendacje globalnie
+\end{itemize}
+
+\textbf{Główne przypadki użycia:}
+\begin{itemize}
+    \item UC-01: Przeglądanie katalogu produktów (Gość, Klient, Admin)
+    \item UC-02: Wyszukiwanie rozmyte produktów (Gość, Klient, Admin)
+    \item UC-03: Wyświetlanie rekomendacji CBF (Klient, Admin)
+    \item UC-04: Wyświetlanie rekomendacji Fuzzy (Klient, Admin)
+    \item UC-05: Wyświetlanie rekomendacji Probabilistic (Klient, Admin)
+    \item UC-06: Składanie zamówienia (Klient)
+    \item UC-07: Zmiana aktywnego algorytmu rekomendacji (Admin)
+    \item UC-08: Debugowanie algorytmów (podgląd wag, macierzy, reguł) (Admin)
+    \item UC-09: Generowanie macierzy podobieństw CBF (Admin)
+    \item UC-10: Trening modeli probabilistycznych (Admin)
+\end{itemize}
+
+\subsection*{3.8 Projekt API — endpointy REST}
+\addcontentsline{toc}{subsection}{3.8 Projekt API — endpointy REST}
+
+System udostępnia REST API zbudowane w Django REST Framework. Zaprojektowano następujące grupy endpointów:
+
+\textbf{API Content-Based Filtering:}
+\begin{itemize}
+    \item \texttt{GET /api/recommendations/content-based/?product\_id=\{id\}} — rekomendacje dla produktu
+    \item \texttt{GET /api/content-based-debug/} — panel debugowania CBF (admin)
+    \item \texttt{POST /api/generate-similarities/} — generowanie macierzy podobieństw (admin)
+\end{itemize}
+
+\textbf{API Fuzzy Logic:}
+\begin{itemize}
+    \item \texttt{GET /api/fuzzy-recommendations/?user\_id=\{id\}} — rekomendacje rozmyte dla użytkownika
+    \item \texttt{GET /api/fuzzy-debug/?user\_id=\{id\}} — panel debugowania Fuzzy (admin)
+    \item \texttt{GET /api/fuzzy-debug/?product\_id=\{id\}} — analiza fuzzyfikacji produktu (admin)
+\end{itemize}
+
+\textbf{API Probabilistic Models:}
+\begin{itemize}
+    \item \texttt{GET /api/markov-recommendations/?user\_id=\{id\}} — rekomendacje Markov + NB
+    \item \texttt{GET /api/bayesian-insights/?user\_id=\{id\}} — analiza behawioralna użytkownika
+    \item \texttt{GET /api/probabilistic-debug/} — panel debugowania Markov + NB (admin)
+\end{itemize}
+
+\textbf{API konfiguracji:}
+\begin{itemize}
+    \item \texttt{GET /api/recommendation-settings/} — pobranie aktywnego algorytmu
+    \item \texttt{PATCH /api/recommendation-settings/} — zmiana aktywnego algorytmu (admin)
+\end{itemize}
+
+\textbf{Format odpowiedzi API}
+
+Wszystkie endpointy zwracają dane w formacie JSON. Przykładowa odpowiedź dla rekomendacji CBF:
+
+\begin{verbatim}
+{
+  "product_id": 123,
+  "recommendations": [
+    {
+      "id": 456,
+      "name": "Product Name",
+      "price": "99.99",
+      "similarity_score": 0.87,
+      "categories": ["Electronics", "Laptops"]
+    }
+  ],
+  "algorithm": "content_based",
+  "count": 10
+}
+\end{verbatim}
+
+\subsection*{3.9 Projekt bazy danych — model ERD}
+\addcontentsline{toc}{subsection}{3.9 Projekt bazy danych — model ERD}
+
+Baza danych została zaprojektowana zgodnie z trzecią postacią normalną (3NF) z wykorzystaniem Django ORM. Struktura składa się z pięciu modułów funkcjonalnych:
+
+\textbf{Moduł produktów i kategorii:}
+\begin{itemize}
+    \item Tabela \texttt{db\_product} — 500 produktów, klucz główny (id), atrybuty: name, price, old\_price, description
+    \item Tabela \texttt{db\_category} — 48 kategorii, constraint UNIQUE na nazwie
+    \item Tabela pośrednicząca \texttt{product\_categories} — relacja M2M
+    \item Tabela \texttt{db\_specification} — specyfikacje jako pary (parameter\_name, specification)
+\end{itemize}
+
+\textbf{Moduł użytkowników i zamówień:}
+\begin{itemize}
+    \item Tabela \texttt{db\_user} — extends Django AbstractUser, dodatkowe pole role
+    \item Tabela \texttt{db\_order} — zamówienia z datą i statusem
+    \item Tabela \texttt{db\_order\_product} — pozycje zamówień z ilością
+\end{itemize}
+
+\textbf{Moduł rekomendacji CBF:}
+\begin{itemize}
+    \item Tabela \texttt{method\_product\_similarity} — macierz podobieństw
+    \item Indeks na (product1\_id, similarity\_type) dla wydajności
+    \item Constraint UNIQUE(product1\_id, product2\_id, similarity\_type)
+\end{itemize}
+
+\textbf{Moduł rekomendacji Fuzzy:}
+\begin{itemize}
+    \item Tabela \texttt{method\_fuzzy\_user\_profile} — profile użytkowników
+    \item Pole category\_preferences typu JSONField (elastyczna struktura)
+    \item Pola: price\_sensitivity, quality\_preference, updated\_at
+\end{itemize}
+
+\textbf{Moduł rekomendacji Probabilistic:}
+\begin{itemize}
+    \item Tabela \texttt{method\_markov\_transitions} — macierz przejść Markova
+    \item Constraint UNIQUE(from\_category, to\_category)
+    \item Tabela \texttt{method\_purchase\_probability} — predykcje Naive Bayes
+\end{itemize}
+
+Diagramy ERD znajdują się w rozdziale 4.6 (Baza danych — modele).
+
+\subsection*{3.10 Podsumowanie projektu}
+\addcontentsline{toc}{subsection}{3.10 Podsumowanie projektu}
+
+Zaprojektowany system rekomendacyjny charakteryzuje się:
+
+\textbf{Modułowością} — każdy algorytm jest niezależnym modułem, który można aktywować, testować i rozwijać osobno.
+
+\textbf{Skalowalnością} — wykorzystanie indeksów bazodanowych, cache'owania wyników oraz bulk operations zapewnia wydajność dla katalogów do 10000 produktów.
+
+\textbf{Rozszerzalnością} — architektura umożliwia łatwe dodawanie nowych metod rekomendacyjnych poprzez implementację wspólnego interfejsu.
+
+\textbf{Interpretowal}nością — zwłaszcza moduł Fuzzy Logic oferuje pełne wyjaśnienie rekomendacji przez aktywacje reguł.
+
+Projekt został zrealizowany zgodnie z najlepszymi praktykami inżynierii oprogramowania: separacja warstw, wykorzystanie wzorców projektowych (singleton dla RecommendationSettings), RESTful API design oraz normalizacja bazy danych.
+
+\newpage
+
+\section*{Rozdzia\l{} 4}
+\addcontentsline{toc}{section}{Rozdział 4: Stos technologiczny i architektura techniczna}
+\section*{Stos technologiczny i architektura techniczna}
+
+Niniejszy rozdział jest wspólny z pracą współautora i opisuje szczegóły techniczne całego systemu e-commerce z modułem rekomendacyjnym.
+
+\subsection*{4.1 Stos technologiczny}
+\addcontentsline{toc}{subsection}{4.1 Stos technologiczny}
+
+Aplikacja została zbudowana w oparciu o nowoczesny stos technologiczny:
+
+\textbf{Backend}: Django 4.2 (Python 3.11) wraz z Django REST Framework 3.14. Django zapewnia solidną architekturę MVC, system ORM dla abstrakcji bazy danych, oraz wbudowane mechanizmy bezpieczeństwa. Django REST Framework rozszerza Django o funkcjonalności API RESTful.
+
+\textbf{Frontend}: React 18 z bibliotekami wspierającymi (Axios, Framer Motion, React Router) tworzy Single Page Application (SPA). React Hooks zarządzają stanem aplikacji.
+
+\textbf{Baza danych}: PostgreSQL 14 przechowuje wszystkie dane aplikacji. Wybór PostgreSQL był podyktowany zaawansowanymi funkcjami (indeksy częściowe, full-text search, JSON support).
+
+\textbf{Biblioteki}: NumPy 1.24 (operacje macierzowe dla wektorów cech i macierzy podobieństwa).
+
+\subsection*{4.2 Backend — Django REST Framework}
+\addcontentsline{toc}{subsection}{4.2 Backend — Django REST Framework}
+
+Architektura backendu opiera się na wzorcu Model-View-Serializer. Kluczowe pliki dla modułu rekomendacyjnego:
+
+\begin{itemize}
+    \item \textbf{custom\_recommendation\_engine.py} — implementacje CBF, Markov, Naive Bayes
+    \item \textbf{fuzzy\_logic\_engine.py} — implementacja systemu Fuzzy Logic
+    \item \textbf{recommendation\_views.py} — endpoint CBF: \texttt{/api/content-based-debug/}
+    \item \textbf{probabilistic\_views.py} — endpointy Markov i Bayes
+    \item \textbf{models.py} — modele ProductSimilarity, RecommendationSettings
+\end{itemize}
+
+\subsection*{4.3 Frontend — React 18}
+\addcontentsline{toc}{subsection}{4.3 Frontend — React 18}
+
+Frontend aplikacji został zbudowany jako Single Page Application (SPA) w technologii React 18, wykorzystując nowoczesne wzorce programowania funkcyjnego i React Hooks do zarządzania stanem. Architektura składa się z modułowych komponentów odpowiedzialnych za poszczególne funkcjonalności systemu.
+
+\textbf{Główne komponenty aplikacji}:
+
+\begin{itemize}
+    \item \textbf{App.js} — główny komponent aplikacji zarządzający routingiem React Router v6 oraz globalnym stanem poprzez Context API. Definiuje strukturę tras (routes) oraz layouty dla różnych typów stron (publiczne, chronione, administracyjne).
+
+    \item \textbf{Navbar.jsx} — responsywna nawigacja z wyszukiwarką, linkami do kluczowych sekcji, przyciskami logowania/rejestracji oraz ikoną koszyka z licznikiem produktów. Wykorzystuje React Hooks (useState, useContext) do zarządzania stanem mobilnego menu oraz danymi użytkownika.
+
+    \item \textbf{SearchModal.jsx} — zaawansowany modal wyszukiwania z dwoma trybami: sentiment search (sortowanie według zagregowanego wyniku sentymentu) oraz fuzzy search (wyszukiwanie z wykorzystaniem logiki rozmytej z tolerancją na błędy).
+
+    \item \textbf{ShopContent.jsx} — komponent wyświetlający katalog produktów z sidebar'em filtrów (kategorie, zakres cen, oceny) oraz grid'em kart produktów. Obsługuje dynamiczne filtrowanie i sortowanie.
+
+    \item \textbf{ProductPage.jsx} — szczegółowy widok pojedynczego produktu zawierający galerię zdjęć (slider react-slick), opis, specyfikacje techniczne, kategorie, sekcję opinii klientów z analizą sentymentu, rekomendacje "Frequently Bought Together" oraz przycisk "Add to Cart" z obsługą stanu koszyka (CartContext).
+
+    \item \textbf{CartContent.jsx} — koszyk zakupowy wyświetlający listę wybranych produktów, łączną wartość zamówienia oraz sekcję rekomendacji cross-sell (produkty komplementarne według reguł asocjacyjnych). Użytkownik może modyfikować ilości, usuwać produkty oraz przejść do finalizacji zamówienia.
+
+    \item \textbf{ClientPanel} — panel klienta zawierający zakładki: Dashboard (podsumowanie aktywności, ostatnie zamówienia, statystyki), Orders (historia wszystkich zamówień z możliwością podglądu szczegółów), Account (edycja danych osobowych, zmiana hasła), Recommendations (spersonalizowane rekomendacje Content-Based Filtering, Fuzzy Logic i Probabilistic Models aktualizowane po każdym zamówieniu).
+
+    \item \textbf{AdminPanel} — panel administracyjny dostępny dla użytkowników z uprawnieniami is\_staff. Zawiera zakładki: Products (zarządzanie produktami), Orders (przeglądanie i zarządzanie zamówieniami), Users (zarządzanie użytkownikami), Statistics (wykresy sprzedaży, najpopularniejsze kategorie, statystyki rekomendacji), Debug ML (narzędzia debugowania algorytmów ML: tabela reguł asocjacyjnych, statystyki sentymentu, analiza podobieństw CBF, reguły rozmyte, macierz Markova).
+\end{itemize}
+
+\textbf{Routing - React Router v6}:
+
+Aplikacja wykorzystuje deklaratywny routing React Router v6 z zagnieżdżonymi trasami dla stron publicznych (home, shop, product), chronionych (cart, client panel) oraz administracyjnych (admin panel). Komponent PrivateRoute sprawdza autentykację użytkownika i przekierowuje niezalogowanych do strony logowania.
+
+\textbf{Zarządzanie stanem - Context API}:
+
+Aplikacja wykorzystuje Context API zamiast Redux dla prostszego zarządzania stanem globalnym. AuthContext przechowuje dane zalogowanego użytkownika i token JWT. CartContext zarządza stanem koszyka zakupowego z funkcjami add, remove, update quantity.
+
+\textbf{Komunikacja z API - Axios}:
+
+Wszystkie zapytania HTTP obsługiwane przez Axios z globalną konfiguracją interceptorów. Automatyczna obsługa błędów 401 Unauthorized z przekierowaniem do logowania. Dołączanie tokena JWT do nagłówków Authorization dla chronionych endpointów.
+
+\textbf{Animacje - Framer Motion}:
+
+Płynne przejścia między stronami oraz animacje komponentów realizowane przez Framer Motion z efektami fade-in, slide-up i scroll-driven. Poprawia doświadczenie użytkownika (UX) bez obciążania wydajności aplikacji.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{images/useCaseDiagram.png}
+  \caption{Diagram przypadków użycia.}
+  \label{fig:use_case}
+\end{figure}
+
+\subsection*{4.4 Diagram przypadków użycia}
+\addcontentsline{toc}{subsection}{4.4 Diagram przypadków użycia}
+
+Diagram przypadków użycia przedstawia funkcjonalności systemu rekomendacji e-commerce z perspektywy trzech grup użytkowników o różnych poziomach uprawnień.
+
+\textbf{Aktorzy systemu}
+
+System wyróżnia trzech aktorów reprezentujących różne role użytkowników:
+
+\textbf{1. Gość (użytkownik niezalogowany)} -- osoba odwiedzająca sklep bez uwierzytelnienia. Gość ma ograniczone uprawnienia, może przeglądać katalog produktów, korzystać z zaawansowanej wyszukiwarki z algorytmem rozmytym oraz dodawać produkty do koszyka. Nie ma dostępu do spersonalizowanych rekomendacji, ponieważ system nie posiada informacji o jego historii zakupowej.
+
+\textbf{2. Klient (użytkownik zalogowany)} -- zarejestrowany użytkownik posiadający konto w systemie. Dziedziczy wszystkie uprawnienia Gościa, ale dodatkowo otrzymuje dostęp do spersonalizowanych rekomendacji generowanych na podstawie jego historii zakupów. Klient może składać zamówienia, przeglądać historię swoich transakcji oraz zarządzać swoim profilem. System śledzi jego zachowania zakupowe, budując profil preferencji wykorzystywany przez algorytmy rekomendacyjne.
+
+\textbf{3. Administrator} -- użytkownik z uprawnieniami zarządzania systemem rekomendacji. Administrator ma dostęp do dedykowanego panelu umożliwiającego konfigurację systemu, w tym dynamiczną zmianę aktywnego algorytmu rekomendacji (przełączanie między Content-Based Filtering, logiką rozmytą a modelem probabilistycznym). Może generować rekomendacje dla wszystkich użytkowników systemu, przeglądać podgląd rekomendacji przed ich publikacją oraz korzystać z zaawansowanych narzędzi debugowania algorytmów (analiza wag cech, podgląd macierzy podobieństwa, wizualizacja macierzy przejść Markowa).
+
+\textbf{Główne przypadki użycia}
+
+Kluczowe funkcjonalności systemu obejmują:
+
+\textbf{Przeglądanie i wyszukiwanie produktów} -- podstawowa funkcjonalność dostępna dla wszystkich aktorów. Katalog produktów obsługuje stronicowanie, filtrowanie po kategoriach oraz zaawansowane wyszukiwanie rozmyte wykorzystujące algorytm Levenshteina do tolerowania literówek i odmian wyrazów.
+
+\textbf{Wyświetlanie rekomendacji spersonalizowanych} -- przypadek użycia dostępny dla zalogowanych Klientów. System automatycznie generuje listę produktów rekomendowanych na podstawie historii zakupowej użytkownika, wykorzystując aktualnie wybrany algorytm (CBF, rozmyty lub probabilistyczny). Rekomendacje są wyświetlane na stronie głównej, w panelu klienta oraz na stronach szczegółowych produktów jako sugestie ``Klienci kupujący ten produkt kupili również...''.
+
+\textbf{Generowanie rekomendacji przez Administratora} -- Administrator może ręcznie wywołać proces generowania rekomendacji dla wybranego użytkownika lub globalnie dla wszystkich użytkowników systemu. Ta funkcjonalność jest szczególnie przydatna podczas testowania różnych konfiguracji algorytmów oraz po wprowadzeniu zmian w parametrach systemu.
+
+\textbf{Zmiana ustawień algorytmu} -- kluczowa funkcjonalność administracyjna umożliwiająca dynamiczne przełączanie między trzema zaimplementowanymi metodami rekomendacyjnymi. Administrator wybiera algorytm z interfejsu panelu, a zmiana jest natychmiast propagowana do całego systemu bez konieczności restartu aplikacji.
+
+\textbf{Debugowanie i analiza algorytmów} -- zaawansowany przypadek użycia przeznaczony dla Administratora. Panel debugowania prezentuje wewnętrzne metryki działania algorytmów: w trybie CBF wyświetlane są wagi poszczególnych cech produktowych i macierz podobieństwa, w trybie rozmytym pokazywane są profile użytkowników z wartościami funkcji przynależności, w trybie probabilistycznym prezentowane są prawdopodobieństwa zakupów i macierz przejść Markowa.
+
+\textbf{Składanie zamówień} -- dostępne dla Klientów. Proces zakupowy jest śledżony przez system rekomendacji - każde zamówienie aktualizuje profil preferencji użytkownika, macierz przejść Markowa oraz dane treningowe modelu Naive Bayes, co wpływa na jakość przyszłych rekomendacji.
+
+\subsection*{4.5 Baza danych — modele ERD}
+\addcontentsline{toc}{subsection}{4.5 Baza danych — modele ERD}
+
+Schemat bazy danych PostgreSQL został zaprojektowany zgodnie z modelem Django ORM. Struktura bazy danych jest podzielona na moduły funkcjonalne realizujące logikę systemu rekomendacji e-commerce.
+
+\textbf{Moduł Produktów i Kategorii}:
+Tabela produktów przechowuje nazwę, cenę, opis oraz relacje wiele-do-wielu z kategoriami i tagami. Specyfikacje techniczne zapisane w formacie klucz-wartość umożliwiają elastyczne definiowanie cech produktów wykorzystywanych przez algorytm CBF.
+
+\textbf{Moduł Użytkowników i Zamówień}:
+Rozszerzony model użytkownika Django przechowuje dane uwierzytelniające oraz role. Historia zamówień rejestruje transakcje użytkowników, stanowiąc podstawę dla wszystkich trzech metod rekomendacyjnych.
+
+\textbf{Moduł Rekomendacji}:
+Tabela podobieństw produktów (\texttt{ProductSimilarity}) przechowuje prekompilowane wartości podobieństwa kosinusowego. Profile rozmyte użytkowników (\texttt{FuzzyUserProfile}) agregują wrażliwość cenową i preferencje kategorialne w formacie JSON. Macierz przejść Markowa (\texttt{MarkovTransitions}) modeluje prawdopodobieństwa zakupów sekwencyjnych.
+
+\newpage
+
+\section*{Rozdzia\l{} 5}
+\addcontentsline{toc}{section}{Rozdział 5: Implementacja Content-Based Filtering}
+\section*{Implementacja Content-Based Filtering}
+
+\subsection*{5.1 Architektura systemu CBF}
+\addcontentsline{toc}{subsection}{5.1 Architektura systemu CBF}
 
 System Content-Based Filtering został zaimplementowany w klasie \texttt{CustomContentBasedFilter} w pliku \texttt{custom\_recommendation\_engine.py}. Architektura składa się z trzech głównych komponentów:
 
@@ -726,8 +1149,8 @@ System Content-Based Filtering został zaimplementowany w klasie \texttt{CustomC
     \item Cache wyników na 2 godziny
 \end{enumerate}
 
-\subsection*{3.2 Implementacja ekstrakcji cech}
-\addcontentsline{toc}{subsection}{3.2 Implementacja ekstrakcji cech}
+\subsection*{5.2 Implementacja ekstrakcji cech}
+\addcontentsline{toc}{subsection}{5.2 Implementacja ekstrakcji cech}
 
 Metoda ekstrakcji cech buduje słownik cech z przypisanymi wagami. Algorytm w pseudokodzie:
 
@@ -786,8 +1209,8 @@ Progi cenowe zostały dobrane empirycznie na podstawie rozkładu cen w katalogu:
 
 Dyskretyzacja eliminuje problem dużej wariancji cen i pozwala na porównywanie produktów z różnych kategorii cenowych.
 
-\subsection*{3.3 Algorytm podobieństwa kosinusowego}
-\addcontentsline{toc}{subsection}{3.3 Algorytm podobieństwa kosinusowego}
+\subsection*{5.3 Algorytm podobieństwa kosinusowego}
+\addcontentsline{toc}{subsection}{5.3 Algorytm podobieństwa kosinusowego}
 
 Metoda \texttt{calculate\_product\_similarity()} implementuje podobieństwo kosinusowe dla wektorów rzadkich (sparse vectors):
 
@@ -828,8 +1251,8 @@ System zapisuje tylko podobieństwa większe niż 0.2 (20\%). Uzasadnienie:
     \item Szybsze zapytania (mniej rekordów do przeszukania)
 \end{itemize}
 
-\subsection*{3.4 Generowanie macierzy podobieństw}
-\addcontentsline{toc}{subsection}{3.4 Generowanie macierzy podobieństw}
+\subsection*{5.4 Generowanie macierzy podobieństw}
+\addcontentsline{toc}{subsection}{5.4 Generowanie macierzy podobieństw}
 
 Metoda \texttt{generate\_similarities\_for\_all\_products()} oblicza podobieństwa dla wszystkich par produktów:
 
@@ -883,8 +1306,8 @@ Dla katalogu 500 produktów:
     \item Po filtrowaniu (próg 0.2): ~4,000 zapisanych rekordów
 \end{itemize}
 
-\subsection*{3.5 Panel debugowania Content-Based Filtering}
-\addcontentsline{toc}{subsection}{3.5 Panel debugowania Content-Based Filtering}
+\subsection*{5.5 Panel debugowania Content-Based Filtering}
+\addcontentsline{toc}{subsection}{5.5 Panel debugowania Content-Based Filtering}
 
 System oferuje zaawansowany panel debugowania dostępny przez endpoint \texttt{/api/content-based-debug/}. Panel prezentuje:
 
@@ -984,8 +1407,8 @@ Panel umożliwia administratorowi:
     \item Ręczne wyzwalanie przeliczenia macierzy
 \end{itemize}
 
-\subsection*{3.6 Interfejs użytkownika - sortowanie według CBF}
-\addcontentsline{toc}{subsection}{3.6 Interfejs użytkownika - sortowanie według CBF}
+\subsection*{5.6 Interfejs użytkownika - sortowanie według CBF}
+\addcontentsline{toc}{subsection}{5.6 Interfejs użytkownika - sortowanie według CBF}
 
 Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania produktów na stronie głównej sklepu. Administrator może wybrać algorytm CBF w ustawieniach systemu rekomendacji, co powoduje wyświetlanie produktów podobnych do tych, które użytkownik wcześniej przeglądał lub kupił.
 
@@ -1027,12 +1450,12 @@ Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik mo�
 
 \newpage
 
-\section*{Rozdzia\l{} 4}
-\addcontentsline{toc}{section}{Rozdział 4: Logika rozmyta}
+\section*{Rozdzia\l{} 6}
+\addcontentsline{toc}{section}{Rozdział 6: Logika rozmyta}
 \section*{Logika rozmyta w systemie rekomendacji}
 
-\subsection*{4.1 Architektura systemu Fuzzy Logic}
-\addcontentsline{toc}{subsection}{4.1 Architektura systemu Fuzzy Logic}
+\subsection*{6.1 Architektura systemu Fuzzy Logic}
+\addcontentsline{toc}{subsection}{6.1 Architektura systemu Fuzzy Logic}
 
 System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_engine.py} i składa się z trzech klas:
 
@@ -1070,8 +1493,8 @@ System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_e
     \item Zwrócenie top N rekomendacji
 \end{enumerate}
 
-\subsection*{4.2 Funkcje przynależności — szczegóły implementacji}
-\addcontentsline{toc}{subsection}{4.2 Funkcje przynależności}
+\subsection*{6.2 Funkcje przynależności — szczegóły implementacji}
+\addcontentsline{toc}{subsection}{6.2 Funkcje przynależności}
 
 \textbf{Funkcje przynależności dla ceny}
 
@@ -1141,8 +1564,8 @@ Funkcja \textbf{medium} (trapezoidalna): $\mu = 0$ dla ceny $< 300$ PLN, wzrost 
 
 Funkcja \textbf{expensive} (trójkątna): $\mu = 0$ dla ceny $\leq 1000$ PLN, liniowy wzrost do $\mu = 1.0$ przy 2000 PLN i powyżej.
 
-\subsection*{4.3 Rozmyty profil użytkownika}
-\addcontentsline{toc}{subsection}{4.3 Rozmyty profil użytkownika}
+\subsection*{6.3 Rozmyty profil użytkownika}
+\addcontentsline{toc}{subsection}{6.3 Rozmyty profil użytkownika}
 
 Klasa \texttt{FuzzyUserProfile} buduje profil preferencji użytkownika jako zbiory rozmyte. Jest to kluczowy element personalizacji rekomendacji.
 
@@ -1196,8 +1619,8 @@ Dla użytkowników bez historii zakupów system stosuje neutralny profil domyśl
     \item popularity\_preference = 0.5 (neutralna wobec popularności)
 \end{itemize}
 
-\subsection*{4.4 Baza reguł rozmytych}
-\addcontentsline{toc}{subsection}{4.4 Baza reguł rozmytych}
+\subsection*{6.4 Baza reguł rozmytych}
+\addcontentsline{toc}{subsection}{6.4 Baza reguł rozmytych}
 
 System wykorzystuje 6 reguł rozmytych typu Mamdani. Każda reguła ma formę IF-THEN z przypisaną wagą określającą jej ważność:
 
@@ -1256,8 +1679,8 @@ WTEDY recommendation JEST moderate
 
 Logika: Dobry stosunek jakości do ceny — "value for money".
 
-\subsection*{4.5 Wnioskowanie i defuzzyfikacja}
-\addcontentsline{toc}{subsection}{4.5 Wnioskowanie i defuzzyfikacja}
+\subsection*{6.5 Wnioskowanie i defuzzyfikacja}
+\addcontentsline{toc}{subsection}{6.5 Wnioskowanie i defuzzyfikacja}
 
 Metoda \texttt{evaluate\_product()} implementuje pełny cykl wnioskowania Mamdani:
 
@@ -1311,8 +1734,8 @@ Metoda zwraca słownik z:
     \item \texttt{price\_membership} — przynależności cenowe (cheap, medium, expensive)
 \end{itemize}
 
-\subsection*{4.6 Panel debugowania Fuzzy Logic}
-\addcontentsline{toc}{subsection}{4.6 Panel debugowania Fuzzy Logic}
+\subsection*{6.6 Panel debugowania Fuzzy Logic}
+\addcontentsline{toc}{subsection}{6.6 Panel debugowania Fuzzy Logic}
 
 Panel debugowania dostępny przez endpoint \texttt{/api/fuzzy-debug/} prezentuje:
 
@@ -1410,8 +1833,8 @@ Category Matching:
 - components.processors: 0.394
 \end{verbatim}
 
-\subsection*{4.7 Interfejs użytkownika - rekomendacje Fuzzy Logic}
-\addcontentsline{toc}{subsection}{4.7 Interfejs użytkownika - rekomendacje Fuzzy Logic}
+\subsection*{6.7 Interfejs użytkownika - rekomendacje Fuzzy Logic}
+\addcontentsline{toc}{subsection}{6.7 Interfejs użytkownika - rekomendacje Fuzzy Logic}
 
 \begin{figure}[h!]
   \centering
@@ -1475,8 +1898,8 @@ Zakładka ``Your Fuzzy User Profile'' (Rysunek \ref{fig:fuzzy_client3}) prezentu
     \item \textbf{Favorite Categories}: ulubione kategorie z wagami zainteresowania
 \end{itemize}
 
-\subsection*{4.8 Wyszukiwanie rozmyte (Fuzzy Search)}
-\addcontentsline{toc}{subsection}{4.8 Wyszukiwanie rozmyte (Fuzzy Search)}
+\subsection*{6.8 Wyszukiwanie rozmyte (Fuzzy Search)}
+\addcontentsline{toc}{subsection}{6.8 Wyszukiwanie rozmyte (Fuzzy Search)}
 
 Wyszukiwanie rozmyte (Fuzzy Search) wykorzystuje algorytm odległości Levensteina do wyszukiwania produktów z tolerancją na literówki i błędy pisowni. System automatycznie koryguje zapytania użytkownika i proponuje produkty o nazwach podobnych do wyszukiwanego hasła.
 
@@ -1506,12 +1929,12 @@ System wyszukiwania rozmytego zwraca produkty, dla których odległość Levenst
 
 \newpage
 
-\section*{Rozdzia{} 5}
-\addcontentsline{toc}{section}{Rozdzia{} 5: Modele probabilistyczne}
+\section*{Rozdzia\l{} 7}
+\addcontentsline{toc}{section}{Rozdział 7: Modele probabilistyczne}
 \section*{Modele probabilistyczne — Markov Chain i Naive Bayes}
 
-\subsection*{5.1 Architektura systemu probabilistycznego}
-\addcontentsline{toc}{subsection}{5.1 Architektura systemu probabilistycznego}
+\subsection*{7.1 Architektura systemu probabilistycznego}
+\addcontentsline{toc}{subsection}{7.1 Architektura systemu probabilistycznego}
 
 System probabilistyczny składa się z trzech komponentów zaimplementowanych w \texttt{custom\_recommendation\_engine.py}:
 
@@ -1537,8 +1960,8 @@ System probabilistyczny składa się z trzech komponentów zaimplementowanych w 
     \item Agregacja wyników i generowanie rekomendacji
 \end{enumerate}
 
-\subsection*{5.2 Łańcuch Markowa dla sekwencji zakupowych}
-\addcontentsline{toc}{subsection}{5.2 Łańcuch Markowa dla sekwencji zakupowych}
+\subsection*{7.2 Łańcuch Markowa dla sekwencji zakupowych}
+\addcontentsline{toc}{subsection}{7.2 Łańcuch Markowa dla sekwencji zakupowych}
 
 Klasa \texttt{CustomMarkovChain} modeluje sekwencje zakupów użytkowników jako łańcuch Markowa pierwszego rzędu, gdzie stanami są kategorie produktów.
 
@@ -1577,8 +2000,8 @@ Oblicza rozkład stacjonarny łańcucha metodą przybliżoną (zliczanie często
 
 Algorytm oblicza rozkład stacjonarny poprzez sumowanie liczby przejść do każdego stanu i normalizację przez całkowitą liczbę przejść. Wynik reprezentuje długoterminowe prawdopodobieństwo znalezienia się użytkownika w danej kategorii.
 
-\subsection*{5.3 Naiwny klasyfikator Bayesa}
-\addcontentsline{toc}{subsection}{5.3 Naiwny klasyfikator Bayesa}
+\subsection*{7.3 Naiwny klasyfikator Bayesa}
+\addcontentsline{toc}{subsection}{7.3 Naiwny klasyfikator Bayesa}
 
 Klasa \texttt{CustomNaiveBayes} implementuje multinomialny Naive Bayes z wygładzaniem Laplace'a.
 
@@ -1640,8 +2063,8 @@ H(feature) = -\sum_{v \in V} P(v | C) \cdot \log_2 P(v | C)
 
 Wyższa entropia oznacza większą zdolność cechy do rozróżniania klas. Typowy ranking ważności cech dla predykcji zakupu: days\_since\_last\_order > total\_orders > avg\_order\_value > favorite\_category.
 
-\subsection*{5.4 Integracja modeli — ProbabilisticRecommendationEngine}
-\addcontentsline{toc}{subsection}{5.4 Integracja modeli}
+\subsection*{7.4 Integracja modeli — ProbabilisticRecommendationEngine}
+\addcontentsline{toc}{subsection}{7.4 Integracja modeli}
 
 Klasa \texttt{ProbabilisticRecommendationEngine} łączy oba modele w jeden system rekomendacyjny.
 
@@ -1678,8 +2101,8 @@ KONIEC FUNKCJA
 
 Wagi agregacji (Markov 60\%, NB 40\%) zostały dobrane empirycznie — Markov Chain lepiej przewiduje następną kategorię, podczas gdy Naive Bayes moduluje wynik na podstawie ogólnego prawdopodobieństwa zakupu użytkownika.
 
-\subsection*{5.5 API probabilistyczne}
-\addcontentsline{toc}{subsection}{5.5 API probabilistyczne}
+\subsection*{7.5 API probabilistyczne}
+\addcontentsline{toc}{subsection}{7.5 API probabilistyczne}
 
 System udostępnia dwa główne endpointy w \texttt{probabilistic\_views.py}:
 
@@ -1749,8 +2172,8 @@ Przykładowa odpowiedź:
 }
 \end{verbatim}
 
-\subsection*{5.6 Panel debugowania modeli probabilistycznych}
-\addcontentsline{toc}{subsection}{5.6 Panel debugowania modeli probabilistycznych}
+\subsection*{7.6 Panel debugowania modeli probabilistycznych}
+\addcontentsline{toc}{subsection}{7.6 Panel debugowania modeli probabilistycznych}
 
 Panel debugowania prezentuje szczegółowe informacje o obu modelach:
 
@@ -1832,8 +2255,8 @@ Next Purchase Predictions (Markov Chain):
 3. peripherals.soundCards: 7.41%
 \end{verbatim}
 
-\subsection*{5.7 Interfejs użytkownika - rekomendacje probabilistyczne}
-\addcontentsline{toc}{subsection}{5.7 Interfejs użytkownika - rekomendacje probabilistyczne}
+\subsection*{7.7 Interfejs użytkownika - rekomendacje probabilistyczne}
+\addcontentsline{toc}{subsection}{7.7 Interfejs użytkownika - rekomendacje probabilistyczne}
 
 \begin{figure}[h!]
   \centering
@@ -1891,8 +2314,8 @@ Zakładka ``Churn Risk Analysis'' (Rysunek \ref{fig:prob_client3}) prezentuje:
     \item \textbf{Personalized Suggestions}: spersonalizowane sugestie produktów
 \end{itemize}
 
-\subsection*{5.8 Panel administracyjny - widoki probabilistyczne}
-\addcontentsline{toc}{subsection}{5.8 Panel administracyjny - widoki probabilistyczne}
+\subsection*{7.8 Panel administracyjny - widoki probabilistyczne}
+\addcontentsline{toc}{subsection}{7.8 Panel administracyjny - widoki probabilistyczne}
 
 Panel administracyjny systemu rekomendacji probabilistycznych prezentuje zaawansowane analizy dla administratora:
 
@@ -1931,212 +2354,12 @@ Rysunek \ref{fig:prob_admin3} prezentuje panel ``Demand Forecast'' z:
 
 \newpage
 
-\section*{Rozdzia{} 6}
-\addcontentsline{toc}{section}{Rozdzia{} 6: Architektura techniczna systemu}
-\section*{Architektura techniczna systemu}
-
-Niniejszy rozdział jest wspólny z pracą współautora i opisuje architekturę całego systemu e-commerce z modułem rekomendacyjnym.
-
-\subsection*{6.1 Stos technologiczny}
-\addcontentsline{toc}{subsection}{6.1 Stos technologiczny}
-
-Aplikacja została zbudowana w oparciu o nowoczesny stos technologiczny:
-
-\textbf{Backend}: Django 4.2 (Python 3.11) wraz z Django REST Framework 3.14. Django zapewnia solidną architekturę MVC, system ORM dla abstrakcji bazy danych, oraz wbudowane mechanizmy bezpieczeństwa. Django REST Framework rozszerza Django o funkcjonalności API RESTful.
-
-\textbf{Frontend}: React 18 z bibliotekami wspierającymi (Axios, Framer Motion, React Router) tworzy Single Page Application (SPA). React Hooks zarządzają stanem aplikacji.
-
-\textbf{Baza danych}: PostgreSQL 14 przechowuje wszystkie dane aplikacji. Wybór PostgreSQL był podyktowany zaawansowanymi funkcjami (indeksy częściowe, full-text search, JSON support).
-
-\textbf{Biblioteki}: NumPy 1.24 (operacje macierzowe dla wektorów cech i macierzy podobieństwa).
-
-\subsection*{6.2 Backend — Django REST Framework}
-\addcontentsline{toc}{subsection}{6.2 Backend — Django REST Framework}
-
-Architektura backendu opiera się na wzorcu Model-View-Serializer. Kluczowe pliki dla modułu rekomendacyjnego:
-
-\begin{itemize}
-    \item \textbf{custom\_recommendation\_engine.py} — implementacje CBF, Markov, Naive Bayes
-    \item \textbf{fuzzy\_logic\_engine.py} — implementacja systemu Fuzzy Logic
-    \item \textbf{recommendation\_views.py} — endpoint CBF: \texttt{/api/content-based-debug/}
-    \item \textbf{probabilistic\_views.py} — endpointy Markov i Bayes
-    \item \textbf{models.py} — modele ProductSimilarity, RecommendationSettings
-\end{itemize}
-
-\subsection*{6.3 Frontend — React 18}
-\addcontentsline{toc}{subsection}{6.3 Frontend — React 18}
-
-Frontend aplikacji został zbudowany jako Single Page Application (SPA) w technologii React 18, wykorzystując nowoczesne wzorce programowania funkcyjnego i React Hooks do zarządzania stanem. Architektura składa się z modułowych komponentów odpowiedzialnych za poszczególne funkcjonalności systemu.
-
-\textbf{Główne komponenty aplikacji}:
-
-\begin{itemize}
-    \item \textbf{App.js} — główny komponent aplikacji zarządzający routingiem React Router v6 oraz globalnym stanem poprzez Context API. Definiuje strukturę tras (routes) oraz layouty dla różnych typów stron (publiczne, chronione, administracyjne).
-
-    \item \textbf{Navbar.jsx} — responsywna nawigacja z wyszukiwarką, linkami do kluczowych sekcji, przyciskami logowania/rejestracji oraz ikoną koszyka z licznikiem produktów. Wykorzystuje React Hooks (useState, useContext) do zarządzania stanem mobilnego menu oraz danymi użytkownika.
-
-    \item \textbf{SearchModal.jsx} — zaawansowany modal wyszukiwania z dwoma trybami: sentiment search (sortowanie według zagregowanego wyniku sentymentu) oraz fuzzy search (wyszukiwanie z wykorzystaniem logiki rozmytej z tolerancją na błędy).
-
-    \item \textbf{ShopContent.jsx} — komponent wyświetlający katalog produktów z sidebar'em filtrów (kategorie, zakres cen, oceny) oraz grid'em kart produktów. Obsługuje dynamiczne filtrowanie i sortowanie.
-
-    \item \textbf{ProductPage.jsx} — szczegółowy widok pojedynczego produktu zawierający galerię zdjęć (slider react-slick), opis, specyfikacje techniczne, kategorie, sekcję opinii klientów z analizą sentymentu, rekomendacje "Frequently Bought Together" oraz przycisk "Add to Cart" z obsługą stanu koszyka (CartContext).
-
-    \item \textbf{CartContent.jsx} — koszyk zakupowy wyświetlający listę wybranych produktów, łączną wartość zamówienia oraz sekcję rekomendacji cross-sell (produkty komplementarne według reguł asocjacyjnych). Użytkownik może modyfikować ilości, usuwać produkty oraz przejść do finalizacji zamówienia.
-
-    \item \textbf{ClientPanel} — panel klienta zawierający zakładki: Dashboard (podsumowanie aktywności, ostatnie zamówienia, statystyki), Orders (historia wszystkich zamówień z możliwością podglądu szczegółów), Account (edycja danych osobowych, zmiana hasła), Recommendations (spersonalizowane rekomendacje Content-Based Filtering, Fuzzy Logic i Probabilistic Models aktualizowane po każdym zamówieniu).
-
-    \item \textbf{AdminPanel} — panel administracyjny dostępny dla użytkowników z uprawnieniami is\_staff. Zawiera zakładki: Products (zarządzanie produktami), Orders (przeglądanie i zarządzanie zamówieniami), Users (zarządzanie użytkownikami), Statistics (wykresy sprzedaży, najpopularniejsze kategorie, statystyki rekomendacji), Debug ML (narzędzia debugowania algorytmów ML: tabela reguł asocjacyjnych, statystyki sentymentu, analiza podobieństw CBF, reguły rozmyte, macierz Markova).
-\end{itemize}
-
-\textbf{Routing - React Router v6}:
-
-Aplikacja wykorzystuje deklaratywny routing React Router v6 z zagnieżdżonymi trasami dla stron publicznych (home, shop, product), chronionych (cart, client panel) oraz administracyjnych (admin panel). Komponent PrivateRoute sprawdza autentykację użytkownika i przekierowuje niezalogowanych do strony logowania.
-
-\textbf{Zarządzanie stanem - Context API}:
-
-Aplikacja wykorzystuje Context API zamiast Redux dla prostszego zarządzania stanem globalnym. AuthContext przechowuje dane zalogowanego użytkownika i token JWT. CartContext zarządza stanem koszyka zakupowego z funkcjami add, remove, update quantity.
-
-\textbf{Komunikacja z API - Axios}:
-
-Wszystkie zapytania HTTP obsługiwane przez Axios z globalną konfiguracją interceptorów. Automatyczna obsługa błędów 401 Unauthorized z przekierowaniem do logowania. Dołączanie tokena JWT do nagłówków Authorization dla chronionych endpointów.
-
-\textbf{Animacje - Framer Motion}:
-
-Płynne przejścia między stronami oraz animacje komponentów realizowane przez Framer Motion z efektami fade-in, slide-up i scroll-driven. Poprawia doświadczenie użytkownika (UX) bez obciążania wydajności aplikacji.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{images/useCaseDiagram.png}
-  \caption{Diagram przypadków użycia.}
-  \label{fig:use_case}
-\end{figure}
-
-\subsection*{6.4 Diagram przypadków użycia}
-\addcontentsline{toc}{subsection}{6.4 Diagram przypadków użycia}
-
-Diagram przypadków użycia przedstawia funkcjonalności systemu rekomendacji e-commerce z perspektywy trzech grup użytkowników o różnych poziomach uprawnień.
-
-\textbf{Aktorzy systemu}
-
-System wyróżnia trzech aktorów reprezentujących różne role użytkowników:
-
-\textbf{1. Gość (użytkownik niezalogowany)} -- osoba odwiedzająca sklep bez uwierzytelnienia. Gość ma ograniczone uprawnienia, może przeglądać katalog produktów, korzystać z zaawansowanej wyszukiwarki z algorytmem rozmytym oraz dodawać produkty do koszyka. Nie ma dostępu do spersonalizowanych rekomendacji, ponieważ system nie posiada informacji o jego historii zakupowej.
-
-\textbf{2. Klient (użytkownik zalogowany)} -- zarejestrowany użytkownik posiadający konto w systemie. Dziedziczy wszystkie uprawnienia Gościa, ale dodatkowo otrzymuje dostęp do spersonalizowanych rekomendacji generowanych na podstawie jego historii zakupów. Klient może składać zamówienia, przeglądać historię swoich transakcji oraz zarządzać swoim profilem. System śledzi jego zachowania zakupowe, budując profil preferencji wykorzystywany przez algorytmy rekomendacyjne.
-
-\textbf{3. Administrator} -- użytkownik z uprawnieniami zarządzania systemem rekomendacji. Administrator ma dostęp do dedykowanego panelu umożliwiającego konfigurację systemu, w tym dynamiczną zmianę aktywnego algorytmu rekomendacji (przełączanie między Content-Based Filtering, logiką rozmytą a modelem probabilistycznym). Może generować rekomendacje dla wszystkich użytkowników systemu, przeglądać podgląd rekomendacji przed ich publikacją oraz korzystać z zaawansowanych narzędzi debugowania algorytmów (analiza wag cech, podgląd macierzy podobieństwa, wizualizacja macierzy przejść Markowa).
-
-\textbf{Główne przypadki użycia}
-
-Kluczowe funkcjonalności systemu obejmują:
-
-\textbf{Przeglądanie i wyszukiwanie produktów} -- podstawowa funkcjonalność dostępna dla wszystkich aktorów. Katalog produktów obsługuje stronicowanie, filtrowanie po kategoriach oraz zaawansowane wyszukiwanie rozmyte wykorzystujące algorytm Levenshteina do tolerowania literówek i odmian wyrazów.
-
-\textbf{Wyświetlanie rekomendacji spersonalizowanych} -- przypadek użycia dostępny dla zalogowanych Klientów. System automatycznie generuje listę produktów rekomendowanych na podstawie historii zakupowej użytkownika, wykorzystując aktualnie wybrany algorytm (CBF, rozmyty lub probabilistyczny). Rekomendacje są wyświetlane na stronie głównej, w panelu klienta oraz na stronach szczegółowych produktów jako sugestie ``Klienci kupujący ten produkt kupili również...''.
-
-\textbf{Generowanie rekomendacji przez Administratora} -- Administrator może ręcznie wywołać proces generowania rekomendacji dla wybranego użytkownika lub globalnie dla wszystkich użytkowników systemu. Ta funkcjonalność jest szczególnie przydatna podczas testowania różnych konfiguracji algorytmów oraz po wprowadzeniu zmian w parametrach systemu.
-
-\textbf{Zmiana ustawień algorytmu} -- kluczowa funkcjonalność administracyjna umożliwiająca dynamiczne przełączanie między trzema zaimplementowanymi metodami rekomendacyjnymi. Administrator wybiera algorytm z interfejsu panelu, a zmiana jest natychmiast propagowana do całego systemu bez konieczności restartu aplikacji.
-
-\textbf{Debugowanie i analiza algorytmów} -- zaawansowany przypadek użycia przeznaczony dla Administratora. Panel debugowania prezentuje wewnętrzne metryki działania algorytmów: w trybie CBF wyświetlane są wagi poszczególnych cech produktowych i macierz podobieństwa, w trybie rozmytym pokazywane są profile użytkowników z wartościami funkcji przynależności, w trybie probabilistycznym prezentowane są prawdopodobieństwa zakupów i macierz przejść Markowa.
-
-\textbf{Składanie zamówień} -- dostępne dla Klientów. Proces zakupowy jest śledżony przez system rekomendacji - każde zamówienie aktualizuje profil preferencji użytkownika, macierz przejść Markowa oraz dane treningowe modelu Naive Bayes, co wpływa na jakość przyszłych rekomendacji.
-
-\subsection*{6.5 Baza danych — modele}
-\addcontentsline{toc}{subsection}{6.5 Baza danych — modele}
-
-Schemat bazy danych PostgreSQL został wygenerowany automatycznie przez Django ORM na podstawie zdefiniowanych modeli aplikacji. Struktura bazy danych jest podzielona na pięć modułów funkcjonalnych, które wspólnie realizują logikę systemu rekomendacji e-commerce.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{images/appErd.png}
-  \caption{ERD - główne tabele aplikacji.}
-  \label{fig:app_erd}
-\end{figure}
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{images/methodsErd.png}
-  \caption{ERD - tabele metod rekomendacyjnych.}
-  \label{fig:methods_erd}
-\end{figure}
-
-\textbf{Moduł Produktów i Kategorii}
-
-Moduł ten stanowi fundament systemu e-commerce, przechowując informacje o oferowanych produktach oraz ich klasyfikacji. Tabela produktów (\texttt{db\_product}) zawiera podstawowe atrybuty każdego artykułu: unikalny identyfikator, nazwę, cenę aktualną oraz opcjonalnie cenę przed obniżką (dla promocji) oraz rozbudowany opis tekstowy. Każdy produkt może należeć do wielu kategorii jednocześnie dzięki relacji wiele-do-wielu, co umożliwia elastyczną klasyfikację (np. laptop może być w kategoriach ``Komputery'', ``Gaming'', ``Produkty mobilne''). Dodatkowo produkty mogą być oznaczane tagami i przypisywane do promocji sprzedażowych.
-
-Tabela kategorii (\texttt{db\_category}) definiuje taksonomię sklepu, obejmując 48 różnych kategorii produktowych. Każda kategoria posiada unikalną nazwę oraz opcjonalny opis wyjaśniający jej zakres. Kategorie są kluczowe dla algorytmów rekomendacji - wykorzystywane są w łańcuchach Markowa do analizy sekwencji zakupowych oraz w logice rozmytej do budowania profili preferencji użytkowników.
-
-Specyfikacje techniczne (\texttt{db\_specification}) przechowują szczegółowe parametry produktów w postaci par klucz-wartość, gdzie klucz to nazwa parametru (np. ``Procesor'', ``RAM'', ``Przekątna ekranu''), a wartość to konkretna specyfikacja. Ta struktura pozwala na dynamiczne definiowanie cech charakterystycznych dla różnych typów produktów. Specyfikacje są intensywnie wykorzystywane przez algorytm Content-Based Filtering do obliczania podobieństwa produktów na podstawie ich cech technicznych.
-
-\textbf{Moduł Użytkowników i Zamówień}
-
-Moduł zarządzania użytkownikami rozszerza standardowy model użytkownika Django (\texttt{AbstractUser}) o dodatkowe pole roli, rozróżniające administratorów od zwykłych klientów. Tabela użytkowników (\texttt{db\_user}) przechowuje dane uwierzytelniające (login, hasło, email) oraz flagi określające status konta i uprawnienia. Rozróżnienie ról jest istotne dla systemu rekomendacji, ponieważ administratorzy mają dostęp do globalnych funkcji zarządzania algorytmami, podczas gdy klienci otrzymują spersonalizowane rekomendacje.
-
-Historia zamówień (\texttt{db\_order}) rejestruje wszystkie transakcje użytkowników wraz z datą złożenia zamówienia oraz statusem jego realizacji. Tabela pośrednicząca produktów w zamówieniach (\texttt{db\_order\_product}) łączy zamówienia z produktami, przechowując informację o ilości każdego zakupionego artykułu. Te dane są fundamentalne dla wszystkich trzech metod rekomendacyjnych - pozwalają budować profile preferencji użytkowników, obliczać prawdopodobieństwa zakupów oraz konstruować macierze przejść między kategoriami produktowymi w modelu Markowa.
-
-\textbf{Moduł Rekomendacji Content-Based Filtering}
-
-Tabela podobieństw produktów (\texttt{method\_product\_similarity}) przechowuje prekompilowane wartości podobieństwa między parami produktów, obliczone na podstawie ich cech technicznych metodą kosinusową. Każdy rekord zawiera identyfikatory dwóch porównywanych produktów, typ zastosowanego podobieństwa oraz wynik w skali 0-1. Unikalne ograniczenie na parę produktów i typ podobieństwa zapobiega duplikacjom. Indeks na pierwszym produkcie i typie podobieństwa umożliwia szybkie wyszukiwanie najbardziej podobnych produktów w czasie rzeczywistym podczas generowania rekomendacji.
-
-\textbf{Moduł Rekomendacji Logiki Rozmytej}
-
-Profile rozmyte użytkowników (\texttt{method\_fuzzy\_user\_profile}) agregują zachowania zakupowe w trzy wymiary: wrażliwość cenową (czy użytkownik wybiera tanie czy drogie produkty), preferencje kategorialne (jakie rodzaje produktów kupuje najczęściej) oraz preferencję jakości (czy wybiera produkty premium). Preferencje kategorialne są przechowywane w formacie JSON, co umożliwia elastyczne reprezentowanie złożonych profili wielokategorialnych. Profile są automatycznie aktualizowane po każdym zamówieniu i wykorzystywane przez silnik rozmyty do generowania spersonalizowanych rekomendacji.
-
-Macierz przejść Markowa (\texttt{method\_markov\_transitions}) modeluje prawdopodobieństwa przejść między kategoriami produktowymi na podstawie historycznych sekwencji zakupowych. Każdy rekord reprezentuje prawdopodobieństwo, że użytkownik, który kupił produkt z kategorii A, następnie kupi produkt z kategorii B. Przechowywane są zarówno znormalizowane prawdopodobieństwa przejścia, jak i surowe liczby obserwacji, co umożliwia aktualizację macierzy w miarę napływu nowych danych bez konieczności przeliczeń od zera.
-
-Wzorce zakupowe użytkowników (\texttt{method\_user\_purchase\_pattern}) agregują częstotliwość zakupów w poszczególnych kategoriach oraz średnią wartość zamówienia per kategoria. Te informacje są wykorzystywane przez algorytm rozmyty do budowania profili oraz przez model Markowa do ważenia prawdopodobieństw przejść.
-
-\textbf{Moduł Probabilistyki Bayesowskiej}
-
-Tabela prawdopodobieństw zakupu (\texttt{method\_purchase\_probability}) przechowuje predykcje modelu Naive Bayes dla par użytkownik-produkt, wskazując z jakim prawdopodobieństwem dany użytkownik kupi konkretny produkt. Dodatkowo zapisywany jest poziom ufności predykcji, co pozwala systemowi rekomendacji filtrować niepewne wyniki.
-
-Prognozy sprzedaży (\texttt{method\_sales\_forecast}) zawierają predykcje przyszłej sprzedaży produktów na określone daty wraz z przedziałami ufności. Są wykorzystywane zarówno w systemie rekomendacji (promowanie produktów z rosnącą sprzedażą), jak i w zarządzaniu magazynem.
-
-Oceny ryzyka (\texttt{method\_risk\_assessment}) przechowują wyniki analizy ryzyka churn użytkowników oraz ryzyka wyprzedania produktów. Każda ocena zawiera typ ryzyka, identyfikator encji (użytkownik/produkt), wynik ryzyka w skali 0-1 oraz opcjonalne sugestie działań mitygujących (np. ``Wysłać kod rabatowy'', ``Uzupełnić stan magazynowy'').
-
-\textbf{Konfiguracja Systemu Rekomendacji}
-
-Tabela ustawień (\texttt{RecommendationSettings}) implementuje wzorzec singleton przechowujący globalną konfigurację systemu, w szczególności aktualnie wybrany algorytm rekomendacji (content\_based, fuzzy\_logic lub probabilistic). Administrator może dynamicznie przełączać algorytm, co natychmiast wpływa na rekomendacje wyświetlane wszystkim użytkownikom systemu.
-
-\subsection*{6.6 Wdrożenie aplikacji — Docker}
-\addcontentsline{toc}{subsection}{6.6 Wdrożenie aplikacji — Docker}
-
-Aplikacja została skonteneryzowana przy użyciu Docker, co zapewnia spójność środowiska między development/staging/production oraz upraszcza proces wdrożenia.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.92\textwidth]{images/dockerView.jpg}
-  \caption{Deployment Docker - architektura trójwarstwowa.}
-  \label{fig:docker_view}
-\end{figure}
-
-Architektura deploymentu składa się z trzech kontenerów Docker:
-
-\textbf{1. Backend Container}: Django 4.2, port 8000.
-
-\textbf{2. Frontend Container}: React 18, port 3000.
-
-\textbf{3. Database Container}: PostgreSQL 14, port 5432.
-
-Docker Compose orchestruje wszystkie kontenery z automatyczną obsługą zależności.
-
-\textbf{Zalety konteneryzacji}:
-\begin{itemize}
-\item \textbf{Powtarzalność} -- identyczne środowisko dev/prod eliminuje problemy ``works on my machine''
-\item \textbf{Izolacja} -- każdy serwis w osobnym kontenerze, zero konfliktów zależności
-\item \textbf{Przenośność} -- build image raz, uruchom na dowolnym serwerze z Docker
-\item \textbf{Łatwość uruchomienia} -- \texttt{docker-compose up} uruchamia całą aplikację jedną komendą
-\end{itemize}
-
-\newpage
-
-\section*{Rozdzia{} 7}
-\addcontentsline{toc}{section}{Rozdzia{} 7: Wyniki i ewaluacja}
+\section*{Rozdzia\l{} 8}
+\addcontentsline{toc}{section}{Rozdział 8: Wyniki i ewaluacja}
 \section*{Wyniki i ewaluacja}
 
-\subsection*{7.1 Metodologia testowania}
-\addcontentsline{toc}{subsection}{7.1 Metodologia testowania}
+\subsection*{8.1 Metodologia testowania}
+\addcontentsline{toc}{subsection}{8.1 Metodologia testowania}
 
 System został przetestowany na danych z aplikacji e-commerce:
 \begin{itemize}
@@ -2146,8 +2369,8 @@ System został przetestowany na danych z aplikacji e-commerce:
     \item Środowisko: Django 4.2, PostgreSQL 14, 8GB RAM, Intel i7
 \end{itemize}
 
-\subsection*{7.2 Wydajność Content-Based Filtering}
-\addcontentsline{toc}{subsection}{7.2 Wydajność Content-Based Filtering}
+\subsection*{8.2 Wydajność Content-Based Filtering}
+\addcontentsline{toc}{subsection}{8.2 Wydajność Content-Based Filtering}
 
 \begin{table}[H]
 \centering
@@ -2168,8 +2391,8 @@ Bulk insert speedup & 80x \\
 
 Coverage: 83\% produktów ma przynajmniej jedno podobieństwo > 0.2.
 
-\subsection*{7.3 Wydajność Fuzzy Logic}
-\addcontentsline{toc}{subsection}{7.3 Wydajność Fuzzy Logic}
+\subsection*{8.3 Wydajność Fuzzy Logic}
+\addcontentsline{toc}{subsection}{8.3 Wydajność Fuzzy Logic}
 
 \begin{table}[H]
 \centering
@@ -2189,8 +2412,8 @@ Liczba reguł & 6 \\
 
 Fuzzy Logic jest najszybszą metodą — brak macierzy, obliczenia on-the-fly.
 
-\subsection*{7.4 Wydajność modeli probabilistycznych}
-\addcontentsline{toc}{subsection}{7.4 Wydajność modeli probabilistycznych}
+\subsection*{8.4 Wydajność modeli probabilistycznych}
+\addcontentsline{toc}{subsection}{8.4 Wydajność modeli probabilistycznych}
 
 \begin{table}[H]
 \centering
@@ -2208,8 +2431,8 @@ Dokładność NB (churn) & $\sim$78\% \\
 \caption{Wydajność modeli probabilistycznych}
 \end{table}
 
-\subsection*{7.5 Porównanie metod}
-\addcontentsline{toc}{subsection}{7.5 Porównanie metod}
+\subsection*{8.5 Porównanie metod}
+\addcontentsline{toc}{subsection}{8.5 Porównanie metod}
 
 \begin{table}[h]
 \centering
@@ -2228,8 +2451,8 @@ Personalizacja & Słaba & Średnia & Wysoka \\
 \caption{Porównanie zaimplementowanych metod rekomendacji}
 \end{table}
 
-\subsection*{7.6 Wnioski}
-\addcontentsline{toc}{subsection}{7.6 Wnioski}
+\subsection*{8.6 Wnioski}
+\addcontentsline{toc}{subsection}{8.6 Wnioski}
 
 W ramach pracy zaimplementowano trzy metody rekomendacji produktów:
 
@@ -2336,6 +2559,7 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 
 
 \newpage
+
 % Wykaz rysunków
 \section*{Wykaz ilustracji, rysunków i tabel}
 \addcontentsline{toc}{section}{Wykaz ilustracji, rysunków i tabel}
@@ -2348,5 +2572,35 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 \small
 \listoftables
 }
+
+\newpage
+
+\section*{Streszczenie}
+\addcontentsline{toc}{section}{Streszczenie}
+
+Niniejsza praca inżynierska przedstawia projekt i implementację systemu rekomendacji produktów dla platformy e-commerce, opartego na trzech zaawansowanych metodach uczenia maszynowego: filtracji opartej na treści (Content-Based Filtering), logice rozmytej (Fuzzy Logic) oraz modelach probabilistycznych (Markov Chain i Naive Bayes). Głównym celem pracy było opracowanie modułowego systemu rekomendacyjnego działającego bez zewnętrznych bibliotek uczenia maszynowego, zapewniającego pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
+
+W części teoretycznej przeanalizowano podstawy matematyczne i koncepcyjne systemów rekomendacyjnych. Metoda Content-Based Filtering (CBF) wykorzystuje reprezentację produktów jako ważonych wektorów cech oraz miarę podobieństwa kosinusowego do identyfikacji artykułów o podobnych właściwościach technicznych. Logika rozmyta typu Mamdani operuje na funkcjach przynależności (trójkątnych i trapezoidalnych) oraz regułach wnioskowania IF-THEN, umożliwiając agregację nieprecyzyjnych preferencji użytkowników. Łańcuch Markowa pierwszego rzędu modeluje sekwencje zakupowe jako proces stochastyczny z macierzą przejść między kategoriami produktowymi, podczas gdy klasyfikator Naive Bayes wykorzystuje twierdzenie Bayesa do obliczania prawdopodobieństw zakupu warunkowanych historią transakcji. Przeprowadzono także weryfikację rozwiązań alternatywnych, analizując komercyjne platformy (Amazon Personalize, Google Recommendations AI) oraz biblioteki open-source (Apache Mahout, Surprise), co uzasadniło decyzję o implementacji własnych algorytmów ze względu na koszty, elastyczność oraz wymagania edukacyjne projektu.
+
+W części praktycznej zaprojektowano architekturę systemu jako aplikację webową trójwarstwową: backend Django 4.2 z REST API, frontend React 18 jako Single Page Application oraz baza danych PostgreSQL 14. Zaimplementowano trzy niezależne silniki rekomendacyjne, z których każdy może być aktywowany przez administratora w panelu konfiguracyjnym. Algorytm Content-Based Filtering prekompiluje macierz podobieństw produktów i wykorzystuje indeksy bazodanowe do szybkiego wyszukiwania rekomendacji. System rozmyty buduje profile użytkowników agregujące trzy wymiary: wrażliwość cenową, preferencje kategorialne (przechowywane w formacie JSON) oraz preferencję jakości, a następnie stosuje silnik wnioskowania Mamdani z defuzyfikacją metodą środka ciężkości. Model probabilistyczny trenuje łańcuch Markowa na sekwencjach zakupowych oraz klasyfikator Naive Bayes na cechach produktów i użytkowników. Frontend oferuje responsywny interfejs z zaawansowaną wyszukiwarką rozmytą (algorytm Levenshteina), zarządzaniem stanem przez Context API oraz animacjami Framer Motion. Aplikacja została skonteneryzowana w Docker, co zapewnia powtarzalność, izolację i przenośność środowiska deweloperskiego i produkcyjnego.
+
+Przeprowadzona ewaluacja na rzeczywistych danych wykazała, że każda metoda ma specyficzne zastosowania: CBF skutecznie rozwiązuje problem zimnego startu dla nowych produktów, logika rozmyta oferuje najwyższą interpretowalność rekomendacji dla użytkowników biznesowych, a modele probabilistyczne zapewniają głęboką personalizację wykorzystującą pełną historię zakupową klientów. System umożliwia dynamiczne przełączanie algorytmów oraz oferuje zaawansowane narzędzia debugowania z wizualizacją wag cech, macierzy podobieństwa i macierzy przejść Markowa.
+
+\textbf{Słowa kluczowe}: systemy rekomendacyjne, filtracja oparta na treści, logika rozmyta, łańcuch Markowa, naiwny klasyfikator Bayesa, e-commerce, Django, React
+
+\newpage
+
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+
+This engineering thesis presents the design and implementation of a product recommendation system for an e-commerce platform, based on three advanced machine learning methods: Content-Based Filtering, Fuzzy Logic, and Probabilistic Models (Markov Chain and Naive Bayes). The main objective was to develop a modular recommendation system operating without external machine learning libraries, providing full control over algorithms and the ability to customize them for specific business requirements.
+
+In the theoretical part, the mathematical and conceptual foundations of recommender systems were analyzed. The Content-Based Filtering method uses product representation as weighted feature vectors and cosine similarity measure to identify items with similar technical properties. Mamdani-type Fuzzy Logic operates on membership functions (triangular and trapezoidal) and IF-THEN inference rules, enabling aggregation of imprecise user preferences. The first-order Markov Chain models purchase sequences as a stochastic process with a transition matrix between product categories, while the Naive Bayes classifier uses Bayes' theorem to calculate purchase probabilities conditioned on transaction history. Alternative solutions were also verified, analyzing commercial platforms (Amazon Personalize, Google Recommendations AI) and open-source libraries (Apache Mahout, Surprise), which justified the decision to implement custom algorithms due to costs, flexibility, and educational project requirements.
+
+In the practical part, the system architecture was designed as a three-tier web application: Django 4.2 backend with REST API, React 18 frontend as a Single Page Application, and PostgreSQL 14 database. Three independent recommendation engines were implemented, each activatable by the administrator in the configuration panel. The CBF algorithm precompiles the product similarity matrix and uses database indexes for fast recommendation retrieval. The fuzzy system builds user profiles aggregating three dimensions: price sensitivity, category preferences (stored in JSON format), and quality preference, then applies the Mamdani inference engine with center-of-gravity defuzzification. The probabilistic model trains the Markov Chain on purchase sequences and the Naive Bayes classifier on product and user features. The frontend offers a responsive interface with advanced fuzzy search (Levenshtein algorithm), state management through Context API, and Framer Motion animations. The application was containerized in Docker, ensuring repeatability, isolation, and portability of development and production environments.
+
+The evaluation conducted on real data demonstrated that each method has specific applications: CBF effectively solves the cold-start problem for new products, fuzzy logic offers the highest recommendation interpretability for business users, and probabilistic models provide deep personalization utilizing complete customer purchase history. The system enables dynamic algorithm switching and offers advanced debugging tools with visualization of feature weights, similarity matrices, and Markov transition matrices.
+
+\textbf{Keywords}: recommender systems, content-based filtering, fuzzy logic, Markov chain, Naive Bayes classifier, e-commerce, Django, React
 
 \end{document}
