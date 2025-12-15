@@ -894,7 +894,7 @@ Szczegółowa implementacja trzech algorytmów rekomendacyjnych wraz z pseudokod
 \subsection*{5.1 Collaborative Filtering - Item-Based z Adjusted Cosine}
 \addcontentsline{toc}{subsection}{5.1 Collaborative Filtering - Item-Based z Adjusted Cosine}
 
-Algorytm Collaborative Filtering w wariancie Item-Based oblicza podobieństwa między produktami na podstawie historii zakupów użytkowników, wykorzystując metrykę Adjusted Cosine Similarity wprowadzoną przez Sarwar et al. (2001) \cite{sarwar2001item}. Kluczowym elementem algorytmu jest formuła matematyczna przedstawiona we wzorze (1) w rozdziale 1.3, która oblicza podobieństwo między dwoma produktami $i$ i $j$ poprzez analizę wzorców ich współwystępowania w zakupach użytkowników z uwzględnieniem centrowania wartości względem średniej zakupów każdego użytkownika $\bar{R}_u$.
+Algorytm Collaborative Filtering w wariancie Item-Based oblicza podobieństwa między produktami na podstawie historii zakupów użytkowników, wykorzystując metrykę Adjusted Cosine Similarity wprowadzoną przez Sarwar et al. (2001) \cite{sarwar2001item}. Kluczowym elementem algorytmu jest formuła matematyczna przedstawiona we wzorze (1) w rozdziale 1.3, która oblicza podobieństwo między dwoma produktami $i$ i $j$ poprzez analizę wzorców ich współwystępowania w zakupach użytkowników \\z uwzględnieniem centrowania wartości względem średniej zakupów każdego użytkownika $\bar{R}_u$.
 
 Proces implementacji składa się z trzech głównych etapów odpowiadających wzorowi (1): budowy macierzy użytkownik-produkt, normalizacji wartości metodą mean-centering (centrowanie względem $\bar{R}_u$) oraz obliczenia podobieństw cosinusowych. Normalizacja polega na odjęciu od każdej wartości zakupowej średniej zakupów danego użytkownika ($R_{u,i} - \bar{R}_u$), co eliminuje bias wynikający z różnych skal zakupowych (hurtownik kupujący po 100 sztuk vs klient kupujący po 1 sztuce otrzymują porównywalne wagi po normalizacji).
 
@@ -1134,7 +1134,7 @@ Kluczową zaletą tej architektury jest rozwiązanie problemu zimnego startu - p
 \subsection*{5.3 Algorytm Apriori - reguły asocjacyjne}
 \addcontentsline{toc}{subsection}{5.3 Algorytm Apriori - reguły asocjacyjne}
 
-Algorytm Apriori (Agrawal \& Srikant 1994) \cite{agrawal1994} generuje reguły asocjacyjne typu ,,Często kupowane razem'' poprzez analizę współwystępowania produktów w transakcjach, wykorzystując trzy fundamentalne metryki przedstawione we wzorach (4), (5) i (6) w rozdziale 1.3:
+Algorytm Apriori (Agrawal \& Srikant 1994) \cite{agrawal1994} generuje reguły asocjacyjne typu ,,Często kupowane razem'' poprzez analizę współwystępowania produktów \\w transakcjach, wykorzystując trzy fundamentalne metryki przedstawione we wzorach (4), (5) i (6) w rozdziale 1.3:
 
 \textbf{Support (Wsparcie)} - wzór (4) określa częstość współwystępowania produktów A i B w transakcjach. System używa minimalnego progu support = 2 transakcje (wartość bezwzględna), co oznacza że para produktów musi wystąpić przynajmniej w dwóch zamówieniach, aby być uznana za znaczącą.
 
@@ -1436,7 +1436,7 @@ System opinii jest zintegrowany w dwóch kluczowych miejscach interfejsu użytko
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.92\textwidth]{images/opinionView.jpg}
-  \caption{Formularz dodawania opinii na stronie produktu z oceną gwiazdkową i recenzją tekstową.}
+  \caption{Formularz dodawania opinii na stronie produktu z oceną gwiazdkową \\i recenzją tekstową.}
   \label{fig:opinion_view1}
 \end{figure}
 
