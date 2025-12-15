@@ -894,7 +894,9 @@ Szczegółowa implementacja trzech algorytmów rekomendacyjnych wraz z pseudokod
 \subsection*{5.1 Collaborative Filtering - Item-Based z Adjusted Cosine}
 \addcontentsline{toc}{subsection}{5.1 Collaborative Filtering - Item-Based z Adjusted Cosine}
 
-Algorytm Collaborative Filtering oblicza podobieństwa między produktami na podstawie historii zakupów użytkowników. Proces składa się z trzech głównych etapów: budowy macierzy użytkownik-produkt, normalizacji metodą mean-centering oraz obliczenia podobieństw cosinusowych. Normalizacja polega na odjęciu od każdej wartości zakupowej średniej zakupów danego użytkownika, co eliminuje zniekształcenia wynikające z różnych skal (hurtownik kupujący po 100 sztuk vs klient kupujący po 1 sztuce otrzymują porównywalne wagi).
+Algorytm Collaborative Filtering w wariancie Item-Based oblicza podobieństwa między produktami na podstawie historii zakupów użytkowników, wykorzystując metrykę Adjusted Cosine Similarity wprowadzoną przez Sarwar et al. (2001) \cite{sarwar2001item}. Kluczowym elementem algorytmu jest formuła matematyczna przedstawiona we wzorze (1) w rozdziale 1.3, która oblicza podobieństwo między dwoma produktami $i$ i $j$ poprzez analizę wzorców ich współwystępowania w zakupach użytkowników z uwzględnieniem centrowania wartości względem średniej zakupów każdego użytkownika $\bar{R}_u$.
+
+Proces implementacji składa się z trzech głównych etapów odpowiadających wzorowi (1): budowy macierzy użytkownik-produkt, normalizacji wartości metodą mean-centering (centrowanie względem $\bar{R}_u$) oraz obliczenia podobieństw cosinusowych. Normalizacja polega na odjęciu od każdej wartości zakupowej średniej zakupów danego użytkownika ($R_{u,i} - \bar{R}_u$), co eliminuje bias wynikający z różnych skal zakupowych (hurtownik kupujący po 100 sztuk vs klient kupujący po 1 sztuce otrzymują porównywalne wagi po normalizacji).
 
 \textbf{Pseudokod 1a: Budowa i normalizacja macierzy Collaborative Filtering}
 
@@ -1030,9 +1032,9 @@ Przepływ procesu generowania rekomendacji Collaborative Filtering:
 \subsection*{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 \addcontentsline{toc}{subsection}{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 
-Analiza sentymentu pojedynczego tekstu metodą słownikową (Liu 2012) polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów pozytywnych i negatywnych. Słowniki zawierają ~200 słów każdego typu (np. pozytywne: , ,excellent', , ,recommend', , ,quality'; negatywne: , ,bad', , ,poor', , ,disappointing'). Formuła wyniku: (liczba\_pozytywnych - liczba\_negatywnych) / liczba\_wszystkich\_słów. Wynik ograniczany do [-1, 1] \\i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (inne).
+Analiza sentymentu pojedynczego tekstu metodą słownikową (Liu 2012) \cite{liu2012} wykorzystuje formułę polarności przedstawioną we wzorze (2) w rozdziale 1.3. Proces analizy polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów występujących w słownikach pozytywnym i negatywnym. Słowniki oparte na leksykonach akademickich AFINN-165 (Nielsen 2011) i Opinion Lexicon (Hu \& Liu 2004) zawierają ~200 słów każdego typu (np. pozytywne: ,,excellent'', ,,recommend'', ,,quality''; negatywne: ,,bad'', ,,poor'', ,,disappointing''). Wynik wzoru (2) jest ograniczany do przedziału [-1, 1] i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (pozostałe).
 
-Wieloźródłowa agregacja sentymentu produktu łączy wyniki z 5 źródeł z wagami: opinie 40\%, opis 25\%, nazwa 15\%, specyfikacje 12\%, kategorie 8\%.
+Wieloźródłowa agregacja sentymentu produktu stanowi kluczową innowację systemu, łącząc wyniki z 5 niezależnych źródeł tekstowych zgodnie ze wzorem (3) przedstawionym w rozdziale 1.3, gdzie każde $S_i$ jest obliczane według wzoru (2). Wagi zostały dobrane empirycznie: opinie klientów 40\% (najbardziej wiarygodne źródło), opis produktu 25\% (profesjonalny opis zawierający kluczowe cechy), nazwa produktu 15\% (często zawiera wskazówki jakościowe jak ,,Premium'', ,,Pro''), specyfikacje techniczne 12\% (obiektywne parametry), kategorie produktu 8\% (ogólny kontekst). Podejście to rozwiązuje fundamentalny problem zimnego startu - produkty bez opinii klientów nadal otrzymują wynik sentymentu na podstawie pozostałych czterech źródeł tekstowych.
 
 \textbf{Pseudokod 3: Analiza sentymentu pojedynczego tekstu}
 
@@ -1132,9 +1134,15 @@ Kluczową zaletą tej architektury jest rozwiązanie problemu zimnego startu - p
 \subsection*{5.3 Algorytm Apriori - reguły asocjacyjne}
 \addcontentsline{toc}{subsection}{5.3 Algorytm Apriori - reguły asocjacyjne}
 
-Algorytm Apriori generuje reguły asocjacyjne typu ,,Często kupowane razem'' wykorzystując optymalizację przycinania bitmapowego (Zaki 2000). Proces składa się z dwóch głównych etapów: znajdowania częstych par produktów oraz generowania reguł z obliczeniem metryk (wsparcie, pewność, lift).
+Algorytm Apriori (Agrawal \& Srikant 1994) \cite{agrawal1994} generuje reguły asocjacyjne typu ,,Często kupowane razem'' poprzez analizę współwystępowania produktów w transakcjach, wykorzystując trzy fundamentalne metryki przedstawione we wzorach (4), (5) i (6) w rozdziale 1.3:
 
-Optymalizacja bitmapowa polega na reprezentacji transakcji jako liczb całkowitych z ustawionymi bitami odpowiadającymi produktom. Sprawdzenie czy transakcja zawiera parę produktów wymaga jednej operacji bitowej AND zamiast iteracji po liście. Wczesne przycinanie eliminuje rzadkie produkty przed obliczaniem par - dzięki właściwości antymonotoniczności Apriori (jeśli produkt jest rzadki, wszystkie jego pary też są rzadkie) zmniejsza liczbę kandydatów.
+\textbf{Support (Wsparcie)} - wzór (4) określa częstość współwystępowania produktów A i B w transakcjach. System używa minimalnego progu support = 2 transakcje (wartość bezwzględna), co oznacza że para produktów musi wystąpić przynajmniej w dwóch zamówieniach, aby być uznana za znaczącą.
+
+\textbf{Confidence (Pewność)} - wzór (5) oblicza warunkowe prawdopodobieństwo zakupu B przy założeniu zakupu A. Minimalny próg confidence = 0.3 (30\%) oznacza że reguła jest zapisywana tylko jeśli przynajmniej 30\% klientów kupujących A kupuje również B.
+
+\textbf{Lift (Wzmocnienie)} - wzór (6) mierzy siłę powiązania między produktami. Interpretacja: lift > 1 wskazuje pozytywną korelację (zakup A zwiększa prawdopodobieństwo zakupu B), lift = 1 oznacza niezależność produktów, lift < 1 wskazuje negatywną korelację. System używa progu lift = 1.0, preferując reguły z lift > 1.5 jako szczególnie wartościowe dla strategii cross-sellingu.
+
+Proces implementacji składa się z dwóch głównych etapów: (1) znajdowania częstych par produktów z obliczeniem Support według wzoru (4), oraz (2) generowania reguł z obliczeniem Confidence i Lift według wzorów (5) i (6). Kluczową optymalizacją jest przycinanie bitmapowe (Zaki 2000), które reprezentuje transakcje jako liczby całkowite z ustawionymi bitami odpowiadającymi produktom. Sprawdzenie czy transakcja zawiera parę produktów wymaga jednej operacji bitowej AND zamiast iteracji po liście, co znacząco przyspiesza obliczenia. Wczesne przycinanie eliminuje rzadkie produkty przed obliczaniem par - dzięki właściwości antymonotoniczności Apriori (jeśli produkt jest rzadki, wszystkie jego pary też są rzadkie) zmniejsza liczbę kandydatów o około 80-90\%.
 
 \textbf{Pseudokod 5a: Znajdowanie częstych par z bitmapami}
 
@@ -1421,11 +1429,58 @@ Rysunek \ref{fig:client_dashboard_cf} przedstawia dashboard klienta z sekcją sp
 \subsection*{6.4 Metoda analizy sentymentu}
 \addcontentsline{toc}{subsection}{6.4 Metoda analizy sentymentu}
 
+\textbf{Interfejs opinii w aplikacji}
+
+System opinii jest zintegrowany w dwóch kluczowych miejscach interfejsu użytkownika. Użytkownicy mogą dodawać opinie bezpośrednio w panelu klienta po zakupie produktu oraz przeglądać wszystkie opinie na karcie produktu.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/opinionView.jpg}
+  \caption{Formularz dodawania opinii na stronie produktu z oceną gwiazdkową i recenzją tekstową.}
+  \label{fig:opinion_view1}
+\end{figure}
+
+Rysunek \ref{fig:opinion_view1} przedstawia sekcję dodawania opinii na karcie produktu. Użytkownik może:
+\begin{itemize}
+\item wystawić ocenę gwiazdkową (1-5 gwiazdek),
+\item napisać szczegółową recenzję tekstową.
+\end{itemize}
+
+Po dodaniu opinii przez użytkownika, system automatycznie:
+\begin{itemize}
+\item Przetwarza tekst opinii algorytmem analizy sentymentu,
+\item Oblicza sentiment\_score w zakresie [-1, 1] według wzoru (2) z rozdziału 1.3,
+\item Klasyfikuje opinię jako positive/neutral/negative,
+\item Aktualizuje statystyki sentymentu produktu w tabeli \texttt{ProductSentimentSummary},
+\item Przelicza zagregowany wynik sentymentu produktu zgodnie ze wzorem (3) z rozdziału 1.3,
+\item Odświeża ranking produktów w wyszukiwarce (jeśli sortowanie ustawione na ,,sentiment\_desc'').
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{images/opinionView2.jpg}
+  \caption{Lista opinii produktu z badge'ami sentymentu i oceną gwiazdkową.}
+  \label{fig:opinion_view2}
+\end{figure}
+
+Rysunek \ref{fig:opinion_view2} pokazuje listę wszystkich opinii dla danego produktu. Każda opinia wyświetla:
+\begin{itemize}
+\item Email użytkownika,
+\item Ocenę gwiazdkową,
+\item Pełną treść recenzji.
+\end{itemize}
+
+System opinii jest kluczowy dla dwóch aspektów aplikacji:
+\begin{enumerate}
+\item \textbf{Social Proof} - budowanie zaufania poprzez autentyczne recenzje klientów,
+\item \textbf{Machine Learning} - opinie stanowią 40\% wagi w wieloźródłowej agregacji sentymentu (najważniejsze źródło zgodnie ze wzorem (3) z rozdziału 1.3).
+\end{enumerate}
+
 \textbf{Wyszukiwarka z sortowaniem według sentymentu}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/searchSentimentView.png}
+  \includegraphics[width=0.65\textwidth]{images/searchSentimentView.png}
   \caption{Wyszukiwarka produktów z sortowaniem według sentymentu.}
   \label{fig:sentiment_search}
 \end{figure}
