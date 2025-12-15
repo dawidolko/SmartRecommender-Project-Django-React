@@ -505,111 +505,55 @@ Coverage = \frac{|\text{products with recommendations}|}{|\text{all products}|}
 \newpage
 
 \section*{Rozdzia\l{} 2}
-\addcontentsline{toc}{section}{Rozdział 2: Weryfikacja rozwiązań alternatywnych}
-\section*{Weryfikacja rozwiązań alternatywnych}
+\addcontentsline{toc}{section}{Rozdział 2: Weryfikacja i analiza rozwiązań alternatywnych}
+\section*{Weryfikacja i analiza rozwiązań alternatywnych}
 
-\subsection*{2.1 Przegląd istniejących systemów rekomendacyjnych}
-\addcontentsline{toc}{subsection}{2.1 Przegląd istniejących systemów rekomendacyjnych}
+W celu uzasadnienia sensowności tworzenia dedykowanego systemu rekomendacji przeprowadzono analizę trzech reprezentatywnych rozwiązań rynkowych. Celem weryfikacji było zidentyfikowanie ograniczeń istniejących narzędzi oraz określenie wymagań dla planowanej aplikacji e-commerce. System został zaprojektowany jako kompleksowe rozwiązanie wykorzystujące sześć komplementarnych metod rekomendacyjnych: trzy metody zaimplementowane w ramach niniejszej pracy (Content-Based Filtering, logika rozmyta, modele probabilistyczne) oraz trzy metody zaimplementowane przez współautora (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne Apriori).
 
-Przed przystąpieniem do implementacji własnego rozwiązania przeprowadzono analizę istniejących systemów i bibliotek dedykowanych rekomendacjom produktów. Analiza objęła zarówno komercyjne usługi chmurowe, jak i narzędzia open-source, z uwzględnieniem ich funkcjonalności, kosztów oraz ograniczeń.
+\subsection*{2.1 Amazon Personalize}
+\addcontentsline{toc}{subsection}{2.1 Amazon Personalize}
 
-\subsection*{2.2 Amazon Personalize}
-\addcontentsline{toc}{subsection}{2.2 Amazon Personalize}
+Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji oparte na algorytmach stosowanych w Amazon.com. System wykorzystuje deep learning (głębokie uczenie - wielowarstwowe sieci neuronowe) oraz collaborative filtering, oferując trzy typy rekomendacji: User Personalization (personalizacja użytkownika), Similar Items (podobne produkty) oraz Personalized Ranking (spersonalizowane rankowanie).
 
-Amazon Personalize to w pełni zarządzana usługa uczenia maszynowego oferowana przez Amazon Web Services, dedykowana tworzeniu spersonalizowanych rekomendacji w czasie rzeczywistym. System wykorzysta tę samą technologię, która napędza rekomendacje na platformie Amazon.com.
+\textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
-\textbf{Funkcjonalność}:
 \begin{itemize}
-    \item Automatyczne dostosowywanie modeli na podstawie danych użytkownika (AutoML)
-    \item Obsługa trzech rodzajów rekomendacji: user personalization, similar items, personalized ranking
-    \item Real-time personalization z aktualizacją modeli co 2 godziny
-    \item Wsparcie dla cold-start poprzez item metadata
-    \item Integracja z AWS ekosystemem (S3, CloudWatch, IAM)
+\item \textbf{Wysokie koszty operacyjne} - rozwiązania chmurowe wiążą się z regularnymi opłatami licencyjnymi, które mogą być znaczące dla małych i średnich platform e-commerce. Dla porównania, własna implementacja eliminuje te koszty przy zachowaniu kontroli nad funkcjonalnościami,
+\item \textbf{Brak natywnej analizy sentymentu, logiki rozmytej oraz modeli probabilistycznych} - Amazon Personalize koncentruje się wyłącznie na collaborative filtering i nie oferuje analizy opinii produktów, systemów rozmytych ani łańcuchów Markova. Wieloźródłowa agregacja sentymentu (współautor), logika rozmyta Mamdani (niniejsza praca) oraz modele probabilistyczne (niniejsza praca) wymagają integracji z dodatkowymi usługami AWS lub samodzielnej implementacji,
+\item \textbf{Vendor lock-in} (uzależnienie od dostawcy) - głęboka integracja z ekosystemem AWS (S3, Lambda, EventBridge) oznacza, że migracja do innej platformy wymaga przepisania całej architektury systemu,
+\item \textbf{Brak kontroli nad algorytmami} - system działa jako ,,czarna skrzynka'' (black box), uniemożliwiając dostosowanie logiki rekomendacji. Przykład: niemożliwe jest zaimplementowanie ważonych wektorów cech dla Content-Based Filtering (niniejsza praca), Adjusted Cosine Similarity z centrowaniem średniej dla Collaborative Filtering (współautor) czy funkcji przynależności dla logiki rozmytej (niniejsza praca),
+\item \textbf{Wymóg dużych zbiorów danych} - według dokumentacji AWS, system wymaga minimum 25000 interakcji dla zapewnienia wysokiej jakości rekomendacji. Dla nowych platform (cold start - problem zimnego startu) jakość jest ograniczona w początkowym okresie działania.
 \end{itemize}
 
-\textbf{Koszty}: Model cenowy pay-per-use:
+\subsection*{2.2 Google Recommendations AI (Vertex AI)}
+\addcontentsline{toc}{subsection}{2.2 Google Recommendations AI (Vertex AI)}
+
+Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz multi-armed contextual bandits (wieloramienne bandyty kontekstowe - algorytmy balansujące eksplorację nowych opcji z wykorzystaniem sprawdzonych rozwiązań). System oferuje zaawansowane rekomendacje dla e-commerce, VOD (Video on Demand - wideo na żądanie) oraz platform newsowych, z automatycznym wykrywaniem trendów i sezonowości.
+
+\textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
+
 \begin{itemize}
-    \item Trening modelu: \$0.24 za godzinę treningu
-    \item Hosting modelu: \$0.054 za godzinę TPS (Transactions Per Second)
-    \item Inference: \$0.0417 za 1000 requestów
-    \item Szacowany koszt miesięczny dla małej aplikacji: \$150-300
+\item \textbf{Bardzo wysokie koszty operacyjne} - koszty usług GCP są często wyższe niż konkurencyjnych rozwiązań chmurowych, co czyni je nieopłacalnymi dla małych i średnich platform e-commerce. Model cenowy oparty na liczbie predykcji generuje rosnące koszty wraz ze skalą ruchu użytkowników,
+\item \textbf{Brak wieloźródłowej agregacji sentymentu, logiki rozmytej i modeli probabilistycznych} - Google Recommendations AI oferuje funkcję ``Frequently Bought Together'' (często kupowane razem, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych (współautor), systemów rozmytych z funkcjami przynależności (niniejsza praca) ani łańcuchów Markova (niniejsza praca) jak w planowanym systemie,
+\item \textbf{Wymóg bardzo dużych zbiorów danych} - rozwiązanie zaprojektowane dla platform o skali YouTube, co czyni je nadmiarowo złożonym dla małych sklepów internetowych,
+\item \textbf{Brak interpretowalności} - głęboka ,,black box'', gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag embeddings (reprezentacji wektorowych) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację. W przeciwieństwie do tego, logika rozmyta (niniejsza praca) oferuje pełną przejrzystość reguł IF-THEN.
 \end{itemize}
 
-\textbf{Ograniczenia}:
+\subsection*{2.3 Apache Mahout}
+\addcontentsline{toc}{subsection}{2.3 Apache Mahout}
+
+Apache Mahout to open-source framework (otwartoźródłowy framework) implementujący klasyczne algorytmy collaborative filtering oraz matrix factorization (faktoryzacja macierzy - technika dekompozycji macierzy user-item) - ALS (Alternating Least Squares - metoda najmniejszych kwadratów na przemian), SVD (Singular Value Decomposition - rozkład według wartości osobliwych). Projekt powstał w 2008 roku, obecnie koncentruje się na Spark-based distributed algorithms (algorytmy rozproszone oparte na Apache Spark).
+
+\textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
+
 \begin{itemize}
-    \item Brak pełnej kontroli nad algorytmami (black-box)
-    \item Wymaga minimum 1000 interakcji użytkowników do treningu
-    \item Vendor lock-in (uzależnienie od AWS)
-    \item Wysokie koszty dla małych projektów edukacyjnych
-    \item Brak wsparcia dla custom feature engineering
+\item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów) oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie z Apache Spark,
+\item \textbf{Koszty infrastruktury} - chociaż licencja Apache 2.0 jest darmowa, utrzymanie klastra Spark wymaga dedykowanych zasobów serwerowych oraz czasu na implementację integracji (REST API, baza danych, cache, frontend), co generuje znaczące koszty operacyjne,
+\item \textbf{Brak analizy sentymentu, logiki rozmytej i modeli probabilistycznych} - Apache Mahout nie oferuje sentiment analysis, fuzzy logic ani Markov Chains. Wymagana jest integracja z zewnętrznymi bibliotekami (np. Stanford CoreNLP dla sentymentu) lub samodzielna implementacja słownikowej analizy sentymentu (współautor), systemu Mamdani dla logiki rozmytej (niniejsza praca) oraz łańcucha Markowa (niniejsza praca),
+\item \textbf{Wolniejszy rozwój projektu} - aktywność projektu spadła w ostatnich latach (2-3 commity miesięcznie w 2023-2024 vs 20-30 commitów w latach 2012-2014), co skutkuje ograniczoną dokumentacją dla nowszych wersji.
 \end{itemize}
 
-\subsection*{2.3 Google Recommendations AI}
-\addcontentsline{toc}{subsection}{2.3 Google Recommendations AI}
-
-Google Recommendations AI (obecnie część Vertex AI) to usługa Google Cloud Platform wykorzystująca modele deep learning do generowania rekomendacji produktów w sklepach e-commerce.
-
-\textbf{Funkcjonalność}:
-\begin{itemize}
-    \item Modele oparte na deep learning (neural networks)
-    \item Cztery typy rekomendacji: others you may like, frequently bought together, recommended for you, recently viewed
-    \item Automatyczna optymalizacja modeli na podstawie konwersji
-    \item Wsparcie dla A/B testing
-    \item Integracja z Google Analytics
-\end{itemize}
-
-\textbf{Koszty}:
-\begin{itemize}
-    \item Model cenowy oparty na liczbie predykcji
-    \item \$0.30 za 1000 predykcji (pierwsze 10M/miesiąc)
-    \item \$0.15 za 1000 predykcji (następne 90M)
-    \item Szacowany koszt miesięczny: \$200-500 dla średniej aplikacji
-\end{itemize}
-
-\textbf{Ograniczenia}:
-\begin{itemize}
-    \item Brak możliwości implementacji własnych algorytmów
-    \item Wymaga integracji z Google Cloud Platform
-    \item Długi czas wdrożenia (konfiguracja, import danych, trening)
-    \item Brak wsparcia dla logiki rozmytej i custom probabilistic models
-    \item Nieodpowiednie dla projektów badawczych wymagających kontroli nad algorytmami
-\end{itemize}
-
-\subsection*{2.4 Apache Mahout i biblioteki open-source}
-\addcontentsline{toc}{subsection}{2.4 Apache Mahout i biblioteki open-source}
-
-Apache Mahout to biblioteka open-source zapewniająca skalowalne implementacje algorytmów uczenia maszynowego, w tym systemów rekomendacyjnych. Alternatywami są biblioteki Surprise (Python) i LensKit (Java).
-
-\textbf{Funkcjonalność Apache Mahout}:
-\begin{itemize}
-    \item Collaborative Filtering: User-based CF, Item-based CF, Matrix Factorization (SVD, ALS)
-    \item Wsparcie dla Apache Spark (przetwarzanie rozproszone)
-    \item Możliwość implementacji custom similarity metrics
-    \item Integracja z Hadoop dla big data
-\end{itemize}
-
-\textbf{Funkcjonalność Surprise (Python)}:
-\begin{itemize}
-    \item Implementacje SVD, SVD++, NMF, KNN
-    \item Built-in dataset loaders i cross-validation
-    \item Evaluation metrics (RMSE, MAE, Precision@K)
-    \item Brak wsparcia dla content-based filtering
-\end{itemize}
-
-\textbf{Koszty}:
-\begin{itemize}
-    \item Darmowe (licencja Apache 2.0 / BSD)
-    \item Koszty infrastruktury (serwery, maintenance)
-\end{itemize}
-
-\textbf{Ograniczenia}:
-\begin{itemize}
-    \item Mahout: stroma krzywa uczenia, wymaga znajomości Spark/Hadoop
-    \item Surprise: brak wsparcia dla Fuzzy Logic i Markov Chains
-    \item Wszystkie biblioteki: brak implementacji logiki rozmytej
-    \item Brak gotowych implementacji hybrydowych systemów (CBF + Fuzzy + Probabilistic)
-    \item Ograniczona możliwość edukacyjna (gotowe black-boxy zamiast implementacji od podstaw)
-\end{itemize}
+\textbf{Alternatywy open-source}: Biblioteka Surprise (Python) oferuje implementacje SVD, SVD++, NMF, KNN z built-in dataset loaders i cross-validation, ale również nie wspiera Content-Based Filtering, Fuzzy Logic, Sentiment Analysis ani Association Rules.
 
 \subsection*{2.5 Analiza porównawcza}
 \addcontentsline{toc}{subsection}{2.5 Analiza porównawcza}
