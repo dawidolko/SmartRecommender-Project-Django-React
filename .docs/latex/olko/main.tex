@@ -217,6 +217,7 @@ Istnieją trzy główne kategorie systemów rekomendacyjnych:
 
 \textbf{Metody Hybrydowe} — łączą różne podejścia rekomendacyjne w celu wykorzystania zalet poszczególnych metod oraz kompensacji ich wad. Przykładem może być połączenie Collaborative Filtering z analizą metadanych produktów oraz analizą treści tekstowych.
 
+\newpage
 Systemy rekomendacyjne w e-commerce wykorzystują różne strategie sprzedażowe. Poniżej znajdują się kluczowe terminy stosowane w branży:
 
 \textbf{Cross-selling (sprzedaż krzyżowa)} — strategia polegająca na proponowaniu produktów komplementarnych, czyli dopełniających zakup główny. Przykład: klient kupuje laptop, system proponuje mysz, torbę na laptop, podkładkę pod mysz. Celem jest zwiększenie wartości koszyka poprzez dodanie produktów powiązanych funkcjonalnie.
@@ -234,7 +235,7 @@ Systemy rekomendacyjne w e-commerce wykorzystują różne strategie sprzedażowe
 
 Matematyczne podstawy trzech implementowanych algorytmów stanowią fundament dla szczegółowych opisów w kolejnych rozdziałach.
 
-\textbf{Adjusted Cosine Similarity dla Item-Based Collaborative Filtering} (Sarwar et al. 2001) \cite{sarwar2001item} stanowi kluczową metrykę podobieństwa wykorzystywaną w systemie. Wzór ten oblicza podobieństwo między dwoma produktami $i$ i $j$ poprzez analizę wzorców ich współwystępowania w zakupach użytkowników:
+\textbf{Adjusted Cosine Similarity dla Item-Based Collaborative Filtering} (Sarwar et al. 2001) \cite{sarwar2001item} stanowi kluczową metrykę podobieństwa wykorzystywaną \\w systemie. Wzór ten oblicza podobieństwo między dwoma produktami $i$ i $j$ poprzez analizę wzorców ich współwystępowania w zakupach użytkowników:
 
 \begin{equation}
 \text{sim}(i,j) = \frac{\sum_{u \in U}(R_{u,i} - \bar{R}_u)(R_{u,j} - \bar{R}_u)}{\sqrt{\sum_{u \in U}(R_{u,i} - \bar{R}_u)^2} \cdot \sqrt{\sum_{u \in U}(R_{u,j} - \bar{R}_u)^2}}
@@ -316,7 +317,7 @@ Apache Mahout to open-source framework (otwartoźródłowy framework) implementu
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
 \begin{itemize}
-\item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów), oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie z Apache Spark,
+\item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów), oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie \\z Apache Spark,
 \item \textbf{Koszty infrastruktury} - utrzymanie klastra Spark wymaga dedykowanych zasobów serwerowych oraz czasu na implementację integracji (REST API, baza danych, cache, frontend), co generuje znaczące koszty operacyjne,
 \item \textbf{Brak analizy sentymentu} - Apache Mahout nie oferuje sentiment analysis. Wymagana jest integracja z zewnętrznymi bibliotekami (np. Stanford CoreNLP) lub samodzielna implementacja słownikowej analizy sentymentu,
 \item \textbf{Wolniejszy rozwój projektu} - aktywność projektu spadła w ostatnich latach (2-3 commity miesięcznie w 2023-2024 vs 20-30 commitów w latach 2012-2014), co skutkuje ograniczoną dokumentacją dla nowszych wersji.
@@ -452,7 +453,7 @@ Diagram przypadków użycia (rys. \ref{fig:use_case_project}) przedstawia komple
 
 \textbf{Ogólny opis diagramu:}
 
-Diagram został zorganizowany wokół trzech głównych aktorów, z których każdy ma dostęp do różnych poziomów funkcjonalności systemu. Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
+Diagram został zorganizowany wokół trzech głównych aktorów, z których każdy ma dostęp do różnych poziomów funkcjonalności systemu. Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego \\i dodaje nowe, specyficzne dla swojej roli.
 
 System został podzielony na trzy główne obszary funkcjonalne:
 
@@ -507,7 +508,7 @@ System został podzielony na trzy główne obszary funkcjonalne:
 \item \textbf{Debugowanie algorytmów rekomendacji} - narzędzia diagnostyczne:
   \begin{itemize}
 \item \textit{Podgląd rekomendacji} - sprawdzenie jakie produkty są rekomendowane dla konkretnego użytkownika lub produktu,
-\item \textit{Sprawdzanie poprawności} - walidacja czy algorytmy działają zgodnie z oczekiwaniami,
+\item \textit{Sprawdzanie poprawności} - walidacja czy algorytmy działają zgodnie \\z oczekiwaniami,
 \item \textit{Wyświetlanie statystyk metod} - szczegółowe metryki dla każdej metody rekomendacji.
 \end{itemize}
 \end{itemize}
@@ -555,7 +556,7 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 
 \textbf{Scenariusz 1: Użytkownik niezalogowany przegląda produkty}
 
-Gość wchodzi na stronę główną aplikacji. Nawiguje do katalogu produktów, filtruje po kategorii ,,Laptopy''', sortuje według ,,Najlepszy sentyment'''. Przegląda kilka produktów, dodaje wybrany laptop do koszyka. W koszyku widzi sekcję ``Często kupowane razem'' z torbą i myszą (rekomendacje Apriori). Decyduje się również dodać torbę. Przy próbie finalizacji zamówienia system przekierowuje do logowania/rejestracji.
+Gość wchodzi na stronę główną aplikacji. Nawiguje do katalogu produktów, filtruje po kategorii ,,Laptopy''', sortuje według ,,Najlepszy sentyment'''. Przegląda kilka produktów, dodaje wybrany laptop do koszyka. W koszyku widzi sekcję ``Często kupowane razem'' z torbą i myszą (rekomendacje Apriori). Decyduje się również dodać torbę. Przy próbie finalizacji zamówienia system przekierowuje do logowania lub rejestracji.
 
 \textbf{Scenariusz 2: Klient składa zamówienie i śledzi jego status}
 
@@ -563,7 +564,7 @@ Użytkownik loguje się do systemu. Przechodzi do koszyka, klika ,,Przejdź do k
 
 \textbf{Scenariusz 3: Administrator zarządza produktami}
 
-Administrator loguje się do panelu administracyjnego. Wchodzi do sekcji ,,Products''', klika ,,Add New Product'''. Wypełnia formularz (nazwa, opis, cena, specyfikacje), przypisuje kategorie. Po zapisaniu produktu, system automatycznie przelicza jego wynik sentymentu (sentiment score) na podstawie opisu i nazwy (brak jeszcze opinii). Administrator może również edytować istniejące produkty lub usuwać te o niskim sentymencie.
+Administrator loguje się do panelu administracyjnego. Wchodzi do sekcji ,,Products''', klika ,,Add New Product'''. Wypełnia formularz (nazwa, opis, cena, specyfikacje), przypisuje kategorie. Po zapisaniu produktu, system automatycznie przelicza jego wynik sentymentu (sentiment score) na podstawie opisu i nazwy (brak jeszcze opinii). Administrator może również edytować istniejące produkty lub usuwać te \\o niskim sentymencie.
 
 \textbf{Scenariusz 4: Klient wystawia opinię i system przelicza sentyment}
 
@@ -1009,7 +1010,7 @@ KONIEC FUNKCJA
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{images/collaborativeDiagram.png}
-  \caption{Diagram sekwencji: Collaborative Filtering - proces generowania rekomendacji produktów podobnych.}
+  \caption{Diagram sekwencji: Collaborative Filtering.}
   \label{fig:cf_sequence}
 \end{figure}
 
@@ -1029,7 +1030,7 @@ Przepływ procesu generowania rekomendacji Collaborative Filtering:
 \subsection*{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 \addcontentsline{toc}{subsection}{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 
-Analiza sentymentu pojedynczego tekstu metodą słownikową (Liu 2012) polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów pozytywnych i negatywnych. Słowniki zawierają ~200 słów każdego typu (np. pozytywne: , ,excellent', , ,recommend', , ,quality'; negatywne: , ,bad', , ,poor', , ,disappointing'). Formuła wyniku: (liczba\_pozytywnych - liczba\_negatywnych) / liczba\_wszystkich\_słów. Wynik ograniczany do [-1, 1] i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (inne).
+Analiza sentymentu pojedynczego tekstu metodą słownikową (Liu 2012) polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów pozytywnych i negatywnych. Słowniki zawierają ~200 słów każdego typu (np. pozytywne: , ,excellent', , ,recommend', , ,quality'; negatywne: , ,bad', , ,poor', , ,disappointing'). Formuła wyniku: (liczba\_pozytywnych - liczba\_negatywnych) / liczba\_wszystkich\_słów. Wynik ograniczany do [-1, 1] \\i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (inne).
 
 Wieloźródłowa agregacja sentymentu produktu łączy wyniki z 5 źródeł z wagami: opinie 40\%, opis 25\%, nazwa 15\%, specyfikacje 12\%, kategorie 8\%.
 
@@ -1109,7 +1110,7 @@ KONIEC FUNKCJA
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{images/sentimentDiagram.png}
-  \caption{Diagram sekwencji: Analiza sentymentu - wieloźródłowa agregacja sentymentu z pięciu źródeł tekstowych.}
+  \caption{Diagram sekwencji: Analiza sentymentu.}
   \label{fig:sentiment_sequence}
 \end{figure}
 
@@ -1234,7 +1235,7 @@ KONIEC FUNKCJA
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{images/associationDiagram.png}
-  \caption{Diagram sekwencji: Algorytm Apriori - generowanie reguł asocjacyjnych typu ``Często kupowane razem''.}
+  \caption{Diagram sekwencji: Algorytm Apriori.}
   \label{fig:apriori_sequence}
 \end{figure}
 
@@ -1262,7 +1263,7 @@ Przepływ procesu generowania reguł asocjacyjnych algorytmem Apriori:
 \subsection*{5.4 Podsumowanie implementacji}
 \addcontentsline{toc}{subsection}{5.4 Podsumowanie implementacji}
 
-Przedstawione pseudokody odzwierciedlają algorytmy zaimplementowane w aplikacji. Kluczowe aspekty techniczne:
+Przedstawione pseudokody odzwierciedlają algorytmy zaimplementowane \\w aplikacji. Kluczowe aspekty techniczne:
 
 \textbf{Collaborative Filtering:}
 \begin{itemize}
@@ -1567,7 +1568,7 @@ W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
 \textbf{Problem zimnego startu} — algorytmy Collaborative Filtering oraz Apriori wymagają historycznych danych o interakcjach użytkowników z produktami. Dla nowych użytkowników bez historii zakupów oraz nowych produktów bez opinii mechanizmy te nie są w stanie generować efektywnych rekomendacji. Analiza sentymentu częściowo kompensuje to ograniczenie, ponieważ może ocenić jakość produktu na podstawie jego opisu, specyfikacji technicznych oraz nazwy, nawet w przypadku braku opinii użytkowników.
 
-\textbf{Ograniczenia analizy sentymentu} — zastosowane podejście słownikowe nie radzi sobie efektywnie z negacją językową (przykład: ,,nie polecam'') oraz z ironią i sarkazmem. Słowa pozytywne w kontekście negatywnym mogą być błędnie klasyfikowane, co wpływa na dokładność oceny sentymentu. Rozwiązanie tego problemu wymagałoby zastosowania bardziej zaawansowanych technik przetwarzania języka naturalnego, takich jak modele kontekstowe.
+\textbf{Ograniczenia analizy sentymentu} — zastosowane podejście słownikowe nie radzi sobie efektywnie z negacją językową (przykład: ,,nie polecam'') oraz z ironią \\i sarkazmem. Słowa pozytywne w kontekście negatywnym mogą być błędnie klasyfikowane, co wpływa na dokładność oceny sentymentu. Rozwiązanie tego problemu wymagałoby zastosowania bardziej zaawansowanych technik przetwarzania języka naturalnego, takich jak modele kontekstowe.
 
 \textbf{Skalowalność dla bardzo dużych katalogów} — dla katalogów produktów przekraczających tysiące pozycji mogą wystąpić wyzwania wydajnościowe wymagające dalszych optymalizacji, takich jak partycjonowanie danych, rozproszenie obliczeń lub zastosowanie dedykowanych struktur danych.
 
@@ -1580,7 +1581,7 @@ Zidentyfikowano następujące kierunki rozwoju systemu:
 
 \textbf{Rekomendacje w czasie rzeczywistym} — obecny system wykorzystuje mechanizm cache'owania z okresem ważności 24 godzin, co oznacza, że rekomendacje są przeliczane cyklicznie. Implementacja systemu aktualizującego rekomendacje w czasie rzeczywistym po każdej akcji użytkownika (przeglądanie produktów, dodawanie do koszyka, finalizacja zakupu) mogłaby znacząco zwiększyć trafność sugestii poprzez uwzględnienie bieżącego kontekstu sesji zakupowej.
 
-\textbf{Zaawansowane metody obsługi zimnego startu} — zastosowanie technik faktoryzacji macierzy, takich jak Singular Value Decomposition (SVD), mogłoby umożliwić generowanie rekomendacji dla nowych produktów na podstawie ich cech (kategoria, cena, marka, specyfikacja) oraz analogii do istniejących produktów w katalogu.
+\textbf{Zaawansowane metody obsługi zimnego startu} — zastosowanie technik faktoryzacji macierzy, takich jak Singular Value Decomposition (SVD), mogłoby umożliwić generowanie rekomendacji dla nowych produktów na podstawie ich cech (kategoria, cena, marka, specyfikacja) oraz analogii do istniejących produktów \\w katalogu.
 
 \subsection*{Wnioski końcowe}
 \addcontentsline{toc}{subsection}{Wnioski końcowe}
@@ -1669,7 +1670,7 @@ Product Recommendation System Based on Collaborative Filtering, Sentiment Analys
 
 \vspace{0.3cm}
 
-Niniejsza praca inżynierska przedstawia projekt oraz implementację systemu rekomendacji produktów dla platformy e-commerce, łączącego trzy komplementarne metody rekomendacyjne: collaborative filtering, analizę sentymentu oraz reguły asocjacyjne. Celem było zaprojektowanie rozwiązania eliminującego problem przeładowania informacyjnego w sklepach internetowych poprzez dostarczanie użytkownikom spersonalizowanych rekomendacji.
+Niniejsza praca inżynierska przedstawia projekt oraz implementację systemu rekomendacji produktów dla platformy e-commerce, łączącego trzy komplementarne metody rekomendacyjne: collaborative filtering, analizę sentymentu oraz reguły asocjacyjne. Celem było zaprojektowanie rozwiązania eliminującego problem przeładowania informacyjnego \\w sklepach internetowych poprzez dostarczanie użytkownikom spersonalizowanych rekomendacji.
 
 Część teoretyczna obejmuje szczegółową analizę fundamentów matematycznych systemów rekomendacyjnych, w tym metryki Adjusted Cosine Similarity dla algorytmu Item-Based Collaborative Filtering, słownikowej analizy sentymentu z agregacją wieloźródłową oraz metryk support, confidence i lift dla reguł asocjacyjnych algorytmu Apriori. Przedstawiono również przegląd rozwiązań alternatywnych (Amazon Personalize, Google Recommendations AI, Apache Mahout) wraz z uzasadnieniem implementacji dedykowanego systemu.
 
