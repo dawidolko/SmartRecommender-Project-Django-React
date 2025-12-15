@@ -664,9 +664,9 @@ Każdy komponent systemu posiada dedykowane pliki:
 \item \textbf{models.py} -- definicje tabel (Product, Order, Opinion, ProductSimilarity),
 \item \textbf{serializers.py} -- konwersja obiektów Django $\leftrightarrow$ JSON,
 \item \textbf{views.py} -- obsługa CRUD dla produktów, zamówień,
-\item \textbf{recommendation\_views.py} -- endpoint /api/collaborative-filtering/,
-\item \textbf{sentiment\_views.py} -- endpoint /api/sentiment-search/,
-\item \textbf{association\_views.py} -- endpoint /api/association-recommendations/,
+\item \textbf{recommendation\_views.py} -- endpointy /api/generate-user-recommendations/, /api/recommendation-algorithm-status/,
+\item \textbf{sentiment\_views.py} -- endpointy /api/sentiment-search/, /api/sentiment-analysis-debug/,
+\item \textbf{association\_views.py} -- endpointy /api/frequently-bought-together/, /api/update-association-rules/,
 \item \textbf{signals.py} -- automatyczna aktualizacja rekomendacji.
 \end{itemize}
 
@@ -960,8 +960,6 @@ FUNKCJA oblicz_podobienstwa_cf(M_norm, prog = 0.5):
 KONIEC FUNKCJA
 \end{lstlisting}
 
-\newpage
-
 Algorytm generowania rekomendacji dla użytkownika wykorzystuje wcześniej obliczone podobieństwa produktów. Proces polega na zebraniu historii zakupów użytkownika (zamówienia + koszyk), a następnie dla każdego produktu z tej historii wyszukiwane są najbardziej podobne produkty. Wyniki są agregowane - jeśli dany produkt jest podobny do wielu produktów zakupionych przez użytkownika, otrzymuje sumę wszystkich podobieństw jako końcowy wynik rekomendacji.
 
 \textbf{Pseudokod 2: Generowanie rekomendacji dla użytkownika}
@@ -1001,7 +999,7 @@ KONIEC FUNKCJA
 
 \textbf{Kluczowe optymalizacje Collaborative Filtering:}
 \begin{itemize}
-\item Pamięć podręczna (cache) przechowuje macierz podobieństw przez 24 godziny,
+\item Pamięć podręczna (cache) przechowuje macierz podobieństw przez 2 godziny (7200 sekund),
 \item Operacje zbiorcze (bulk insert) zapisują po 1000 rekordów jednocześnie,
 \item Próg 0.5 redukuje rozmiar bazy, poprzez odrzucenie niższych wartości,
 \item Indeksowanie na kolumnach (produkt\_1, typ\_podobienstwa).
@@ -1023,11 +1021,9 @@ Przepływ procesu generowania rekomendacji Collaborative Filtering:
 \item Przy braku w pamięci podręcznej następuje zapytanie do bazy danych o historię zakupów
 \item Budowana jest macierz użytkownik-produkt z OrderProduct
 \item Macierz jest normalizowana (centrowanie wartości) i obliczane są podobieństwa cosinusowe
-\item Wyniki zapisywane są do pamięci podręcznej (24h) oraz tabeli ProductSimilarity
+\item Wyniki zapisywane są do pamięci podręcznej (2 godziny) oraz tabeli ProductSimilarity
 \item API zwraca top N rekomendacji
 \end{enumerate}
-
-\newpage
 
 \subsection*{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 \addcontentsline{toc}{subsection}{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
@@ -1064,8 +1060,6 @@ FUNKCJA analizuj_sentiment(tekst, slownik_poz, slownik_neg):
     ZWROC (wynik, kat)
 KONIEC FUNKCJA
 \end{lstlisting}
-
-\newpage
 
 Algorytm wieloźródłowej agregacji sentymentu analizuje 5 niezależnych źródeł tekstowych produktu zamiast polegać wyłącznie na opiniach klientów. Rozwiązuje to problem zimnego startu - produkty bez opinii nadal otrzymują wynik bazujący na opisie i nazwie. Wagi źródeł: opinie 40\%, opis 25\%, nazwa 15\%, specyfikacje 12\%, kategorie 8\%. System zlicza rozkład opinii (pozytywne/negatywne/neutralne) dla lepszej oceny konsensusu.
 
@@ -1105,8 +1099,6 @@ FUNKCJA agreguj_sentiment_produktu(produkt):
 KONIEC FUNKCJA
 \end{lstlisting}
 
-\newpage
-
 \textbf{Diagram sekwencji: Analiza Sentymentu}
 
 \begin{figure}[H]
@@ -1128,8 +1120,6 @@ Przepływ procesu wieloźródłowej analizy sentymentu:
 \end{enumerate}
 
 Kluczową zaletą tej architektury jest rozwiązanie problemu zimnego startu - produkty bez opinii nadal otrzymują wynik sentymentu na podstawie pozostałych 4 źródeł.
-
-\newpage
 
 \subsection*{5.3 Algorytm Apriori - reguły asocjacyjne}
 \addcontentsline{toc}{subsection}{5.3 Algorytm Apriori - reguły asocjacyjne}
@@ -1266,8 +1256,6 @@ Przepływ procesu generowania reguł asocjacyjnych algorytmem Apriori:
 \item Operacje zbiorcze (bulk operations): rozmiar\_partii=500.
 \end{itemize}
 
-\newpage
-
 \subsection*{5.4 Podsumowanie implementacji}
 \addcontentsline{toc}{subsection}{5.4 Podsumowanie implementacji}
 
@@ -1277,7 +1265,7 @@ Przedstawione pseudokody odzwierciedlają algorytmy zaimplementowane \\w aplikac
 \begin{itemize}
 \item Adjusted Cosine Similarity eliminuje zniekształcenia skal zakupowych,
 \item NumPy dla wektoryzacji operacji macierzowych,
-\item Pamięć podręczna Django 24h z automatycznym unieważnieniem,
+\item Pamięć podręczna Django 2 godziny (CACHE\_TIMEOUT\_LONG) z automatycznym unieważnieniem,
 \item Operacje zbiorcze (rozmiar\_partii=1000),
 \item Próg podobieństwa 0.5 redukuje liczbę zapisywanych rekordów.
 \end{itemize}
@@ -1330,10 +1318,11 @@ System rekomendacji został zintegrowany z aplikacją e-commerce w architekturze
 
 \textbf{Warstwa logiki biznesowej (Django)} - endpointy API obsługujące zapytania o rekomendacje:
 \begin{itemize}
-\item \texttt{/api/recommendations/collaborative/} - zwraca produkty Collaborative Filtering,
-\item \texttt{/api/recommendations/sentiment/} - zwraca produkty według sentymentu,
-\item \texttt{/api/recommendations/association/} - zwraca reguły asocjacyjne,
-\item \texttt{/api/admin/recommendation-settings/} - zarządzanie aktywną metodą.
+\item \texttt{/api/generate-user-recommendations/} - generowanie rekomendacji Collaborative Filtering,
+\item \texttt{/api/sentiment-search/} - wyszukiwanie produktów według sentymentu,
+\item \texttt{/api/frequently-bought-together/} - produkty z reguł asocjacyjnych Apriori,
+\item \texttt{/api/recommendation-algorithm-status/} - status algorytmów i debugowanie,
+\item \texttt{/api/admin/update-product-similarity/} - regeneracja macierzy podobieństw.
 \end{itemize}
 
 \textbf{Warstwa danych (PostgreSQL)} - tabele przechowujące prekalkulowane wyniki:
@@ -1634,7 +1623,7 @@ Zidentyfikowano następujące kierunki rozwoju systemu:
 
 \textbf{Zastosowanie głębokiego uczenia maszynowego} — obecny system wykorzystuje klasyczne algorytmy rekomendacyjne oparte na analizie podobieństw oraz regułach asocjacyjnych. Zastosowanie sieci neuronowych, takich jak autoencodery czy sieci rekurencyjne, mogłoby umożliwić automatyczne uczenie się ukrytych wzorców w danych bez konieczności ręcznego definiowania reguł. Przykładowo, sieci neuronowe mogłyby odkryć nieoczywiste zależności między produktami oraz preferencjami użytkowników, które nie są widoczne w tradycyjnych metrykach podobieństwa.
 
-\textbf{Rekomendacje w czasie rzeczywistym} — obecny system wykorzystuje mechanizm cache'owania z okresem ważności 24 godzin, co oznacza, że rekomendacje są przeliczane cyklicznie. Implementacja systemu aktualizującego rekomendacje w czasie rzeczywistym po każdej akcji użytkownika (przeglądanie produktów, dodawanie do koszyka, finalizacja zakupu) mogłaby znacząco zwiększyć trafność sugestii poprzez uwzględnienie bieżącego kontekstu sesji zakupowej.
+\textbf{Rekomendacje w czasie rzeczywistym} — obecny system wykorzystuje mechanizm cache'owania z okresem ważności 2 godzin (CACHE\_TIMEOUT\_LONG = 7200 sekund), co oznacza, że rekomendacje są przeliczane cyklicznie. Implementacja systemu aktualizującego rekomendacje w czasie rzeczywistym po każdej akcji użytkownika (przeglądanie produktów, dodawanie do koszyka, finalizacja zakupu) mogłaby znacząco zwiększyć trafność sugestii poprzez uwzględnienie bieżącego kontekstu sesji zakupowej.
 
 \textbf{Zaawansowane metody obsługi zimnego startu} — zastosowanie technik faktoryzacji macierzy, takich jak Singular Value Decomposition (SVD), mogłoby umożliwić generowanie rekomendacji dla nowych produktów na podstawie ich cech (kategoria, cena, marka, specyfikacja) oraz analogii do istniejących produktów \\w katalogu.
 
