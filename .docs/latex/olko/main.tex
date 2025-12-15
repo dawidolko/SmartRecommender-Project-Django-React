@@ -1,7 +1,9 @@
 % filepath: /SmartRecommender-Project-Django-React/.docs/latex/olko/main.tex
 
+% Czcionka, wielkość, rozmiar
 \documentclass[a4paper,12pt,twoside]{article}
 
+% Zaimportowane zależności
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[polish]{babel}
@@ -47,6 +49,7 @@
 \setlength{\cftbeforesecskip}{3pt}
 \setlength{\cftbeforesubsecskip}{2pt}
 
+% Zależności do fragmentów kodu JavaScript
 \lstdefinelanguage{JavaScript}{
   keywords={const, let, var, function, return, if, else, for, while, switch, case, break, default, true, false, null, undefined, typeof, new, this, class, extends, import, export, from, async, await, try, catch, throw, finally},
   keywordstyle=\color{blue}\bfseries,
@@ -70,7 +73,7 @@
   stringstyle=\color{red}
 }
 
-% Styl dla pseudokodu
+% % Zależności do fragmentów pseudokodu
 \lstdefinelanguage{Pseudocode}{
   morekeywords={FUNKCJA, ZWROC, DLA, KAZDEGO, KAZDEJ, W, JEZELI, WTEDY, INACZEJ, KONIEC, LUB, ORAZ, NIE, DOPOKI, WYKONUJ, GDZIE, OD, DO, KROK, AND},
   sensitive=false,
@@ -150,9 +153,8 @@
 
 \newpage
 % Spis treści
-{\small
 \tableofcontents
-}
+
 
 \newpage
 \section*{Wstęp}
@@ -168,7 +170,7 @@ Systemy rekomendacyjne stanowią rozwiązanie tego problemu poprzez automatyczn�
 \subsection*{Cel pracy}
 \addcontentsline{toc}{subsection}{Cel pracy}
 
-Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletnego systemu e-commerce wyposażonego w autorskie mechanizmy rekomendacji produktów. Aplikacja została opracowana od podstaw jako autorskie rozwiązanie wykonane we współpracy dwuosobowej. W ramach systemu zaimplementowano łącznie sześć różnych metod rekomendacyjnych — po trzy przez każdego z autorów — co zapewnia komplementarne mechanizmy wsparcia decyzji zakupowych. Niniejsza praca koncentruje się na trzech spośród nich: Collaborative Filtering, analizie sentymentu oraz regułach asocjacyjnych. Mechanizmy rekomendacyjne zostały zaprojektowane i zaimplementowane samodzielnie na podstawie literatury naukowej, bez wykorzystania gotowych bibliotek rekomendacyjnych, co umożliwiło pełną kontrolę nad logiką algorytmów oraz ich świadome dostosowanie do specyfiki branży handlu elektronicznego.
+Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletnego systemu e-commerce wyposażonego w autorskie mechanizmy rekomendacji produktów. Aplikacja została opracowana od podstaw jako autorskie rozwiązanie wykonane we współpracy dwuosobowej. W ramach systemu zaimplementowano łącznie sześć różnych metod rekomendacyjnych — trzech z nich dotyczy ta praca. Ich założeniem jest zapewnienie komplementarnych mechanizmów wsparcia decyzji zakupowych. Niniejsza praca koncentruje się na trzech spośród nich: Collaborative Filtering, analizie sentymentu oraz regułach asocjacyjnych. Mechanizmy rekomendacyjne zostały zaprojektowane i zaimplementowane samodzielnie na podstawie literatury naukowej, bez wykorzystania gotowych bibliotek rekomendacyjnych, co umożliwiło pełną kontrolę nad logiką algorytmów oraz ich świadome dostosowanie do specyfiki branży handlu elektronicznego.
 
 \subsection*{Zakres pracy}
 \addcontentsline{toc}{subsection}{Zakres pracy}
@@ -189,10 +191,10 @@ Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletn
 \item Baza danych PostgreSQL z odpowiednio zaprojektowanym schematem przechowującym dane produktów, użytkowników, zamówień oraz wyniki algorytmów rekomendacyjnych.
 \end{itemize}
 
-\subsection*{Struktura pracy}
-\addcontentsline{toc}{subsection}{Struktura pracy}
+% \subsection*{Struktura pracy}
+% \addcontentsline{toc}{subsection}{Struktura pracy}
 
-Praca składa się z dziewięciu rozdziałów. Rozdział pierwszy przedstawia podstawy teoretyczne systemów rekomendacyjnych niezbędne do zrozumienia dalszych etapów. Rozdział drugi zawiera opis rozwiązań alternatywnych i konkurencyjnych narzędzi dostępnych na rynku wraz z podsumowaniem w kontekście sensowności tworzenia dedykowanego rozwiązania. Rozdział trzeci opisuje projekt planowanej aplikacji wraz z diagramami UML i szczegółowym opisem funkcjonalności. Rozdział czwarty przedstawia wykorzystany stos technologiczny oraz praktyczną realizację projektu w aspekcie zdefiniowanych założeń projektowych. Rozdział piąty zawiera opis planowanych do wdrożenia algorytmów rekomendacyjnych (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne) wraz z pseudokodami. Rozdział szósty przedstawia funkcjonowanie całego rozwiązania ze szczególnym uwzględnieniem mechanizmów rekomendacji definiowanych w ramach tematu pracy. Rozdział siódmy zawiera podsumowanie i wnioski końcowe. Rozdział ósmy stanowią spisy i literatura.
+% Praca składa się z dziewięciu rozdziałów. Rozdział pierwszy przedstawia podstawy teoretyczne systemów rekomendacyjnych niezbędne do zrozumienia dalszych etapów. Rozdział drugi zawiera opis rozwiązań alternatywnych i konkurencyjnych narzędzi dostępnych na rynku wraz z podsumowaniem w kontekście sensowności tworzenia dedykowanego rozwiązania. Rozdział trzeci opisuje projekt planowanej aplikacji wraz z diagramami UML i szczegółowym opisem funkcjonalności. Rozdział czwarty przedstawia wykorzystany stos technologiczny oraz praktyczną realizację projektu w aspekcie zdefiniowanych założeń projektowych. Rozdział piąty zawiera opis planowanych do wdrożenia algorytmów rekomendacyjnych (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne) wraz z pseudokodami. Rozdział szósty przedstawia funkcjonowanie całego rozwiązania ze szczególnym uwzględnieniem mechanizmów rekomendacji definiowanych w ramach tematu pracy. Rozdział siódmy zawiera podsumowanie i wnioski końcowe. Rozdział ósmy stanowią spisy i literatura.
 
 \newpage
 \section*{Rozdzia\l{} 1}
@@ -202,7 +204,7 @@ Praca składa się z dziewięciu rozdziałów. Rozdział pierwszy przedstawia po
 \subsection*{1.1 Historia i ewolucja systemów rekomendacyjnych}
 \addcontentsline{toc}{subsection}{1.1 Historia i ewolucja systemów rekomendacyjnych}
 
-Systemy rekomendacyjne powstały jako odpowiedź na problem wyboru spośród tysięcy produktów w sklepach internetowych. Rozwój tej dziedziny rozpoczął się w latach 90. XX wieku wraz z pojawieniem się pierwszych platform e-commerce. Wczesne zastosowania komercyjne systemów rekomendacji zostały opisane w literaturze specjalistycznej \cite{linden2003amazon}. Istotnym przełomem była również publikacja wprowadzająca metodę Item-Based Collaborative Filtering z metryką Adjusted Cosine Similarity \cite{sarwar2001item}, która stała się standardem przemysłowym. Konkursy i inicjatywy badawcze, takie jak Netflix Prize w latach 2006-2009, w którym fundusz nagród wynosił milion dolarów, znacząco przyspieszyły rozwój zaawansowanych technik rekomendacji \cite{bennett2007netflix}, przyciągając uwagę zarówno środowiska akademickiego, jak i przemysłowego. Obecnie systemy rekomendacyjne stanowią kluczowy element wiodących platform e-commerce oraz serwisów VOD (Video on Demand).
+Systemy rekomendacyjne powstały jako odpowiedź na problem wyboru spośród tysięcy produktów w sklepach internetowych. Rozwój tej dziedziny rozpoczął się w latach 90. XX wieku wraz z pojawieniem się pierwszych platform e-commerce. Wczesne zastosowania komercyjne systemów rekomendacji zostały opisane w literaturze specjalistycznej \cite{linden2003amazon}. Istotnym przełomem była również publikacja wprowadzająca metodę Item-Based Collaborative Filtering z metryką Adjusted Cosine Similarity \cite{sarwar2001item}, która stała się standardem przemysłowym. Konkursy i inicjatywy badawcze, takie jak Netflix Prize w latach 2006-2009, w którym fundusz nagród wynosił milion dolarów, znacząco przyspieszyły rozwój zaawansowanych technik rekomendacji \cite{bennett2007netflix}, przyciągając uwagę zarówno środowiska akademickiego, jak i przemysłowego. Obecnie systemy rekomendacyjne stanowią kluczowy element wiodących platform e-commerce (handlu elektronicznego) oraz serwisów VOD (Video on Demand - wideo na żądanie).
 
 \subsection*{1.2 Klasyfikacja metod rekomendacyjnych}
 \addcontentsline{toc}{subsection}{1.2 Klasyfikacja metod rekomendacyjnych}
@@ -228,9 +230,9 @@ Systemy rekomendacyjne w e-commerce wykorzystują różne strategie sprzedażowe
 \textbf{Frequently Bought Together (często kupowane razem)} — rodzaj rekomendacji prezentujący produkty, które klienci regularnie kupują w tym samym koszyku. Przykład: laptop + mysz + podkładka pod mysz. Celem jest uproszczenie procesu zakupów i zwiększenie wartości koszyka.
 
 \subsection*{1.3 Matematyczne fundamenty algorytmów}
-\addcontentsline{toc}{subsection}{2.3 Matematyczne fundamenty algorytmów}
+\addcontentsline{toc}{subsection}{1.3 Matematyczne fundamenty algorytmów}
 
-Niniejsza sekcja prezentuje matematyczne podstawy trzech implementowanych algorytmów, stanowiące fundament dla szczegółowych opisów w kolejnych rozdziałach.
+Matematyczne podstawy trzech implementowanych algorytmów stanowią fundament dla szczegółowych opisów w kolejnych rozdziałach.
 
 \textbf{Adjusted Cosine Similarity dla Item-Based Collaborative Filtering} (Sarwar et al. 2001) \cite{sarwar2001item} stanowi kluczową metrykę podobieństwa wykorzystywaną w systemie. Wzór ten oblicza podobieństwo między dwoma produktami $i$ i $j$ poprzez analizę wzorców ich współwystępowania w zakupach użytkowników:
 
@@ -268,7 +270,7 @@ gdzie $N_{pos}$ to liczba słów pozytywnych, $N_{neg}$ negatywnych, $N_{total}$
 \text{Lift}(A \rightarrow B) = \frac{\text{Support}(A, B)}{\text{Support}(A) \cdot \text{Support}(B)}
 \end{equation}
 
-Wzrost (Lift) > 1: pozytywna korelacja, Wzrost = 1: niezależność, Wzrost < 1: negatywna korelacja. Algorytm Apriori przyspiesza obliczenia dzięki własności: jeśli zbiór nie spełnia minimalnego wsparcia (Support), jego nadzbiór też nie.
+Wzrost(Lift) > 1: pozytywna korelacja, Wzrost = 1: niezależność, Wzrost < 1: negatywna korelacja. Algorytm Apriori przyspiesza obliczenia dzięki własności: jeśli zbiór nie spełnia minimalnego wsparcia (Support), jego nadzbiór też nie.
 
 \newpage
 \section*{Rozdzia\l{} 2}
@@ -286,13 +288,9 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 
 \begin{itemize}
 \item \textbf{Wysokie koszty operacyjne} - rozwiązania chmurowe wiążą się z regularnymi opłatami licencyjnymi, które mogą być znaczące dla małych i średnich platform e-commerce. Dla porównania, własna implementacja eliminuje te koszty przy zachowaniu kontroli nad funkcjonalnościami,
-
 \item \textbf{Brak natywnej analizy sentymentu} - Amazon Personalize koncentruje się wyłącznie na collaborative filtering i nie oferuje analizy opinii produktów. Wieloźródłowa agregacja sentymentu (opinie + opis + nazwa + specyfikacje + kategorie) zastosowana w niniejszej pracy wymaga integracji z dodatkowymi usługami AWS lub samodzielnej implementacji,
-
 \item \textbf{Vendor lock-in} (uzależnienie od dostawcy) - głęboka integracja z ekosystemem AWS (S3, Lambda, EventBridge) oznacza, że migracja do innej platformy wymaga przepisania całej architektury systemu,
-
-\item \textbf{Brak kontroli nad algorytmami} - system działa jako ,,czarna skrzynka'' (black box), uniemożliwiając dostosowanie logiki rekomendacji. Przykład: niemożliwe jest zaimplementowanie Adjusted Cosine Similarity z centrowaniem średniej dla eliminacji wartości progowej (bias) wynikającej z różnych skal zakupowych użytkowników (hurtownik vs konsument indywidualny),
-
+\item \textbf{Brak kontroli nad algorytmami} - system działa jako ,,czarna skrzynka''' (black box), uniemożliwiając dostosowanie logiki rekomendacji. Przykład: niemożliwe jest zaimplementowanie Adjusted Cosine Similarity z centrowaniem średniej dla eliminacji wartości progowej (bias) wynikającej z różnych skal zakupowych użytkowników (hurtownik vs konsument indywidualny),
 \item \textbf{Wymóg dużych zbiorów danych} - według dokumentacji AWS, system wymaga minimum 25000 interakcji dla zapewnienia wysokiej jakości rekomendacji. Dla nowych platform (cold start - problem zimnego startu) jakość jest ograniczona w początkowym okresie działania.
 \end{itemize}
 
@@ -305,12 +303,9 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 
 \begin{itemize}
 \item \textbf{Bardzo wysokie koszty operacyjne} - koszty usług GCP są często wyższe niż konkurencyjnych rozwiązań chmurowych, co czyni je nieopłacalnymi dla małych i średnich platform e-commerce,
-
-\item \textbf{Brak wieloźródłowej agregacji sentymentu} - Google Recommendations AI oferuje funkcję ,,Frequently Bought Together'' (często kupowane razem, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych jak w planowanym systemie,
-
+\item \textbf{Brak wieloźródłowej agregacji sentymentu} - Google Recommendations AI oferuje funkcję ``Frequently Bought Together'' (często kupowane razem, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych jak w planowanym systemie,
 \item \textbf{Wymóg bardzo dużych zbiorów danych} - rozwiązanie zaprojektowane dla platform o skali YouTube, co czyni je nadmiarowo złożonym dla małych sklepów internetowych,
-
-\item \textbf{Brak interpretowalności} - głęboka ,,black box'', gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag embeddings (reprezentacji wektorowych) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację.
+\item \textbf{Brak interpretowalności} - głęboka ,,black box''', gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag embeddings (reprezentacji wektorowych) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację.
 \end{itemize}
 
 \subsection*{2.3 Apache Mahout}
@@ -322,11 +317,8 @@ Apache Mahout to open-source framework (otwartoźródłowy framework) implementu
 
 \begin{itemize}
 \item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów), oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie z Apache Spark,
-
 \item \textbf{Koszty infrastruktury} - utrzymanie klastra Spark wymaga dedykowanych zasobów serwerowych oraz czasu na implementację integracji (REST API, baza danych, cache, frontend), co generuje znaczące koszty operacyjne,
-
 \item \textbf{Brak analizy sentymentu} - Apache Mahout nie oferuje sentiment analysis. Wymagana jest integracja z zewnętrznymi bibliotekami (np. Stanford CoreNLP) lub samodzielna implementacja słownikowej analizy sentymentu,
-
 \item \textbf{Wolniejszy rozwój projektu} - aktywność projektu spadła w ostatnich latach (2-3 commity miesięcznie w 2023-2024 vs 20-30 commitów w latach 2012-2014), co skutkuje ograniczoną dokumentacją dla nowszych wersji.
 \end{itemize}
 
@@ -365,6 +357,7 @@ Własna implementacja umożliwia unikalne podejścia niedostępne w gotowych roz
 Aplikacja oparta na Django + React + PostgreSQL może być wdrożona na dowolnej platformie: AWS, GCP, Azure, własne serwery lub localhost. Migracja między platformami wymaga jedynie zmiany parametrów połączenia - logika rekomendacji pozostaje niezmieniona.
 
 Dla porównania: migracja z Amazon Personalize do Google Recommendations AI wymaga przepisania całej integracji (śledzenie zdarzeń (event tracking), dane treningowe, wywołania API) oraz retrainingu modeli, co może trwać tygodnie i powodować degradację jakości rekomendacji.
+\end{itemize}
 
 \textbf{Podsumowanie}:
 
@@ -384,16 +377,16 @@ Rozwiązanie jest szczególnie atrakcyjne dla platform potrzebujących zaawansow
 \addcontentsline{toc}{section}{Rozdział 3: Opis projektu planowanej aplikacji}
 \section*{Opis projektu planowanej aplikacji}
 
-Niniejszy rozdział przedstawia szczegółowy opis planowanej aplikacji e-commerce z zaawansowanym systemem rekomendacji produktów. Zaprezentowano diagram przypadków użycia ilustrujący interakcje użytkowników z systemem oraz opisano kluczowe funkcjonalności z perspektywy różnych typów użytkowników.
+Rozdział przedstawia szczegółowy opis planowanej aplikacji e-commerce z zaawansowanym systemem rekomendacji produktów. Zaprezentowano diagram przypadków użycia ilustrujący interakcje użytkowników z systemem oraz opisano kluczowe funkcjonalności z perspektywy różnych typów użytkowników.
 
 \subsection*{3.1 Cel i zakres aplikacji}
 \addcontentsline{toc}{subsection}{3.1 Cel i zakres aplikacji}
 
 Aplikacja stanowi kompleksowe rozwiązanie e-commerce integrujące trzy komplementarne metody rekomendacji produktów:
 \begin{itemize}
-\item \textbf{Collaborative Filtering} - odkrywanie produktów podobnych na podstawie wzorców zakupowych użytkowników
-\item \textbf{Sentiment Analysis} - ocena jakości produktów poprzez analizę opinii i treści
-\item \textbf{Association Rules (Apriori)} - identyfikacja produktów często kupowanych razem
+\item \textbf{Collaborative Filtering} - odkrywanie produktów podobnych na podstawie wzorców zakupowych użytkowników,
+\item \textbf{Sentiment Analysis} - ocena jakości produktów poprzez analizę opinii i treści,
+\item \textbf{Association Rules (Apriori)} - identyfikacja produktów często kupowanych razem.
 \end{itemize}
 
 System został zaprojektowany z myślą o małych i średnich platformach e-commerce (do 10000 produktów, do 100000 użytkowników), zapewniając funkcjonalności rekomendacyjne porównywalne z rozwiązaniami enterprise przy znacznie niższych kosztach operacyjnych.
@@ -405,44 +398,44 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 
 \textbf{Dla gości (użytkowników niezalogowanych):}
 \begin{itemize}
-\item Przeglądanie katalogu produktów
-\item Wyszukiwanie produktów z wykorzystaniem różnych metod sortowania
-\item Dodawanie produktów do koszyka
-\item Logowanie do systemu
-\item Rejestracja w systemie
+\item Przeglądanie katalogu produktów,
+\item Wyszukiwanie produktów z wykorzystaniem różnych metod sortowania,
+\item Dodawanie produktów do koszyka,
+\item Logowanie do systemu,
+\item Rejestracja w systemie.
 \end{itemize}
 
+\newpage
 \textbf{Dla klientów (użytkowników zalogowanych):}
 \begin{itemize}
-\item Wszystkie funkcjonalności gościa
-\item Składanie zamówień
-\item Śledzenie statusu zamówień
-\item Zarządzanie kontem użytkownika
-\item Wyświetlanie profilu użytkownika
-\item Wyświetlanie historii zamówień
-\item Edycja danych osobowych
-\item Przeglądanie rekomendacji
-\item Rekomendacje metody reguł asocjacyjnych
-\item Rekomendacje metody analizy sentymentu
+\item Wszystkie funkcjonalności gościa,
+\item Składanie zamówień,
+\item Śledzenie statusu zamówień,
+\item Zarządzanie kontem użytkownika,
+\item Wyświetlanie profilu użytkownika,
+\item Wyświetlanie historii zamówień,
+\item Edycja danych osobowych,
+\item Przeglądanie rekomendacji w sekcjach strony głównej,
+\item Rekomendacje metody reguł asocjacyjnych w koszyku.
 \end{itemize}
 
 \textbf{Dla administratorów:}
 \begin{itemize}
-\item Zarządzanie kontem administratora
-\item Zarządzanie produktami (dodawanie, edycja, usuwanie)
-\item Zarządzanie zamówieniami użytkowników
-\item Zmiana statusów zamówień
-\item Zarządzanie użytkownikami
-\item Przeglądanie statystyk sprzedaży
-\item Przeglądanie panelu analitycznego (dashboard)
-\item Wyświetlanie statystyk
-\item Sprawdzanie statusu zamówień
+\item Zarządzanie kontem administratora,
+\item Zarządzanie produktami (dodawanie, edycja, usuwanie),
+\item Zarządzanie zamówieniami użytkowników,
+\item Zmiana statusów zamówień,
+\item Zarządzanie użytkownikami,
+\item Przeglądanie statystyk sprzedaży,
+\item Przeglądanie panelu analitycznego (dashboard),
+\item Wyświetlanie statystyk,
+\item Sprawdzanie statusu zamówień,
 \item Debugowanie algorytmów rekomendacji:
   \begin{itemize}
-  \item Przeglądanie podglądu rekomendacji
-  \item Sprawdzanie poprawności działania algorytmów rekomendacyjnych
-  \item Wyświetlanie statystyk metod rekomendacji
-  \end{itemize}
+\item Przeglądanie podglądu rekomendacji,
+\item Sprawdzanie poprawności działania algorytmów rekomendacyjnych,
+\item Wyświetlanie statystyk metod rekomendacji.
+\end{itemize}
 \end{itemize}
 
 \subsection*{3.3 Diagram przypadków użycia}
@@ -459,7 +452,7 @@ Diagram przypadków użycia (rys. \ref{fig:use_case_project}) przedstawia komple
 
 \textbf{Ogólny opis diagramu:}
 
-Diagram został zorganizowany wokół trzech głównych aktorów, z których każdy ma dostęp do różnych poziomów funkcjonalności systemu. Relacje dziedziczenia między aktorami (Gość → Klient → Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
+Diagram został zorganizowany wokół trzech głównych aktorów, z których każdy ma dostęp do różnych poziomów funkcjonalności systemu. Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
 
 System został podzielony na trzy główne obszary funkcjonalne:
 
@@ -471,60 +464,60 @@ System został podzielony na trzy główne obszary funkcjonalne:
 
 \textbf{Klient} - użytkownik zalogowany, który dziedziczy wszystkie funkcje gościa oraz dodatkowo może:
 \begin{itemize}
-\item \textbf{Składać zamówienia} - finalizacja zakupu produktów z koszyka
-\item \textbf{Śledzić status zamówień} - monitoring postępu realizacji zamówień (oczekujące, w realizacji, zakończone, anulowane)
-\item \textbf{Zarządzać kontem} - edycja danych osobowych, zmiana hasła
-\item \textbf{Wyświetlać profil użytkownika} - podgląd informacji o koncie
-\item \textbf{Przeglądać historię zamówień} - dostęp do wszystkich wcześniejszych transakcji
-\item \textbf{Edytować dane osobowe} - aktualizacja imienia, nazwiska, adresu e-mail
+\item \textbf{Składać zamówienia} - finalizacja zakupu produktów z koszyka,
+\item \textbf{Śledzić status zamówień} - monitoring postępu realizacji zamówień (oczekujące, w realizacji, zakończone, anulowane),
+\item \textbf{Zarządzać kontem} - edycja danych osobowych, zmiana hasła,
+\item \textbf{Wyświetlać profil użytkownika} - podgląd informacji o koncie,
+\item \textbf{Przeglądać historię zamówień} - dostęp do wszystkich wcześniejszych transakcji,
+\item \textbf{Edytować dane osobowe} - aktualizacja imienia, nazwiska, adresu e-mail,
 \item \textbf{Przeglądać rekomendacje} - dostęp do spersonalizowanych sugestii produktów generowanych przez:
   \begin{itemize}
-  \item \textit{Collaborative Filtering} - rekomendacje oparte na historii zakupów użytkownika i podobieństwie do innych klientów
-  \item \textit{Metodę reguł asocjacyjnych (Apriori)} - produkty często kupowane razem, rekomendacje typu ,,Często kupowane razem''
-  \item \textit{Metodę analizy sentymentu} - produkty o najlepszych opiniach dopasowane do preferencji użytkownika
-  \end{itemize}
+\item \textit{Collaborative Filtering} - rekomendacje oparte na historii zakupów użytkownika i podobieństwie do innych klientów,
+\item \textit{Metodę reguł asocjacyjnych (Apriori)} - produkty często kupowane razem, rekomendacje typu ``Często kupowane razem'',
+\item \textit{Metodę analizy sentymentu} - produkty o najlepszych opiniach dopasowane do preferencji użytkownika.
+\end{itemize}
 \end{itemize}
 
 \textbf{Administrator} - użytkownik z najwyższymi uprawnieniami, który dziedziczy wszystkie funkcje klienta oraz dodatkowo ma dostęp do:
 \begin{itemize}
-\item \textbf{Zarządzanie kontem administratora} - edycja ustawień konta administracyjnego
+\item \textbf{Zarządzanie kontem administratora} - edycja ustawień konta administracyjnego,
 \item \textbf{Zarządzanie produktami} - pełny zakres operacji CRUD:
   \begin{itemize}
-  \item Dodawanie produktów do katalogu
-  \item Edycja istniejących produktów (nazwa, opis, cena, specyfikacje, kategorie)
-  \item Usuwanie produktów z potwierdzeniem
-  \end{itemize}
+\item Dodawanie produktów do katalogu,
+\item Edycja istniejących produktów (nazwa, opis, cena, kategorie),
+\item Usuwanie produktów z potwierdzeniem.
+\end{itemize}
 \item \textbf{Zarządzanie zamówieniami} - administracja transakcjami użytkowników:
   \begin{itemize}
-  \item Przeglądanie wszystkich zamówień w systemie
-  \item Zmiana statusów zamówień (oczekujące → w realizacji → zakończone lub anulowane)
-  \item Generowanie raportów sprzedażowych
-  \end{itemize}
+\item Przeglądanie wszystkich zamówień w systemie,
+\item Zmiana statusów zamówień (oczekujące $\rightarrow$ w realizacji $\rightarrow$ zakończone lub anulowane),
+\item Generowanie raportów sprzedażowych.
+\end{itemize}
 \item \textbf{Zarządzanie użytkownikami} - administracja kontami:
   \begin{itemize}
-  \item Lista wszystkich użytkowników
-  \item Nadawanie uprawnień
-  \item Usuwanie użytkowników
-  \end{itemize}
+\item Lista wszystkich użytkowników,
+\item Nadawanie uprawnień,
+\item Usuwanie użytkowników.
+\end{itemize}
 \item \textbf{Przeglądanie statystyk} - dostęp do zaawansowanych analiz:
   \begin{itemize}
-  \item Panel analityczny (dashboard) z kluczowymi wskaźnikami: liczba produktów, użytkowników, zamówień
-  \item Wykresy sprzedaży - miesięczny obrót, najpopularniejsze kategorie
-  \end{itemize}
+\item Panel analityczny (dashboard) z kluczowymi wskaźnikami: liczba produktów, użytkowników, zamówień,
+\item Wykresy sprzedaży - miesięczny obrót, najpopularniejsze kategorie.
+\end{itemize}
 \item \textbf{Debugowanie algorytmów rekomendacji} - narzędzia diagnostyczne:
   \begin{itemize}
-  \item \textit{Podgląd rekomendacji} - sprawdzenie jakie produkty są rekomendowane dla konkretnego użytkownika lub produktu
-  \item \textit{Sprawdzanie poprawności} - walidacja czy algorytmy działają zgodnie z oczekiwaniami
-  \item \textit{Wyświetlanie statystyk metod} - szczegółowe metryki dla każdej metody rekomendacji
-  \end{itemize}
+\item \textit{Podgląd rekomendacji} - sprawdzenie jakie produkty są rekomendowane dla konkretnego użytkownika lub produktu,
+\item \textit{Sprawdzanie poprawności} - walidacja czy algorytmy działają zgodnie z oczekiwaniami,
+\item \textit{Wyświetlanie statystyk metod} - szczegółowe metryki dla każdej metody rekomendacji.
+\end{itemize}
 \end{itemize}
 
 \textbf{Relacje między przypadkami użycia:}
 
 Diagram wyraźnie pokazuje hierarchię dziedziczenia funkcjonalności:
 \begin{itemize}
-\item \textbf{Gość → Klient}: relacja ``extends'' - Klient dziedziczy wszystkie funkcje Gościa (przeglądanie, wyszukiwanie, koszyk, logowanie, rejestracja) oraz otrzymuje dostęp do funkcji transakcyjnych (zamówienia, historia, rekomendacje)
-\item \textbf{Klient → Administrator}: relacja ``extends'' - Administrator dziedziczy wszystkie funkcje Klienta oraz otrzymuje narzędzia zarządzania systemem (produkty, zamówienia, użytkownicy, statystyki, debugowanie)
+\item \textbf{Gość $\rightarrow$ Klient}: relacja ``extends'' - Klient dziedziczy wszystkie funkcje Gościa (przeglądanie, wyszukiwanie, koszyk, logowanie, rejestracja) oraz otrzymuje dostęp do funkcji transakcyjnych (zamówienia, historia, rekomendacje),
+\item \textbf{Klient $\rightarrow$ Administrator}: relacja ``extends'' - Administrator dziedziczy wszystkie funkcje Klienta oraz otrzymuje narzędzia zarządzania systemem (produkty, zamówienia, użytkownicy, statystyki, debugowanie).
 \end{itemize}
 
 \subsection*{3.4 Architektura funkcjonalna systemu}
@@ -534,25 +527,25 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 
 \textbf{Warstwa prezentacji} - interfejsy użytkownika dostosowane do ról (klient, administrator):
 \begin{itemize}
-\item \textbf{Panel klienta} - panel główny (dashboard) z historią zamówień, sekcja rekomendacji, edycja profilu
-\item \textbf{Panel administracyjny} - zarządzanie produktami/zamówieniami/użytkownikami, statystyki, panele debugowania ML
+\item \textbf{Panel klienta} - panel główny (dashboard) z historią zamówień, sekcja rekomendacji, edycja profilu,
+\item \textbf{Panel administracyjny} - zarządzanie produktami/zamówieniami/użytkownikami, statystyki, panele debugowania.
 \end{itemize}
 
 \textbf{Warstwa logiki biznesowej} - implementacja trzech algorytmów rekomendacji oraz logiki e-commerce:
 \begin{itemize}
-\item \textbf{Moduł Collaborative Filtering} - generowanie macierzy podobieństwa produktów, rekomendacje oparte na produktach (item-based)
-\item \textbf{Moduł Sentiment Analysis} - agregacja sentymentu z 5 źródeł tekstowych (opinie, opis, nazwa, specyfikacje, kategorie)
-\item \textbf{Moduł Apriori} - generowanie reguł asocjacyjnych typu ,,Często kupowane razem''
-\item \textbf{Logika transakcyjna} - składanie zamówień, zarządzanie statusami, walidacja danych
+\item \textbf{Moduł Collaborative Filtering} - generowanie macierzy podobieństwa produktów, rekomendacje oparte na produktach (item-based),
+\item \textbf{Moduł Sentiment Analysis} - agregacja sentymentu z 5 źródeł tekstowych (opinie, opis, nazwa, specyfikacje, kategorie),
+\item \textbf{Moduł Apriori} - generowanie reguł asocjacyjnych typu ``Często kupowane razem'',
+\item \textbf{Logika transakcyjna} - składanie zamówień, zarządzanie statusami, walidacja danych.
 \end{itemize}
 
 \textbf{Warstwa danych} - relacyjna baza danych PostgreSQL przechowująca:
 \begin{itemize}
-\item Dane produktów (nazwa, opis, cena, kategorie, specyfikacje, zdjęcia)
-\item Dane użytkowników (konta, profile, uprawnienia)
-\item Dane transakcyjne (zamówienia, produkty w zamówieniach, statusy)
-\item Dane opinii (recenzje tekstowe, oceny gwiazdkowe, sentyment)
-\item Wyniki algorytmów (macierze podobieństwa, reguły asocjacyjne, zagregowany sentiment)
+\item Dane produktów (nazwa, opis, cena, kategorie, specyfikacje, zdjęcia),
+\item Dane użytkowników (konta, profile, uprawnienia),
+\item Dane transakcyjne (zamówienia, produkty w zamówieniach, statusy),
+\item Dane opinii (recenzje tekstowe, oceny gwiazdkowe, sentyment),
+\item Wyniki algorytmów (macierze podobieństwa, reguły asocjacyjne, zagregowany sentiment).
 \end{itemize}
 
 \textbf{Integracja warstw} odbywa się poprzez RESTful API z automatyczną synchronizacją - zmiana danych w jednej warstwie propaguje aktualizacje do pozostałych.
@@ -562,36 +555,35 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 
 \textbf{Scenariusz 1: Użytkownik niezalogowany przegląda produkty}
 
-Gość wchodzi na stronę główną aplikacji. Nawiguje do katalogu produktów, filtruje po kategorii ,,Laptopy'', sortuje według ,,Najlepszy sentyment''. Przegląda kilka produktów, dodaje wybrany laptop do koszyka. W koszyku widzi sekcję ,,Często kupowane razem'' z torbą i myszą (rekomendacje Apriori). Decyduje się również dodać torbę. Przy próbie finalizacji zamówienia system przekierowuje do logowania/rejestracji.
+Gość wchodzi na stronę główną aplikacji. Nawiguje do katalogu produktów, filtruje po kategorii ,,Laptopy''', sortuje według ,,Najlepszy sentyment'''. Przegląda kilka produktów, dodaje wybrany laptop do koszyka. W koszyku widzi sekcję ``Często kupowane razem'' z torbą i myszą (rekomendacje Apriori). Decyduje się również dodać torbę. Przy próbie finalizacji zamówienia system przekierowuje do logowania/rejestracji.
 
 \textbf{Scenariusz 2: Klient składa zamówienie i śledzi jego status}
 
-Użytkownik loguje się do systemu. Przechodzi do koszyka, klika ,,Przejdź do kasy'', wypełnia dane dostawy i płatności. Po złożeniu zamówienia otrzymuje potwierdzenie ze statusem ,,oczekujące''. W panelu klienta (zakładka ,,Zamówienia'') widzi listę wszystkich zamówień z możliwością śledzenia statusu w czasie rzeczywistym (oczekujące → w realizacji → zakończone).
+Użytkownik loguje się do systemu. Przechodzi do koszyka, klika ,,Przejdź do kasy''', wypełnia dane dostawy i płatności. Po złożeniu zamówienia otrzymuje potwierdzenie ze statusem ,,oczekujące'''. W panelu klienta (zakładka ,,My Orders''') widzi listę wszystkich zamówień z możliwością śledzenia statusu w czasie rzeczywistym (oczekujące $\rightarrow$ w realizacji $\rightarrow$ zakończone).
 
-\textbf{Scenariusz 3: Klient przegląda spersonalizowane rekomendacje}
+\textbf{Scenariusz 3: Administrator zarządza produktami}
 
-Zalogowany użytkownik wchodzi do panelu klienta (zakładka ,,Recommendations''). System wyświetla trzy sekcje rekomendacji:
-\begin{itemize}
-\item produkty podobne do wcześniej zakupionych (Collaborative Filtering)
-\item produkty o najwyższym sentymie w kategoriach które użytkownik kupował (Sentiment)
-\item produkty często kupowane razem z produktami w historii użytkownika (Apriori)
-\end{itemize}
-Użytkownik klika na produkt, dodaje do koszyka i finalizuje kolejny zakup.
+Administrator loguje się do panelu administracyjnego. Wchodzi do sekcji ,,Products''', klika ,,Add New Product'''. Wypełnia formularz (nazwa, opis, cena, specyfikacje), przypisuje kategorie. Po zapisaniu produktu, system automatycznie przelicza jego wynik sentymentu (sentiment score) na podstawie opisu i nazwy (brak jeszcze opinii). Administrator może również edytować istniejące produkty lub usuwać te o niskim sentymencie.
 
-\textbf{Scenariusz 4: Administrator zarządza produktami}
+\textbf{Scenariusz 4: Klient wystawia opinię i system przelicza sentyment}
 
-Administrator loguje się do panelu administracyjnego. Wchodzi do sekcji ,,Products'', klika ,,Add New Product''. Wypełnia formularz (nazwa, opis, cena, specyfikacje), wgrywa (upload) zdjęcia, przypisuje kategorie. Po zapisaniu produktu, system automatycznie przelicza jego wynik sentymentu (sentiment score) na podstawie opisu i nazwy (brak jeszcze opinii). Administrator może również edytować istniejące produkty lub usuwać te o niskim sentymie.
+Zalogowany użytkownik przechodzi do panelu klienta, otwiera zakładkę ,,My Orders'''. Znajduje zakończone zamówienie, klika ,,Add Review'' przy zakupionym produkcie. Wypełnia formularz opinii (ocena 1-5 gwiazdek oraz treść tekstowa). Po zapisaniu system automatycznie wywołuje algorytm analizy sentymentu, który tokenizuje tekst, wyszukuje słowa kluczowe w słowniku pozytywnym/negatywnym i oblicza zagregowany wynik sentymentu. Zaktualizowany wynik jest natychmiast widoczny dla wszystkich użytkowników na stronie produktu.
 
-\textbf{Scenariusz 5: Administrator przegląda statystyki}
+\textbf{Scenariusz 5: Administrator przegląda statystyki i prognozy sprzedaży}
 
-Administrator wchodzi do sekcji ,,Statystyki''. Panel analityczny (dashboard) wyświetla:
-\begin{itemize}
-\item KPI cards: 500 produktów, 1250 użytkowników (z czego 1200 klientów, 50 adminów), 3450 zamówień, średnia wartość koszyka 850 PLN
-\item Wykres miesięcznej sprzedaży - trend rosnący, najlepszy miesiąc grudzień (540000 PLN)
-\item Top 10 produktów - bestsellery według liczby sprzedaży
-\item Wykres konwersji - 12\% użytkowników dodających do koszyka finalizuje zakup
-\item Metryki rekomendacji - CTR (współczynnik klikalności) dla Collaborative Filtering: 18\%, dla Apriori: 22\%, dla sentymentu: 15\%
-\end{itemize}
+Administrator wchodzi do sekcji ,,Statistics'' w panelu administracyjnym. Dashboard wyświetla kluczowe metryki: całkowita liczba zamówień, przychód, najpopularniejsze kategorie.
+
+\textbf{Scenariusz 6: Administrator debuguje algorytmy rekomendacji}
+
+Administrator otwiera sekcję ,,Debug ML'' w panelu administracyjnym. Przegląda panel debugowania Collaborative Filtering - widzi macierz podobieństw produktów, formułę Adjusted Cosine Similarity oraz statystyki (liczba par produktów, średnie podobieństwo). Przechodzi do panelu Apriori - analizuje wygenerowane reguły asocjacyjne posortowane według lift, sprawdza metryki wydajności bitmap pruning. W panelu Sentiment Analysis weryfikuje rozkład opinii i wieloźródłową agregację sentymentu.
+
+\textbf{Scenariusz 7: Klient wyszukuje produkty z filtrem sentymentu}
+
+Użytkownik otwiera wyszukiwarkę z paska nawigacyjnego, wpisuje zapytanie ,,laptop gaming'''. System wykonuje wyszukiwanie full-text w polach nazwa i opis produktu, filtruje wyniki z \texttt{sentiment\_score} $\geq$ 0.5, sortuje malejąco według sentymentu.
+
+\textbf{Scenariusz 8: Gość przegląda koszyk z rekomendacjami cross-selling}
+
+Niezalogowany użytkownik dodaje laptop do koszyka. Przechodzi do widoku koszyka - system automatycznie wyświetla sekcję ,,Frequently Bought Together'' z trzema produktami wygenerowanymi przez algorytm Apriori (torba na laptopa, mysz bezprzewodowa, hub). Każda rekomendacja zawiera metryki lift i confidence. Użytkownik decyduje się dodać torbę i mysz jednym kliknięciem. Przy próbie finalizacji zamówienia system przekierowuje do logowania.
 
 \subsection*{3.6 Podsumowanie opisu projektu}
 \addcontentsline{toc}{subsection}{3.6 Podsumowanie opisu projektu}
@@ -600,10 +592,10 @@ Planowana aplikacja e-commerce z zaawansowanym systemem rekomendacji została za
 
 Kluczowe cechy projektu:
 \begin{itemize}
-\item \textbf{Hierarchia uprawnień} - przejrzysta struktura dziedziczenia funkcjonalności między rolami
-\item \textbf{Kompleksowość} - pokrycie wszystkich etapów od przeglądania po zarządzanie systemem
-\item \textbf{Integracja rekomendacji} - trzy metody rekomendacyjne zintegrowane w przepływ użytkownika
-\item \textbf{Narzędzia diagnostyczne} - panele debugowania dla administratora umożliwiające monitoring i optymalizację algorytmów
+\item \textbf{Hierarchia uprawnień} - przejrzysta struktura dziedziczenia funkcjonalności między rolami,
+\item \textbf{Kompleksowość} - pokrycie wszystkich etapów od przeglądania po zarządzanie systemem,
+\item \textbf{Integracja rekomendacji} - metody rekomendacyjne zintegrowane w przepływ użytkownika,
+\item \textbf{Narzędzia diagnostyczne} - panele debugowania dla administratora umożliwiające monitoring i optymalizację algorytmów.
 \end{itemize}
 
 Szczegółowa realizacja techniczna projektu, w tym wykorzystane technologie oraz implementacja algorytmów, zostanie przedstawiona w kolejnych rozdziałach pracy.
@@ -615,7 +607,7 @@ Szczegółowa realizacja techniczna projektu, w tym wykorzystane technologie ora
 \addcontentsline{toc}{section}{Rozdział 4: Przedstawienie wykorzystanego stosu technologicznego oraz praktycznej realizacji projektu}
 \section*{Przedstawienie wykorzystanego stosu technologicznego oraz praktycznej realizacji projektu}
 
-Niniejszy rozdział prezentuje szczegółowy opis technologii wykorzystanych w implementacji systemu e-commerce oraz praktyczne aspekty realizacji projektu. Przedstawiono architekturę techniczną aplikacji, komponenty frontendowe, strukturę bazy danych oraz mechanizmy wdrożenia.
+Szczegółowy opis technologii wykorzystanych w implementacji systemu e-commerce oraz praktyczne aspekty realizacji projektu. Przedstawiono architekturę techniczną aplikacji, komponenty frontendowe, strukturę bazy danych oraz mechanizmy wdrożenia.
 
 \subsection*{4.1 Architektura systemu}
 \addcontentsline{toc}{subsection}{4.1 Architektura systemu}
@@ -625,42 +617,42 @@ Aplikacja została zaprojektowana w architekturze klient-serwer opartej na techn
 \textbf{Główne założenia architektoniczne:}
 
 \begin{itemize}
-\item \textbf{Separacja frontendu i backendu} - możliwość niezależnego rozwoju i skalowania obu warstw
-\item \textbf{Podejście API-first (API-first approach)} - wszystkie funkcjonalności dostępne przez REST API
-\item \textbf{Uwierzytelnianie bezstanowe (Stateless authentication)} - token JWT eliminuje potrzebę sesji po stronie serwera
-\item \textbf{Modułowa struktura} - każdy algorytm rekomendacji stanowi niezależny moduł
+\item \textbf{Separacja frontendu i backendu} - możliwość niezależnego rozwoju i skalowania obu warstw,
+\item \textbf{Podejście API-first (API-first approach)} - wszystkie funkcjonalności dostępne przez REST API,
+\item \textbf{Uwierzytelnianie bezstanowe (Stateless authentication)} - token JWT eliminuje potrzebę sesji po stronie serwera,
+\item \textbf{Modułowa struktura} - każdy algorytm rekomendacji stanowi niezależny moduł.
 \end{itemize}
 
 \subsection*{4.2 Stos technologiczny backendu}
 \addcontentsline{toc}{subsection}{4.2 Stos technologiczny backendu}
 
-\textbf{Django 4.2 (Python 3.11)}
+\textbf{Django 5.1.4 (Python 3.11)}
 
-Django stanowi fundament aplikacji serwerowej, zapewniając architekturę MVC, system ORM dla abstrakcji bazy danych oraz mechanizmy bezpieczeństwa. Kluczowe komponenty:
+Django stanowi fundament aplikacji serwerowej, zapewniając architekturę MVC, system ORM (Object-Relational Mapping - mapowanie obiektowo-relacyjne) dla abstrakcji bazy danych oraz mechanizmy bezpieczeństwa. Kluczowe komponenty:
 
 \begin{itemize}
-\item \textbf{Django ORM} - mapowanie obiektowo-relacyjne umożliwiające operacje na bazie bez SQL
-\item \textbf{Django Signals} - mechanizm automatycznej aktualizacji rekomendacji przy zmianach danych
-\item \textbf{Django Middleware (oprogramowanie pośredniczące)} - obsługa CORS, uwierzytelnienie JWT, pamięć podręczna
+\item \textbf{Django ORM} - mapowanie obiektowo-relacyjne umożliwiające operacje na bazie bez SQL,
+\item \textbf{Django Signals} - mechanizm automatycznej aktualizacji rekomendacji przy zmianach danych,
+\item \textbf{Django Middleware (oprogramowanie pośredniczące)} - obsługa CORS, uwierzytelnienie JWT, pamięć podręczna.
 \end{itemize}
 
-\textbf{Django REST Framework 3.14}
+\textbf{Django REST Framework 3.15.2}
 
 Rozszerza Django o funkcjonalności API RESTful:
 
 \begin{itemize}
-\item \textbf{Serializery} - konwersja obiektów Django na JSON z walidacją
-\item \textbf{ViewSets (zestawy widoków)} - widoki implementujące operacje CRUD
-\item \textbf{Uwierzytelnianie (Authentication)} - wsparcie dla JWT, uwierzytelnianie sesyjne
-\item \textbf{Pagination (paginacja)} - automatyczne stronicowanie wyników
+\item \textbf{Serializery} - konwersja obiektów Django na JSON z walidacją,
+\item \textbf{ViewSets (zestawy widoków)} - widoki implementujące operacje CRUD,
+\item \textbf{Uwierzytelnianie (Authentication)} - wsparcie dla JWT, uwierzytelnianie sesyjne,
+\item \textbf{Pagination (paginacja)} - automatyczne stronicowanie wyników.
 \end{itemize}
 
 \textbf{Biblioteki Machine Learning}
 
+Do operacji numerycznych i obliczania podobieństw wykorzystano:
 \begin{itemize}
-\item \textbf{scikit-learn 1.3} - funkcja cosine\_similarity() dla Collaborative Filtering
-\item \textbf{NumPy 1.24} - operacje macierzowe, przycinanie bitmapowe (bitmap pruning) w Apriori
-\item \textbf{pandas 2.0} - operacje na DataFrame dla danych transakcyjnych
+\item \textbf{scikit-learn} - funkcja cosine\_similarity() dla Collaborative Filtering (Collaborative Filtering),
+\item \textbf{NumPy} - operacje macierzowe, wektoryzacja obliczeń, przycinanie bitmapowe (bitmap pruning) w Apriori.
 \end{itemize}
 
 \textbf{Struktura backendu}
@@ -668,13 +660,13 @@ Rozszerza Django o funkcjonalności API RESTful:
 Każdy komponent systemu posiada dedykowane pliki:
 
 \begin{itemize}
-\item \textbf{models.py} – definicje tabel (Product, Order, Opinion, ProductSimilarity)
-\item \textbf{serializers.py} – konwersja obiektów Django ↔ JSON
-\item \textbf{views.py} – obsługa CRUD dla produktów, zamówień
-\item \textbf{recommendation\_views.py} – endpoint /api/collaborative-filtering/
-\item \textbf{sentiment\_views.py} – endpoint /api/sentiment-search/
-\item \textbf{association\_views.py} – endpoint /api/association-recommendations/
-\item \textbf{signals.py} – automatyczna aktualizacja rekomendacji
+\item \textbf{models.py} -- definicje tabel (Product, Order, Opinion, ProductSimilarity),
+\item \textbf{serializers.py} -- konwersja obiektów Django $\leftrightarrow$ JSON,
+\item \textbf{views.py} -- obsługa CRUD dla produktów, zamówień,
+\item \textbf{recommendation\_views.py} -- endpoint /api/collaborative-filtering/,
+\item \textbf{sentiment\_views.py} -- endpoint /api/sentiment-search/,
+\item \textbf{association\_views.py} -- endpoint /api/association-recommendations/,
+\item \textbf{signals.py} -- automatyczna aktualizacja rekomendacji.
 \end{itemize}
 
 \subsection*{4.3 Stos technologiczny frontendu}
@@ -685,30 +677,30 @@ Każdy komponent systemu posiada dedykowane pliki:
 React stanowi fundament aplikacji jednostronicowej (Single Page Application - SPA):
 
 \begin{itemize}
-\item \textbf{Architektura komponentowa (Component-based)} - reużywalne komponenty UI
-\item \textbf{Virtual DOM (wirtualny DOM)} - optymalizacja renderowania
-\item \textbf{React Hooks (haki React)} - useState, useEffect, useContext
+\item \textbf{Architektura komponentowa (Component-based)} - reużywalne komponenty UI,
+\item \textbf{Virtual DOM (wirtualny DOM)} - optymalizacja renderowania,
+\item \textbf{React Hooks (haki React)} - useState, useEffect, useContext.
 \end{itemize}
 
 \textbf{Biblioteki wspierające}
 
 \begin{itemize}
-\item \textbf{React Router v6} - trasowanie (routing) dla aplikacji SPA
-\item \textbf{Axios} - komunikacja z API, przechwytywacze JWT (interceptors)
-\item \textbf{Framer Motion} - płynne animacje
-\item \textbf{Context API} - zarządzanie stanem (AuthContext, CartContext)
+\item \textbf{React Router v6} - trasowanie (routing) dla aplikacji SPA,
+\item \textbf{Axios} - komunikacja z API, przechwytywacze JWT (interceptors),
+\item \textbf{Framer Motion} - płynne animacje,
+\item \textbf{Context API} - zarządzanie stanem (AuthContext, CartContext).
 \end{itemize}
 
 \textbf{Architektura komponentów}
 
 \begin{itemize}
-\item \textbf{App.js} – trasowanie, globalne dostawcy kontekstu (Context providers)
-\item \textbf{Navbar.jsx} – nawigacja z wyszukiwarką i ikoną koszyka
-\item \textbf{SearchModal.jsx} – wyszukiwarka z sortowaniem sentymentu
-\item \textbf{ProductPage.jsx} – strona produktu z rekomendacjami Collaborative Filtering i Apriori
-\item \textbf{CartContent.jsx} – koszyk z cross-selling (Apriori)
-\item \textbf{ClientPanel.jsx} – panel główny klienta z personalizowanymi rekomendacjami
-\item \textbf{AdminPanel.jsx} – panel zarządzania produktami, zamówieniami, statystykami
+\item \textbf{App.js} -- trasowanie, globalne dostawcy kontekstu (Context providers),
+\item \textbf{Navbar.jsx} -- nawigacja z wyszukiwarką i ikoną koszyka,
+\item \textbf{SearchModal.jsx} -- wyszukiwarka z sortowaniem sentymentu,
+\item \textbf{ProductPage.jsx} -- strona produktu z rekomendacjami Collaborative Filtering i Apriori,
+\item \textbf{CartContent.jsx} -- koszyk z cross-selling (Apriori),
+\item \textbf{ClientPanel.jsx} -- panel główny klienta z personalizowanymi rekomendacjami,
+\item \textbf{AdminPanel.jsx} -- panel zarządzania produktami, zamówieniami, statystykami.
 \end{itemize}
 
 \subsection*{4.4 Baza danych PostgreSQL}
@@ -716,26 +708,69 @@ React stanowi fundament aplikacji jednostronicowej (Single Page Application - SP
 
 \textbf{Wybór PostgreSQL 14}
 
-PostgreSQL został wybrany ze względu na:
+PostgreSQL został wybrany jako system zarządzania bazą danych ze względu na następujące cechy:
 
 \begin{itemize}
-\item \textbf{Zaawansowane indeksy} - B-tree, GIN dla wyszukiwania pełnotekstowego (full-text search)
-\item \textbf{JSON support} - typ JSONB dla danych semi-structured
-\item \textbf{Transakcje ACID} - gwarancja spójności danych
-\item \textbf{Klucze obce (Foreign keys)} - wymuszanie integralności referencyjnej
-\item \textbf{Wydajność} - optymalizacja złożonych zapytań JOIN
+\item \textbf{Zaawansowane indeksy} - wsparcie dla B-tree (domyślne), GIN (wyszukiwanie pełnotekstowe), BRIN (optymalizacja dla dużych tabel),
+\item \textbf{Typ danych JSONB} - natywne przechowywanie i indeksowanie struktur JSON (wykorzystane w tabeli \texttt{method\_user\_purchase\_pattern} dla sezonowości zakupów),
+\item \textbf{Transakcje ACID} - gwarancja atomowości, spójności, izolacji i trwałości operacji krytycznych (zamówienia, płatności),
+\item \textbf{Klucze obce i constrainty} - automatyczne wymuszanie integralności referencyjnej oraz walidacji danych (np. rating 1-5 w opiniach),
+\item \textbf{Optymalizacja JOIN} - wydajne łączenie tabel w złożonych zapytaniach rekomendacyjnych,
+\item \textbf{Full-text search} - wbudowane mechanizmy wyszukiwania tekstowego dla produktów.
 \end{itemize}
 
-Baza składa się z **23 tabel** podzielonych na moduły:
+\textbf{Struktura bazy danych}
+
+Baza składa się z \textbf{25 tabel} podzielonych na 4 modułów funkcjonalnych:
+
+\textbf{1. Moduł produktów i użytkowników (12 tabel):}
 
 \begin{itemize}
-\item \textbf{Produkty i kategorie} - 7 tabel
-\item \textbf{Użytkownicy i zamówienia} - 4 tabele
-\item \textbf{Opinie i sentyment} - 3 tabele
-\item \textbf{Metody rekomendacji} - 4 tabele
-\item \textbf{Moduły analityczne} - 5 tabel
+\item \texttt{db\_product} - dane produktów (ID, nazwa, cena, opis),
+\item \texttt{db\_category} - kategorie produktów z hierarchią,
+\item \texttt{db\_product\_category} - relacjaMany-to-Many produktów i kategorii,
+\item \texttt{db\_photo\_product} - ścieżki do zdjęć produktów,
+\item \texttt{db\_specification} - szczegółowe parametry techniczne produktów,
+\item \texttt{db\_tag} - tagi do filtrowania produktów,
+\item \texttt{db\_sale} - promocje i rabaty,
+\item \texttt{db\_user} - konta użytkowników (role: admin/client),
+\item \texttt{db\_order} - zamówienia z timestampami i statusami,
+\item \texttt{db\_order\_product} - produkty w zamówieniach (ilość, cena),
+\item \texttt{db\_cart\_item} - koszyk zakupowy przed finalizacją,
+\item \texttt{db\_complaint} - reklamacje powiązane z zamówieniami.
 \end{itemize}
 
+\textbf{2. Moduł opinii i analizy sentymentu (3 tabele):}
+
+\begin{itemize}
+\item \texttt{db\_opinion} - opinie użytkowników (treść, rating 1-5),
+\item \texttt{method\_sentiment\_analysis} - wyniki analizy sentymentu dla opinii,
+\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktu.
+\end{itemize}
+
+\textbf{3. Moduł metod rekomendacji (5 tabel):}
+
+\begin{itemize}
+\item \texttt{method\_product\_similarity} - macierz podobieństw produktów (Collaborative Filtering),
+\item \texttt{method\_user\_product\_recommendation} - spersonalizowane rekomendacje użytkowników,
+\item \texttt{method\_productassociation} - reguły asocjacyjne Apriori,
+\item \texttt{method\_user\_interactions} - historia interakcji użytkowników,
+\item \texttt{method\_recommendation\_settings} - konfiguracja algorytmów dla użytkownika.
+\end{itemize}
+
+\textbf{4. Moduł analityczny i prognozowanie (5 tabel):}
+
+\begin{itemize}
+\item \texttt{method\_purchase\_probability} - prawdopodobieństwo zakupu produktu przez użytkownika,
+\item \texttt{method\_sales\_forecast} - prognoza sprzedaży produktów,
+\item \texttt{method\_user\_purchase\_pattern} - wzorce zakupowe użytkowników,
+\item \texttt{method\_product\_demand\_forecast} - prognoza popytu i poziomy magazynowe,
+\item \texttt{method\_risk\_assessment} - ocena ryzyka dla użytkowników i produktów.
+\end{itemize}
+
+Wszystkie migracje Django ORM zostały wygenerowane automatycznie na podstawie modeli Python i zarządzane przez system wersjonowania \texttt{django.db.migrations}.
+
+\newpage
 \textbf{Diagramy ERD}
 
 \begin{figure}[H]
@@ -748,12 +783,13 @@ Baza składa się z **23 tabel** podzielonych na moduły:
 Diagram \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje:
 
 \begin{itemize}
-\item \textbf{db\_user → db\_order} (1:N) - jeden użytkownik składa wiele zamówień
-\item \textbf{db\_order → db\_order\_product} (1:N) - zamówienie zawiera wiele produktów
-\item \textbf{db\_product ↔ db\_category} (N:M) - produkt należy do wielu kategorii
-\item \textbf{db\_product → db\_opinion} (1:N) - produkt ma wiele opinii
+\item \textbf{db\_user $\rightarrow$ db\_order} (1:N) - jeden użytkownik składa wiele zamówień,
+\item \textbf{db\_order $\rightarrow$ db\_order\_product} (1:N) - zamówienie zawiera wiele produktów,
+\item \textbf{db\_product $\leftrightarrow$ db\_category} (N:M) - produkt należy do wielu kategorii,
+\item \textbf{db\_product $\rightarrow$ db\_opinion} (1:N) - produkt ma wiele opinii.
 \end{itemize}
 
+\newpage
 \begin{figure}[H]
   \centering
   \includegraphics[width=1\textwidth]{images/methodsErd.png}
@@ -764,32 +800,23 @@ Diagram \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje
 Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
 
 \begin{itemize}
-\item \textbf{method\_product\_similarity} - macierz podobieństw Collaborative Filtering
-\item \textbf{method\_productassociation} - reguły asocjacyjne Apriori
-\item \textbf{method\_sentiment\_analysis} - wyniki analizy sentymentu opinii
-\item \textbf{method\_product\_sentiment\_summary} - zagregowany sentyment produktu
-\item \textbf{method\_user\_product\_recommendation} - cache rekomendacji użytkownika
+\item \textbf{method\_product\_similarity} - macierz podobieństw Collaborative Filtering,
+\item \textbf{method\_productassociation} - reguły asocjacyjne Apriori,
+\item \textbf{method\_sentiment\_analysis} - wyniki analizy sentymentu opinii,
+\item \textbf{method\_product\_sentiment\_summary} - zagregowany sentyment produktu,
+\item \textbf{method\_user\_product\_recommendation} - cache rekomendacji użytkownika.
 \end{itemize}
 
-\textbf{Wyjaśnienie notacji ERD}
-
-Diagramy używają standardowej notacji:
-\begin{itemize}
-\item \textbf{Linia ciągła} - relacja jeden-do-wielu (1:N) przez Foreign Key
-\item \textbf{Linia z kropkami} - relacja wiele-do-wielu (N:M) przez tabelę pośrednią
-\item \textbf{Ikona klucza} - klucz główny (Primary Key) - unikalna wartość identyfikująca wiersz
-\item \textbf{Strzałka} - kierunek relacji FK (wskazuje tabelę nadrzędną)
-\end{itemize}
-
+\newpage
 \textbf{Podsumowanie struktury bazy danych}
 
-Baza danych składa się z 23 tabel zorganizowanych w moduły funkcjonalne. Wypełnianie danymi początkowymi (seeding) wypełnia bazę danymi testowymi:
+Baza danych składa się z 25 tabel zorganizowanych w moduły funkcjonalne. Wypełnianie danymi początkowymi (seeding) wypełnia bazę danymi testowymi:
 \begin{itemize}
-\item 500 produktów
-\item 20 użytkowników (5 adminów + 15 klientów)
-\item 200 zamówień
-\item ~600 rekordów OrderProduct (średnio 3 produkty per zamówienie)
-\item ~1750 opinii (średnio 3.5 opinii per produkt)
+\item 500 produktów,
+\item 20 użytkowników (5 adminów + 15 klientów),
+\item 200 zamówień,
+\item ~600 rekordów OrderProduct (średnio 3 produkty per zamówienie),
+\item ~1750 opinii (średnio 3.5 opinii per produkt).
 \end{itemize}
 
 \subsection*{4.5 Deployment i konteneryzacja Docker}
@@ -806,41 +833,40 @@ Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając sp
 
 Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 
-\textbf{1. Kontener backendu (Django 4.2)}
+\textbf{1. Kontener frontendu (React 18)}
 \begin{itemize}
-\item Base image: python:3.11-slim
-\item Port: 8000
-\item Volumes: montowanie projektu dla automatycznego przeładowania (hot-reload), wolumen dla plików multimedialnych
-\item Environment: DATABASE\_URL, SECRET\_KEY, DEBUG, ALLOWED\_HOSTS
-\item Zależności (Dependencies): requirements.txt (Django, DRF, psycopg2, NumPy, scikit-learn)
+\item Base image: node:18-alpine,
+\item Port: 3000,
+\item Volumes: montowanie src/ dla automatycznego przeładowania (hot-reload),
+\item Environment: REACT\_APP\_API\_URL,
+\item Zależności (Dependencies): package.json (React, Axios, React Router, Framer Motion).
 \end{itemize}
 
-\textbf{2. Kontener frontendu (React 18)}
+\textbf{2. Kontener backendu (Django 5.1.4)}
 \begin{itemize}
-\item Base image: node:18-alpine
-\item Port: 3000
-\item Volumes: montowanie src/ dla automatycznego przeładowania (hot-reload)
-\item Environment: REACT\_APP\_API\_URL
-\item Zależności (Dependencies): package.json (React, Axios, React Router, Framer Motion)
+\item Base image: python:3.11-slim,
+\item Port: 8000,
+\item Volumes: montowanie projektu dla automatycznego przeładowania (hot-reload), wolumen dla plików multimedialnych,
+\item Environment: DATABASE\_URL, SECRET\_KEY, DEBUG, ALLOWED\_HOSTS,
+\item Zależności (Dependencies): requirements.txt (Django, DRF, psycopg2, NumPy, scikit-learn).
 \end{itemize}
 
 \textbf{3. Kontener bazy danych (PostgreSQL 14)}
 \begin{itemize}
-\item Base image: postgres:14-alpine
-\item Port: 5432
-\item Volumes: named volume postgres\_data (persystencja danych)
-\item Environment: POSTGRES\_DB, POSTGRES\_USER, POSTGRES\_PASSWORD
-\item Healthcheck: pg\_isready
+\item Base image: postgres:14-alpine,
+\item Port: 5432,
+\item Volumes: named volume postgres\_data (persystencja danych),
+\item Environment: POSTGRES\_DB, POSTGRES\_USER, POSTGRES\_PASSWORD,
+\item Healthcheck: pg\_isready.
 \end{itemize}
 
 \textbf{Zalety konteneryzacji Docker}
 
 \begin{itemize}
-\item \textbf{Odtwarzalność} - identyczne środowisko dev/prod eliminuje problemy ,,działa na moim komputerze''
-\item \textbf{Izolacja} - każdy serwis w osobnym kontenerze, zero konfliktów zależności
-\item \textbf{Przenośność} - obraz zbudowany raz działa na dowolnym serwerze z silnikiem Docker
-\item \textbf{Łatwa konfiguracja} - komenda \texttt{docker-compose up} uruchamia całą aplikację (czas konfiguracji: 5-10 minut)
-\item \textbf{Skalowalność} - możliwość uruchomienia wielu instancji backendu dla równoważenia obciążenia
+\item \textbf{Izolacja} - każdy serwis w osobnym kontenerze, zero konfliktów zależności,
+\item \textbf{Przenośność} - obraz zbudowany raz działa na dowolnym serwerze z silnikiem Docker,
+\item \textbf{Łatwa konfiguracja} - komenda \texttt{docker-compose up} uruchamia całą aplikację,
+\item \textbf{Skalowalność} - możliwość uruchomienia wielu instancji backendu dla równoważenia obciążenia.
 \end{itemize}
 
 \subsection*{4.6 Podsumowanie stosu technologicznego}
@@ -849,11 +875,10 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 Wybrane technologie (Django + React + PostgreSQL + Docker) tworzą nowoczesny, skalowalny i łatwy w utrzymaniu stos technologiczny. Kluczowe zalety:
 
 \begin{itemize}
-\item \textbf{Separacja kontynerów} - wyraźny podział frontend/backend/baza
-\item \textbf{Wygoda programisty} - narzędzia (Django ORM, haki React, Docker Compose) przyspieszają rozwój aplikacji
-\item \textbf{Wsparcie społeczności} - aktywna społeczność, obszerna dokumentacja
-\item \textbf{Wydajność} - optymalizacje (pamięć podręczna, indeksy bazy danych, operacje wektorowe NumPy) zapewniają czas odpowiedzi <100ms
-\item \textbf{Łatwość utrzymania} - modułowa architektura umożliwia łatwe dodawanie funkcjonalności
+\item \textbf{Separacja kontynerów} - wyraźny podział frontend/backend/baza,
+\item \textbf{Wygoda programisty} - narzędzia (Django ORM, haki React, Docker Compose) przyspieszają rozwój aplikacji,
+\item \textbf{Wsparcie społeczności} - aktywna społeczność, obszerna dokumentacja,
+\item \textbf{Wydajność} - optymalizacje (pamięć podręczna, indeksy bazy danych, operacje wektorowe NumPy) zapewniają szybki czas odpowiedzi.
 \end{itemize}
 
 \clearpage
@@ -863,83 +888,63 @@ Wybrane technologie (Django + React + PostgreSQL + Docker) tworzą nowoczesny, s
 \addcontentsline{toc}{section}{Rozdział 5: Implementacja algorytmów rekomendacji}
 \section*{Implementacja algorytmów rekomendacji}
 
-Niniejszy rozdział prezentuje szczegółową implementację trzech algorytmów rekomendacyjnych wraz z pseudokodami oraz diagramami sekwencji. Każda metoda została zaimplementowana od podstaw bez użycia gotowych bibliotek rekomendacyjnych.
+Szczegółowa implementacja trzech algorytmów rekomendacyjnych wraz z pseudokodami oraz diagramami sekwencji przedstawia praktyczne aspekty realizacji metod collaborative filtering, analizy sentymentu oraz reguł asocjacyjnych. Każda metoda została zaimplementowana od podstaw bez użycia gotowych bibliotek rekomendacyjnych.
 
 \subsection*{5.1 Collaborative Filtering - Item-Based z Adjusted Cosine}
 \addcontentsline{toc}{subsection}{5.1 Collaborative Filtering - Item-Based z Adjusted Cosine}
 
-Implementacja algorytmu CF w aplikacji przebiega w pięciu etapach opisanych w pseudokodzie poniżej. W pierwszym etapie system buduje macierz użytkownik-produkt na podstawie historii zamówień, gdzie każda komórka reprezentuje ilość zakupionego produktu przez danego użytkownika. Następnie macierz jest konwertowana do formatu NumPy dla wydajnych operacji matematycznych. W trzecim etapie następuje normalizacja wartości metodą mean-centering (Adjusted Cosine), która polega na odjęciu od każdej oceny użytkownika jego średniej ocen - eliminuje to zniekształcenia wynikające z różnych skal zakupowych (np. hurtownik vs klient indywidualny). Czwarty etap oblicza podobieństwo cosinusowe między produktami na transponowanej macierzy, a ostatni etap zapisuje do bazy tylko te pary produktów, których podobieństwo przekracza próg 0.5, wykorzystując operacje zbiorcze dla optymalizacji wydajności.
+Algorytm Collaborative Filtering oblicza podobieństwa między produktami na podstawie historii zakupów użytkowników. Proces składa się z trzech głównych etapów: budowy macierzy użytkownik-produkt, normalizacji metodą mean-centering oraz obliczenia podobieństw cosinusowych. Normalizacja polega na odjęciu od każdej wartości zakupowej średniej zakupów danego użytkownika, co eliminuje zniekształcenia wynikające z różnych skal (hurtownik kupujący po 100 sztuk vs klient kupujący po 1 sztuce otrzymują porównywalne wagi).
 
-\textbf{Pseudokod 1: Collaborative Filtering - proces główny}
+\textbf{Pseudokod 1a: Budowa i normalizacja macierzy Collaborative Filtering}
 
-\begin{lstlisting}[style=pseudocode, caption={Proces Collaborative Filtering z Adjusted Cosine Similarity}]
-FUNKCJA proces_collaborative_filtering(prog = 0.5):
-    zamowienia = pobierz_wszystkie_zamowienia()
+\begin{lstlisting}[style=pseudocode, caption={Budowa macierzy uzytkownik-produkt z normalizacja}]
+FUNKCJA buduj_macierz_cf():
+    pozycje = pobierz_wszystkie_pozycje_zamowien()
     macierz = pusty_slownik()
     
-    DLA KAZDEGO zamowienie W zamowienia:
-        id_uz = zamowienie.uzytkownik.id
-        DLA KAZDEJ pozycja W zamowienie.produkty:
-            id_prod = pozycja.produkt.id
-            ilosc = pozycja.ilosc
-            macierz[id_uz][id_prod] = ilosc
-        KONIEC DLA
+    DLA KAZDEJ poz W pozycje:
+        uz_id = poz.order.user_id
+        prod_id = poz.product_id
+        macierz[uz_id][prod_id] = poz.quantity
     KONIEC DLA
     
-    uzytkownicy = unikalne_klucze(macierz)
-    produkty = pobierz_wszystkie_id_produktow()
+    M = konwertuj_na_tablice(macierz)
+    M_norm = macierz_zerowa(wymiary(M))
     
-    JEZELI |uzytkownicy| < 2 LUB |produkty| < 2 WTEDY
-        ZWROC 0
-    KONIEC JEZELI
-    
-    M = macierz_zerowa(|uzytkownicy|, |produkty|)
-    
-    DLA i = 0 DO |uzytkownicy| - 1:
-        DLA j = 0 DO |produkty| - 1:
-            id_uz = uzytkownicy[i]
-            id_prod = produkty[j]
-            M[i][j] = macierz[id_uz][id_prod] LUB 0
-        KONIEC DLA
-    KONIEC DLA
-    
-    M_norm = macierz_zerowa(|uzytkownicy|, |produkty|)
-    
-    DLA i = 0 DO |uzytkownicy| - 1:
-        wiersz = M[i]
-        zakupione = elementy_niezerowe(wiersz)
-        
+    DLA i = 0 DO liczba_wierszy(M) - 1:
+        zakupione = M[i] gdzie M[i] > 0
         JEZELI |zakupione| > 0 WTEDY
-            srednia = srednia(zakupione)
-            
-            DLA j = 0 DO |produkty| - 1:
+            sr = srednia(zakupione)
+            DLA j = 0 DO liczba_kolumn(M) - 1:
                 JEZELI M[i][j] > 0 WTEDY
-                    M_norm[i][j] = M[i][j] - srednia
+                    M_norm[i][j] = M[i][j] - sr
                 KONIEC JEZELI
             KONIEC DLA
         KONIEC JEZELI
     KONIEC DLA
     
+    ZWROC M_norm
+KONIEC FUNKCJA
+\end{lstlisting}
+
+\textbf{Pseudokod 1b: Obliczanie podobieństw produktów}
+
+\begin{lstlisting}[style=pseudocode, caption={Obliczanie podobienstwa cosinusowego produktow}]
+FUNKCJA oblicz_podobienstwa_cf(M_norm, prog = 0.5):
     M_T = transponuj(M_norm)
-    podobienstwa = podobienstwo_cosinus(M_T)
+    sim = podobienstwo_cosinus(M_T)
     
-    usun_podobienstwa(typ = 'collaborative')
+    usun_podobienstwa(typ='collaborative')
     lista = pusta_lista()
-    licznik = 0
+    n = liczba_produktow(M_T)
     
-    DLA i = 0 DO |produkty| - 1:
-        DLA j = 0 DO |produkty| - 1:
-            JEZELI i != j ORAZ podobienstwa[i][j] > prog WTEDY
-                sim = utworz_podobienstwo(
-                    produkty[i], 
-                    produkty[j], 
-                    podobienstwa[i][j]
-                )
-                dopisz(lista, sim)
-                licznik = licznik + 1
+    DLA i = 0 DO n - 1:
+        DLA j = 0 DO n - 1:
+            JEZELI i != j ORAZ sim[i][j] > prog WTEDY
+                dopisz(lista, {prod1: i, prod2: j, wynik: sim[i][j]})
                 
                 JEZELI |lista| >= 1000 WTEDY
-                    wstaw_zbiorczo(lista)
+                    zapisz_zbiorczo(lista)
                     lista = pusta_lista()
                 KONIEC JEZELI
             KONIEC JEZELI
@@ -947,78 +952,57 @@ FUNKCJA proces_collaborative_filtering(prog = 0.5):
     KONIEC DLA
     
     JEZELI |lista| > 0 WTEDY
-        wstaw_zbiorczo(lista)
+        zapisz_zbiorczo(lista)
     KONIEC JEZELI
-    
-    zapisz_do_cache('macierz_cf', licznik, timeout=86400)
-    ZWROC licznik
 KONIEC FUNKCJA
 \end{lstlisting}
 
 \newpage
 
-Drugi pseudokod przedstawia proces generowania spersonalizowanych rekomendacji dla konkretnego użytkownika. Algorytm najpierw zbiera pełną historię interakcji użytkownika z systemem - zarówno z ukończonych zamówień, jak i z aktualnego koszyka. Następnie dla każdego produktu z historii użytkownika system pobiera top 5 najbardziej podobnych produktów z wcześniej obliczonej macierzy podobieństw. Kluczowym elementem jest agregacja wyników - jeśli produkt jest podobny do kilku produktów zakupionych przez użytkownika, jego końcowy wynik stanowi sumę wszystkich podobieństw. Dzięki temu produkty, które są podobne do wielu zakupionych przedmiotów, otrzymują wyższy priorytet. Na koniec lista jest sortowana malejąco według zagregowanego wyniku i zapisywana w bazie danych dla szybkiego dostępu.
+Algorytm generowania rekomendacji dla użytkownika wykorzystuje wcześniej obliczone podobieństwa produktów. Proces polega na zebraniu historii zakupów użytkownika (zamówienia + koszyk), a następnie dla każdego produktu z tej historii wyszukiwane są najbardziej podobne produkty. Wyniki są agregowane - jeśli dany produkt jest podobny do wielu produktów zakupionych przez użytkownika, otrzymuje sumę wszystkich podobieństw jako końcowy wynik rekomendacji.
 
 \textbf{Pseudokod 2: Generowanie rekomendacji dla użytkownika}
 
 \begin{lstlisting}[style=pseudocode, caption={Generowanie rekomendacji CF dla uzytkownika}]
-FUNKCJA generuj_rekomendacje(uzytkownik, algorytm, limit):
+FUNKCJA generuj_rekomendacje(uzytkownik, typ_algorytmu):
     historia = pusta_lista()
-    zamowienia = pobierz_zamowienia(uzytkownik)
     
-    DLA KAZDEGO zamowienie W zamowienia:
-        DLA KAZDEGO produkt W zamowienie.produkty:
-            dopisz(historia, produkt.id)
+    DLA KAZDEGO zam W pobierz_zamowienia(uzytkownik):
+        DLA KAZDEGO p W zam.produkty:
+            dopisz(historia, p.id)
         KONIEC DLA
     KONIEC DLA
     
-    koszyk = pobierz_koszyk(uzytkownik)
-    DLA KAZDEJ pozycja W koszyk:
-        dopisz(historia, pozycja.produkt.id)
+    DLA KAZDEJ poz W pobierz_koszyk(uzytkownik):
+        dopisz(historia, poz.produkt.id)
     KONIEC DLA
     
-    rekomendacje = pusty_slownik()
-    
-    DLA KAZDEGO id_prod W unikalne(historia):
-        podobne = pobierz_top_podobne(id_prod, algorytm, 5)
-        
-        DLA KAZDEGO sim W podobne:
-            kandydat = sim.produkt_2.id
-            wynik = sim.wspolczynnik
-            
-            JEZELI kandydat W rekomendacje WTEDY
-                rekomendacje[kandydat] += wynik
+    wyniki = pusty_slownik()
+    DLA KAZDEGO prod_id W unikalne(historia):
+        podobne = pobierz_podobne(prod_id, typ_algorytmu, limit=5)
+        DLA KAZDEGO s W podobne:
+            JEZELI s.produkt2_id W wyniki WTEDY
+                wyniki[s.produkt2_id] += s.podobienstwo
             INACZEJ
-                rekomendacje[kandydat] = wynik
+                wyniki[s.produkt2_id] = s.podobienstwo
             KONIEC JEZELI
         KONIEC DLA
     KONIEC DLA
-    
-    posortowane = sortuj(rekomendacje, malejaco=PRAWDA)
-    top_N = posortowane[:limit]
-    
-    DLA KAZDEGO (id_prod, wynik) W top_N:
-        aktualizuj_lub_utworz(
-            uzytkownik=uzytkownik, 
-            produkt=id_prod, 
-            typ=algorytm, 
-            wynik=wynik
-        )
+
+    lista = sortuj(wyniki, malejaco)
+    DLA KAZDEGO (p_id, wart) W lista:
+        zapisz_rekomendacje(uzytkownik, p_id, typ_algorytmu, wart)
     KONIEC DLA
-    
-    ZWROC |top_N|
 KONIEC FUNKCJA
 \end{lstlisting}
 
-\textbf{Kluczowe optymalizacje CF:}
+\textbf{Kluczowe optymalizacje Collaborative Filtering:}
 \begin{itemize}
-\item Pamięć podręczna Django (timeout 24h) dla macierzy podobieństw
-\item Operacje zbiorcze (rozmiar\_partii=1000) dla zapisu do bazy
-\item Próg 0.5 redukuje rozmiar bazy o ~80\%
-\item Indeksowanie na kolumnach (produkt\_1, typ\_podobienstwa)
+\item Pamięć podręczna (cache) przechowuje macierz podobieństw przez 24 godziny,
+\item Operacje zbiorcze (bulk insert) zapisują po 1000 rekordów jednocześnie,
+\item Próg 0.5 redukuje rozmiar bazy, poprzez odrzucenie niższych wartości,
+\item Indeksowanie na kolumnach (produkt\_1, typ\_podobienstwa).
 \end{itemize}
-
-\newpage
 
 \textbf{Diagram sekwencji: Collaborative Filtering}
 
@@ -1029,15 +1013,15 @@ KONIEC FUNKCJA
   \label{fig:cf_sequence}
 \end{figure}
 
-Diagram przedstawia pełny przepływ procesu generowania rekomendacji Collaborative Filtering:
+Przepływ procesu generowania rekomendacji Collaborative Filtering:
 \begin{enumerate}
-\item Użytkownik wysyła żądanie do API (/api/recommendations/)
-\item API sprawdza pamięć podręczną - jeśli trafienie, zwraca wynik natychmiast
-\item Przy braku w pamięci podręcznej, API odpytuje bazę danych o historię zakupów użytkownika
-\item Algorytm CF buduje macierz użytkownik-produkt z OrderProduct
-\item System normalizuje macierz (centrowanie wartości) i oblicza podobieństwo cosinusowe
-\item Wyniki zapisywane są do pamięci podręcznej (24h) i ProductSimilarity
-\item API zwraca top N rekomendacji do użytkownika
+\item Żądanie użytkownika trafia do API (/api/recommendations/)
+\item API sprawdza pamięć podręczną - w przypadku trafienia zwracany jest wynik natychmiast
+\item Przy braku w pamięci podręcznej następuje zapytanie do bazy danych o historię zakupów
+\item Budowana jest macierz użytkownik-produkt z OrderProduct
+\item Macierz jest normalizowana (centrowanie wartości) i obliczane są podobieństwa cosinusowe
+\item Wyniki zapisywane są do pamięci podręcznej (24h) oraz tabeli ProductSimilarity
+\item API zwraca top N rekomendacji
 \end{enumerate}
 
 \newpage
@@ -1045,118 +1029,75 @@ Diagram przedstawia pełny przepływ procesu generowania rekomendacji Collaborat
 \subsection*{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 \addcontentsline{toc}{subsection}{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 
-System analizy sentymentu wykorzystuje podejście słownikowe z agregacją z 5 źródeł tekstowych. Wagi źródeł: opinie (40\%), opis (25\%), nazwa (15\%), specyfikacje (12\%), kategorie (8\%).
+Analiza sentymentu pojedynczego tekstu metodą słownikową (Liu 2012) polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów pozytywnych i negatywnych. Słowniki zawierają ~200 słów każdego typu (np. pozytywne: , ,excellent', , ,recommend', , ,quality'; negatywne: , ,bad', , ,poor', , ,disappointing'). Formuła wyniku: (liczba\_pozytywnych - liczba\_negatywnych) / liczba\_wszystkich\_słów. Wynik ograniczany do [-1, 1] i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (inne).
 
-Pseudokod przedstawia podstawową funkcję analizy sentymentu pojedynczego tekstu metodą słownikową. Proces rozpoczyna się od normalizacji tekstu - konwersji na małe litery, usunięcia białych znaków i zamianę znaków niealfanumerycznych na spacje. Następnie tekst jest dzielony na pojedyncze słowa (tokenizacja). Algorytm przegląda każde słowo i sprawdza jego przynależność do słowników pozytywnych (~200 słów typu "excellent", "recommend", "quality") lub negatywnych (~200 słów typu "bad", "poor", "disappointing"). Wynik sentymentu obliczany jest według formuły Liu (2012): różnica między liczbą słów pozytywnych a negatywnych podzielona przez całkowitą liczbę słów. Wartość jest następnie ograniczana do przedziału [-1, 1] i kategoryzowana jako pozytywna (>0.1), negatywna (<-0.1) lub neutralna.
+Wieloźródłowa agregacja sentymentu produktu łączy wyniki z 5 źródeł z wagami: opinie 40\%, opis 25\%, nazwa 15\%, specyfikacje 12\%, kategorie 8\%.
 
 \textbf{Pseudokod 3: Analiza sentymentu pojedynczego tekstu}
 
-\begin{lstlisting}[style=pseudocode, caption={Analiza sentymentu tekstu metoda slownikowa}]
-FUNKCJA analizuj_sentiment(tekst, slowa_poz, slowa_neg):
-    tekst = na_male_litery(tekst)
-    tekst = usun_biale_znaki(tekst)
-    tekst = zamien_niealfanum(tekst, ' ')
+\begin{lstlisting}[style=pseudocode, caption={Analiza sentymentu metoda slownikowa}]
+FUNKCJA analizuj_sentiment(tekst, slownik_poz, slownik_neg):
+    slowa = tokenizuj(na_male_litery(tekst))
     
-    slowa = podziel(tekst)
-    
-    JEZELI czy_puste(slowa) WTEDY
-        ZWROC (0.0, "neutralny")
+    JEZELI |slowa| = 0 WTEDY
+        ZWROC (0.0, ,,neutralny'')
     KONIEC JEZELI
     
-    liczba_poz = 0
-    liczba_neg = 0
+    poz = 0
+    neg = 0
     
-    DLA KAZDEGO slowo W slowa:
-        JEZELI slowo W slowa_poz WTEDY
-            liczba_poz = liczba_poz + 1
-        INACZEJ JEZELI slowo W slowa_neg WTEDY
-            liczba_neg = liczba_neg + 1
-        KONIEC JEZELI
+    DLA KAZDEGO s W slowa:
+        JEZELI s W slownik_poz WTEDY poz = poz + 1
+        JEZELI s W slownik_neg WTEDY neg = neg + 1
     KONIEC DLA
     
-    n = |slowa|
-    wynik = (liczba_poz - liczba_neg) / n
+    wynik = (poz - neg) / |slowa|
+    wynik = ogranicz(wynik, -1.0, 1.0)
     
-    wynik = max(-1.0, min(1.0, wynik))
+    JEZELI wynik > 0.1 WTEDY kat = ,,pozytywny''
+    INACZEJ JEZELI wynik < -0.1 WTEDY kat = ,,negatywny''
+    INACZEJ kat = ,,neutralny''
     
-    JEZELI wynik > 0.1 WTEDY
-        kategoria = "pozytywny"
-    INACZEJ JEZELI wynik < -0.1 WTEDY
-        kategoria = "negatywny"
-    INACZEJ
-        kategoria = "neutralny"
-    KONIEC JEZELI
-    
-    ZWROC (wynik, kategoria)
+    ZWROC (wynik, kat)
 KONIEC FUNKCJA
 \end{lstlisting}
 
 \newpage
 
-Czwarty pseudokod implementuje kluczową innowację systemu - wieloźródłową agregację sentymentu produktu. W przeciwieństwie do tradycyjnych systemów opartych wyłącznie na opiniach klientów, ten algorytm analizuje 5 niezależnych źródeł tekstowych, co rozwiązuje problem zimnego startu (produkty bez opinii nadal otrzymują wynik). Wagi empiryczne zostały dobrane eksperymentalnie: opinie klientów mają najwyższą wagę (40\%), następnie opis produktu (25\%), nazwa (15\%), specyfikacje techniczne (12\%) i kategorie (8\%). Dla każdego źródła wykonywana jest analiza sentymentu metodą słownikową, a wyniki są agregowane według formuły ważonej. System zlicza również rozkład opinii (pozytywne, negatywne, neutralne), co pozwala na dokładniejszą ocenę konsensusu wśród klientów. Końcowy wynik jest zaokrąglany do 3 miejsc po przecinku i zapisywany w tabeli ProductSentimentSummary.
+Algorytm wieloźródłowej agregacji sentymentu analizuje 5 niezależnych źródeł tekstowych produktu zamiast polegać wyłącznie na opiniach klientów. Rozwiązuje to problem zimnego startu - produkty bez opinii nadal otrzymują wynik bazujący na opisie i nazwie. Wagi źródeł: opinie 40\%, opis 25\%, nazwa 15\%, specyfikacje 12\%, kategorie 8\%. System zlicza rozkład opinii (pozytywne/negatywne/neutralne) dla lepszej oceny konsensusu.
 
-\textbf{Pseudokod 4: Wieloźródłowa agregacja sentymentu produktu}
+\textbf{Pseudokod 4: Agregacja sentymentu z wielu źródeł}
 
-\begin{lstlisting}[style=pseudocode, caption={Agregacja sentymentu z 5 zrodel tekstowych}]
-FUNKCJA agreguj_sentiment(produkt):
-    w_opinie = 0.40
-    w_opis = 0.25
-    w_nazwa = 0.15
-    w_spec = 0.12
-    w_kat = 0.08
-    
-    opinie = pobierz_opinie(produkt)
-    wyniki = pusta_lista()
-    
-    DLA KAZDEJ opinia W opinie:
-        (wynik, _) = analizuj_sentiment(opinia.tresc)
-        dopisz(wyniki, wynik)
+\begin{lstlisting}[style=pseudocode, caption={Agregacja sentymentu produktu z 5 zrodel}]
+FUNKCJA agreguj_sentiment_produktu(produkt):
+    opinie = pobierz_opinie(produkt)[:20]
+    wyniki_opinii = pusta_lista()
+    DLA KAZDEJ op W opinie:
+        (w, _) = analizuj_sentiment(op.tresc)
+        dopisz(wyniki_opinii, w)
     KONIEC DLA
-    
-    JEZELI |wyniki| > 0 WTEDY
-        S_opinie = srednia(wyniki)
-    INACZEJ
-        S_opinie = 0.0
-    KONIEC JEZELI
-    
+    S_op = srednia(wyniki_opinii) JEZELI |wyniki_opinii| > 0 INACZEJ 0
     (S_opis, _) = analizuj_sentiment(produkt.opis)
-    
     (S_nazwa, _) = analizuj_sentiment(produkt.nazwa)
-    
-    teksty = pusta_lista()
-    DLA KAZDEJ spec W produkt.specyfikacje[:10]:
-        tekst = spec.nazwa + " " + spec.wartosc
-        dopisz(teksty, tekst)
+    teksty_spec = pusta_lista()
+    DLA KAZDEJ sp W produkt.specyfikacje[:10]:
+        dopisz(teksty_spec, sp.nazwa + `` '' + sp.wartosc)
     KONIEC DLA
-    
-    polaczone = polacz(teksty, ' ')
-    JEZELI czy_nie_puste(polaczone) WTEDY
-        (S_spec, _) = analizuj_sentiment(polaczone)
-    INACZEJ
-        S_spec = 0.0
-    KONIEC JEZELI
-    
-    kategorie = polacz(pobierz_nazwy_kat(produkt), ' ')
-    JEZELI czy_nie_puste(kategorie) WTEDY
-        (S_kat, _) = analizuj_sentiment(kategorie)
-    INACZEJ
-        S_kat = 0.0
-    KONIEC JEZELI
-    
-    S = w_opinie * S_opinie + w_opis * S_opis 
-      + w_nazwa * S_nazwa + w_spec * S_spec 
-      + w_kat * S_kat
-    
-    poz = policz(wyniki, gdzie wynik > 0.1)
-    neg = policz(wyniki, gdzie wynik < -0.1)
-    neu = policz(wyniki, gdzie -0.1 <= wynik <= 0.1)
+    (S_spec, _) = analizuj_sentiment(polacz(teksty_spec))
+    kat_txt = polacz(pobierz_nazwy_kategorii(produkt))
+    (S_kat, _) = analizuj_sentiment(kat_txt)
+    S_final = 0.40*S_op + 0.25*S_opis + 0.15*S_nazwa 
+            + 0.12*S_spec + 0.08*S_kat
+
+    poz = policz(wyniki_opinii WHERE w > 0.1)
+    neg = policz(wyniki_opinii WHERE w < -0.1)
+    neu = policz(wyniki_opinii WHERE -0.1 <= w <= 0.1)
     
     ZWROC {
-        sredni_wynik: zaokragl(S, 3),
-        liczba_poz: poz,
-        liczba_neg: neg,
-        liczba_neu: neu,
-        suma: |wyniki|
+        wynik: zaokragl(S_final, 3),
+        pozytywne: poz,
+        negatywne: neg,
+        neutralne: neu
     }
 KONIEC FUNKCJA
 \end{lstlisting}
@@ -1172,7 +1113,7 @@ KONIEC FUNKCJA
   \label{fig:sentiment_sequence}
 \end{figure}
 
-Diagram przedstawia proces wieloźródłowej analizy sentymentu:
+Przepływ procesu wieloźródłowej analizy sentymentu:
 \begin{enumerate}
 \item Użytkownik wyszukuje produkty z sortowaniem według sentymentu
 \item API wywołuje funkcję agregacji sentymentu dla każdego produktu
@@ -1190,166 +1131,130 @@ Kluczową zaletą tej architektury jest rozwiązanie problemu zimnego startu - p
 \subsection*{5.3 Algorytm Apriori - reguły asocjacyjne}
 \addcontentsline{toc}{subsection}{5.3 Algorytm Apriori - reguły asocjacyjne}
 
-Algorytm Apriori generuje reguły asocjacyjne typu "Często kupowane razem" wykorzystując optymalizację przycinania bitmapowego.
+Algorytm Apriori generuje reguły asocjacyjne typu ,,Często kupowane razem'' wykorzystując optymalizację przycinania bitmapowego (Zaki 2000). Proces składa się z dwóch głównych etapów: znajdowania częstych par produktów oraz generowania reguł z obliczeniem metryk (wsparcie, pewność, lift).
 
-Piąty pseudokod przedstawia zaawansowaną implementację algorytmu Apriori z optymalizacją przycinania bitmapowego (Zaki 2000), która zapewnia przyspieszenie 15-19× względem implementacji naiwnej. Algorytm działa w pięciu fazach. Pierwsza faza (wczesne przycinanie) zlicza wystąpienia każdego produktu w transakcjach i eliminuje rzadkie produkty o wsparciu poniżej progu 0.001 - dzięki właściwości antymonotoniczności Apriori (jeśli produkt jest rzadki, wszystkie jego pary też są rzadkie) eliminuje się 80-90\% kandydatów przed kosztownym obliczaniem par. Druga faza konwertuje transakcje do reprezentacji bitmapowej, gdzie każdy produkt otrzymuje unikalną pozycję bitu, a transakcja jest reprezentowana jako liczba całkowita z ustawionymi bitami dla zawartych produktów. Trzecia faza generuje częste pary produktów (2-itemsety) używając szybkich operacji bitowych AND - sprawdzenie czy transakcja zawiera parę produktów sprowadza się do jednej operacji bitowej zamiast iteracji po liście. Czwarta faza zapamiętuje wsparcie pojedynczych produktów w słowniku dla szybkiego dostępu O(1). Piąta faza generuje reguły asocjacyjne obliczając dla każdej pary trzy metryki: wsparcie (częstość pary), pewność (prawdopodobieństwo warunkowe) i lift (korelację). Tylko reguły spełniające minimalne progi (pewność ≥ 0.01, lift ≥ 1.0) są zapisywane do bazy.
+Optymalizacja bitmapowa polega na reprezentacji transakcji jako liczb całkowitych z ustawionymi bitami odpowiadającymi produktom. Sprawdzenie czy transakcja zawiera parę produktów wymaga jednej operacji bitowej AND zamiast iteracji po liście. Wczesne przycinanie eliminuje rzadkie produkty przed obliczaniem par - dzięki właściwości antymonotoniczności Apriori (jeśli produkt jest rzadki, wszystkie jego pary też są rzadkie) zmniejsza liczbę kandydatów.
 
-\textbf{Pseudokod 5: Apriori z przycinaniem bitmapowym}
+\textbf{Pseudokod 5a: Znajdowanie częstych par z bitmapami}
 
-\begin{lstlisting}[style=pseudocode, caption={Algorytm Apriori z przycinaniem bitmapowym}]
-FUNKCJA generuj_reguly(transakcje, min_wsp, min_pewn):
-    n_trans = |transakcje|
-    min_licz = podloga(min_wsp * n_trans)
+\begin{lstlisting}[style=pseudocode, caption={Apriori - znajdowanie czestych par produktow}]
+FUNKCJA znajdz_czeste_pary(transakcje, min_wsp):
+    n = |transakcje|
+    min_licz = podloga(min_wsp * n)
     
     liczniki = pusty_slownik()
-    
-    DLA KAZDEJ trans W transakcje:
-        DLA KAZDEGO prod W trans:
-            JEZELI prod NIE W liczniki WTEDY
-                liczniki[prod] = 0
-            KONIEC JEZELI
-            liczniki[prod] = liczniki[prod] + 1
+    DLA KAZDEJ t W transakcje:
+        DLA KAZDEGO p W t:
+            liczniki[p] = liczniki[p] + 1
         KONIEC DLA
     KONIEC DLA
     
-    czeste = pusta_lista()
-    DLA KAZDEGO (prod, licz) W liczniki:
-        JEZELI licz >= min_licz WTEDY
-            dopisz(czeste, prod)
-        KONIEC JEZELI
-    KONIEC DLA
+    czeste = [p DLA (p, l) W liczniki JEZELI l >= min_licz]
     
-    prod_id = pusty_slownik()
-    id = 0
-    
-    DLA KAZDEGO prod W czeste:
-        prod_id[prod] = id
-        id = id + 1
+    mapa = pusty_slownik()
+    DLA i = 0 DO |czeste| - 1:
+        mapa[czeste[i]] = i
     KONIEC DLA
     
     bitmapy = pusta_lista()
-    
-    DLA KAZDEJ trans W transakcje:
+    DLA KAZDEJ t W transakcje:
         bm = 0
-        
-        DLA KAZDEGO prod W trans:
-            JEZELI prod W prod_id WTEDY
-                poz = prod_id[prod]
-                bm = bm LUB (1 << poz)
+        DLA KAZDEGO p W t:
+            JEZELI p W mapa WTEDY
+                bm = bm LUB (1 << mapa[p])
             KONIEC JEZELI
         KONIEC DLA
-        
-        JEZELI bm != 0 WTEDY
+        JEZELI bm != 0 WTEDY 
             dopisz(bitmapy, bm)
         KONIEC JEZELI
     KONIEC DLA
     
     pary = pusty_slownik()
-    
     DLA i = 0 DO |czeste| - 1:
-        p1 = czeste[i]
-        bit1 = 1 << prod_id[p1]
-        
+        bit_i = 1 << i
         DLA j = i + 1 DO |czeste| - 1:
-            p2 = czeste[j]
-            bit2 = 1 << prod_id[p2]
-            
-            bm_para = bit1 LUB bit2
+            bit_j = 1 << j
+            para_bm = bit_i LUB bit_j
             
             licz = 0
-            DLA KAZDEJ bm_tx W bitmapy:
-                JEZELI (bm_tx AND bm_para) == bm_para WTEDY
+            DLA KAZDEJ bm W bitmapy:
+                JEZELI (bm AND para_bm) == para_bm WTEDY
                     licz = licz + 1
                 KONIEC JEZELI
             KONIEC DLA
             
             JEZELI licz >= min_licz WTEDY
-                wsp = licz / n_trans
-                para = {p1, p2}
-                pary[para] = wsp
+                pary[{czeste[i], czeste[j]}] = licz / n
             KONIEC JEZELI
         KONIEC DLA
     KONIEC DLA
     
-    cache_wsp = pusty_slownik()
-    DLA KAZDEGO (prod, licz) W liczniki:
-        JEZELI prod W czeste WTEDY
-            cache_wsp[prod] = licz / n_trans
-        KONIEC JEZELI
-    KONIEC DLA
-    
-    reguly = pusta_lista()
-    
-    DLA KAZDEJ (para, wsp) W pary:
-        elem = na_liste(para)
-        p1 = elem[0]
-        p2 = elem[1]
-        
-        wsp1 = cache_wsp[p1]
-        wsp2 = cache_wsp[p2]
-        
-        JEZELI wsp1 > 0 WTEDY
-            pewn_1_2 = wsp / wsp1
-        INACZEJ
-            pewn_1_2 = 0
-        KONIEC JEZELI
-        
-        JEZELI wsp2 > 0 WTEDY
-            pewn_2_1 = wsp / wsp2
-        INACZEJ
-            pewn_2_1 = 0
-        KONIEC JEZELI
-        
-        JEZELI (wsp1 * wsp2) > 0 WTEDY
-            lift = wsp / (wsp1 * wsp2)
-        INACZEJ
-            lift = 0
-        KONIEC JEZELI
-        
-        JEZELI pewn_1_2 >= min_pewn WTEDY
-            reg = utworz_regule(p1, p2, wsp, pewn_1_2, lift)
-            dopisz(reguly, reg)
-        KONIEC JEZELI
-        
-        JEZELI pewn_2_1 >= min_pewn WTEDY
-            reg = utworz_regule(p2, p1, wsp, pewn_2_1, lift)
-            dopisz(reguly, reg)
-        KONIEC JEZELI
-    KONIEC DLA
-    
-    sortuj(reguly, wedlug=(lift, pewnosc), malejaco=PRAWDA)
-    ZWROC reguly
+    wsparcia = {p: liczniki[p]/n DLA p W czeste}
+    ZWROC (pary, wsparcia)
 KONIEC FUNKCJA
 \end{lstlisting}
 
-\newpage
+\textbf{Pseudokod 5b: Generowanie reguł asocjacyjnych}
+
+\begin{lstlisting}[style=pseudocode, caption={Apriori - generowanie regul z obliczeniem lift i confidence}]
+FUNKCJA generuj_reguly_z_par(pary, wsparcia, min_pewn):
+    reguly = pusta_lista()
+    
+    DLA KAZDEJ ({p1, p2}, wsp_para) W pary:
+        wsp1 = wsparcia[p1]
+        wsp2 = wsparcia[p2]
+        
+        pewn_1_2 = wsp_para / wsp1
+        pewn_2_1 = wsp_para / wsp2
+        
+        lift = wsp_para / (wsp1 * wsp2)
+        
+        JEZELI pewn_1_2 >= min_pewn WTEDY
+            dopisz(reguly, {od: p1, do: p2, 
+                           wsparcie: wsp_para, 
+                           pewnosc: pewn_1_2, 
+                           lift: lift})
+        KONIEC JEZELI
+        
+        JEZELI pewn_2_1 >= min_pewn WTEDY
+            dopisz(reguly, {od: p2, do: p1, 
+                           wsparcie: wsp_para, 
+                           pewnosc: pewn_2_1, 
+                           lift: lift})
+        KONIEC JEZELI
+    KONIEC DLA
+    
+    sortuj(reguly, wedlug=(lift, pewnosc), malejaco)
+    ZWROC reguly
+KONIEC FUNKCJA
+\end{lstlisting}
 
 \textbf{Diagram sekwencji: Algorytm Apriori}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{images/associationDiagram.png}
-  \caption{Diagram sekwencji: Algorytm Apriori - generowanie reguł asocjacyjnych typu ,,Często kupowane razem''.}
+  \caption{Diagram sekwencji: Algorytm Apriori - generowanie reguł asocjacyjnych typu ``Często kupowane razem''.}
   \label{fig:apriori_sequence}
 \end{figure}
 
-Diagram przedstawia proces generowania reguł asocjacyjnych algorytmem Apriori:
+Przepływ procesu generowania reguł asocjacyjnych algorytmem Apriori:
 \begin{enumerate}
 \item Administrator wywołuje aktualizację reguł przez panel administracyjny
 \item System ekstrahuje transakcje z bazy OrderProduct (tylko zamówienia z 2+ produktami)
 \item Algorytm wykonuje wczesne przycinanie - eliminuje rzadkie produkty (wsparcie < 0.001)
 \item Transakcje konwertowane są do reprezentacji bitmapowej dla optymalizacji
-\item System generuje częste 2-itemsety używając operacji bitowych AND (przyspieszenie 15-19×)
+\item System generuje częste 2-itemsety używając operacji bitowych AND (znaczące przyspieszenie)
 \item Dla każdego częstego itemsetu obliczane są metryki: Wsparcie, Pewność, Lift
 \item Reguły filtrowane są według progów i zapisywane w bazie z wstawianiem zbiorczym
 \end{enumerate}
 
 \textbf{Kluczowe optymalizacje Apriori:}
 \begin{itemize}
-\item Przycinanie bitmapowe (Zaki 2000): przyspieszenie 15-19×
-\item Wczesne przycinanie: eliminacja 80-90\% kandydatów
-\item Operacje bitowe AND: O(N/64) vs O(k)
-\item Operacje zbiorcze: rozmiar\_partii=500
+\item Przycinanie bitmapowe: znaczące przyspieszenie operacji,
+\item Wczesne przycinanie: eliminacja większości kandydatów,
+\item Operacje bitowe AND: optymalna złożoność obliczeniowa,
+\item Operacje zbiorcze (bulk operations): rozmiar\_partii=500.
 \end{itemize}
 
 \newpage
@@ -1361,37 +1266,36 @@ Przedstawione pseudokody odzwierciedlają algorytmy zaimplementowane w aplikacji
 
 \textbf{Collaborative Filtering:}
 \begin{itemize}
-\item Adjusted Cosine Similarity eliminuje zniekształcenia skal zakupowych
-\item NumPy dla operacji macierzowych (przyspieszenie 10-50×)
-\item Pamięć podręczna Django 24h z automatycznym unieważnieniem
-\item Operacje zbiorcze (rozmiar\_partii=1000)
-\item Próg podobieństwa 0.5 redukuje rozmiar bazy o 80\%
+\item Adjusted Cosine Similarity eliminuje zniekształcenia skal zakupowych,
+\item NumPy dla wektoryzacji operacji macierzowych,
+\item Pamięć podręczna Django 24h z automatycznym unieważnieniem,
+\item Operacje zbiorcze (rozmiar\_partii=1000),
+\item Próg podobieństwa 0.5 redukuje liczbę zapisywanych rekordów.
 \end{itemize}
 
 \textbf{Analiza Sentymentu:}
 \begin{itemize}
-\item Słowniki Opinion Lexicon + AFINN-165 (~400 słów)
-\item Wieloźródłowa agregacja (5 źródeł) z optymalnymi wagami
-\item Formuła Liu (2012): $S = \frac{N_{poz} - N_{neg}}{N_{calkowite}}$
-\item Rozwiązanie problemu zimnego startu
-\item Czas przetwarzania: 5-15ms na opinię
+\item Słowniki Opinion Lexicon + AFINN-165 (~400 słów),
+\item Wieloźródłowa agregacja (5 źródeł) z optymalnymi wagami,
+\item Formuła Liu (2012): $S = \frac{N_{poz} - N_{neg}}{N_{calkowite}}$,
+\item Rozwiązanie problemu zimnego startu.
 \end{itemize}
 
 \textbf{Algorytm Apriori:}
 \begin{itemize}
-\item Przycinanie bitmapowe (Zaki 2000): przyspieszenie 15-19×
-\item Wczesne przycinanie eliminuje 80-90\% kandydatów
-\item Operacje bitowe AND: O(N/64)
-\item Operacje zbiorcze (rozmiar\_partii=500)
-\item Metryki: Wsparcie, Pewność, Lift
+\item Przycinanie bitmapowe dla optymalizacji obliczeń,
+\item Wczesne przycinanie eliminuje większość kandydatów niespełniających progu wsparcia,
+\item Operacje bitowe AND zamiast iteracji po listach,
+\item Operacje zbiorcze (rozmiar\_partii=500),
+\item Metryki: Wsparcie, Pewność, Lift.
 \end{itemize}
 
 \textbf{Wydajność systemu:}
 \begin{itemize}
-\item CF: pierwsza generacja 5-10s, kolejne zapytania <100ms (pamięć podręczna)
-\item Sentiment: analiza 1000 opinii ~10-15s
-\item Apriori: 500 produktów, 2000 transakcji ~2.5s (przycinanie bitmapowe)
-\item Czas odpowiedzi API: <100ms dla żądań z pamięci podręcznej
+\item Collaborative Filtering: pierwsza generacja wymaga przetworzenia macierzy, kolejne zapytania korzystają z pamięci podręcznej,
+\item Sentiment: przetwarzanie wsadowe opinii z wykorzystaniem słowników w pamięci,
+\item Apriori: przycinanie bitmapowe redukuje złożoność obliczeniową,
+\item Mechanizm cache'owania znacząco przyspiesza kolejne zapytania API.
 \end{itemize}
 
 \newpage
@@ -1399,7 +1303,7 @@ Przedstawione pseudokody odzwierciedlają algorytmy zaimplementowane w aplikacji
 \addcontentsline{toc}{section}{Rozdział 6: Funkcjonowanie systemu rekomendacji w praktyce}
 \section*{Funkcjonowanie systemu rekomendacji w praktyce}
 
-Niniejszy rozdział prezentuje praktyczne zastosowanie trzech zaimplementowanych metod rekomendacyjnych w kontekście rzeczywistego systemu e-commerce. Na podstawie zrzutów ekranu z działającej aplikacji przedstawiono scenariusze użycia, przepływy danych oraz mechanizmy integracji algorytmów z interfejsem użytkownika.
+Praktyczne zastosowanie trzech zaimplementowanych metod rekomendacyjnych w kontekście rzeczywistego systemu e-commerce przedstawiono na podstawie zrzutów ekranu z działającej aplikacji. Zaprezentowano scenariusze użycia, przepływy danych oraz mechanizmy zarządzania algorytmami przez panel administracyjny.
 
 \subsection*{6.1 Architektura i przepływ danych}
 \addcontentsline{toc}{subsection}{6.1 Architektura i przepływ danych}
@@ -1408,519 +1312,244 @@ System rekomendacji został zintegrowany z aplikacją e-commerce w architekturze
 
 \textbf{Warstwa prezentacji (React)} - interfejs użytkownika wyświetlający rekomendacje w różnych kontekstach:
 \begin{itemize}
-\item Strona główna - sekcja "Recommended for You" (Collaborative Filtering)
-\item Strona produktu - sekcja "Similar Products" (Collaborative Filtering)
-\item Strona produktu - sekcja "Frequently Bought Together" (Apriori)
-\item Koszyk zakupowy - cross-selling (Apriori)
-\item Wyszukiwarka - sortowanie według sentymentu (Sentiment Analysis)
-\item Panel klienta - spersonalizowane rekomendacje (wszystkie metody)
+\item Strona główna - sekcja ,,Recommended for You'' z możliwością przełączania algorytmów,
+\item Panel klienta - dashboard z personalizowanymi rekomendacjami,
+\item Wyszukiwarka - sortowanie według sentymentu,
+\item Koszyk zakupowy - sekcja ,,Frequently Bought Together'',
+\item Panel administracyjny - zarządzanie metodami rekomendacji i debugowanie.
 \end{itemize}
 
 \textbf{Warstwa logiki biznesowej (Django)} - endpointy API obsługujące zapytania o rekomendacje:
 \begin{itemize}
-\item \texttt{/api/recommendations/collaborative/} - zwraca produkty podobne
-\item \texttt{/api/recommendations/sentiment/} - zwraca top produkty według sentymentu
-\item \texttt{/api/recommendations/association/} - zwraca reguły asocjacyjne
-\item \texttt{/api/products/search/} - wyszukiwanie z sortowaniem według sentymentu
+\item \texttt{/api/recommendations/collaborative/} - zwraca produkty Collaborative Filtering,
+\item \texttt{/api/recommendations/sentiment/} - zwraca produkty według sentymentu,
+\item \texttt{/api/recommendations/association/} - zwraca reguły asocjacyjne,
+\item \texttt{/api/admin/recommendation-settings/} - zarządzanie aktywną metodą.
 \end{itemize}
 
 \textbf{Warstwa danych (PostgreSQL)} - tabele przechowujące prekalkulowane wyniki:
 \begin{itemize}
-\item \texttt{method\_product\_similarity} - macierz podobieństw CF (24h cache)
-\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktów
-\item \texttt{method\_productassociation} - reguły asocjacyjne Apriori
-\item \texttt{method\_user\_product\_recommendation} - spersonalizowane rekomendacje użytkowników
+\item \texttt{method\_product\_similarity} - macierz podobieństw Collaborative Filtering,
+\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment,
+\item \texttt{method\_productassociation} - reguły Apriori,
+\item \texttt{method\_recommendation\_settings} - konfiguracja aktywnej metody.
 \end{itemize}
 
-\textbf{Przepływ danych - przykład sesji zakupowej:}
+\subsection*{6.2 Konfiguracja metod rekomendacji w panelu administratora}
+\addcontentsline{toc}{subsection}{6.2 Konfiguracja metod rekomendacji w panelu administratora}
 
-\begin{enumerate}
-\item Użytkownik wchodzi na stronę główną → API pobiera top 10 produktów według sentymentu
-\item Użytkownik przegląda produkt X → API pobiera 5 podobnych produktów (CF) + 3 produkty często kupowane razem (Apriori)
-\item Użytkownik dodaje produkt do koszyka → System aktualizuje rekomendacje cross-selling w koszyku
-\item Użytkownik finalizuje zakup → Django Signal wywołuje przeliczenie macierzy CF (asynchronicznie)
-\item Następnego dnia użytkownik wraca → Panel klienta pokazuje spersonalizowane rekomendacje oparte na historii zakupów
-\end{enumerate}
-
-\subsection*{6.2 Integracja Collaborative Filtering w systemie}
-\addcontentsline{toc}{subsection}{6.2 Integracja Collaborative Filtering w systemie}
-
-Algorytm Collaborative Filtering został zintegrowany w trzech kluczowych miejscach aplikacji:
-
-\textbf{1. Strona produktu - sekcja "Similar Products"}
+Panel administracyjny umożliwia dynamiczne przełączanie między trzema metodami rekomendacji wyświetlanymi na stronie głównej aplikacji.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/productPageCF.png}
-  \caption{Sekcja "Similar Products" na stronie produktu - rekomendacje Collaborative Filtering.}
-  \label{fig:cf_product_page}
+  \includegraphics[width=\textwidth]{images/recomendationSystemAdmin2.png}
+  \caption{Panel zarządzania metodami rekomendacji.}
+  \label{fig:admin_recommendation_settings}
 \end{figure}
 
-Rysunek \ref{fig:cf_product_page} przedstawia stronę produktu "Apple iPhone 15 Pro Max" z sekcją rekomendacji produktów podobnych. System wyświetla 4 produkty o najwyższym podobieństwie cosinusowym obliczonym przez algorytm CF:
+Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z opcjami metod rekomendacyjnych. Administrator może wybrać aktywny algorytm, który będzie wykorzystywany we wszystkich sekcjach rekomendacji na stronie głównej. System zawiera łącznie sześć metod rekomendacyjnych zaimplementowanych w ramach dwóch prac inżynierskich. W ramach niniejszej pracy zaimplementowano:
 
 \begin{itemize}
-\item Samsung Galaxy S24 Ultra (similarity: 0.87) - podobny zakres cenowy i kategoria "flagowe smartfony"
-\item Google Pixel 8 Pro (similarity: 0.82) - podobna grupa docelowa (użytkownicy premium)
-\item OnePlus 12 (similarity: 0.79) - często kupowany przez użytkowników rozważających iPhone
-\item Xiaomi 14 Ultra (similarity: 0.76) - alternatywa w niższej cenie
+\item \textbf{Collaborative Filtering} - rekomendacje oparte na historii zakupów użytkowników (opisane w niniejszej pracy).
 \end{itemize}
 
-\textbf{Przepływ działania (krok po kroku):}
+Pozostałe metody (Content-Based Filtering, Fuzzy Logic) zostały zaimplementowane przez współautora systemu i opisane w odrębnej pracy inżynierskiej.
 
-\begin{enumerate}
-\item Użytkownik otwiera stronę produktu iPhone 15 Pro Max (ID: 142)
-\item React wywołuje \texttt{GET /api/recommendations/collaborative/?product\_id=142}
-\item Backend sprawdza tabelę \texttt{method\_product\_similarity} WHERE \texttt{product\_1\_id = 142}
-\item System sortuje wyniki malejąco według \texttt{similarity\_score}
-\item API zwraca top 4 produkty z danymi (ID, nazwa, cena, zdjęcie, wynik CF)
-\item React renderuje karty produktów w sekcji "Similar Products"
-\end{enumerate}
+Zmiana metody następuje natychmiast po zapisaniu ustawień i wpływa na wszystkie sekcje rekomendacji w aplikacji.
 
-\textbf{Snippet kodu frontend (React):}
+\subsection*{6.3 Metoda Collaborative Filtering - Item-Based}
+\addcontentsline{toc}{subsection}{6.3 Metoda Collaborative Filtering - Item-Based}
 
-\begin{lstlisting}[language=JavaScript, caption={Pobieranie rekomendacji CF w React}]
-useEffect(() => {
-  const fetchSimilarProducts = async () => {
-    const response = await axios.get(
-      `/api/recommendations/collaborative/?product_id=${productId}`
-    );
-    setSimilarProducts(response.data.slice(0, 4));
-  };
-  fetchSimilarProducts();
-}, [productId]);
-\end{lstlisting}
-
-\textbf{2. Panel klienta - spersonalizowane rekomendacje}
+\textbf{Widok strony głównej z rekomendacjami}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/clientPanelCF.png}
-  \caption{Panel klienta z sekcją rekomendacji CF opartych na historii zakupów.}
-  \label{fig:cf_client_panel}
+  \includegraphics[width=\textwidth]{images/mainSectionView1.png}
+  \caption{Strona główna - pierwsza sekcja rekomendacji.}
+  \label{fig:main_cf_1}
 \end{figure}
 
-Rysunek \ref{fig:cf_client_panel} pokazuje panel użytkownika z zakładką "Recommendations". System agreguje produkty podobne do wszystkich wcześniej zakupionych przedmiotów:
-
-\textbf{Historia zakupów użytkownika:}
-\begin{itemize}
-\item Zamówienie \#1: MacBook Pro 16" + Magic Mouse
-\item Zamówienie \#2: iPad Pro 12.9"
-\item Zamówienie \#3: AirPods Pro 2
-\end{itemize}
-
-\textbf{Wygenerowane rekomendacje CF (top 6):}
-\begin{itemize}
-\item Apple Pencil 2 (score: 2.34) - podobny do iPad Pro (0.91) + MacBook (0.72) + AirPods (0.71)
-\item Magic Keyboard for iPad (score: 2.12) - podobny do iPad Pro (0.88) + MacBook (0.76)
-\item Apple Watch Ultra 2 (score: 1.95) - ekosystem Apple
-\item USB-C Hub (score: 1.87) - akcesoria do MacBooka
-\item Dell XPS 15 (score: 1.76) - alternatywa dla MacBooka
-\item Sony WH-1000XM5 (score: 1.68) - alternatywa dla AirPods
-\end{itemize}
-
-\textbf{Kluczowa obserwacja:} System rekomenduje przede wszystkim akcesoria Apple (Apple Pencil, Magic Keyboard, Apple Watch) - produkty komplementarne dla już posiadanego ekosystemu, co jest zgodne z oczekiwaniami algorytmu CF.
-
-\textbf{3. Strona główna - sekcja "Recommended for You"}
-
-Dla użytkowników zalogowanych strona główna wyświetla sekcję z 8 produktami opartymi na historii zakupów (CF) oraz sentymencie. Dla użytkowników niezalogowanych system pokazuje top produkty według sentymentu zagregowanego.
-
-\subsection*{6.3 Integracja analizy sentymentu w systemie}
-\addcontentsline{toc}{subsection}{6.3 Integracja analizy sentymentu w systemie}
-
-Analiza sentymentu została zintegrowana w dwóch kluczowych miejscach:
-
-\textbf{1. Wyszukiwarka z sortowaniem według sentymentu}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/mainSectionView2.png}
+  \caption{Strona główna - druga sekcja rekomendacji.}
+  \label{fig:main_cf_2}
+\end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/searchSentiment.png}
-  \caption{Wyszukiwarka produktów z opcją sortowania według sentymentu zagregowanego.}
+  \includegraphics[width=0.85\textwidth]{images/mainSectionView3.png}
+  \caption{Strona główna - trzecia sekcja rekomendacji.}
+  \label{fig:main_cf_3}
+\end{figure}
+
+Rysunki \ref{fig:main_cf_1}, \ref{fig:main_cf_2} i \ref{fig:main_cf_3} pokazują trzy sekcje rekomendacji na stronie głównej. Wszystkie sekcje wyświetlają produkty dobrane według metody wybranej w panelu administratora (rys. \ref{fig:admin_recommendation_settings}). Gdy administrator wybierze Collaborative Filtering, wszystkie trzy sekcje będą prezentowały produkty dobrane według tej metody. Produkty są dobierane dynamicznie na podstawie podobieństwa obliczonego algorytmem Item-Based Collaborative Filtering z metryką Adjusted Cosine Similarity.
+
+\textbf{Panel debugowania Collaborative Filtering}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/collaborativeDebug1.png}
+  \caption{Panel debugowania Collaborative Filtering - formuła algorytmu i dane z bazy.}
+  \label{fig:cf_debug_1}
+\end{figure}
+
+Rysunek \ref{fig:cf_debug_1} przedstawia sekcję debugowania algorytmu Collaborative Filtering w panelu administratora. Pod numerem (1) widoczna jest nazwa algorytmu ,,Item-Based Collaborative Filtering'', formuła matematyczna Adjusted Cosine Similarity oraz status wykonania. Pod numerem (2) znajdują się dane z bazy danych - tabela \texttt{method\_product\_similarity} zawierająca pary produktów wraz z obliczonymi współczynnikami podobieństwa oraz fragment macierzy podobieństw w formacie wizualnym.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/collaborativeDebug2.png}
+  \caption{Panel debugowania Collaborative Filtering - podsumowanie obliczeń.}
+  \label{fig:cf_debug_2}
+\end{figure}
+
+Rysunek \ref{fig:cf_debug_2} pokazuje drugą część panelu debugowania Collaborative Filtering. System wyświetla podsumowanie macierzy, statystyki cache oraz przykład rekomendacji dla pierwszego użytkownika z bazy danych.
+
+\textbf{Rekomendacje w panelu klienta}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/recomendationSystemAdmin4.png}
+  \caption{Dashboard klienta z sekcją rekomendacji.}
+  \label{fig:client_dashboard_cf}
+\end{figure}
+
+Rysunek \ref{fig:client_dashboard_cf} przedstawia dashboard klienta z sekcją spersonalizowanych rekomendacji. Produkty są dobierane na podstawie pełnej historii zakupów użytkownika z zastosowaniem metody Collaborative Filtering.
+
+\newpage
+\subsection*{6.4 Metoda analizy sentymentu}
+\addcontentsline{toc}{subsection}{6.4 Metoda analizy sentymentu}
+
+\textbf{Wyszukiwarka z sortowaniem według sentymentu}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/searchSentimentView.png}
+  \caption{Wyszukiwarka produktów z sortowaniem według sentymentu.}
   \label{fig:sentiment_search}
 \end{figure}
 
-Rysunek \ref{fig:sentiment_search} przedstawia wyszukiwarkę z wynikami dla zapytania "laptop". Użytkownik wybrał sortowanie "Best Sentiment" - produkty są uporządkowane według zagregowanego wyniku sentymentu z 5 źródeł tekstowych.
+Rysunek \ref{fig:sentiment_search} przedstawia wyszukiwarkę z wynikami posortowanymi według zagregowanego sentymentu. Każdy produkt wyświetla wynik sentiment score, kategorię oraz rozkład opinii.
 
-\textbf{Top 5 wyników wyszukiwania "laptop" (posortowane według sentymentu):}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Produkt} & \textbf{Wynik} & \textbf{Opinie} & \textbf{Opis} & \textbf{Nazwa} & \textbf{Spec} \\
-\hline
-MacBook Pro 16" M3 & 0.847 & 0.92 & 0.88 & 0.76 & 0.81 \\
-\hline
-Dell XPS 15 9530 & 0.823 & 0.89 & 0.85 & 0.72 & 0.79 \\
-\hline
-Lenovo ThinkPad X1 & 0.798 & 0.86 & 0.82 & 0.68 & 0.77 \\
-\hline
-HP Spectre x360 & 0.776 & 0.83 & 0.79 & 0.71 & 0.74 \\
-\hline
-ASUS ROG Zephyrus & 0.754 & 0.81 & 0.76 & 0.69 & 0.72 \\
-\hline
-\end{tabular}
-\caption{Top 5 laptopów według sentymentu zagregowanego (wagi: opinie 40\%, opis 25\%, nazwa 15\%, spec 12\%, kategorie 8\%)}
-\label{tab:sentiment_scores}
-\end{table}
-
-\textbf{Analiza wyników:}
-
-\begin{itemize}
-\item \textbf{MacBook Pro 16"} - najwyższy wynik (0.847) dzięki bardzo pozytywnym opiniom (0.92) oraz opisowi pełnemu słów "excellent", "powerful", "premium"
-\item \textbf{Dell XPS 15} - drugie miejsce (0.823) - solidne opinie (0.89) oraz opis podkreślający "quality", "reliable", "performance"
-\item \textbf{ASUS ROG Zephyrus} - piąte miejsce (0.754) mimo wysokiej ceny - opinie zawierają więcej słów neutralnych/technicznych ("gaming", "RGB", "cooling")
-\end{itemize}
-
-\textbf{Przepływ działania sortowania według sentymentu:}
-
-\begin{enumerate}
-\item Użytkownik wpisuje zapytanie "laptop" i wybiera sortowanie "Best Sentiment"
-\item React wywołuje \texttt{GET /api/products/search/?q=laptop\&sort=sentiment}
-\item Backend wykonuje zapytanie SQL z JOIN:
-\begin{lstlisting}[language=SQL, caption={Query wyszukiwania z sortowaniem według sentymentu}]
-SELECT p.*, s.average_sentiment_score
-FROM db_product p
-LEFT JOIN method_product_sentiment_summary s 
-  ON p.id = s.product_id
-WHERE p.name ILIKE '%laptop%' 
-   OR p.description ILIKE '%laptop%'
-ORDER BY s.average_sentiment_score DESC NULLS LAST
-LIMIT 20;
-\end{lstlisting}
-\item System zwraca produkty z wynikiem sentymentu
-\item React renderuje karty produktów z widocznym wskaźnikiem sentymentu
-\end{enumerate}
-
-\textbf{2. Karta produktu - wskaźnik sentymentu zagregowanego}
+\newpage
+\textbf{Panel debugowania analizy sentymentu}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/productSentimentIndicator.png}
-  \caption{Karta produktu z wskaźnikiem sentymentu zagregowanego i rozkładem opinii.}
-  \label{fig:sentiment_indicator}
+  \includegraphics[width=\textwidth]{images/sentimentDebug2.png}
+  \caption{Panel debugowania analizy sentymentu.}
+  \label{fig:sentiment_debug}
 \end{figure}
 
-Rysunek \ref{fig:sentiment_indicator} pokazuje kartę produktu "MacBook Pro 16" M3" z widocznym wskaźnikiem sentymentu. System wyświetla:
+Rysunek \ref{fig:sentiment_debug} pokazuje panel debugowania analizy sentymentu. Administrator może wybrać dowolny produkt z listy rozwijanej i sprawdzić wynik zagregowany, status kategorii oraz szczegółowe informacje z poszczególnych źródeł tekstowych.
 
-\begin{itemize}
-\item \textbf{Wynik zagregowany:} 0.847 (84.7\% - bardzo pozytywny)
-\item \textbf{Rozkład opinii:} 
-  \begin{itemize}
-  \item Pozytywne: 127 opinii (89\%)
-  \item Neutralne: 12 opinii (8\%)
-  \item Negatywne: 4 opinie (3\%)
-  \end{itemize}
-\item \textbf{Źródła sentymentu:}
-  \begin{itemize}
-  \item Opinie użytkowników: 0.92 (waga 40\%)
-  \item Opis produktu: 0.88 (waga 25\%)
-  \item Nazwa: 0.76 (waga 15\%)
-  \item Specyfikacje: 0.81 (waga 12\%)
-  \item Kategorie: 0.73 (waga 8\%)
-  \end{itemize}
-\end{itemize}
+\newpage
+\subsection*{6.5 Metoda reguł asocjacyjnych (Apriori)}
+\addcontentsline{toc}{subsection}{6.5 Metoda reguł asocjacyjnych (Apriori)}
 
-\textbf{Kluczowa obserwacja:} Nawet dla produktu z zaledwie 4 negatywnymi opiniami (3\%), system jest w stanie zagregować wynik sentymentu (0.847) dzięki analizie opisu, nazwy i specyfikacji. To rozwiązuje problem zimnego startu - produkty bez opinii nadal otrzymują wiarygodny wynik sentymentu.
-
-\subsection*{6.4 Integracja reguł asocjacyjnych w systemie}
-\addcontentsline{toc}{subsection}{6.4 Integracja reguł asocjacyjnych w systemie}
-
-Algorytm Apriori został zintegrowany w dwóch miejscach optymalizujących cross-selling:
-
-\textbf{1. Strona produktu - sekcja "Frequently Bought Together"}
+\textbf{Widok rekomendacji Apriori na stronie produktu}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/productPageApriori.png}
-  \caption{Sekcja "Frequently Bought Together" na stronie produktu - rekomendacje Apriori.}
-  \label{fig:apriori_product_page}
+  \includegraphics[width=0.7\textwidth]{images/associationView.png}
+  \caption{Sekcja ,,Frequently Bought Together'' na stronie produktu.}
+  \label{fig:association_view}
 \end{figure}
 
-Rysunek \ref{fig:apriori_product_page} przedstawia stronę produktu "MacBook Pro 16" M3" z sekcją rekomendacji produktów często kupowanych razem. System wyświetla 3 produkty z najwyższymi metrykami reguł asocjacyjnych:
+Rysunek \ref{fig:association_view} przedstawia sekcję ,,Frequently Bought Together'' na stronie produktu. Pod numerem (1) widoczne są produkty dodane przez użytkownika do koszyka. Pod numerem (2) system wyświetla produkty proponowane na podstawie reguł asocjacyjnych wraz z metrykami lift, support i confidence.
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Produkt} & \textbf{Support} & \textbf{Confidence} & \textbf{Lift} \\
-\hline
-USB-C Hub 7-in-1 & 0.042 & 0.68 & 3.24 \\
-\hline
-Magic Mouse 2 & 0.038 & 0.61 & 2.87 \\
-\hline
-Apple Care+ & 0.035 & 0.57 & 2.64 \\
-\hline
-\end{tabular}
-\caption{Top 3 produkty często kupowane z MacBook Pro 16" (min\_support=0.001, min\_confidence=0.01, min\_lift=1.0)}
-\label{tab:apriori_macbook}
-\end{table}
-
-\textbf{Analiza reguł asocjacyjnych:}
-
-\begin{itemize}
-\item \textbf{USB-C Hub} - najwyższy lift (3.24) oznacza, że prawdopodobieństwo zakupu tego produktu jest 3.24× wyższe gdy użytkownik kupuje MacBooka. Support 0.042 = 4.2\% wszystkich transakcji zawiera tę parę (42 na 1000 zamówień)
-\item \textbf{Magic Mouse 2} - confidence 0.61 = 61\% użytkowników kupujących MacBooka dodaje również mysz
-\item \textbf{Apple Care+} - typowa reguła cross-sellingu - 57\% kupujących MacBooka rozważa rozszerzoną gwarancję
-\end{itemize}
-
-\textbf{Przepływ działania rekomendacji Apriori:}
-
-\begin{enumerate}
-\item Użytkownik otwiera stronę MacBooka (ID: 87)
-\item React wywołuje \texttt{GET /api/recommendations/association/?product\_id=87}
-\item Backend wykonuje zapytanie:
-\begin{lstlisting}[language=SQL, caption={Query reguł asocjacyjnych}]
-SELECT pa.*, p.name, p.price, p.image
-FROM method_productassociation pa
-JOIN db_product p ON pa.consequent_id = p.id
-WHERE pa.antecedent_id = 87
-ORDER BY pa.lift DESC, pa.confidence DESC
-LIMIT 3;
-\end{lstlisting}
-\item System zwraca top 3 produkty z metrykami Apriori
-\item React renderuje sekcję "Frequently Bought Together" z ceną sumaryczną i przyciskiem "Add All to Cart"
-\end{enumerate}
-
-\textbf{2. Koszyk zakupowy - dynamiczny cross-selling}
+\textbf{Panel zarządzania regułami asocjacyjnymi}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/cartApriori.png}
-  \caption{Koszyk zakupowy z dynamicznymi rekomendacjami cross-selling opartymi na Apriori.}
-  \label{fig:apriori_cart}
+  \includegraphics[width=0.8\textwidth]{images/associationAdmin.png}
+  \caption{Panel administracyjny zarządzania regułami Apriori.}
+  \label{fig:association_admin}
 \end{figure}
 
-Rysunek \ref{fig:apriori_cart} pokazuje koszyk użytkownika z produktami:
-\begin{itemize}
-\item MacBook Pro 16" M3
-\item iPad Pro 12.9"
-\end{itemize}
+Rysunek \ref{fig:association_admin} pokazuje panel administracyjny z listą wygenerowanych reguł asocjacyjnych. Pod numerem (1) znajduje się lista par produktów często kupowanych razem. Pod numerem (2) wyświetlane są szczegółowe metryki każdej reguły - support, confidence i lift.
 
-System wyświetla sekcję "You May Also Like" z 4 rekomendacjami opartymi na regułach asocjacyjnych dla obu produktów w koszyku:
+\newpage
+\textbf{Panel debugowania reguł asocjacyjnych}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|c|c|}
-\hline
-\textbf{Reguła} & \textbf{Produkt} & \textbf{Confidence} & \textbf{Lift} \\
-\hline
-MacBook → ? & Apple Pencil 2 & 0.72 & 3.41 \\
-\hline
-iPad → ? & Magic Keyboard & 0.68 & 3.18 \\
-\hline
-MacBook + iPad → ? & Apple Watch Ultra & 0.54 & 2.87 \\
-\hline
-MacBook → ? & USB-C Cable & 0.49 & 2.54 \\
-\hline
-\end{tabular}
-\caption{Rekomendacje cross-selling w koszyku dla MacBook + iPad}
-\label{tab:cart_apriori}
-\end{table}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/associationDebug1.png}
+  \caption{Panel debugowania Apriori - wybór produktu i dane z bazy.}
+  \label{fig:association_debug_1}
+\end{figure}
 
-\textbf{Kluczowa obserwacja:} System agreguje reguły dla wszystkich produktów w koszyku. Apple Watch Ultra ma confidence 0.54 dla reguły "MacBook + iPad → Apple Watch", co jest niższe niż dla pojedynczych produktów, ale lift 2.87 wskazuje na silną korelację - użytkownicy posiadający oba produkty Apple są prawie 3× bardziej skłonni kupić Apple Watcha.
+Rysunek \ref{fig:association_debug_1} przedstawia pierwszy ekran panelu debugowania algorytmu Apriori. Pod numerem (1) administrator wybiera produkt z listy rozwijanej. Poniżej system wyświetla dane produktu z bazy danych, obliczenia transakcji oraz wszystkie reguły asocjacyjne dla wybranego produktu.
 
-\textbf{Biznesowa wartość Apriori:}
+\newpage
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/associationDebug2.png}
+  \caption{Panel debugowania Apriori - top 10 reguł i szczegóły analizy.}
+  \label{fig:association_debug_2}
+\end{figure}
 
-W testach A/B (100 użytkowników przez 30 dni) sekcja "Frequently Bought Together" zwiększyła:
-\begin{itemize}
-\item Średnią wartość koszyka o 23\% (z 850 PLN do 1045 PLN)
-\item Conversion rate o 8\% (z 12\% do 13\%)
-\item Liczbę produktów per transakcja o 31\% (z 2.3 do 3.0)
-\end{itemize}
+Rysunek \ref{fig:association_debug_2} pokazuje drugą część panelu debugowania Apriori. Pod numerem (1) znajduje się ranking top 10 reguł asocjacyjnych dla wybranego produktu posortowanych według lift. Pod numerem (2) wyświetlane są szczegółowe analizy reguł dla produktów, w tym rozkład wartości lift, średnie metryki oraz porównanie z globalnymi statystykami.
 
-\subsection*{6.5 Mechanizmy optymalizacji i cache'owania}
-\addcontentsline{toc}{subsection}{6.5 Mechanizmy optymalizacji i cache'owania}
+\newpage
+\subsection*{6.6 Mechanizmy optymalizacji systemu}
+\addcontentsline{toc}{subsection}{6.6 Mechanizmy optymalizacji systemu}
 
-System wykorzystuje wielopoziomowe mechanizmy cache'owania dla zapewnienia wydajności:
+System wykorzystuje mechanizmy optymalizacji dla zapewnienia wydajności:
 
-\textbf{1. Cache Django (Redis) - warstwa backendu}
+\textbf{Prekalkulacja w bazie danych}
+
+Wszystkie trzy algorytmy zapisują wyniki do dedykowanych tabel z indeksami przyspieszającymi zapytania:
 
 \begin{itemize}
-\item \textbf{Macierz CF:} timeout 24h, klucz \texttt{collaborative\_matrix\_v1}
-\item \textbf{Reguły Apriori:} timeout 48h, klucz \texttt{apriori\_rules\_v1}
-\item \textbf{Sentyment produktów:} timeout 12h, klucz \texttt{sentiment\_summary\_\{product\_id\}}
-\item \textbf{Rekomendacje użytkownika:} timeout 6h, klucz \texttt{user\_recs\_\{user\_id\}\_\{method\}}
+\item \texttt{method\_product\_similarity} - macierz podobieństw Collaborative Filtering,
+\item \texttt{method\_productassociation} - reguły asocjacyjne Apriori,
+\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktów.
 \end{itemize}
 
-\textbf{Snippet kodu cache'owania CF:}
+\textbf{Django Signals - automatyczna aktualizacja}
 
-\begin{lstlisting}[language=Python, caption={Cache'owanie macierzy CF w Django}]
-from django.core.cache import cache
-
-def get_collaborative_matrix():
-    matrix = cache.get('collaborative_matrix_v1')
-    if matrix is None:
-        # Przelicz macierz (5-10s)
-        matrix = compute_collaborative_filtering()
-        cache.set('collaborative_matrix_v1', matrix, timeout=86400)
-    return matrix
-\end{lstlisting}
-
-\textbf{2. Prekalkulacja w bazie danych}
-
-Wszystkie trzy algorytmy zapisują wyniki do dedykowanych tabel:
+System wykorzystuje mechanizm Django Signals do automatycznego przeliczania rekomendacji po zmianach danych:
 
 \begin{itemize}
-\item \texttt{method\_product\_similarity} - 125,000 par produktów (500 produktów × 500 × 0.5 filtr)
-\item \texttt{method\_productassociation} - 8,500 reguł asocjacyjnych
-\item \texttt{method\_product\_sentiment\_summary} - 500 wpisów (po jednym na produkt)
+\item Nowe zamówienie - przeliczenie macierzy Collaborative Filtering,
+\item Nowa opinia - aktualizacja sentymentu produktu,
+\item Nowy produkt - automatyczna analiza sentymentu opisu i nazwy.
 \end{itemize}
 
-\textbf{Indeksy PostgreSQL:}
+\textbf{Operacje zbiorcze}
 
-\begin{lstlisting}[language=SQL, caption={Indeksy przyspieszające zapytania}]
-CREATE INDEX idx_similarity_p1 
-  ON method_product_similarity(product_1_id, similarity_score DESC);
-
-CREATE INDEX idx_association_ant 
-  ON method_productassociation(antecedent_id, lift DESC);
-
-CREATE INDEX idx_sentiment_score 
-  ON method_product_sentiment_summary(average_sentiment_score DESC);
-\end{lstlisting}
-
-\textbf{3. Django Signals - automatyczna aktualizacja}
-
-System wykorzystuje mechanizm Django Signals do automatycznego przeliczania rekomendacji:
-
-\begin{lstlisting}[language=Python, caption={Automatyczna aktualizacja po dodaniu opinii}]
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-@receiver(post_save, sender=Opinion)
-def update_sentiment_after_opinion(sender, instance, **kwargs):
-    # Asynchroniczne przeliczenie sentymentu produktu
-    product = instance.product
-    update_product_sentiment.delay(product.id)
-    
-    # Unieważnienie cache
-    cache_key = f'sentiment_summary_{product.id}'
-    cache.delete(cache_key)
-\end{lstlisting}
-
-\textbf{Scenariusze aktualizacji cache:}
-
-\begin{itemize}
-\item \textbf{Nowe zamówienie:} przeliczenie macierzy CF (asynchroniczne, kolejka Celery)
-\item \textbf{Nowa opinia:} przeliczenie sentymentu produktu (synchroniczne, <50ms)
-\item \textbf{Nowy produkt:} automatyczna analiza sentymentu opisu/nazwy (synchroniczne)
-\item \textbf{Zmiana ceny/opisu:} unieważnienie cache produktu (synchroniczne)
-\end{itemize}
-
-\subsection*{6.6 Analiza wydajności systemu}
-\addcontentsline{toc}{subsection}{6.6 Analiza wydajności systemu}
-
-Przeprowadzono testy wydajności dla 500 produktów, 1000 użytkowników, 2000 zamówień:
-
-\textbf{1. Czasy generowania rekomendacji (pierwsza iteracja - bez cache):}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Algorytm} & \textbf{Czas obliczeń} & \textbf{Rozmiar cache} & \textbf{Liczba rekordów} \\
-\hline
-Collaborative Filtering & 5.2s & 15.3 MB & 125,000 par \\
-\hline
-Sentiment Analysis & 8.7s & 2.1 MB & 500 produktów \\
-\hline
-Apriori (bitmap pruning) & 2.4s & 1.8 MB & 8,500 reguł \\
-\hline
-\end{tabular}
-\caption{Czasy pierwszej generacji rekomendacji (500 produktów, 2000 zamówień)}
-\label{tab:performance_first}
-\end{table}
-
-\textbf{2. Czasy odpowiedzi API (z cache):}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Endpoint} & \textbf{Avg (ms)} & \textbf{P95 (ms)} & \textbf{P99 (ms)} \\
-\hline
-GET /api/recommendations/collaborative/ & 47 & 89 & 142 \\
-\hline
-GET /api/recommendations/sentiment/ & 32 & 71 & 118 \\
-\hline
-GET /api/recommendations/association/ & 28 & 64 & 105 \\
-\hline
-GET /api/products/search/?sort=sentiment & 156 & 284 & 431 \\
-\hline
-\end{tabular}
-\caption{Czasy odpowiedzi API z włączonym cache Redis (1000 requestów)}
-\label{tab:performance_api}
-\end{table}
-
-\textbf{Kluczowe obserwacje wydajnościowe:}
-
-\begin{itemize}
-\item \textbf{Cache skuteczność:} hit rate 94\% dla CF, 97\% dla Apriori, 89\% dla sentymentu
-\item \textbf{Najszybszy algorytm:} Apriori (28ms avg) dzięki bitmap pruning
-\item \textbf{Najwolniejszy endpoint:} wyszukiwanie z sortowaniem sentymentu (156ms) - wymaga full-text search + JOIN + sortowanie
-\item \textbf{Skalowanie:} dla 10,000 produktów czas CF wzrasta do ~45s (pierwsza iteracja), ale z cache pozostaje <100ms
-\end{itemize}
-
-\textbf{3. Wykorzystanie zasobów serwerowych:}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Zasób} & \textbf{Idle} & \textbf{Peak (przeliczanie CF)} \\
-\hline
-CPU (4 cores) & 8\% & 78\% \\
-\hline
-RAM & 512 MB & 1.8 GB \\
-\hline
-PostgreSQL connections & 5 & 12 \\
-\hline
-Redis memory & 45 MB & 62 MB \\
-\hline
-\end{tabular}
-\caption{Wykorzystanie zasobów dla środowiska testowego (Docker Compose)}
-\label{tab:performance_resources}
-\end{table}
-
-\textbf{Rekomendacje optymalizacyjne dla środowiska produkcyjnego:}
-
-\begin{itemize}
-\item \textbf{Serwer:} minimum 8 GB RAM dla 10,000 produktów
-\item \textbf{Cache:} Redis 6+ z persystencją RDB
-\item \textbf{Baza danych:} PostgreSQL 14+ z 2 GB shared\_buffers
-\item \textbf{Kolejka zadań:} Celery + RabbitMQ dla asynchronicznego przeliczania CF
-\item \textbf{CDN:} CloudFlare/CloudFront dla zdjęć produktów (redukuje obciążenie backendu o 60\%)
-\end{itemize}
+System używa operacji zbiorczych (bulk operations) dla zapisu wielu rekordów jednocześnie, co znacząco przyspiesza operacje zapisu do bazy danych.
 
 \subsection*{6.7 Podsumowanie funkcjonowania systemu}
 \addcontentsline{toc}{subsection}{6.7 Podsumowanie funkcjonowania systemu}
 
 Zaimplementowany system rekomendacji charakteryzuje się:
 
-\textbf{Kompletnością integracji:}
+\textbf{Kompletnością zarządzania:}
 \begin{itemize}
-\item 6 miejsc w UI wykorzystujących rekomendacje (strona główna, produkt, koszyk, panel klienta, wyszukiwarka)
-\item 3 komplementarne algorytmy pokrywające różne scenariusze zakupowe
-\item Automatyczna aktualizacja rekomendacji przez Django Signals
+\item Panel administratora z dynamicznym przełączaniem metod,
+\item Sekcje debugowania dla wszystkich trzech algorytmów,
+\item Wizualizacja metryk i statystyk w czasie rzeczywistym.
 \end{itemize}
 
-\textbf{Wydajnością:}
+\textbf{Integracją w aplikacji:}
 \begin{itemize}
-\item Czasy odpowiedzi API <100ms (P95) z włączonym cache
-\item Cache hit rate 94\% dla Collaborative Filtering
-\item Bitmap pruning w Apriori przyspiesza 15-19× vs implementacja naiwna
+\item Strona główna z konfigurowalnymi rekomendacjami,
+\item Dashboard klienta z personalizacją,
+\item Wyszukiwarka z sortowaniem według sentymentu,
+\item Sekcje ,,Frequently Bought Together'' oparte na Apriori.
 \end{itemize}
 
-\textbf{Praktyczną wartością biznesową:}
+\textbf{Narzędziami diagnostycznymi:}
 \begin{itemize}
-\item Wzrost średniej wartości koszyka o 23\% dzięki "Frequently Bought Together"
-\item Rozwiązanie problemu zimnego startu przez wieloźródłową agregację sentymentu
-\item Spersonalizowane rekomendacje w panelu klienta zwiększające retention
+\item Podgląd macierzy podobieństw Collaborative Filtering,
+\item Analiza źródeł sentymentu dla każdego produktu,
+\item Ranking reguł asocjacyjnych z metrykami,
+\item Statystyki wykonania algorytmów.
 \end{itemize}
 
-System jest gotowy do wdrożenia w środowisku produkcyjnym i może obsłużyć do 10,000 produktów oraz 100,000 użytkowników przy zachowaniu akceptowalnych czasów odpowiedzi.
-
-\clearpage
+System jest w pełni funkcjonalny i gotowy do wdrożenia w środowisku produkcyjnym.
 
 \clearpage
 
@@ -1938,7 +1567,7 @@ W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
 \textbf{Problem zimnego startu} — algorytmy Collaborative Filtering oraz Apriori wymagają historycznych danych o interakcjach użytkowników z produktami. Dla nowych użytkowników bez historii zakupów oraz nowych produktów bez opinii mechanizmy te nie są w stanie generować efektywnych rekomendacji. Analiza sentymentu częściowo kompensuje to ograniczenie, ponieważ może ocenić jakość produktu na podstawie jego opisu, specyfikacji technicznych oraz nazwy, nawet w przypadku braku opinii użytkowników.
 
-\textbf{Ograniczenia analizy sentymentu} — zastosowane podejście słownikowe nie radzi sobie efektywnie z negacją językową (przykład: „nie polecam") oraz z ironią i sarkazmem. Słowa pozytywne w kontekście negatywnym mogą być błędnie klasyfikowane, co wpływa na dokładność oceny sentymentu. Rozwiązanie tego problemu wymagałoby zastosowania bardziej zaawansowanych technik przetwarzania języka naturalnego, takich jak modele kontekstowe.
+\textbf{Ograniczenia analizy sentymentu} — zastosowane podejście słownikowe nie radzi sobie efektywnie z negacją językową (przykład: ,,nie polecam'') oraz z ironią i sarkazmem. Słowa pozytywne w kontekście negatywnym mogą być błędnie klasyfikowane, co wpływa na dokładność oceny sentymentu. Rozwiązanie tego problemu wymagałoby zastosowania bardziej zaawansowanych technik przetwarzania języka naturalnego, takich jak modele kontekstowe.
 
 \textbf{Skalowalność dla bardzo dużych katalogów} — dla katalogów produktów przekraczających tysiące pozycji mogą wystąpić wyzwania wydajnościowe wymagające dalszych optymalizacji, takich jak partycjonowanie danych, rozproszenie obliczeń lub zastosowanie dedykowanych struktur danych.
 
@@ -2017,17 +1646,10 @@ IEEE Transactions on Knowledge and Data Engineering, 2000.
 
 \newpage
 % Wykaz rysunków
-\section*{Wykaz rysunków i tabel }
+\section*{Wykaz rysunków }
 \addcontentsline{toc}{section}{Wykaz ilustracji, rysunków, wykresów i tabel}
 \small
 \listoffigures
-
-% Spis tabel
-{
-\addcontentsline{toc}{section}{Spis tabel}
-\small
-\listoftables
-}
 
 \newpage
 \section*{Streszczenie}
