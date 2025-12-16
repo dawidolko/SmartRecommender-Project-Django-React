@@ -1,0 +1,193 @@
+\subsubsection*{6.3.1 Panel debugowania Fuzzy Logic}
+
+Panel debugowania dostępny przez endpoint \texttt{/api/fuzzy-debug/} prezentuje:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug1.jpg}
+  \caption{Panel debugowania Fuzzy Logic.}
+  \label{fig:fuzzy_debug1}
+\end{figure}
+
+\textbf{Widok ogólny}:
+
+\begin{itemize}
+    \item \textbf{Szczegóły algorytmu}: metoda (Mamdani Fuzzy Inference), liczba reguł (6), T-norma (min), T-conorma (max)
+    \item \textbf{Funkcje przynależności}: definicje dla price, quality, popularity z progami
+    \item \textbf{Statystyki}: średni fuzzy\_score, rozkład wyników, aktywacja reguł
+    \item \textbf{Profil użytkownika}: jeśli podany user\_id — szczegóły profilu rozmytego
+\end{itemize}
+
+\textbf{Widok produktu} (z parametrem product\_id):
+
+\begin{itemize}
+    \item Wartości fuzzyfikacji (wszystkie przynależności)
+    \item Aktywacja każdej z 6 reguł z wyjaśnieniem
+    \item Obliczenie końcowe z breakdownem
+    \item Porównanie z innymi produktami
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug2.jpg}
+  \caption{Fuzzy Logic - ewaluacja produktu.}
+  \label{fig:fuzzy_debug2}
+\end{figure}
+
+\textbf{Przykładowe dane z panelu debugowania}:
+
+\begin{verbatim}
+Algorithm: Fuzzy Logic Inference System (Mamdani-style)
+Description: System rekomendacji oparty na logice rozmytej
+z uproszczona defuzzyfikacja
+
+User Profile:
+- User: admin2 (ID: 2)
+- Profile Type: authenticated
+- Price Sensitivity: 0.6 - Medium
+- Tracked Categories: 26
+
+Category Interests:
+- wearables.watches: 0.132
+- networking.networkCards: 0.093
+- peripherals.microphones: 0.066
+- monitoring.cameras: 0.06
+- gadgets: 0.06
+
+Membership Functions:
+Price Functions:
+- CHEAP: μ = 1.0 dla ceny ≤ 100 PLN, spada do 0 przy 500 PLN
+- MEDIUM: μ = 1.0 dla ceny 500-1200 PLN
+- EXPENSIVE: μ = 1.0 dla ceny ≥ 2000 PLN
+\end{verbatim}
+
+\textbf{Przykład fuzzyfikacji produktu} (AMD Ryzen 9 7900X, cena: 400 PLN, rating: 3, views: 1):
+
+\begin{verbatim}
+Selected Product:
+- ID: 96
+- Name: AMD Ryzen 9 7900X
+- Price: 400 PLN
+- Rating: 3
+- View Count: 1
+- Categories: components.processors
+
+Fuzzification - Membership Degrees:
+Price: 400 PLN
+- Cheap: μ = 0.25
+- Medium: μ = 0.5
+- Expensive: μ = 0
+- Dominant: MEDIUM
+
+Quality: 3
+- Low: μ = 0.5
+- Medium: μ = 0.5
+- High: μ = 0
+- Dominant: LOW
+
+Popularity: 1 views
+- Low: μ = 1
+- Medium: μ = 0
+- High: μ = 0
+- Dominant: LOW
+
+Category Matching:
+- Max Match: 0.394
+- components.processors: 0.394
+\end{verbatim}
+
+\subsubsection*{6.3.2 Interfejs użytkownika - rekomendacje Fuzzy Logic}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{images/fuzzyLogicSequenceDiagram.png}
+  \caption{Diagram sekwencji - Fuzzy Logic.}
+  \label{fig:fuzzy_sequence}
+\end{figure}
+
+Rekomendacje oparte na logice rozmytej są prezentowane użytkownikowi w panelu klienta w sekcji "Recommended For You (Fuzzy Logic)". System wyświetla wykres kołowy przedstawiający rozkład kategorii w historii zakupów użytkownika oraz listę rekomendowanych produktów.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient1.jpg}
+  \caption{Panel klienta - rekomendacje Fuzzy Logic.}
+  \label{fig:fuzzy_client}
+\end{figure}
+
+Wykres "Category Distribution" pokazuje procentowy udział kategorii w historii zakupów użytkownika (np. electronics.phones, accessories.powerBanks, wearables.watches, peripherals.printers, office.accessories). Na podstawie tych danych system buduje rozmyty profil użytkownika i generuje spersonalizowane rekomendacje.
+
+Sekcja "Recommended For You (Fuzzy Logic)" prezentuje produkty z najwyższym wynikiem fuzzy\_score, uwzględniając:
+\begin{itemize}
+    \item Dopasowanie do kategorii zainteresowań użytkownika
+    \item Wrażliwość cenową użytkownika
+    \item Jakość produktu (rating)
+    \item Popularność produktu (view\_count)
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient2.jpg}
+  \caption{Zakładka "Fuzzy Recommendations".}
+  \label{fig:fuzzy_client2}
+\end{figure}
+
+Zakładka "Fuzzy Recommendations" wyświetla produkty wraz z:
+\begin{itemize}
+    \item \textbf{Fuzzy Score}: całkowity wynik rekomendacji (np. 58.1\%, 56.3\%)
+    \item \textbf{Category Match}: stopień dopasowania kategorii do preferencji użytkownika (np. 65.9\%, 60.6\%)
+    \item \textbf{View Rule Activations}: przycisk do podglądu aktywacji wszystkich 6 reguł rozmytych
+\end{itemize}
+
+Przykładowe rekomendacje z interfejsu:
+\begin{itemize}
+    \item Motorola edge 40 neo 5G (\$549.99): Fuzzy Score 58.1\%, Category Match 65.9\%
+    \item Apple iPad Air 11" M2 (\$749.99): Fuzzy Score 56.3\%, Category Match 60.6\%
+    \item Roborock Q8 Max+ White (\$649.99): Fuzzy Score 56.3\%, Category Match 60.6\%
+    \item JoyRoom Powerbank 10000mAh (\$49.99): Fuzzy Score 54.3\%, Category Match 64.3\%
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient3.jpg}
+  \caption{Zakładka "Your Fuzzy User Profile".}
+  \label{fig:fuzzy_client3}
+\end{figure}
+
+Zakładka ``Your Fuzzy User Profile'' (Rysunek \ref{fig:fuzzy_client3}) prezentuje rozmyty profil użytkownika zbudowany na podstawie historii zakupów:
+\begin{itemize}
+    \item \textbf{Profile Type}: typ profilu (authenticated/guest)
+    \item \textbf{Price Sensitivity}: wrażliwość cenowa w procentach (np. 60\%)
+    \item \textbf{Favorite Categories}: ulubione kategorie z wagami zainteresowania
+\end{itemize}
+
+\subsubsection*{6.3.3 Wyszukiwanie rozmyte (Fuzzy Search)}
+
+Wyszukiwanie rozmyte (Fuzzy Search) wykorzystuje algorytm odległości Levensteina do wyszukiwania produktów z tolerancją na literówki i błędy pisowni. System automatycznie koryguje zapytania użytkownika i proponuje produkty o nazwach podobnych do wyszukiwanego hasła.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzySearch1.jpg}
+  \caption{Wyszukiwarka rozmyta (Fuzzy Search).}
+  \label{fig:fuzzy_search}
+\end{figure}
+
+Algorytm Levensteina oblicza minimalną liczbę operacji edycji (wstawienie, usunięcie, zamiana znaku) potrzebnych do przekształcenia jednego ciągu w drugi:
+
+\begin{equation}
+lev(a,b) = \begin{cases}
+|a| & \text{jeśli } |b| = 0 \\
+|b| & \text{jeśli } |a| = 0 \\
+lev(tail(a), tail(b)) & \text{jeśli } a[0] = b[0] \\
+1 + \min \begin{cases}
+lev(tail(a), b) \\
+lev(a, tail(b)) \\
+lev(tail(a), tail(b))
+\end{cases} & \text{w przeciwnym wypadku}
+\end{cases}
+\end{equation}
+
+System wyszukiwania rozmytego zwraca produkty, dla których odległość Levensteina między zapytaniem a nazwą produktu jest mniejsza niż ustalony próg (domyślnie 3).
+
+\newpage
+
+\section*{Rozdzia\l{} 7}

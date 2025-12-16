@@ -1,0 +1,143 @@
+\subsubsection*{6.2.1 Panel debugowania Content-Based Filtering}
+
+System oferuje zaawansowany panel debugowania dostępny przez endpoint \texttt{/api/content-based-debug/}. Panel prezentuje:
+
+\textbf{Widok ogólny (bez parametru product\_id)}:
+
+\begin{itemize}
+    \item \textbf{Szczegóły algorytmu}: nazwa, metoda (Weighted Feature Vectors + Cosine Similarity), status
+    \item \textbf{Wagi cech}: category (40\%), tag (30\%), price (20\%), keywords (10\%)
+    \item \textbf{Statystyki bazy danych}: liczba produktów, zapisanych podobieństw, procent pokrycia
+    \item \textbf{Status cache}: HIT/MISS, czas wygaśnięcia
+    \item \textbf{Top 10 podobieństw}: produkty o najwyższym podobieństwie w systemie
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug1.jpg}
+  \caption{Panel debugowania Content-Based Filtering.}
+  \label{fig:cbf_debug1}
+\end{figure}
+
+\textbf{Widok szczegółowy (z parametrem product\_id)}:
+
+Dla konkretnego produktu panel pokazuje:
+
+\begin{itemize}
+    \item Wektor cech produktu z wagami (słownik feature → weight)
+    \item Top 10 produktów podobnych z szczegółami obliczeń
+    \item Wzór matematyczny dla każdej pary: $\frac{dot\_product}{norm_1 \times norm_2}$
+    \item Cechy wspólne między produktami
+    \item Breakdown podobieństwa: ile % z kategorii, ile z tagów, ile z ceny, ile z keywords
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug2.jpg}
+  \caption{CBF - szczegółowa analiza podobieństwa produktu.}
+  \label{fig:cbf_debug2}
+\end{figure}
+
+\textbf{Przykładowe dane z panelu debugowania}:
+
+\begin{verbatim}
+Algorithm: Content-Based Filtering (Cosine Similarity)
+Formula: cos(θ) = (A·B) / (||A|| × ||B||)
+
+Database Statistics:
+- Total Products: 500
+- Saved Similarities: 16038
+- Percentage Saved: 6.43%
+- Threshold: 20% (Only similarities > 20% are saved to database)
+
+Feature Weights:
+- Category: 40%
+- Tag: 30%
+- Price: 20%
+- Keywords: 10%
+\end{verbatim}
+
+\textbf{Przykład wektora cech produktu} (ACEFAST Powerbank MagSafe M10 10000 mAh):
+
+\begin{verbatim}
+Feature Vector (12 features):
+- category_accessories.powerbanks: 0.400
+- tag_budget:                      0.300
+- tag_portable:                    0.300
+- tag_fast charging:               0.300
+- tag_magsafe compatible:          0.300
+- tag_wireless:                    0.300
+- price_low:                       0.200
+- keyword_charging:                0.020
+- keyword_power:                   0.020
+- keyword_fast:                    0.020
+- keyword_devices:                 0.020
+- keyword_magsafe:                 0.020
+
+Top 10 Similar Products:
+#1 Baseus Magnetic Mini Wireless Charging 20W 20000mAh z MagSafe: 99.90%
+#2 Baseus Magnetic Mini Wireless Charging 20W 20000mAh z MagSafe: 99.90%
+#3 Belkin Magnetic Wireless 5000mAh MagSafe + Stand: 99.90%
+#4 Baseus mini 5000mAh 20W (magnetyczny): 92.70%
+#5 Belkin 20000mAh (15W, USB-C, USB-A): 84.90%
+
+Detailed Calculation (#1):
+- Dot Product: 0.6512
+- Norm Product 1: 0.8075
+- Norm Product 2: 0.8075
+- Formula: 0.6512 / (0.8075 × 0.8075) = 0.9988
+- Verification: Stored: 0.999 | Calculated: 0.9988 ✓
+- Common Features: 10 total
+\end{verbatim}
+
+Panel umożliwia administratorowi:
+\begin{itemize}
+    \item Monitorowanie pokrycia rekomendacji (ile produktów ma podobieństwa)
+    \item Identyfikację produktów bez podobieństw (słabo opisane metadane)
+    \item Walidację działania wag (czy kategorie dominują prawidłowo)
+    \item Ręczne wyzwalanie przeliczenia macierzy
+\end{itemize}
+
+\subsubsection*{6.2.2 Interfejs użytkownika - sortowanie według CBF}
+
+Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania produktów na stronie głównej sklepu. Administrator może wybrać algorytm CBF w ustawieniach systemu rekomendacji, co powoduje wyświetlanie produktów podobnych do tych, które użytkownik wcześniej przeglądał lub kupił.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdmin1.jpg}
+  \caption{Panel administratora - rekomendacje CBF.}
+  \label{fig:cbf_admin}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdmin1.jpg}
+  \caption{Panel administratora - rekomendacje Fuzzy Logic.}
+  \label{fig:fuzzy_admin}
+\end{figure}
+
+Porównanie rysunków \ref{fig:cbf_admin} i \ref{fig:fuzzy_admin} demonstruje kluczową różnicę między metodami: przełączenie algorytmu z Content-Based Filtering na Fuzzy Logic powoduje natychmiastową zmianę rekomendowanych produktów. CBF poleca produkty o podobnych cechach (kategoria, tagi, cena), podczas gdy Fuzzy Logic uwzględnia dodatkowo rozmyty profil użytkownika i reguły wnioskowania.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{images/contentBasedSequenceDiagram.png}
+  \caption{Diagram sekwencji - Content-Based Filtering.}
+  \label{fig:cbf_sequence}
+\end{figure}
+
+Proces generowania rekomendacji CBF przebiega następująco:
+\begin{enumerate}
+    \item Klient przegląda produkt na stronie ProductPage
+    \item Frontend wysyła żądanie GET do \newline
+    \texttt{/api/recommendations/content-based/?product\_id=\{id\}}
+    \item Backend (ContentBasedAPI) wykonuje zapytanie do modelu ProductSimilarity
+    \item Model pobiera top 10 podobnych produktów z bazy danych (sortowanie po \texttt{-similarity\_score})
+    \item Backend zwraca odpowiedź 200 OK z listą rekomendacji (product\_id, name, price, similarity\_score)
+    \item Frontend wyświetla sekcję "Podobne produkty" na stronie produktu
+\end{enumerate}
+
+Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik może zobaczyć produkty podobne do swoich poprzednich zakupów. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji.
+
+\newpage
+
+\section*{Rozdzia\l{} 6}

@@ -1,0 +1,180 @@
+\subsubsection*{6.4.1 Panel debugowania modeli probabilistycznych}
+
+Panel debugowania prezentuje szczegółowe informacje o obu modelach:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug1.jpg}
+  \caption{Panel debugowania - Markov Chain.}
+  \label{fig:prob_debug1}
+\end{figure}
+
+\textbf{Statystyki Markov Chain} (z panelu debugowania):
+\begin{itemize}
+    \item Rząd łańcucha (Order): 1 (first-order Markov Chain)
+    \item Liczba stanów (kategorii): 48
+    \item Liczba przejść (transitions): 48
+\end{itemize}
+
+\textbf{Top 10 przejść z najwyższym prawdopodobieństwem}:
+
+\begin{verbatim}
+| # | From Category        | To Category            | Probability | Count |
+|---|----------------------|------------------------|-------------|-------|
+| 1 | laptops.learning     | office.accessories     | 100.00%     | 1     |
+| 2 | computers.office     | drones                 | 100.00%     | 1     |
+| 3 | computers.learning   | power.strips           | 66.67%      | 0.67  |
+| 4 | computers.gaming     | peripherals.keyboards  | 50.00%      | 0.5   |
+| 5 | computers.gaming     | power.strips           | 50.00%      | 0.5   |
+| 6 | laptops.gaming       | electronics.televisions| 50.00%      | 0.5   |
+| 7 | laptops.gaming       | laptop.hubs            | 50.00%      | 0.5   |
+| 8 | laptops.office       | peripherals.keyboards  | 50.00%      | 0.5   |
+| 9 | laptops.office       | components.disks       | 50.00%      | 0.5   |
+|10 | components.processors| networking.networkCards| 33.33%      | 0.33  |
+\end{verbatim}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug2.jpg}
+  \caption{Panel debugowania - Naive Bayes.}
+  \label{fig:prob_debug2}
+\end{figure}
+
+\textbf{Statystyki Naive Bayes} (z panelu debugowania):
+
+\textit{Purchase Prediction}:
+\begin{itemize}
+    \item Trained: Yes
+    \item Number of Features: 3
+    \item Classes: will\_not\_purchase
+    \item Class Priors: will\_not\_purchase = 1.0
+\end{itemize}
+
+\textit{Churn Prediction}:
+\begin{itemize}
+    \item Trained: Yes
+    \item Number of Features: 3
+    \item Classes: will\_churn, will\_not\_churn
+    \item Class Priors: will\_churn = 0.95, will\_not\_churn = 0.05
+\end{itemize}
+
+\textbf{Przykład analizy użytkownika} (client4, ID: 9):
+
+\begin{verbatim}
+User Analysis:
+- User: client4 (ID: 9)
+- Total Orders: 10
+- Total Spent: 31331.33 PLN
+- Avg Order Value: 3133.13 PLN
+- Days Since Last Order: 74
+- Last Category Purchased: cleaning.supplies
+
+Purchase Sequence (Last 10):
+components.powerSupply → electronics.tablets → camera.accessories →
+laptop.hubs → peripherals.speakers → laptop.hubs → electronics.phones →
+gadgets → laptop.hubs → cleaning.supplies
+
+Next Purchase Predictions (Markov Chain):
+1. peripherals.printers: 11.11%
+2. accessories.powerBanks: 7.41%
+3. peripherals.soundCards: 7.41%
+\end{verbatim}
+
+\subsubsection*{6.4.2 Interfejs użytkownika - rekomendacje probabilistyczne}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{images/probabilisticMethodsSequenceDiagram.png}
+  \caption{Diagram sekwencji - Probabilistic Models.}
+  \label{fig:prob_sequence}
+\end{figure}
+
+Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkownikowi w panelu klienta w zakładce ``Smart Recommendations''. System wyświetla dwie podzakładki:
+\begin{itemize}
+    \item \textbf{Next Purchase (Markov)}: produkty z kategorii przewidywanych przez łańcuch Markowa jako najbardziej prawdopodobne do zakupu
+    \item \textbf{Behavior Insights (Bayesian)}: analiza zachowań zakupowych użytkownika z wykorzystaniem Naive Bayes
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient1.jpg}
+  \caption{Zakładka "Next Purchase (Markov)".}
+  \label{fig:prob_client1}
+\end{figure}
+
+Zakładka "Next Purchase (Markov)" prezentuje:
+\begin{itemize}
+    \item \textbf{Next Purchase Probability}: prawdopodobieństwo zakupu w ciągu 30 dni (np. 50\%)
+    \item \textbf{Expected Days Until Next Purchase}: przewidywany czas do następnego zakupu
+    \item \textbf{Likely Next Products}: lista produktów z najwyższym Prediction Score (np. Imou Cruiser 2 5MP: 13\%, A4Tech HD PK-910P: 13\%)
+    \item \textbf{Your Shopping Patterns}: najczęstsza sekwencja zakupów i długość cyklu (np. power.strips → laptop.hubs → office.accessories, 10 products per cycle)
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient2.jpg}
+  \caption{Zakładka "Behavior Insights (Bayesian)".}
+  \label{fig:prob_client2}
+\end{figure}
+
+Zakładka ``Behavior Insights (Bayesian)'' wykorzystuje model Naive Bayes do analizy preferencji zakupowych:
+\begin{itemize}
+    \item \textbf{Purchase Likelihood}: wykres słupkowy prawdopodobieństwa zakupu dla każdej kategorii
+    \item Kategorie z najwyższym prawdopodobieństwem: electronics.phones (10\%), power.strips (9\%), accessories.cables (9\%), office.accessories (9\%)
+    \item Model uczy się na podstawie historii zakupów wszystkich użytkowników i tworzy profil behawioralny
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient3.jpg}
+  \caption{Zakładka "Churn Risk Analysis".}
+  \label{fig:prob_client3}
+\end{figure}
+
+Zakładka ``Churn Risk Analysis'' (Rysunek \ref{fig:prob_client3}) prezentuje:
+\begin{itemize}
+    \item \textbf{Churn Risk}: poziom ryzyka rezygnacji klienta (np. 25\% - LOW RISK)
+    \item \textbf{Shopping Behavior Analysis}: analiza wzorców zakupowych użytkownika
+    \item \textbf{Personalized Suggestions}: spersonalizowane sugestie produktów
+\end{itemize}
+
+\subsubsection*{6.4.3 Panel administracyjny - widoki probabilistyczne}
+
+Panel administracyjny systemu rekomendacji probabilistycznych prezentuje zaawansowane analizy dla administratora:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin1.jpg}
+  \caption{Panel administracyjny - Markov Chain Analysis.}
+  \label{fig:prob_admin1}
+\end{figure}
+
+Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Chain Analysis'' zawierający:
+\begin{itemize}
+    \item \textbf{Sales Forecast}: wykres prognozy sprzedaży w czasie
+    \item \textbf{Detailed Forecast}: tabela z szczegółowymi predykcjami dla poszczególnych okresów
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin2.jpg}
+  \caption{Panel administracyjny - Bayesian Analysis.}
+  \label{fig:prob_admin2}
+\end{figure}
+
+Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' z:
+\begin{itemize}
+    \item \textbf{Category Preferences}: wykres słupkowy preferencji kategorii użytkowników
+    \item \textbf{Performance Metrics}: metryki wydajności modelu Naive Bayes
+\end{itemize}
+
+Rysunek \ref{fig:prob_admin3} prezentuje panel ``Demand Forecast'' z:
+\begin{itemize}
+    \item \textbf{Demand Trends}: wykres trendów popytu w czasie
+    \item \textbf{Seasonality Analysis}: analiza sezonowości zakupów
+    \item \textbf{Stock Recommendations}: rekomendacje dotyczące poziomu zapasów
+\end{itemize}
+
+\newpage
+
+\section*{Rozdzia\l{} 8}
