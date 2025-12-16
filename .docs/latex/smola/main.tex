@@ -730,7 +730,14 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \subsection*{3.3 Diagram przypadków użycia}
 \addcontentsline{toc}{subsection}{3.3 Diagram przypadków użycia}
 
-Diagram przypadków użycia przedstawia kompletny widok funkcjonalności systemu oraz relacji między aktorami a przypadkami użycia. System obsługuje trzy główne typy aktorów: Gościa (użytkownik niezalogowany), Klienta (użytkownik zalogowany) oraz Administratora (zarządzający systemem). Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
+Diagram przypadków użycia (rys. \ref{fig:use_case_project}) przedstawia kompletny widok funkcjonalności systemu oraz relacji między aktorami a przypadkami użycia. System obsługuje trzy główne typy aktorów: Gościa (użytkownik niezalogowany), Klienta (użytkownik zalogowany) oraz Administratora (zarządzający systemem). Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/useCaseDiagram.png}
+  \caption{Diagram przypadków użycia systemu.}
+  \label{fig:use_case_project}
+\end{figure}
 
 System został podzielony na trzy główne obszary funkcjonalne:
 
@@ -834,13 +841,13 @@ Szczegółowe aspekty techniczne implementacji (stos technologiczny, struktura b
 \newpage
 
 \section*{Rozdzia\l{} 4}
-\addcontentsline{toc}{section}{Rozdział 4: Stos technologiczny i architektura techniczna}
-\section*{Stos technologiczny i architektura techniczna}
+\addcontentsline{toc}{section}{Rozdział 4: Przedstawienie wykorzystanego stosu technologicznego oraz praktycznej realizacji projektu}
+\section*{Przedstawienie wykorzystanego stosu technologicznego oraz praktycznej realizacji projektu}
 
-Niniejszy rozdział jest wspólny z pracą współautora i opisuje szczegóły techniczne całego systemu e-commerce z modułem rekomendacyjnym.
+Niniejszy rozdział jest wspólny z pracą współautora i opisuje szczegóły techniczne całego systemu e-commerce z modułem rekomendacyjnym. Przedstawiono architekturę techniczną aplikacji, komponenty frontendowe i backendowe, strukturę bazy danych oraz mechanizmy wdrożenia.
 
-\subsection*{4.1 Architektura systemu i stos technologiczny}
-\addcontentsline{toc}{subsection}{4.1 Architektura systemu i stos technologiczny}
+\subsection*{4.1 Architektura systemu}
+\addcontentsline{toc}{subsection}{4.1 Architektura systemu}
 
 Aplikacja została zaprojektowana w architekturze klient-serwer opartej na technologiach Django (backend) oraz React (frontend). Komunikacja odbywa się poprzez RESTful API z uwierzytelnianiem tokenowym JSON Web Tokens (JWT). Struktura aplikacji wyraźnie rozdziela warstwę prezentacji (React SPA), logikę biznesową (widoki Django i serializery) oraz warstwę danych (PostgreSQL).
 
@@ -853,20 +860,12 @@ Aplikacja została zaprojektowana w architekturze klient-serwer opartej na techn
 \item \textbf{Modułowa struktura} - każdy algorytm rekomendacji stanowi niezależny moduł.
 \end{itemize}
 
-\textbf{Stos technologiczny}
+\subsection*{4.2 Stos technologiczny backendu}
+\addcontentsline{toc}{subsection}{4.2 Stos technologiczny backendu}
 
-\textbf{Backend}: Django 5.1.4 (Python 3.11) wraz z Django REST Framework 3.15.2. Django zapewnia solidną architekturę MVC, system ORM (Object-Relational Mapping - mapowanie obiektowo-relacyjne) dla abstrakcji bazy danych oraz mechanizmy bezpieczeństwa (CSRF, XSS, SQL injection prevention). Django REST Framework rozszerza Django o funkcjonalności API RESTful (serializery, ViewSets, uwierzytelnianie, paginacja).
+\textbf{Django 5.1.4 (Python 3.11)}
 
-\textbf{Frontend}: React 18 z bibliotekami wspierającymi (Axios, Framer Motion, React Router) tworzy Single Page Application (SPA). React Hooks (useState, useEffect, useContext) zarządzają stanem aplikacji. Context API zapewnia globalny stan (AuthContext, CartContext) bez zewnętrznych bibliotek.
-
-\textbf{Baza danych}: PostgreSQL 14 przechowuje wszystkie dane aplikacji (25 tabel w 4 modułach funkcjonalnych). Wybór PostgreSQL był podyktowany zaawansowanymi funkcjami (indeksy B-tree/GIN/BRIN, full-text search, typ JSONB, transakcje ACID, klucze obce).
-
-\textbf{Biblioteki Machine Learning}: NumPy 1.24 (operacje macierzowe dla wektorów cech i macierzy podobieństwa w CBF i modelu probabilistycznym), scikit-learn (funkcja cosine\_similarity() dla Collaborative Filtering zaimplementowanego przez współautora).
-
-\subsection*{4.2 Backend — Django REST Framework}
-\addcontentsline{toc}{subsection}{4.2 Backend — Django REST Framework}
-
-Architektura backendu opiera się na wzorcu Model-View-Serializer (MVS). Django zapewnia komponenty ORM, Signals oraz Middleware:
+Django stanowi fundament aplikacji serwerowej, zapewniając architekturę MVC, system ORM (Object-Relational Mapping - mapowanie obiektowo-relacyjne) dla abstrakcji bazy danych oraz mechanizmy bezpieczeństwa (CSRF, XSS, SQL injection prevention). Architektura backendu opiera się na wzorcu Model-View-Serializer (MVS). Django zapewnia komponenty ORM, Signals oraz Middleware:
 
 \textbf{Kluczowe komponenty Django:}
 
@@ -876,7 +875,9 @@ Architektura backendu opiera się na wzorcu Model-View-Serializer (MVS). Django 
 \item \textbf{Django Middleware (oprogramowanie pośredniczące)} - obsługa CORS, uwierzytelnienie JWT, pamięć podręczna.
 \end{itemize}
 
-\textbf{Django REST Framework 3.15.2} rozszerza Django o funkcjonalności API RESTful:
+\textbf{Django REST Framework 3.15.2}
+
+Rozszerza Django o funkcjonalności API RESTful:
 
 \begin{itemize}
 \item \textbf{Serializery} - konwersja obiektów Django na JSON z walidacją,
@@ -885,162 +886,138 @@ Architektura backendu opiera się na wzorcu Model-View-Serializer (MVS). Django 
 \item \textbf{Pagination (paginacja)} - automatyczne stronicowanie wyników.
 \end{itemize}
 
-\textbf{Struktura plików backendu}
+\textbf{Biblioteki Machine Learning}
 
-Każdy komponent systemu posiada dedykowane pliki. Niniejsza praca obejmuje następujące moduły:
-
+Do operacji numerycznych i obliczania podobieństw wykorzystano:
 \begin{itemize}
-    \item \textbf{models.py} - definicje tabel (Product, Order, ProductSimilarity, FuzzyUserProfile, MarkovTransitions, PurchaseProbability, RecommendationSettings),
-    \item \textbf{serializers.py} - konwersja obiektów Django $\leftrightarrow$ JSON,
-    \item \textbf{views.py} - obsługa CRUD dla produktów, zamówień,
-    \item \textbf{custom\_recommendation\_engine.py} - implementacje CBF, Markov, Naive Bayes,
-    \item \textbf{fuzzy\_logic\_engine.py} - implementacja systemu Fuzzy Logic (Mamdani),
-    \item \textbf{recommendation\_views.py} - endpointy CBF: \texttt{/api/content-based-debug/}, \texttt{/api/generate-similarities/},
-    \item \textbf{fuzzy\_views.py} - endpointy Fuzzy: \texttt{/api/fuzzy-recommendations/}, \texttt{/api/fuzzy-debug/},
-    \item \textbf{probabilistic\_views.py} - endpointy Markov i Bayes: \texttt{/api/markov-recommendations/}, \texttt{/api/bayesian-insights/},
-    \item \textbf{signals.py} - automatyczna aktualizacja rekomendacji przy zmianach danych.
+\item \textbf{NumPy 1.24} - operacje macierzowe dla wektorów cech i macierzy podobieństwa w CBF i modelu probabilistycznym,
+\item \textbf{scikit-learn} - funkcja cosine\_similarity() dla Collaborative Filtering zaimplementowanego przez współautora.
 \end{itemize}
 
-System został rozbudowany przez współautora o dodatkowe pliki:
+\textbf{Struktura backendu}
+
+Każdy komponent systemu posiada dedykowane pliki:
 
 \begin{itemize}
-    \item \textbf{collaborative\_views.py} - endpointy \texttt{/api/generate-user-recommendations/}, \texttt{/api/recommendation-algorithm-status/},
-    \item \textbf{sentiment\_views.py} - endpointy \texttt{/api/sentiment-search/}, \texttt{/api/sentiment-analysis-debug/},
-    \item \textbf{association\_views.py} - endpointy \texttt{/api/frequently-bought-together/}, \texttt{/api/update-association-rules/}.
+\item \textbf{models.py} -- definicje tabel (Product, Order, Opinion, ProductSimilarity, FuzzyUserProfile, MarkovTransitions, PurchaseProbability, RecommendationSettings),
+\item \textbf{serializers.py} -- konwersja obiektów Django $\leftrightarrow$ JSON,
+\item \textbf{views.py} -- obsługa CRUD dla produktów, zamówień,
+\item \textbf{custom\_recommendation\_engine.py} -- implementacje CBF, Markov, Naive Bayes (niniejsza praca),
+\item \textbf{fuzzy\_logic\_engine.py} -- implementacja systemu Fuzzy Logic Mamdani (niniejsza praca),
+\item \textbf{recommendation\_views.py} -- endpointy CBF: \texttt{/api/content-based-debug/}, \texttt{/api/generate-similarities/} (niniejsza praca),
+\item \textbf{fuzzy\_views.py} -- endpointy Fuzzy: \texttt{/api/fuzzy-recommendations/}, \texttt{/api/fuzzy-debug/} (niniejsza praca),
+\item \textbf{probabilistic\_views.py} -- endpointy Markov i Bayes: \texttt{/api/markov-recommendations/}, \texttt{/api/bayesian-insights/} (niniejsza praca),
+\item \textbf{collaborative\_views.py} -- endpointy \texttt{/api/generate-user-recommendations/} (współautor),
+\item \textbf{sentiment\_views.py} -- endpointy \texttt{/api/sentiment-search/}, \texttt{/api/sentiment-analysis-debug/} (współautor),
+\item \textbf{association\_views.py} -- endpointy \texttt{/api/frequently-bought-together/}, \texttt{/api/update-association-rules/} (współautor),
+\item \textbf{signals.py} -- automatyczna aktualizacja rekomendacji przy zmianach danych.
 \end{itemize}
 
-\subsection*{4.3 Frontend — React 18}
-\addcontentsline{toc}{subsection}{4.3 Frontend — React 18}
+\subsection*{4.3 Stos technologiczny frontendu}
+\addcontentsline{toc}{subsection}{4.3 Stos technologiczny frontendu}
+
+\textbf{React 18}
+
+React stanowi fundament aplikacji jednostronicowej (Single Page Application - SPA):
+
+\begin{itemize}
+\item \textbf{Architektura komponentowa (Component-based)} - reużywalne komponenty UI,
+\item \textbf{Virtual DOM (wirtualny DOM)} - optymalizacja renderowania,
+\item \textbf{React Hooks (haki React)} - useState, useEffect, useContext.
+\end{itemize}
+
+\textbf{Biblioteki wspierające}
+
+\begin{itemize}
+\item \textbf{React Router v6} - trasowanie (routing) dla aplikacji SPA,
+\item \textbf{Axios} - komunikacja z API, przechwytywacze JWT (interceptors),
+\item \textbf{Framer Motion} - płynne animacje,
+\item \textbf{Context API} - zarządzanie stanem (AuthContext, CartContext).
+\end{itemize}
+
+\textbf{Architektura komponentów}
 
 Frontend aplikacji został zbudowany jako Single Page Application (SPA) w technologii React 18, wykorzystując nowoczesne wzorce programowania funkcyjnego i React Hooks do zarządzania stanem. Architektura składa się z modułowych komponentów odpowiedzialnych za poszczególne funkcjonalności systemu.
 
-\textbf{Główne komponenty aplikacji}:
-
 \begin{itemize}
-    \item \textbf{App.js} — główny komponent aplikacji zarządzający routingiem React Router v6 oraz globalnym stanem poprzez Context API. Definiuje strukturę tras (routes) oraz layouty dla różnych typów stron (publiczne, chronione, administracyjne).
-
-    \item \textbf{Navbar.jsx} — responsywna nawigacja z wyszukiwarką, linkami do kluczowych sekcji, przyciskami logowania/rejestracji oraz ikoną koszyka z licznikiem produktów. Wykorzystuje React Hooks (useState, useContext) do zarządzania stanem mobilnego menu oraz danymi użytkownika.
-
-    \item \textbf{SearchModal.jsx} — zaawansowany modal wyszukiwania z dwoma trybami: sentiment search (sortowanie według zagregowanego wyniku sentymentu) oraz fuzzy search (wyszukiwanie z wykorzystaniem logiki rozmytej z tolerancją na błędy).
-
-    \item \textbf{ShopContent.jsx} — komponent wyświetlający katalog produktów z sidebar'em filtrów (kategorie, zakres cen, oceny) oraz grid'em kart produktów. Obsługuje dynamiczne filtrowanie i sortowanie.
-
-    \item \textbf{ProductPage.jsx} — szczegółowy widok pojedynczego produktu zawierający galerię zdjęć (slider react-slick), opis, specyfikacje techniczne, kategorie, sekcję opinii klientów z analizą sentymentu, rekomendacje "Frequently Bought Together" oraz przycisk "Add to Cart" z obsługą stanu koszyka (CartContext).
-
-    \item \textbf{CartContent.jsx} — koszyk zakupowy wyświetlający listę wybranych produktów, łączną wartość zamówienia oraz sekcję rekomendacji cross-sell (produkty komplementarne według reguł asocjacyjnych). Użytkownik może modyfikować ilości, usuwać produkty oraz przejść do finalizacji zamówienia.
-
-    \item \textbf{ClientPanel} — panel klienta zawierający zakładki: Dashboard (podsumowanie aktywności, ostatnie zamówienia, statystyki), Orders (historia wszystkich zamówień z możliwością podglądu szczegółów), Account (edycja danych osobowych, zmiana hasła), Recommendations (spersonalizowane rekomendacje Content-Based Filtering, Fuzzy Logic i Probabilistic Models aktualizowane po każdym zamówieniu).
-
-    \item \textbf{AdminPanel} — panel administracyjny dostępny dla użytkowników z uprawnieniami is\_staff. Zawiera zakładki: Products (zarządzanie produktami), Orders (przeglądanie i zarządzanie zamówieniami), Users (zarządzanie użytkownikami), Statistics (wykresy sprzedaży, najpopularniejsze kategorie, statystyki rekomendacji), Debug ML (narzędzia debugowania algorytmów ML: tabela reguł asocjacyjnych, statystyki sentymentu, analiza podobieństw CBF, reguły rozmyte, macierz Markova).
+\item \textbf{App.js} -- główny komponent zarządzający routingiem React Router v6 oraz globalnym stanem poprzez Context API,
+\item \textbf{Navbar.jsx} -- responsywna nawigacja z wyszukiwarką, linkami do kluczowych sekcji, przyciskami logowania/rejestracji oraz ikoną koszyka z licznikiem produktów,
+\item \textbf{SearchModal.jsx} -- zaawansowany modal wyszukiwania z dwoma trybami: sentiment search (sortowanie według zagregowanego wyniku sentymentu - współautor) oraz fuzzy search (wyszukiwanie z wykorzystaniem logiki rozmytej - niniejsza praca),
+\item \textbf{ShopContent.jsx} -- komponent wyświetlający katalog produktów z sidebar'em filtrów (kategorie, zakres cen, oceny) oraz grid'em kart produktów,
+\item \textbf{ProductPage.jsx} -- szczegółowy widok produktu z galerią zdjęć, opisem, specyfikacjami technicznymi, sekcją opinii z analizą sentymentu (współautor), rekomendacjami "Frequently Bought Together" (Apriori - współautor),
+\item \textbf{CartContent.jsx} -- koszyk zakupowy z sekcją rekomendacji cross-sell (reguły asocjacyjne - współautor),
+\item \textbf{ClientPanel.jsx} -- panel klienta z zakładkami: Dashboard, Orders, Account, Recommendations (CBF, Fuzzy Logic, Probabilistic - niniejsza praca),
+\item \textbf{AdminPanel.jsx} -- panel administracyjny z narzędziami debugowania algorytmów ML (wszystkie 6 metod).
 \end{itemize}
 
-\textbf{Routing - React Router v6}:
+\subsection*{4.4 Baza danych PostgreSQL}
+\addcontentsline{toc}{subsection}{4.4 Baza danych PostgreSQL}
 
-Aplikacja wykorzystuje deklaratywny routing React Router v6 z zagnieżdżonymi trasami dla stron publicznych (home, shop, product), chronionych (cart, client panel) oraz administracyjnych (admin panel). Komponent PrivateRoute sprawdza autentykację użytkownika i przekierowuje niezalogowanych do strony logowania.
+\textbf{Wybór PostgreSQL 14}
 
-\textbf{Zarządzanie stanem - Context API}:
+PostgreSQL został wybrany jako system zarządzania bazą danych ze względu na następujące cechy:
 
-Aplikacja wykorzystuje Context API zamiast Redux dla prostszego zarządzania stanem globalnym. AuthContext przechowuje dane zalogowanego użytkownika i token JWT. CartContext zarządza stanem koszyka zakupowego z funkcjami add, remove, update quantity.
+\begin{itemize}
+\item \textbf{Zaawansowane indeksy} - wsparcie dla B-tree (domyślne), GIN (wyszukiwanie pełnotekstowe), BRIN (optymalizacja dla dużych tabel),
+\item \textbf{Typ danych JSONB} - natywne przechowywanie i indeksowanie struktur JSON (wykorzystane w tabeli \texttt{method\_user\_purchase\_pattern} dla sezonowości zakupów),
+\item \textbf{Transakcje ACID} - gwarancja atomowości, spójności, izolacji i trwałości operacji krytycznych (zamówienia, płatności),
+\item \textbf{Klucze obce i constrainty} - automatyczne wymuszanie integralności referencyjnej oraz walidacji danych (np. rating 1-5 w opiniach),
+\item \textbf{Optymalizacja JOIN} - wydajne łączenie tabel w złożonych zapytaniach rekomendacyjnych,
+\item \textbf{Full-text search} - wbudowane mechanizmy wyszukiwania tekstowego dla produktów.
+\end{itemize}
 
-\textbf{Komunikacja z API - Axios}:
+\textbf{Struktura bazy danych}
 
-Wszystkie zapytania HTTP obsługiwane przez Axios z globalną konfiguracją interceptorów. Automatyczna obsługa błędów 401 Unauthorized z przekierowaniem do logowania. Dołączanie tokena JWT do nagłówków Authorization dla chronionych endpointów.
-
-\textbf{Animacje - Framer Motion}:
-
-Płynne przejścia między stronami oraz animacje komponentów realizowane przez Framer Motion z efektami fade-in, slide-up i scroll-driven. Poprawia doświadczenie użytkownika (UX) bez obciążania wydajności aplikacji.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{images/useCaseDiagram.png}
-  \caption{Diagram przypadków użycia.}
-  \label{fig:use_case}
-\end{figure}
-
-\subsection*{4.4 Diagram przypadków użycia}
-\addcontentsline{toc}{subsection}{4.4 Diagram przypadków użycia}
-
-Diagram przypadków użycia przedstawia funkcjonalności systemu rekomendacji e-commerce z perspektywy trzech grup użytkowników o różnych poziomach uprawnień.
-
-\textbf{Aktorzy systemu}
-
-System wyróżnia trzech aktorów reprezentujących różne role użytkowników:
-
-\textbf{1. Gość (użytkownik niezalogowany)} -- osoba odwiedzająca sklep bez uwierzytelnienia. Gość ma ograniczone uprawnienia, może przeglądać katalog produktów, korzystać z zaawansowanej wyszukiwarki z algorytmem rozmytym oraz dodawać produkty do koszyka. Nie ma dostępu do spersonalizowanych rekomendacji, ponieważ system nie posiada informacji o jego historii zakupowej.
-
-\textbf{2. Klient (użytkownik zalogowany)} -- zarejestrowany użytkownik posiadający konto w systemie. Dziedziczy wszystkie uprawnienia Gościa, ale dodatkowo otrzymuje dostęp do spersonalizowanych rekomendacji generowanych na podstawie jego historii zakupów. Klient może składać zamówienia, przeglądać historię swoich transakcji oraz zarządzać swoim profilem. System śledzi jego zachowania zakupowe, budując profil preferencji wykorzystywany przez algorytmy rekomendacyjne.
-
-\textbf{3. Administrator} -- użytkownik z uprawnieniami zarządzania systemem rekomendacji. Administrator ma dostęp do dedykowanego panelu umożliwiającego konfigurację systemu, w tym dynamiczną zmianę aktywnego algorytmu rekomendacji (przełączanie między Content-Based Filtering, logiką rozmytą a modelem probabilistycznym). Może generować rekomendacje dla wszystkich użytkowników systemu, przeglądać podgląd rekomendacji przed ich publikacją oraz korzystać z zaawansowanych narzędzi debugowania algorytmów (analiza wag cech, podgląd macierzy podobieństwa, wizualizacja macierzy przejść Markowa).
-
-\textbf{Główne przypadki użycia}
-
-Kluczowe funkcjonalności systemu obejmują:
-
-\textbf{Przeglądanie i wyszukiwanie produktów} -- podstawowa funkcjonalność dostępna dla wszystkich aktorów. Katalog produktów obsługuje stronicowanie, filtrowanie po kategoriach oraz zaawansowane wyszukiwanie rozmyte wykorzystujące algorytm Levenshteina do tolerowania literówek i odmian wyrazów.
-
-\textbf{Wyświetlanie rekomendacji spersonalizowanych} -- przypadek użycia dostępny dla zalogowanych Klientów. System automatycznie generuje listę produktów rekomendowanych na podstawie historii zakupowej użytkownika, wykorzystując aktualnie wybrany algorytm (CBF, rozmyty lub probabilistyczny). Rekomendacje są wyświetlane na stronie głównej, w panelu klienta oraz na stronach szczegółowych produktów jako sugestie ``Klienci kupujący ten produkt kupili również...''.
-
-\textbf{Generowanie rekomendacji przez Administratora} -- Administrator może ręcznie wywołać proces generowania rekomendacji dla wybranego użytkownika lub globalnie dla wszystkich użytkowników systemu. Ta funkcjonalność jest szczególnie przydatna podczas testowania różnych konfiguracji algorytmów oraz po wprowadzeniu zmian w parametrach systemu.
-
-\textbf{Zmiana ustawień algorytmu} -- kluczowa funkcjonalność administracyjna umożliwiająca dynamiczne przełączanie między trzema zaimplementowanymi metodami rekomendacyjnymi. Administrator wybiera algorytm z interfejsu panelu, a zmiana jest natychmiast propagowana do całego systemu bez konieczności restartu aplikacji.
-
-\textbf{Debugowanie i analiza algorytmów} -- zaawansowany przypadek użycia przeznaczony dla Administratora. Panel debugowania prezentuje wewnętrzne metryki działania algorytmów: w trybie CBF wyświetlane są wagi poszczególnych cech produktowych i macierz podobieństwa, w trybie rozmytym pokazywane są profile użytkowników z wartościami funkcji przynależności, w trybie probabilistycznym prezentowane są prawdopodobieństwa zakupów i macierz przejść Markowa.
-
-\textbf{Składanie zamówień} -- dostępne dla Klientów. Proces zakupowy jest śledżony przez system rekomendacji - każde zamówienie aktualizuje profil preferencji użytkownika, macierz przejść Markowa oraz dane treningowe modelu Naive Bayes, co wpływa na jakość przyszłych rekomendacji.
-
-\subsection*{4.5 Baza danych — modele ERD}
-\addcontentsline{toc}{subsection}{4.5 Baza danych — modele ERD}
-
-Schemat bazy danych PostgreSQL został zaprojektowany zgodnie z modelem Django ORM. Struktura bazy danych jest podzielona na moduły funkcjonalne realizujące logikę systemu rekomendacji e-commerce.
+Baza składa się z \textbf{25 tabel} podzielonych na 4 moduły funkcjonalne:
 
 \textbf{1. Moduł produktów i użytkowników (12 tabel):}
 
 \begin{itemize}
-\item \texttt{db\_product} -- dane produktów (ID, nazwa, cena, old\_price, opis, rating, view\_count),
-\item \texttt{db\_category} -- kategorie produktów z hierarchią (48 kategorii z constraint UNIQUE na nazwie),
-\item \texttt{db\_product\_category} -- relacja Many-to-Many produktów i kategorii,
-\item \texttt{db\_photo\_product} -- ścieżki do zdjęć produktów (wielokrotne zdjęcia per produkt),
-\item \texttt{db\_specification} -- szczegółowe parametry techniczne produktów (klucz-wartość),
-\item \texttt{db\_tag} -- tagi do filtrowania produktów (np. "Gaming", "Premium", "Budget"),
-\item \texttt{db\_sale} -- promocje i rabaty (powiązanie z Product),
-\item \texttt{db\_user} -- konta użytkowników (extends Django AbstractUser, dodatkowe pole role),
-\item \texttt{db\_order} -- zamówienia z timestampami i statusami,
-\item \texttt{db\_order\_product} -- produkty w zamówieniach (ilość, cena jednostkowa),
-\item \texttt{db\_cart\_item} -- koszyk zakupowy przed finalizacją,
-\item \texttt{db\_complaint} -- reklamacje powiązane z zamówieniami.
+\item \texttt{db\_product} - dane produktów (ID, nazwa, cena, opis),
+\item \texttt{db\_category} - kategorie produktów z hierarchią,
+\item \texttt{db\_product\_category} - relacja Many-to-Many produktów i kategorii,
+\item \texttt{db\_photo\_product} - ścieżki do zdjęć produktów,
+\item \texttt{db\_specification} - szczegółowe parametry techniczne produktów,
+\item \texttt{db\_tag} - tagi do filtrowania produktów,
+\item \texttt{db\_sale} - promocje i rabaty,
+\item \texttt{db\_user} - konta użytkowników (role: admin/client),
+\item \texttt{db\_order} - zamówienia z timestampami i statusami,
+\item \texttt{db\_order\_product} - produkty w zamówieniach (ilość, cena),
+\item \texttt{db\_cart\_item} - koszyk zakupowy przed finalizacją,
+\item \texttt{db\_complaint} - reklamacje powiązane z zamówieniami.
 \end{itemize}
 
 \textbf{2. Moduł opinii i analizy sentymentu (3 tabele):}
 
 \begin{itemize}
-\item \texttt{db\_opinion} -- opinie użytkowników (treść, rating 1-5, timestamps),
-\item \texttt{method\_sentiment\_analysis} -- wyniki analizy sentymentu dla opinii (współautor),
-\item \texttt{method\_product\_sentiment\_summary} -- zagregowany sentyment produktu (współautor).
+\item \texttt{db\_opinion} - opinie użytkowników (treść, rating 1-5),
+\item \texttt{method\_sentiment\_analysis} - wyniki analizy sentymentu dla opinii,
+\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktu.
 \end{itemize}
 
 \textbf{3. Moduł metod rekomendacji (5 tabel):}
 
 \begin{itemize}
-\item \texttt{method\_product\_similarity} -- macierz podobieństw (CBF i CF), constraint UNIQUE(product1\_id, product2\_id, similarity\_type), indeks na (product1\_id, similarity\_type),
-\item \texttt{method\_fuzzy\_user\_profile} -- profile rozmyte użytkowników (price\_sensitivity, quality\_preference, category\_preferences jako JSONField),
-\item \texttt{method\_markov\_transitions} -- macierz przejść Markova (from\_category, to\_category, probability, count), constraint UNIQUE(from\_category, to\_category),
-\item \texttt{method\_purchase\_probability} -- predykcje Naive Bayes (user\_id, purchase\_probability, expected\_days\_to\_next\_order),
-\item \texttt{method\_user\_product\_recommendation} -- cache rekomendacji użytkownika (współautor),
-\item \texttt{method\_productassociation} -- reguły asocjacyjne Apriori (współautor),
-\item \texttt{method\_user\_interactions} -- historia interakcji użytkowników,
-\item \texttt{method\_recommendation\_settings} -- konfiguracja algorytmów (wzorzec Singleton).
+\item \texttt{method\_product\_similarity} - macierz podobieństw produktów (Collaborative Filtering),
+\item \texttt{method\_user\_product\_recommendation} - spersonalizowane rekomendacje użytkowników,
+\item \texttt{method\_productassociation} - reguły asocjacyjne Apriori,
+\item \texttt{method\_user\_interactions} - historia interakcji użytkowników,
+\item \texttt{method\_recommendation\_settings} - konfiguracja algorytmów dla użytkownika.
 \end{itemize}
 
 \textbf{4. Moduł analityczny i prognozowanie (5 tabel):}
 
 \begin{itemize}
-\item \texttt{method\_sales\_forecast} -- prognoza sprzedaży produktów,
-\item \texttt{method\_user\_purchase\_pattern} -- wzorce zakupowe użytkowników (typ JSONB),
-\item \texttt{method\_product\_demand\_forecast} -- prognoza popytu i poziomy magazynowe,
-\item \texttt{method\_risk\_assessment} -- ocena ryzyka dla użytkowników i produktów.
+\item \texttt{method\_purchase\_probability} - prawdopodobieństwo zakupu produktu przez użytkownika,
+\item \texttt{method\_sales\_forecast} - prognoza sprzedaży produktów,
+\item \texttt{method\_user\_purchase\_pattern} - wzorce zakupowe użytkowników,
+\item \texttt{method\_product\_demand\_forecast} - prognoza popytu i poziomy magazynowe,
+\item \texttt{method\_risk\_assessment} - ocena ryzyka dla użytkowników i produktów.
 \end{itemize}
 
-Wszystkie migracje Django ORM zostały wygenerowane automatycznie na podstawie modeli Python. Wypełnianie danymi początkowymi (seeding): 500 produktów, 20 użytkowników, 200 zamówień, $\sim$600 rekordów OrderProduct, $\sim$1750 opinii.
+Wszystkie migracje Django ORM zostały wygenerowane automatycznie na podstawie modeli Python i zarządzane przez system wersjonowania \texttt{django.db.migrations}.
+
+\newpage
 
 \textbf{Diagramy ERD}
 
@@ -1051,8 +1028,16 @@ Wszystkie migracje Django ORM zostały wygenerowane automatycznie na podstawie m
   \label{fig:erd1}
 \end{figure}
 
-Diagram \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje: db\_user $\rightarrow$ db\_order (1:N), db\_order $\rightarrow$ db\_order\_product (1:N), db\_product $\leftrightarrow$ db\_category (N:M), db\_product $\rightarrow$ db\_opinion (1:N).
+Rysunek \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje:
 
+\begin{itemize}
+\item \textbf{db\_user $\rightarrow$ db\_order} (1:N) - jeden użytkownik składa wiele zamówień,
+\item \textbf{db\_order $\rightarrow$ db\_order\_product} (1:N) - zamówienie zawiera wiele produktów,
+\item \textbf{db\_product $\leftrightarrow$ db\_category} (N:M) - produkt należy do wielu kategorii,
+\item \textbf{db\_product $\rightarrow$ db\_opinion} (1:N) - produkt ma wiele opinii.
+\end{itemize}
+
+\newpage
 \begin{figure}[H]
   \centering
   \includegraphics[width=1\textwidth]{images/methodsErd.png}
@@ -1060,13 +1045,78 @@ Diagram \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje
   \label{fig:erd2}
 \end{figure}
 
-Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML: method\_product\_similarity (CBF i CF), method\_fuzzy\_user\_profile (Fuzzy Logic), method\_markov\_transitions i method\_purchase\_probability (modele probabilistyczne), method\_productassociation (Apriori - współautor), method\_sentiment\_analysis i method\_product\_sentiment\_summary (analiza sentymentu - współautor), method\_user\_product\_recommendation (cache CF - współautor).
+Rysunek \ref{fig:erd2} pokazuje tabele algorytmów ML z podziałem na metody niniejszej pracy oraz metody współautora. System wykorzystuje wspólną infrastrukturę tabel do przechowywania wyników rekomendacji wszystkich sześciu metod.
+
+\subsection*{4.5 Deployment i konteneryzacja Docker}
+\addcontentsline{toc}{subsection}{4.5 Deployment i konteneryzacja Docker}
+
+Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając spójność środowiska między środowiskiem deweloperskim (development), testowym (staging) i produkcyjnym (production).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/dockerView.jpg}
+  \caption{Deployment aplikacji w architekturze Docker Compose.}
+  \label{fig:docker_view}
+\end{figure}
+
+Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
+
+\textbf{1. Kontener frontendu (React 18)}
+\begin{itemize}
+\item Base image: node:18-alpine,
+\item Port: 3000,
+\item Volumes: montowanie src/ dla automatycznego przeładowania (hot-reload),
+\item Environment: REACT\_APP\_API\_URL,
+\item Zależności (Dependencies): package.json (React, Axios, React Router, Framer Motion).
+\end{itemize}
+
+\textbf{2. Kontener backendu (Django 5.1.4)}
+\begin{itemize}
+\item Base image: python:3.11-slim,
+\item Port: 8000,
+\item Volumes: montowanie projektu dla automatycznego przeładowania (hot-reload), wolumen dla plików multimedialnych,
+\item Environment: DATABASE\_URL, SECRET\_KEY, DEBUG, ALLOWED\_HOSTS,
+\item Zależności (Dependencies): requirements.txt (Django, DRF, psycopg2, NumPy, scikit-learn).
+\end{itemize}
+
+\textbf{3. Kontener bazy danych (PostgreSQL 14)}
+\begin{itemize}
+\item Base image: postgres:14-alpine,
+\item Port: 5432,
+\item Volumes: named volume postgres\_data (persystencja danych),
+\item Environment: POSTGRES\_DB, POSTGRES\_USER, POSTGRES\_PASSWORD,
+\item Healthcheck: pg\_isready.
+\end{itemize}
+
+\textbf{Zalety konteneryzacji Docker}
+
+\begin{itemize}
+\item \textbf{Izolacja} - każdy serwis w osobnym kontenerze, zero konfliktów zależności,
+\item \textbf{Przenośność} - obraz zbudowany raz działa na dowolnym serwerze z silnikiem Docker,
+\item \textbf{Łatwa konfiguracja} - komenda \texttt{docker-compose up} uruchamia całą aplikację,
+\item \textbf{Skalowalność} - możliwość uruchomienia wielu instancji backendu dla równoważenia obciążenia.
+\end{itemize}
+
+\subsection*{4.6 Podsumowanie stosu technologicznego}
+\addcontentsline{toc}{subsection}{4.6 Podsumowanie stosu technologicznego}
+
+Wybrane technologie (Django + React + PostgreSQL + Docker) tworzą nowoczesny, skalowalny i łatwy w utrzymaniu stos technologiczny. Kluczowe zalety:
+
+\begin{itemize}
+\item \textbf{Separacja kontynerów} - wyraźny podział frontend/backend/baza,
+\item \textbf{Wygoda programisty} - narzędzia (Django ORM, haki React, Docker Compose) przyspieszają rozwój aplikacji,
+\item \textbf{Wsparcie społeczności} - aktywna społeczność, obszerna dokumentacja,
+\item \textbf{Wydajność} - optymalizacje (pamięć podręczna, indeksy bazy danych, operacje wektorowe NumPy) zapewniają szybki czas odpowiedzi.
+\end{itemize}
+
+\clearpage
 
 \newpage
-
 \section*{Rozdzia\l{} 5}
-\addcontentsline{toc}{section}{Rozdział 5: Implementacja Content-Based Filtering}
-\section*{Implementacja Content-Based Filtering}
+\addcontentsline{toc}{section}{Rozdział 5: Implementacja algorytmów rekomendacji}
+\section*{Implementacja algorytmów rekomendacji}
+
+Szczegółowa implementacja trzech algorytmów rekomendacyjnych wraz z pseudokodami oraz diagramami sekwencji przedstawia praktyczne aspekty realizacji metod Content-Based Filtering, logiki rozmytej oraz modeli probabilistycznych. Każda metoda została zaimplementowana od podstaw bez użycia gotowych bibliotek rekomendacyjnych.
 
 Niniejszy rozdział oraz rozdziały 6 i 7 opisują szczegółowo implementację trzech metod rekomendacyjnych zrealizowanych w ramach niniejszej pracy: Content-Based Filtering, logikę rozmytą oraz modele probabilistyczne. System został rozbudowany przez współautora o trzy komplementarne metody (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne), których szczegółowa implementacja stanowi przedmiot odrębnej pracy inżynierskiej.
 
