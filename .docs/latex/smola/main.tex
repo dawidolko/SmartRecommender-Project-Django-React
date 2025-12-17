@@ -156,7 +156,7 @@ Rzeczona praca odpowiada na powyższe wyzwania poprzez zaprojektowanie i impleme
 \subsection*{Cel i zakres pracy}
 \addcontentsline{toc}{subsection}{Cel i zakres pracy}
 
-Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce, który łączy sześć zaawansowanych i komplementarnych metod uczenia maszynowego. System został zbudowany od podstaw, bez wykorzystania gotowych bibliotek uczenia maszynowego, co zapewniło pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
+Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce, który łączy sześć zaawansowanych i komplementarnych metod uczenia maszynowego. System został zbudowany od podstaw, z ograniczeniem wykorzystania gotowych bibliotek uczenia maszynowego, co zapewniło pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
 
 Praca została zrealizowana we współpracy dwuosobowej jako kompleksowe rozwiązanie e-commerce, gdzie każdy z autorów zaimplementował trzy komplementarne metody rekomendacyjne:
 \begin{itemize}
@@ -181,7 +181,7 @@ Zakres pracy obejmuje trzy główne obszary: podstawy teoretyczne metod rekomend
 Niniejsza praca koncentruje się szczegółowo na aspektach algorytmicznych i jakościowych trzech metod zaimplementowanych w jej ramach, z uwzględnieniem problemu zimnego startu, interpretowalności wyników oraz personalizacji doświadczenia użytkownika. Każda z sześciu metod rozwiązuje inne wyzwania:
 \begin{itemize}
     \item \textbf{Content-Based Filtering} (niniejsza praca) - rozwiązuje problem zimnego startu dla nowych produktów poprzez analizę cech produktowych
-    \item \textbf{Fuzzy Logic} (niniejsza praca) - oferuje najwyższą interpretowalność decyzji algorytmu (explainable AI) poprzez reguły IF-THEN
+    \item \textbf{Fuzzy Logic} (niniejsza praca) - oferuje najwyższą interpretowalność decyzji algorytmu poprzez reguły IF-THEN
     \item \textbf{Modele probabilistyczne} (niniejsza praca) - przewidują sekwencje zakupowe i ryzyko churnu na podstawie historii transakcji
     \item \textbf{Collaborative Filtering} (współautor) - odkrywa ukryte wzorce zakupowe poprzez analizę podobieństw między użytkownikami
     \item \textbf{Sentiment Analysis} (współautor) - agreguje jakość produktów z wielu źródeł tekstowych, rozwiązując problem zimnego startu dla produktów bez opinii
@@ -207,8 +207,8 @@ Istotnym katalizatorem rozwoju zaawansowanych technik rekomendacji były konkurs
 
 Ewolucja systemów rekomendacyjnych przebiegała od prostych metod statystycznych (najbardziej popularne produkty, najlepiej ocenione) przez collaborative filtering (analiza wzorców zakupowych użytkowników), content-based filtering (analiza cech produktów), aż po zaawansowane metody hybrydowe łączące multiple podejścia. Obecne trendy obejmują wykorzystanie deep learning (sieci neuronowe), contextual bandits (algorytmy balansujące eksplorację i eksploatację), explainable AI (interpretowalność decyzji algorytmicznych) oraz personalizację w czasie rzeczywistym.
 
-\subsection*{1.2 Content-Based Filtering — podstawy teoretyczne}
-\addcontentsline{toc}{subsection}{1.2 Content-Based Filtering — podstawy teoretyczne}
+\subsection*{1.2 Content-Based Filtering -- podstawy teoretyczne}
+\addcontentsline{toc}{subsection}{1.2 Content-Based Filtering -- podstawy teoretyczne}
 
 Content-Based Filtering (CBF, filtracja oparta na treści) jest jedną z fundamentalnych metod systemów rekomendacyjnych. W przeciwieństwie do Collaborative Filtering, CBF analizuje cechy samych produktów, a nie wzorce zachowań użytkowników. Metoda została szczegółowo opisana w literaturze \cite{pazzani2007content}.
 
@@ -232,18 +232,20 @@ gdzie $w_i$ to waga cechy $i$, a $f_i(p)$ to wartość cechy dla produktu $p$. F
 
 \textbf{Zalety CBF}:
 \begin{itemize}
-    \item Brak problemu zimnego startu dla nowych produktów — wystarczy opis i cechy
-    \item Przejrzystość rekomendacji — można wyjaśnić dlaczego produkt został polecony ("podobna kategoria", "podobne tagi")
-    \item Niezależność od innych użytkowników — działa nawet dla pierwszego klienta w systemie
-    \item Szybka aktualizacja — dodanie nowego produktu nie wymaga przeliczenia całej macierzy
+    \item Brak problemu zimnego startu dla nowych produktów -- wystarczy opis i cechy
+    \item Przejrzystość rekomendacji -- można wyjaśnić dlaczego produkt został polecony ("podobna kategoria", "podobne tagi")
+    \item Niezależność od innych użytkowników -- działa nawet dla pierwszego klienta w systemie
+    \item Szybka aktualizacja -- dodanie nowego produktu nie wymaga przeliczenia całej macierzy
 \end{itemize}
+
+\newpage
 
 \textbf{Wady CBF}:
 \begin{itemize}
-    \item Problem "filter bubble" — rekomenduje tylko podobne produkty, użytkownik nie odkrywa nowych kategorii
-    \item Wymaga dobrze opisanych cech produktów — jakość rekomendacji zależy od jakości metadanych
+    \item Problem "filter bubble"~-- rekomenduje tylko podobne produkty, użytkownik nie odkrywa nowych kategorii
+    \item Wymaga dobrze opisanych cech produktów -- jakość rekomendacji zależy od jakości metadanych
     \item Nie odkrywa nieoczywistych powiązań między produktami (np. "użytkownicy kupujący kawę często kupują cukier")
-    \item Ograniczenie do podobieństwa cech — nie uwzględnia kontekstu użytkownika
+    \item Ograniczenie do podobieństwa cech -- nie uwzględnia kontekstu użytkownika
 \end{itemize}
 
 \textbf{Podobieństwo kosinusowe} (Cosine Similarity) jest standardową metryką w CBF \cite{salton1989automatic}. Dla dwóch wektorów $\vec{A}$ i $\vec{B}$:
@@ -256,9 +258,9 @@ gdzie $\vec{A}$ i $\vec{B}$ to wektory cech dwóch produktów. Wynik mieści si�
 
 \textbf{Interpretacja podobieństwa kosinusowego}:
 \begin{itemize}
-    \item $cos(\theta) = 1$ — wektory identyczne (produkty mają te same cechy)
-    \item $cos(\theta) = 0$ — wektory ortogonalne (brak wspólnych cech)
-    \item $cos(\theta) \in (0, 1)$ — częściowe podobieństwo
+    \item $cos(\theta) = 1$ -- wektory identyczne (produkty mają te same cechy)
+    \item $cos(\theta) = 0$ -- wektory ortogonalne (brak wspólnych cech)
+    \item $cos(\theta) \in (0, 1)$ -- częściowe podobieństwo
 \end{itemize}
 
 \textbf{TF-IDF (Term Frequency - Inverse Document Frequency)}
@@ -279,12 +281,12 @@ TF\text{-}IDF(t, d, D) = TF(t, d) \times IDF(t, D)
 
 gdzie $IDF(t, D) = \log\frac{|D|}{|\{d \in D : t \in d\}|}$ to odwrócona częstość dokumentowa, penalizująca terminy występujące w wielu dokumentach.
 
-\subsection*{1.3 Logika rozmyta — podstawy teoretyczne}
-\addcontentsline{toc}{subsection}{1.3 Logika rozmyta — podstawy teoretyczne}
+\subsection*{1.3 Logika rozmyta -- podstawy teoretyczne}
+\addcontentsline{toc}{subsection}{1.3 Logika rozmyta -- podstawy teoretyczne}
 
 Logika rozmyta (Fuzzy Logic) została wprowadzona przez Lotfi Zadeha w przełomowej pracy \cite{zadeh1965fuzzy}. Rozszerza klasyczną logikę dwuwartościową (prawda/fałsz) o stopnie przynależności w przedziale $[0, 1]$.
 
-\textbf{Motywacja}: Klasyczna logika wymaga precyzyjnych granic. Pytanie "Czy produkt za 450 PLN jest tani?" nie ma jednoznacznej odpowiedzi — zależy od kontekstu, kategorii produktu i preferencji użytkownika. Logika rozmyta pozwala odpowiedzieć: "Produkt jest tani ze stopniem 0.3 i średnio drogi ze stopniem 0.7".
+\textbf{Motywacja}: Klasyczna logika wymaga precyzyjnych granic. Pytanie "Czy produkt za 450 PLN jest tani?"~nie ma jednoznacznej odpowiedzi -- zależy od kontekstu, kategorii produktu i preferencji użytkownika. Logika rozmyta pozwala odpowiedzieć: "Produkt jest tani ze stopniem 0.3 i średnio drogi ze stopniem 0.7".
 
 \textbf{Zbiory rozmyte} (Fuzzy Sets): W klasycznej teorii zbiorów element należy lub nie należy do zbioru. W zbiorach rozmytych element ma stopień przynależności $\mu(x) \in [0, 1]$. Formalnie, zbiór rozmyty $A$ na uniwersum $X$ jest zdefiniowany przez funkcję przynależności:
 
@@ -333,7 +335,7 @@ gdzie $c$ to środek (mean), a $\sigma$ to odchylenie standardowe kontrolujące 
 \mu_{\bar{A}}(x) = 1 - \mu_A(x)
 \end{equation}
 
-\textit{Przecięcie} (AND) — T-norma:
+\textit{Przecięcie} (AND) -- T-norma:
 \begin{equation}
 \mu_{A \cap B}(x) = T(\mu_A(x), \mu_B(x))
 \end{equation}
@@ -345,7 +347,7 @@ Najczęściej używane T-normy:
     \item Łukasiewicz: $T_L(a, b) = \max(0, a + b - 1)$
 \end{itemize}
 
-\textit{Suma} (OR) — T-conorma (S-norma):
+\textit{Suma} (OR) -- T-conorma (S-norma):
 \begin{equation}
 \mu_{A \cup B}(x) = S(\mu_A(x), \mu_B(x))
 \end{equation}
@@ -360,19 +362,19 @@ Najczęściej używane T-conormy:
 \textbf{System wnioskowania Mamdani} \cite{mamdani1975experiment} jest najbardziej rozpowszechnioną metodą wnioskowania rozmytego. Składa się z czterech etapów:
 
 \begin{enumerate}
-    \item \textbf{Fuzzyfikacja} — przekształcenie wartości wejściowych na stopnie przynależności do zbiorów rozmytych. Przykład: cena 450 PLN → $\mu_{cheap}=0.1$, $\mu_{medium}=0.6$, $\mu_{expensive}=0.0$.
+    \item \textbf{Fuzzyfikacja} -- przekształcenie wartości wejściowych na stopnie przynależności do zbiorów rozmytych. Przykład: cena 450 PLN → $\mu_{cheap}=0.1$, $\mu_{medium}=0.6$, $\mu_{expensive}=0.0$.
 
-    \item \textbf{Ewaluacja reguł} — obliczenie aktywacji reguł IF-THEN za pomocą T-norm. Dla reguły "IF price IS cheap AND quality IS high THEN recommendation IS strong":
+    \item \textbf{Ewaluacja reguł} -- obliczenie aktywacji reguł IF-THEN za pomocą T-norm. Dla reguły "IF price IS cheap AND quality IS high THEN recommendation IS strong":
     \begin{equation}
     \alpha = T(\mu_{cheap}(price), \mu_{high}(quality)) = \min(\mu_{cheap}, \mu_{high})
     \end{equation}
 
-    \item \textbf{Agregacja} — połączenie wyników wszystkich reguł za pomocą T-conormy. Jeśli wiele reguł prowadzi do tego samego konsekwentu:
+    \item \textbf{Agregacja} -- połączenie wyników wszystkich reguł za pomocą T-conormy. Jeśli wiele reguł prowadzi do tego samego konsekwentu:
     \begin{equation}
     \mu_{output} = S(\alpha_1, \alpha_2, ..., \alpha_n) = \max(\alpha_1, \alpha_2, ..., \alpha_n)
     \end{equation}
 
-    \item \textbf{Defuzzyfikacja} — przekształcenie wyniku rozmytego na wartość liczbową.
+    \item \textbf{Defuzzyfikacja} -- przekształcenie wyniku rozmytego na wartość liczbową.
 \end{enumerate}
 
 \textbf{Metody defuzzyfikacji}:
@@ -382,7 +384,7 @@ Najczęściej używane T-conormy:
 y^* = \frac{\int y \cdot \mu(y) dy}{\int \mu(y) dy}
 \end{equation}
 
-\textit{Średnia ważona} (Weighted Average) — uproszczona metoda używana w implementacji:
+\textit{Średnia ważona} (Weighted Average) -- uproszczona metoda używana w implementacji:
 \begin{equation}
 y^* = \frac{\sum_{i=1}^{n} \alpha_i \cdot w_i}{\sum_{i=1}^{n} w_i}
 \end{equation}
@@ -403,10 +405,10 @@ Reguła rozmyta ma postać \cite{ross2010fuzzy}:
 
 gdzie $A_1$, $A_2$, $B$ to zbiory rozmyte definiujące warunki i konsekwencje reguły. Operator AND realizowany jest przez T-normę, najczęściej minimum lub iloczyn algebraiczny.
 
-\subsection*{1.4 Modele probabilistyczne — podstawy teoretyczne}
-\addcontentsline{toc}{subsection}{1.4 Modele probabilistyczne — podstawy teoretyczne}
+\subsection*{1.4 Modele probabilistyczne -- podstawy teoretyczne}
+\addcontentsline{toc}{subsection}{1.4 Modele probabilistyczne -- podstawy teoretyczne}
 
-\textbf{Łańcuchy Markowa} (Markov Chains) zostały wprowadzone przez Andrieja Markowa w 1906 roku. Są procesami stochastycznymi spełniającymi własność Markowa — przyszły stan zależy tylko od stanu obecnego, nie od historii \cite{rabiner1989tutorial}.
+\textbf{Łańcuchy Markowa} (Markov Chains) zostały wprowadzone przez Andrieja Markowa w 1906 roku. Są procesami stochastycznymi spełniającymi własność Markowa -- przyszły stan zależy tylko od stanu obecnego, nie od historii \cite{rabiner1989tutorial}.
 
 \textit{Definicja formalna}: Łańcuch Markowa to ciąg zmiennych losowych $X_0, X_1, X_2, ...$ przyjmujących wartości ze zbioru stanów $S = \{s_1, s_2, ..., s_n\}$, spełniający własność Markowa:
 
@@ -440,7 +442,7 @@ gdzie $count(s_i \rightarrow s_j)$ to liczba obserwowanych przejść ze stanu $s
 \pi = \pi P, \quad \sum_i \pi_i = 1
 \end{equation}
 
-Jest to rozkład prawdopodobieństwa, który pozostaje niezmieniony po przejściu — reprezentuje długoterminowe prawdopodobieństwa przebywania w każdym stanie. Rozkład stacjonarny jest istotny w analizie długoterminowego zachowania systemu.
+Jest to rozkład prawdopodobieństwa, który pozostaje niezmieniony po przejściu -- reprezentuje długoterminowe prawdopodobieństwa przebywania w każdym stanie. Rozkład stacjonarny jest istotny w analizie długoterminowego zachowania systemu.
 
 \textbf{Naiwny klasyfikator Bayesa} (Naive Bayes, NB) opiera się na twierdzeniu Bayesa z założeniem niezależności cech \cite{murphy2012machine}.
 
@@ -451,13 +453,13 @@ P(C | X) = \frac{P(X | C) \cdot P(C)}{P(X)}
 
 gdzie:
 \begin{itemize}
-    \item $P(C | X)$ — prawdopodobieństwo a posteriori klasy $C$ przy cechach $X$
-    \item $P(C)$ — prawdopodobieństwo a priori klasy $C$
-    \item $P(X | C)$ — wiarygodność (likelihood) — prawdopodobieństwo obserwacji cech $X$ w klasie $C$
-    \item $P(X)$ — prawdopodobieństwo marginalne cech (stałe dla wszystkich klas)
+    \item $P(C | X)$ -- prawdopodobieństwo a posteriori klasy $C$ przy cechach $X$
+    \item $P(C)$ -- prawdopodobieństwo a priori klasy $C$
+    \item $P(X | C)$ -- wiarygodność (likelihood) -- prawdopodobieństwo obserwacji cech $X$ w klasie $C$
+    \item $P(X)$ -- prawdopodobieństwo marginalne cech (stałe dla wszystkich klas)
 \end{itemize}
 
-\textit{Założenie naiwne} (Naive assumption) — niezależność warunkowa cech:
+\textit{Założenie naiwne} (Naive assumption) -- niezależność warunkowa cech:
 \begin{equation}
 P(X | C) = P(x_1, x_2, ..., x_n | C) = \prod_{i=1}^{n} P(x_i | C)
 \end{equation}
@@ -480,48 +482,50 @@ P(x_i = v | C) = \frac{count(x_i = v, C) + 1}{count(C) + |V_i|}
 
 gdzie $|V_i|$ to liczba unikalnych wartości cechy $x_i$. Dodanie 1 do licznika i $|V|$ do mianownika zapewnia, że żadne prawdopodobieństwo nie będzie zerowe.
 
-\textit{Logarytm dla stabilności numerycznej}: Iloczyn wielu małych prawdopodobieństw prowadzi do underflow. Rozwiązanie — praca w przestrzeni logarytmów:
+\textit{Logarytm dla stabilności numerycznej}: Iloczyn wielu małych prawdopodobieństw prowadzi do underflow. Rozwiązanie -- praca w przestrzeni logarytmów:
 \begin{equation}
 \log P(C | X) = \log P(C) + \sum_{i=1}^{n} \log P(x_i | C) + const
 \end{equation}
 
 \textit{Warianty Naive Bayes}:
 \begin{itemize}
-    \item \textbf{Multinomial NB} — dla danych zliczeniowych (np. częstość słów)
-    \item \textbf{Bernoulli NB} — dla cech binarnych (obecność/brak)
-    \item \textbf{Gaussian NB} — dla cech ciągłych (zakłada rozkład normalny)
+    \item \textbf{Multinomial NB} -- dla danych zliczeniowych (np. częstość słów)
+    \item \textbf{Bernoulli NB} -- dla cech binarnych (obecność/brak)
+    \item \textbf{Gaussian NB} -- dla cech ciągłych (zakłada rozkład normalny)
 \end{itemize}
 
 Naive Bayes jest szeroko stosowany w klasyfikacji tekstu, filtracji spamu oraz systemach rekomendacyjnych ze względu na prostotę implementacji i niskie wymagania obliczeniowe.
+
+\newpage
 
 \subsection*{1.5 Metryki oceny systemów rekomendacyjnych}
 \addcontentsline{toc}{subsection}{1.5 Metryki oceny systemów rekomendacyjnych}
 
 Ewaluacja systemów rekomendacyjnych wymaga odpowiednich metryk jakości. Najpopularniejsze:
 
-\textbf{Precision@K} — jaka część top K rekomendacji była faktycznie kupiona/polubiona:
+\textbf{Precision@K} -- jaka część top K rekomendacji była faktycznie kupiona/polubiona:
 \begin{equation}
 Precision@K = \frac{|Recommended@K \cap Relevant|}{K}
 \end{equation}
 
-\textbf{Recall@K} — jaka część produktów istotnych dla użytkownika została trafiona:
+\textbf{Recall@K} -- jaka część produktów istotnych dla użytkownika została trafiona:
 \begin{equation}
 Recall@K = \frac{|Recommended@K \cap Relevant|}{|Relevant|}
 \end{equation}
 
-\textbf{F1-Score} — harmoniczna średnia Precision i Recall:
+\textbf{F1-Score} -- harmoniczna średnia Precision i Recall:
 \begin{equation}
 F1@K = 2 \cdot \frac{Precision@K \cdot Recall@K}{Precision@K + Recall@K}
 \end{equation}
 
-\textbf{Mean Reciprocal Rank (MRR)} — pozycja pierwszego trafienia:
+\textbf{Mean Reciprocal Rank (MRR)} -- pozycja pierwszego trafienia:
 \begin{equation}
 MRR = \frac{1}{|U|} \sum_{u \in U} \frac{1}{rank_u}
 \end{equation}
 
 gdzie $rank_u$ to pozycja pierwszego istotnego produktu w rankingu dla użytkownika $u$.
 
-\textbf{Coverage} — procent produktów, które system jest w stanie rekomendować:
+\textbf{Coverage} -- procent produktów, które system jest w stanie rekomendować:
 \begin{equation}
 Coverage = \frac{|\text{products with recommendations}|}{|\text{all products}|}
 \end{equation}
@@ -1112,18 +1116,18 @@ Niniejszy rozdział opisuje szczegółowo implementację trzech metod rekomendac
 
 System Content-Based Filtering został zaimplementowany w klasie \texttt{CustomContentBasedFilter} w pliku \texttt{custom\_recommendation\_engine.py}. Architektura składa się z trzech głównych komponentów:
 
-\textbf{1. Ekstraktor cech} (Feature Extractor) — odpowiada za budowę ważonego wektora cech dla każdego produktu. Analizuje cztery źródła danych:
+\textbf{1. Ekstraktor cech} (Feature Extractor) -- odpowiada za budowę ważonego wektora cech dla każdego produktu. Analizuje cztery źródła danych:
 
 \begin{itemize}
-    \item \textbf{Kategorie} (waga 40\%) — główna klasyfikacja produktu. Format cechy: \texttt{category\_\{nazwa\}}. Przykład: \texttt{category\_Electronics}, \texttt{category\_Laptops}.
-    \item \textbf{Tagi} (waga 30\%) — dodatkowe deskryptory (np. "Gaming", "Premium", "Budget"). Format: \texttt{tag\_\{nazwa\}}.
-    \item \textbf{Przedział cenowy} (waga 20\%) — dyskretyzacja ceny: low (<100 PLN), medium (100-500), high (500-1500), premium (>1500).
-    \item \textbf{Słowa kluczowe} (waga 10\%) — top 10 słów z opisu produktu po filtracji stop-words.
+    \item \textbf{Kategorie} (waga 40\%) -- główna klasyfikacja produktu. Format cechy: \texttt{category\_\{nazwa\}}. Przykład: \texttt{category\_Electronics}, \texttt{category\_Laptops}.
+    \item \textbf{Tagi} (waga 30\%) -- dodatkowe deskryptory (np. "Gaming", "Premium", "Budget"). Format: \texttt{tag\_\{nazwa\}}.
+    \item \textbf{Przedział cenowy} (waga 20\%) -- dyskretyzacja ceny: low (<100 PLN), medium (100-500), high (500-1500), premium (>1500).
+    \item \textbf{Słowa kluczowe} (waga 10\%) -- top 10 słów z opisu produktu po filtracji stop-words.
 \end{itemize}
 
-\textbf{2. Kalkulator podobieństwa} — oblicza podobieństwo kosinusowe między wektorami cech produktów. Operuje na wektorach rzadkich dla efektywności.
+\textbf{2. Kalkulator podobieństwa} -- oblicza podobieństwo kosinusowe między wektorami cech produktów. Operuje na wektorach rzadkich dla efektywności.
 
-\textbf{3. Generator rekomendacji} — zwraca top N produktów podobnych do danego produktu, z filtrowaniem według dostępności i progu podobieństwa.
+\textbf{3. Generator rekomendacji} -- zwraca top N produktów podobnych do danego produktu, z filtrowaniem według dostępności i progu podobieństwa.
 
 \textbf{Przepływ danych w systemie CBF}:
 
@@ -1187,10 +1191,10 @@ Metoda \texttt{\_extract\_keywords()} przetwarza opis produktu:
 Progi cenowe zostały dobrane empirycznie na podstawie rozkładu cen w katalogu:
 
 \begin{itemize}
-    \item \texttt{price\_low}: cena < 100 PLN — akcesoria, kable, drobne peryferia
-    \item \texttt{price\_medium}: 100 PLN $\leq$ cena < 500 PLN — peryferia, komponenty
-    \item \texttt{price\_high}: 500 PLN $\leq$ cena < 1500 PLN — monitory, karty graficzne
-    \item \texttt{price\_premium}: cena $\geq$ 1500 PLN — laptopy, komputery, high-end
+    \item \texttt{price\_low}: cena < 100 PLN -- akcesoria, kable, drobne peryferia
+    \item \texttt{price\_medium}: 100 PLN $\leq$ cena < 500 PLN -- peryferia, komponenty
+    \item \texttt{price\_high}: 500 PLN $\leq$ cena < 1500 PLN -- monitory, karty graficzne
+    \item \texttt{price\_premium}: cena $\geq$ 1500 PLN -- laptopy, komputery, high-end
 \end{itemize}
 
 Dyskretyzacja eliminuje problem dużej wariancji cen i pozwala na porównywanie produktów z różnych kategorii cenowych.
@@ -1231,7 +1235,7 @@ Zamiast tworzyć pełne wektory o długości równej liczbie wszystkich możliwy
 
 System zapisuje tylko podobieństwa większe niż 0.2 (20\%). Uzasadnienie:
 \begin{itemize}
-    \item Podobieństwo < 0.2 oznacza mniej niż 20\% wspólnych cech — produkty są praktycznie różne
+    \item Podobieństwo < 0.2 oznacza mniej niż 20\% wspólnych cech -- produkty są praktycznie różne
     \item Redukcja rozmiaru tabeli o 60-80\%
     \item Szybsze zapytania (mniej rekordów do przeszukania)
 \end{itemize}
@@ -1279,7 +1283,7 @@ Wynik generowania macierzy podobieństw jest cachowany na 2 godziny (7200 sekund
 
 Teoretyczna złożoność to $O(n^2)$ dla $n$ produktów (wszystkie pary). W praktyce ograniczamy liczbę porównań przez:
 \begin{itemize}
-    \item \texttt{max\_comparisons\_per\_product = 50} — dla każdego produktu obliczamy podobieństwo do max 50 innych
+    \item \texttt{max\_comparisons\_per\_product = 50} -- dla każdego produktu obliczamy podobieństwo do max 50 innych
     \item Wczesne odrzucanie produktów bez wspólnych kategorii
 \end{itemize}
 
@@ -1298,23 +1302,23 @@ Dla katalogu 500 produktów:
 
 System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_engine.py} i składa się z trzech klas:
 
-\textbf{1. FuzzyMembershipFunctions} — definiuje funkcje przynależności dla trzech zmiennych wejściowych:
+\textbf{1. FuzzyMembershipFunctions} -- definiuje funkcje przynależności dla trzech zmiennych wejściowych:
 
 \begin{itemize}
-    \item \textbf{Cena} (price): cheap, medium, expensive — funkcje trójkątne i trapezoidalne z progami dostosowanymi do katalogu e-commerce
-    \item \textbf{Jakość} (quality/rating): low, medium, high — bazuje na średniej ocenie produktu (1-5 gwiazdek)
-    \item \textbf{Popularność} (popularity/view\_count): low, medium, high — bazuje na liczbie zamówień produktu
+    \item \textbf{Cena} (price): cheap, medium, expensive -- funkcje trójkątne i trapezoidalne z progami dostosowanymi do katalogu e-commerce
+    \item \textbf{Jakość} (quality/rating): low, medium, high -- bazuje na średniej ocenie produktu (1-5 gwiazdek)
+    \item \textbf{Popularność} (popularity/view\_count): low, medium, high -- bazuje na liczbie zamówień produktu
 \end{itemize}
 
-\textbf{2. FuzzyUserProfile} — buduje rozmyty profil użytkownika na podstawie:
+\textbf{2. FuzzyUserProfile} -- buduje rozmyty profil użytkownika na podstawie:
 
 \begin{itemize}
-    \item Historii zakupów (dla zalogowanych użytkowników) — analiza kategorii, średniej ceny
-    \item Danych sesji (dla gości) — ostatnio przeglądane produkty
-    \item Profilu domyślnego (fallback) — gdy brak danych
+    \item Historii zakupów (dla zalogowanych użytkowników) -- analiza kategorii, średniej ceny
+    \item Danych sesji (dla gości) -- ostatnio przeglądane produkty
+    \item Profilu domyślnego (fallback) -- gdy brak danych
 \end{itemize}
 
-\textbf{3. SimpleFuzzyInference} — silnik wnioskowania Mamdani z 6 regułami IF-THEN i metodą defuzzyfikacji średniej ważonej.
+\textbf{3. SimpleFuzzyInference} -- silnik wnioskowania Mamdani z 6 regułami IF-THEN i metodą defuzzyfikacji średniej ważonej.
 
 \textbf{Przepływ danych}:
 
@@ -1332,13 +1336,13 @@ System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_e
     \item Zwrócenie top N rekomendacji
 \end{enumerate}
 
-\subsubsection*{5.2.2 Funkcje przynależności — szczegóły implementacji}
+\subsubsection*{5.2.2 Funkcje przynależności -- szczegóły implementacji}
 
 \textbf{Funkcje przynależności dla ceny}
 
 Klasa \texttt{FuzzyMembershipFunctions} definiuje trzy funkcje dla zmiennej "cena":
 
-\textit{Funkcja "cheap" (tania)} — trójkątna/trapezoidalna:
+\textit{Funkcja "cheap" (tania)} -- trójkątna/trapezoidalna:
 
 \begin{equation}
 \mu_{cheap}(price) = \begin{cases}
@@ -1350,7 +1354,7 @@ Klasa \texttt{FuzzyMembershipFunctions} definiuje trzy funkcje dla zmiennej "cen
 
 Interpretacja: Produkty poniżej 100 PLN są w pełni "tanie". Od 100 do 500 PLN stopień "taności" maleje liniowo.
 
-\textit{Funkcja "medium" (średnia)} — trapezoidalna:
+\textit{Funkcja "medium" (średnia)} -- trapezoidalna:
 
 \begin{equation}
 \mu_{medium}(price) = \begin{cases}
@@ -1362,7 +1366,7 @@ Interpretacja: Produkty poniżej 100 PLN są w pełni "tanie". Od 100 do 500 PLN
 \end{cases}
 \end{equation}
 
-Interpretacja: Przedział $[500, 1200]$ ma pełną przynależność. Przejścia są płynne — cena 400 PLN jest częściowo "tania" i częściowo "średnia".
+Interpretacja: Przedział $[500, 1200]$ ma pełną przynależność. Przejścia są płynne -- cena 400 PLN jest częściowo "tania" i częściowo "średnia".
 
 \textit{Funkcja "expensive" (droga)}:
 
@@ -1429,9 +1433,9 @@ Klasa \texttt{FuzzyUserProfile} buduje profil preferencji użytkownika jako zbio
 \end{cases}
 \end{equation}
 
-Użytkownik kupujący średnio tanie produkty (avg < 300 PLN) ma wysoką wrażliwość cenową (0.9) — system będzie promował tanie produkty. Użytkownik premium (avg > 1500 PLN) ma niską wrażliwość (0.2) — system może rekomendować droższe produkty.
+Użytkownik kupujący średnio tanie produkty (avg < 300 PLN) ma wysoką wrażliwość cenową (0.9) -- system będzie promował tanie produkty. Użytkownik premium (avg > 1500 PLN) ma niską wrażliwość (0.2) -- system może rekomendować droższe produkty.
 
-\textbf{Dopasowanie kategorii} — metoda \texttt{fuzzy\_category\_match()}:
+\textbf{Dopasowanie kategorii} -- metoda \texttt{fuzzy\_category\_match()}:
 
 Dla każdej kategorii produktu system oblicza stopień dopasowania do profilu użytkownika:
 
@@ -1467,7 +1471,7 @@ JEZELI quality JEST high ORAZ (price JEST cheap LUB price JEST medium)
 WTEDY recommendation JEST strong
 \end{lstlisting}
 
-Logika: Wysokiej jakości produkt w rozsądnej cenie to doskonała okazja. Najwyższa waga — ta reguła najsilniej wpływa na wynik.
+Logika: Wysokiej jakości produkt w rozsądnej cenie to doskonała okazja. Najwyższa waga -- ta reguła najsilniej wpływa na wynik.
 
 \textbf{R2: Popular in Category} (waga: 0.7)
 
@@ -1494,7 +1498,7 @@ JEZELI category_match JEST high ORAZ (quality JEST medium LUB quality JEST high)
 WTEDY recommendation JEST strong
 \end{lstlisting}
 
-Logika: Dopasowanie do kategorii + dobra jakość. Wysoka waga — dopasowanie kategorii jest istotne.
+Logika: Dopasowanie do kategorii + dobra jakość. Wysoka waga -- dopasowanie kategorii jest istotne.
 
 \textbf{R5: Premium Match} (waga: 0.8)
 
@@ -1513,7 +1517,7 @@ JEZELI (quality JEST high ORAZ price JEST reasonable) LUB
 WTEDY recommendation JEST moderate
 \end{lstlisting}
 
-Logika: Dobry stosunek jakości do ceny — "value for money".
+Logika: Dobry stosunek jakości do ceny -- "value for money".
 
 \subsubsection*{5.2.5 Wnioskowanie i defuzzyfikacja}
 
@@ -1563,28 +1567,28 @@ Wagi reguł wynoszą: $w_{R1} = 0.9$, $w_{R2} = 0.7$, $w_{R3} = 0.6$, $w_{R4} = 
 
 Metoda zwraca słownik z:
 \begin{itemize}
-    \item \texttt{fuzzy\_score} — wartość z przedziału $[0, 1]$ reprezentująca siłę rekomendacji
-    \item \texttt{rule\_activations} — słownik z aktywacją każdej reguły (dla debugowania)
-    \item \texttt{category\_match} — stopień dopasowania kategorii
-    \item \texttt{price\_membership} — przynależności cenowe (cheap, medium, expensive)
+    \item \texttt{fuzzy\_score} -- wartość z przedziału $[0, 1]$ reprezentująca siłę rekomendacji
+    \item \texttt{rule\_activations} -- słownik z aktywacją każdej reguły (dla debugowania)
+    \item \texttt{category\_match} -- stopień dopasowania kategorii
+    \item \texttt{price\_membership} -- przynależności cenowe (cheap, medium, expensive)
 \end{itemize}
 
-\subsection*{5.3 Modele probabilistyczne — Markov Chain i Naive Bayes}
-\addcontentsline{toc}{subsection}{5.3 Modele probabilistyczne — Markov Chain i Naive Bayes}
+\subsection*{5.3 Modele probabilistyczne -- Markov Chain i Naive Bayes}
+\addcontentsline{toc}{subsection}{5.3 Modele probabilistyczne -- Markov Chain i Naive Bayes}
 
 \subsubsection*{5.3.1 Architektura systemu probabilistycznego}
 
 System probabilistyczny składa się z trzech komponentów zaimplementowanych w \texttt{custom\_recommendation\_engine.py}:
 
-\textbf{1. CustomMarkovChain} — łańcuch Markowa pierwszego rzędu do predykcji sekwencji zakupowych kategorii produktów. Modeluje pytanie: "Jeśli użytkownik kupił produkt z kategorii A, jaka kategoria jest najbardziej prawdopodobna jako następna?"
+\textbf{1. CustomMarkovChain} -- łańcuch Markowa pierwszego rzędu do predykcji sekwencji zakupowych kategorii produktów. Modeluje pytanie: "Jeśli użytkownik kupił produkt z kategorii A, jaka kategoria jest najbardziej prawdopodobna jako następna?"
 
-\textbf{2. CustomNaiveBayes} — naiwny klasyfikator Bayesa z wygładzaniem Laplace'a do:
+\textbf{2. CustomNaiveBayes} -- naiwny klasyfikator Bayesa z wygładzaniem Laplace'a do:
 \begin{itemize}
     \item Predykcji prawdopodobieństwa zakupu (will\_purchase / will\_not\_purchase)
     \item Predykcji ryzyka rezygnacji (will\_churn / will\_not\_churn)
 \end{itemize}
 
-\textbf{3. ProbabilisticRecommendationEngine} — silnik łączący oba modele w jeden system rekomendacji z wagami: Markov (60\%) + Naive Bayes (40\%).
+\textbf{3. ProbabilisticRecommendationEngine} -- silnik łączący oba modele w jeden system rekomendacji z wagami: Markov (60\%) + Naive Bayes (40\%).
 
 \textbf{Przepływ danych}:
 
@@ -1606,9 +1610,9 @@ Klasa \texttt{CustomMarkovChain} modeluje sekwencje zakupów użytkowników jako
 
 Łańcuch Markowa przechowuje:
 \begin{itemize}
-    \item \texttt{transitions} — słownik słowników: \{stan: \{następny\_stan: licznik\}\}
-    \item \texttt{states} — zbiór wszystkich stanów (48 kategorii produktów)
-    \item \texttt{total\_sequences} — liczba sekwencji użytych do treningu
+    \item \texttt{transitions} -- słownik słowników: \{stan: \{następny\_stan: licznik\}\}
+    \item \texttt{states} -- zbiór wszystkich stanów (48 kategorii produktów)
+    \item \texttt{total\_sequences} -- liczba sekwencji użytych do treningu
 \end{itemize}
 
 \textbf{Trening modelu}:
@@ -1629,9 +1633,9 @@ Dla danego stanu (ostatnia kategoria zakupu) algorytm sortuje wszystkie możliwe
 
 \textbf{Generowanie sekwencji}:
 
-Metoda predict\_sequence() generuje sekwencję $n$ przewidywanych kategorii metodą zachłanną (greedy), wybierając w każdym kroku najbardziej prawdopodobny następny stan. Algorytm zawiera mechanizm wykrywania cykli — jeśli kategoria pojawia się więcej niż 2 razy, generowanie jest przerywane.
+Metoda predict\_sequence() generuje sekwencję $n$ przewidywanych kategorii metodą zachłanną (greedy), wybierając w każdym kroku najbardziej prawdopodobny następny stan. Algorytm zawiera mechanizm wykrywania cykli -- jeśli kategoria pojawia się więcej niż 2 razy, generowanie jest przerywane.
 
-\textbf{Rozkład stacjonarny} — metoda \texttt{get\_stationary\_distribution()}:
+\textbf{Rozkład stacjonarny} -- metoda \texttt{get\_stationary\_distribution()}:
 
 Oblicza rozkład stacjonarny łańcucha metodą przybliżoną (zliczanie częstości stanów docelowych):
 
@@ -1644,20 +1648,20 @@ Klasa \texttt{CustomNaiveBayes} implementuje multinomialny Naive Bayes z wygład
 \textbf{Cechy użytkownika} (features):
 
 \begin{itemize}
-    \item \texttt{total\_orders} — łączna liczba zamówień (dyskretyzowana: 0-2, 3-5, 6-10, 11+)
-    \item \texttt{avg\_order\_value} — średnia wartość zamówienia (low, medium, high, premium)
-    \item \texttt{days\_since\_last\_order} — dni od ostatniego zamówienia (recent, moderate, old, very\_old)
-    \item \texttt{favorite\_category} — najczęściej kupowana kategoria
-    \item \texttt{order\_frequency} — częstość zamówień (rare, occasional, regular, frequent)
+    \item \texttt{total\_orders} -- łączna liczba zamówień (dyskretyzowana: 0-2, 3-5, 6-10, 11+)
+    \item \texttt{avg\_order\_value} -- średnia wartość zamówienia (low, medium, high, premium)
+    \item \texttt{days\_since\_last\_order} -- dni od ostatniego zamówienia (recent, moderate, old, very\_old)
+    \item \texttt{favorite\_category} -- najczęściej kupowana kategoria
+    \item \texttt{order\_frequency} -- częstość zamówień (rare, occasional, regular, frequent)
 \end{itemize}
 
 \textbf{Struktura danych}:
 
 Model przechowuje:
 \begin{itemize}
-    \item \texttt{class\_priors} — prawdopodobieństwa a priori $P(C)$ dla każdej klasy
-    \item \texttt{feature\_likelihoods} — prawdopodobieństwa warunkowe $P(x_i | C)$
-    \item \texttt{feature\_vocabularies} — unikalne wartości każdej cechy (dla wygładzania Laplace'a)
+    \item \texttt{class\_priors} -- prawdopodobieństwa a priori $P(C)$ dla każdej klasy
+    \item \texttt{feature\_likelihoods} -- prawdopodobieństwa warunkowe $P(x_i | C)$
+    \item \texttt{feature\_vocabularies} -- unikalne wartości każdej cechy (dla wygładzania Laplace'a)
 \end{itemize}
 
 \textbf{Trening modelu}:
@@ -1665,7 +1669,7 @@ Model przechowuje:
 Faza treningu obejmuje:
 \begin{enumerate}
     \item Zliczenie wystąpień każdej klasy i obliczenie prawdopodobieństw a priori: $P(C) = \frac{count(C)}{N}$
-    \item Dla każdej próbki treningowej — aktualizacja słowników cech dla odpowiedniej klasy
+    \item Dla każdej próbki treningowej -- aktualizacja słowników cech dla odpowiedniej klasy
     \item Budowa słownika unikalnych wartości cech (vocabulary) potrzebnego do wygładzania Laplace'a
 \end{enumerate}
 
@@ -1699,7 +1703,7 @@ H(feature) = -\sum_{v \in V} P(v | C) \cdot \log_2 P(v | C)
 
 Wyższa entropia oznacza większą zdolność cechy do rozróżniania klas. Typowy ranking ważności cech dla predykcji zakupu: days\_since\_last\_order > total\_orders > avg\_order\_value > favorite\_category.
 
-\subsubsection*{5.3.4 Integracja modeli — ProbabilisticRecommendationEngine}
+\subsubsection*{5.3.4 Integracja modeli -- ProbabilisticRecommendationEngine}
 
 Klasa \texttt{ProbabilisticRecommendationEngine} łączy oba modele w jeden system rekomendacyjny.
 
@@ -1707,9 +1711,9 @@ Klasa \texttt{ProbabilisticRecommendationEngine} łączy oba modele w jeden syst
 
 System trenuje trzy komponenty:
 \begin{enumerate}
-    \item \textbf{Markov Chain} — na sekwencjach kategorii z historii zamówień
-    \item \textbf{Purchase NB} — na cechach użytkowników z etykietami will\_purchase / will\_not\_purchase
-    \item \textbf{Churn NB} — na cechach użytkowników z etykietami will\_churn / will\_not\_churn
+    \item \textbf{Markov Chain} -- na sekwencjach kategorii z historii zamówień
+    \item \textbf{Purchase NB} -- na cechach użytkowników z etykietami will\_purchase / will\_not\_purchase
+    \item \textbf{Churn NB} -- na cechach użytkowników z etykietami will\_churn / will\_not\_churn
 \end{enumerate}
 
 \textbf{Predykcja zintegrowana}:
@@ -1734,7 +1738,7 @@ FUNKCJA generuj_rekomendacje(uzytkownik, ostatnia_kategoria, k=10):
 KONIEC FUNKCJA
 \end{lstlisting}
 
-Wagi agregacji (Markov 60\%, NB 40\%) zostały dobrane empirycznie — Markov Chain lepiej przewiduje następną kategorię, podczas gdy Naive Bayes moduluje wynik na podstawie ogólnego prawdopodobieństwa zakupu użytkownika.
+Wagi agregacji (Markov 60\%, NB 40\%) zostały dobrane empirycznie -- Markov Chain lepiej przewiduje następną kategorię, podczas gdy Naive Bayes moduluje wynik na podstawie ogólnego prawdopodobieństwa zakupu użytkownika.
 
 \subsubsection*{5.3.5 API probabilistyczne}
 
@@ -1811,11 +1815,11 @@ Przykładowa odpowiedź:
 
 W niniejszym rozdziale przedstawiono szczegółową implementację trzech metod rekomendacyjnych bez użycia gotowych bibliotek:
 
-\textbf{Content-Based Filtering (CBF)} — algorytm oparty na ważonych wektorach cech i podobieństwie cosinusowym, umożliwiający rekomendacje produktów na podstawie ich cech (kategoria, tagi, cena, słowa kluczowe). System efektywnie przetwarza 500 produktów, obliczając i przechowując ~4,000 par podobieństw powyżej progu 20\%.
+\textbf{Content-Based Filtering (CBF)} -- algorytm oparty na ważonych wektorach cech i podobieństwie cosinusowym, umożliwiający rekomendacje produktów na podstawie ich cech (kategoria, tagi, cena, słowa kluczowe). System efektywnie przetwarza 500 produktów, obliczając i przechowując ~4,000 par podobieństw powyżej progu 20\%.
 
-\textbf{Fuzzy Logic} — system rozmytego wnioskowania Mamdani z 6 regułami IF-THEN, uwzględniający czynniki ceny, jakości i popularności. Algorytm buduje rozmyty profil użytkownika na podstawie historii zakupów i generuje spersonalizowane rekomendacje z wyjaśnieniem aktywacji reguł.
+\textbf{Fuzzy Logic} -- system rozmytego wnioskowania Mamdani z 6 regułami IF-THEN, uwzględniający czynniki ceny, jakości i popularności. Algorytm buduje rozmyty profil użytkownika na podstawie historii zakupów i generuje spersonalizowane rekomendacje z wyjaśnieniem aktywacji reguł.
 
-\textbf{Modele probabilistyczne} — łańcuch Markowa pierwszego rzędu (predykcja sekwencji zakupowych kategorii) oraz klasyfikator Naive Bayes (prawdopodobieństwo zakupu i churn). System wykorzystuje historię 265 zamówień do budowy macierzy przejść i modeli predykcyjnych.
+\textbf{Modele probabilistyczne} -- łańcuch Markowa pierwszego rzędu (predykcja sekwencji zakupowych kategorii) oraz klasyfikator Naive Bayes (prawdopodobieństwo zakupu i churn). System wykorzystuje historię 265 zamówień do budowy macierzy przejść i modeli predykcyjnych.
 
 Wszystkie trzy metody zostały zintegrowane z systemem Django/React, oferują API REST oraz zaawansowane panele debugowania dla administratorów. Praktyczne funkcjonowanie systemu, interfejsy użytkownika oraz wyniki ewaluacji zostały przedstawione w kolejnych rozdziałach.
 
@@ -2046,7 +2050,7 @@ Liczba reguł & 6 \\
 \caption{Wydajność Fuzzy Logic (wartości orientacyjne)}
 \end{table}
 
-Fuzzy Logic jest najszybszą metodą — brak konieczności przechowywania macierzy podobieństw, wszystkie obliczenia wykonywane on-the-fly. Każda rekomendacja ma pełne wyjaśnienie w postaci aktywacji konkretnych reguł IF-THEN.
+Fuzzy Logic jest najszybszą metodą -- brak konieczności przechowywania macierzy podobieństw, wszystkie obliczenia wykonywane on-the-fly. Każda rekomendacja ma pełne wyjaśnienie w postaci aktywacji konkretnych reguł IF-THEN.
 
 \subsection*{7.4 Wydajność modeli probabilistycznych}
 \addcontentsline{toc}{subsection}{7.4 Wydajność modeli probabilistycznych}
@@ -2096,11 +2100,11 @@ Każda metoda ma swoje zalety i ograniczenia. CBF rozwiązuje problem zimnego st
 
 W ramach pracy zaimplementowano trzy metody rekomendacji produktów:
 
-\textbf{Content-Based Filtering} — rozwiązuje problem zimnego startu dla nowych produktów. Wagi cech (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) zostały dobrane empirycznie.
+\textbf{Content-Based Filtering} -- rozwiązuje problem zimnego startu dla nowych produktów. Wagi cech (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) zostały dobrane empirycznie.
 
-\textbf{Logika rozmyta} — oferuje najwyższą interpretowalność. Każda rekomendacja ma wyjaśnienie w postaci aktywacji 6 reguł IF-THEN.
+\textbf{Logika rozmyta} -- oferuje najwyższą interpretowalność. Każda rekomendacja ma wyjaśnienie w postaci aktywacji 6 reguł IF-THEN.
 
-\textbf{Modele probabilistyczne} — umożliwiają personalizację na podstawie historii (Markov) i profilu (Naive Bayes).
+\textbf{Modele probabilistyczne} -- umożliwiają personalizację na podstawie historii (Markov) i profilu (Naive Bayes).
 
 Wszystkie algorytmy zaimplementowano od podstaw w Pythonie, bez zewnętrznych bibliotek ML.
 
@@ -2130,26 +2134,26 @@ Niniejsza praca przedstawiła proces implementacji oraz analizy kompletnego syst
 
 W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
-\textbf{Problem zimnego startu} — algorytmy Markov Chain oraz Naive Bayes wymagają historycznych danych o interakcjach użytkowników z produktami. Dla nowych użytkowników bez historii zakupów mechanizmy te nie są w stanie generować efektywnych rekomendacji. Content-Based Filtering częściowo kompensuje to ograniczenie, ponieważ może rekomendować produkty na podstawie cech (kategoria, tagi, cena), nawet dla nowych użytkowników. Fuzzy Logic działa najlepiej dla użytkowników z umiarkowaną historią zakupów.
+\textbf{Problem zimnego startu} -- algorytmy Markov Chain oraz Naive Bayes wymagają historycznych danych o interakcjach użytkowników z produktami. Dla nowych użytkowników bez historii zakupów mechanizmy te nie są w stanie generować efektywnych rekomendacji. Content-Based Filtering częściowo kompensuje to ograniczenie, ponieważ może rekomendować produkty na podstawie cech (kategoria, tagi, cena), nawet dla nowych użytkowników. Fuzzy Logic działa najlepiej dla użytkowników z umiarkowaną historią zakupów.
 
-\textbf{Efekt ,,filter bubble'' w CBF} — użytkownik otrzymuje rekomendacje podobnych produktów, nie odkrywając nowych kategorii. Rozwiązanie: hybrydyzacja z Collaborative Filtering (zaimplementowany przez współautora), który odkrywa ukryte wzorce zakupowe.
+\textbf{Efekt ,,filter bubble'' w CBF} -- użytkownik otrzymuje rekomendacje podobnych produktów, nie odkrywając nowych kategorii. Rozwiązanie: hybrydyzacja z Collaborative Filtering (zaimplementowany przez współautora), który odkrywa ukryte wzorce zakupowe.
 
-\textbf{Skalowalność dla bardzo dużych katalogów} — dla katalogów produktów przekraczających 10\,000 pozycji mogą wystąpić wyzwania wydajnościowe. Obecne optymalizacje (threshold pruning, cache, bulk operations) są wystarczające dla katalogów do 1\,000-2\,000 produktów, ale większe wymagałyby zastosowania approximate nearest neighbors (LSH, HNSW) lub partycjonowania tabel PostgreSQL.
+\textbf{Skalowalność dla bardzo dużych katalogów} -- dla katalogów produktów przekraczających 10\,000 pozycji mogą wystąpić wyzwania wydajnościowe. Obecne optymalizacje (threshold pruning, cache, bulk operations) są wystarczające dla katalogów do 1\,000-2\,000 produktów, ale większe wymagałyby zastosowania approximate nearest neighbors (LSH, HNSW) lub partycjonowania tabel PostgreSQL.
 
-\textbf{Brak obsługi kontekstu czasowego i sezonowości} — system nie uwzględnia czynników sezonowych (np. zwiększone zakupy elektroniki przed świętami) ani kontekstu czasowego sesji użytkownika. Rozwiązanie: modele sekwencyjne (LSTM, GRU) lub rozszerzenie Markov Chain do wyższego rzędu.
+\textbf{Brak obsługi kontekstu czasowego i sezonowości} -- system nie uwzględnia czynników sezonowych (np. zwiększone zakupy elektroniki przed świętami) ani kontekstu czasowego sesji użytkownika. Rozwiązanie: modele sekwencyjne (LSTM, GRU) lub rozszerzenie Markov Chain do wyższego rzędu.
 
 \subsection*{8.2 Kierunki dalszego rozwoju}
 \addcontentsline{toc}{subsection}{8.2 Kierunki dalszego rozwoju}
 
 Zidentyfikowano następujące kierunki rozwoju systemu:
 
-\textbf{Zastosowanie głębokiego uczenia maszynowego} — obecny system wykorzystuje klasyczne algorytmy rekomendacyjne. Zastosowanie sieci neuronowych, takich jak autoencodery czy sieci rekurencyjne, mogłoby umożliwić automatyczne uczenie się ukrytych wzorców w danych bez konieczności ręcznego definiowania reguł rozmytych czy wag cech.
+\textbf{Zastosowanie głębokiego uczenia maszynowego} -- obecny system wykorzystuje klasyczne algorytmy rekomendacyjne. Zastosowanie sieci neuronowych, takich jak autoencodery czy sieci rekurencyjne, mogłoby umożliwić automatyczne uczenie się ukrytych wzorców w danych bez konieczności ręcznego definiowania reguł rozmytych czy wag cech.
 
-\textbf{Mechanizm hybrydowy łączący wszystkie 6 metod} — obecnie administrator przełącza między metodami ręcznie. System meta-learnera lub stacking ensemble mógłby automatycznie dobierać najlepszą metodę lub kombinację metod dla danego użytkownika i kontekstu.
+\textbf{Mechanizm hybrydowy łączący wszystkie 6 metod} -- obecnie administrator przełącza między metodami ręcznie. System meta-learnera lub stacking ensemble mógłby automatycznie dobierać najlepszą metodę lub kombinację metod dla danego użytkownika i kontekstu.
 
-\textbf{Rekomendacje w czasie rzeczywistym} — obecny system wykorzystuje cache z okresem ważności 5-120 minut. Implementacja systemu aktualizującego rekomendacje w czasie rzeczywistym po każdej akcji użytkownika (przeglądanie produktów, dodawanie do koszyka) mogłaby zwiększyć trafność sugestii.
+\textbf{Rekomendacje w czasie rzeczywistym} -- obecny system wykorzystuje cache z okresem ważności 5-120 minut. Implementacja systemu aktualizującego rekomendacje w czasie rzeczywistym po każdej akcji użytkownika (przeglądanie produktów, dodawanie do koszyka) mogłaby zwiększyć trafność sugestii.
 
-\textbf{Zaawansowane metody obsługi zimnego startu} — zastosowanie technik faktoryzacji macierzy (SVD) lub wstępnej ankiety preferencji dla nowych użytkowników mogłoby poprawić jakość rekomendacji w pierwszych sesjach.
+\textbf{Zaawansowane metody obsługi zimnego startu} -- zastosowanie technik faktoryzacji macierzy (SVD) lub wstępnej ankiety preferencji dla nowych użytkowników mogłoby poprawić jakość rekomendacji w pierwszych sesjach.
 
 \subsection*{8.3 Wnioski końcowe}
 \addcontentsline{toc}{subsection}{8.3 Wnioski końcowe}
@@ -2162,7 +2166,7 @@ Zrealizowany system stanowi kompletne rozwiązanie e-commerce z autorskimi mecha
 
 \textbf{Modele probabilistyczne} umożliwiają najgłębszą personalizację dla użytkowników z bogatą historią zakupów. Łańcuch Markowa przewiduje sekwencje zakupowe na poziomie kategorii produktów, Naive Bayes ocenia prawdopodobieństwo zakupu i ryzyko churnu.
 
-Komplementarność zastosowanych metod — Content-Based Filtering dla nowych produktów, Fuzzy Logic dla personalizacji z interpretowal nością, modele probabilistyczne dla głębokiej analizy behawioralnej — zapewnia wszechstronne wsparcie procesu decyzyjnego użytkownika. Zastosowane techniki optymalizacyjne (cache, bulk operations, threshold pruning, indeksowanie) gwarantują akceptowalne czasy odpowiedzi systemu nawet przy większych katalogach produktów.
+Komplementarność zastosowanych metod -- Content-Based Filtering dla nowych produktów, Fuzzy Logic dla personalizacji z interpretowal nością, modele probabilistyczne dla głębokiej analizy behawioralnej -- zapewnia wszechstronne wsparcie procesu decyzyjnego użytkownika. Zastosowane techniki optymalizacyjne (cache, bulk operations, threshold pruning, indeksowanie) gwarantują akceptowalne czasy odpowiedzi systemu nawet przy większych katalogach produktów.
 
 Praca wykazała, że implementacja systemu rekomendacyjnego od podstaw jest możliwa i celowa w kontekście edukacyjnym oraz w sytuacjach wymagających pełnej kontroli nad logiką biznesową. Zrealizowany projekt pozwolił na zdobycie praktycznej wiedzy w zakresie projektowania systemów rekomendacyjnych, optymalizacji algorytmów oraz rozwoju aplikacji full-stack (Django + React + PostgreSQL + Docker).
 
@@ -2240,7 +2244,7 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 \section*{Streszczenie}
 \addcontentsline{toc}{section}{Streszczenie}
 
-Niniejsza praca inżynierska przedstawia projekt i implementację systemu rekomendacji produktów dla platformy e-commerce, opartego na trzech zaawansowanych metodach uczenia maszynowego: filtracji opartej na treści (Content-Based Filtering), logice rozmytej (Fuzzy Logic) oraz modelach probabilistycznych (Markov Chain i Naive Bayes). Praca została zrealizowana we współpracy dwuosobowej jako kompleksowy system e-commerce wyposażony w sześć metod rekomendacyjnych — niniejsza praca obejmuje trzy metody (CBF, Fuzzy Logic, modele probabilistyczne), praca współautora koncentruje się na trzech komplementarnych metodach (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne Apriori). Głównym celem pracy było opracowanie modułowego systemu rekomendacyjnego działającego bez zewnętrznych bibliotek uczenia maszynowego, zapewniającego pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
+Niniejsza praca inżynierska przedstawia projekt i implementację systemu rekomendacji produktów dla platformy e-commerce, opartego na trzech zaawansowanych metodach uczenia maszynowego: filtracji opartej na treści (Content-Based Filtering), logice rozmytej (Fuzzy Logic) oraz modelach probabilistycznych (Markov Chain i Naive Bayes). Praca została zrealizowana we współpracy dwuosobowej jako kompleksowy system e-commerce wyposażony w sześć metod rekomendacyjnych -- niniejsza praca obejmuje trzy metody (CBF, Fuzzy Logic, modele probabilistyczne), praca współautora koncentruje się na trzech komplementarnych metodach (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne Apriori). Głównym celem pracy było opracowanie modułowego systemu rekomendacyjnego działającego bez zewnętrznych bibliotek uczenia maszynowego, zapewniającego pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
 
 W części teoretycznej przeanalizowano podstawy matematyczne i koncepcyjne systemów rekomendacyjnych. Metoda Content-Based Filtering (CBF) wykorzystuje reprezentację produktów jako ważonych wektorów cech oraz miarę podobieństwa kosinusowego do identyfikacji artykułów o podobnych właściwościach technicznych. Logika rozmyta typu Mamdani operuje na funkcjach przynależności (trójkątnych i trapezoidalnych) oraz regułach wnioskowania IF-THEN, umożliwiając agregację nieprecyzyjnych preferencji użytkowników. Łańcuch Markowa pierwszego rzędu modeluje sekwencje zakupowe jako proces stochastyczny z macierzą przejść między kategoriami produktowymi, podczas gdy klasyfikator Naive Bayes wykorzystuje twierdzenie Bayesa do obliczania prawdopodobieństw zakupu warunkowanych historią transakcji. Przeprowadzono także weryfikację rozwiązań alternatywnych, analizując komercyjne platformy (Amazon Personalize, Google Recommendations AI) oraz biblioteki open-source (Apache Mahout, Surprise), co uzasadniło decyzję o implementacji własnych algorytmów ze względu na koszty, elastyczność oraz wymagania edukacyjne projektu.
 
@@ -2249,20 +2253,5 @@ W części praktycznej zaprojektowano architekturę systemu jako aplikację webo
 Przeprowadzona ewaluacja na rzeczywistych danych wykazała, że każda metoda ma specyficzne zastosowania: CBF skutecznie rozwiązuje problem zimnego startu dla nowych produktów, logika rozmyta oferuje najwyższą interpretowalność rekomendacji dla użytkowników biznesowych, a modele probabilistyczne zapewniają głęboką personalizację wykorzystującą pełną historię zakupową klientów. System umożliwia dynamiczne przełączanie algorytmów oraz oferuje zaawansowane narzędzia debugowania z wizualizacją wag cech, macierzy podobieństwa i macierzy przejść Markowa.
 
 \textbf{Słowa kluczowe}: systemy rekomendacyjne, filtracja oparta na treści, logika rozmyta, łańcuch Markowa, naiwny klasyfikator Bayesa, e-commerce, Django, React
-
-\newpage
-
-\section*{Abstract}
-\addcontentsline{toc}{section}{Abstract}
-
-This engineering thesis presents the design and implementation of a product recommendation system for an e-commerce platform, based on three advanced machine learning methods: Content-Based Filtering, Fuzzy Logic, and Probabilistic Models (Markov Chain and Naive Bayes). The thesis was completed in collaboration as a comprehensive e-commerce system equipped with six recommendation methods — this thesis covers three methods (CBF, Fuzzy Logic, Probabilistic Models), while the co-author's thesis focuses on three complementary methods (Collaborative Filtering, Sentiment Analysis, Association Rules - Apriori). The main objective was to develop a modular recommendation system operating without external machine learning libraries, providing full control over algorithms and the ability to customize them for specific business requirements.
-
-In the theoretical part, the mathematical and conceptual foundations of recommender systems were analyzed. The Content-Based Filtering method uses product representation as weighted feature vectors and cosine similarity measure to identify items with similar technical properties. Mamdani-type Fuzzy Logic operates on membership functions (triangular and trapezoidal) and IF-THEN inference rules, enabling aggregation of imprecise user preferences. The first-order Markov Chain models purchase sequences as a stochastic process with a transition matrix between product categories, while the Naive Bayes classifier uses Bayes' theorem to calculate purchase probabilities conditioned on transaction history. Alternative solutions were also verified, analyzing commercial platforms (Amazon Personalize, Google Recommendations AI) and open-source libraries (Apache Mahout, Surprise), which justified the decision to implement custom algorithms due to costs, flexibility, and educational project requirements.
-
-In the practical part, the system architecture was designed as a three-tier web application: Django 5.1.4 backend with REST API, React 18 frontend as a Single Page Application, and PostgreSQL 14 database. Three independent recommendation engines were implemented, each activatable by the administrator in the configuration panel. The CBF algorithm precompiles the product similarity matrix and uses database indexes for fast recommendation retrieval. The fuzzy system builds user profiles aggregating three dimensions: price sensitivity, category preferences (stored in JSON format), and quality preference, then applies the Mamdani inference engine with center-of-gravity defuzzification. The probabilistic model trains the Markov Chain on purchase sequences and the Naive Bayes classifier on product and user features. The frontend offers a responsive interface with advanced fuzzy search (Levenshtein algorithm), state management through Context API, and Framer Motion animations. The application was containerized in Docker, ensuring repeatability, isolation, and portability of development and production environments.
-
-The evaluation conducted on real data demonstrated that each method has specific applications: CBF effectively solves the cold-start problem for new products, fuzzy logic offers the highest recommendation interpretability for business users, and probabilistic models provide deep personalization utilizing complete customer purchase history. The system enables dynamic algorithm switching and offers advanced debugging tools with visualization of feature weights, similarity matrices, and Markov transition matrices.
-
-\textbf{Keywords}: recommender systems, content-based filtering, fuzzy logic, Markov chain, Naive Bayes classifier, e-commerce, Django, React
 
 \end{document}
