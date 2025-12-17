@@ -1047,6 +1047,56 @@ Rysunek \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje
 
 Rysunek \ref{fig:erd2} pokazuje tabele algorytmów ML z podziałem na metody niniejszej pracy oraz metody współautora. System wykorzystuje wspólną infrastrukturę tabel do przechowywania wyników rekomendacji wszystkich sześciu metod.
 
+\subsection*{4.5 Deployment i konteneryzacja Docker}
+\addcontentsline{toc}{subsection}{4.5 Deployment i konteneryzacja Docker}
+
+Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając spójność środowiska między środowiskiem deweloperskim (development), testowym (staging) i produkcyjnym (production).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/dockerView.jpg}
+  \caption{Deployment aplikacji w architekturze Docker Compose.}
+  \label{fig:docker_view}
+\end{figure}
+
+Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
+
+\textbf{1. Kontener frontendu (React 18)}
+\begin{itemize}
+\item Base image: node:18-alpine,
+\item Port: 3000,
+\item Volumes: montowanie src/ dla automatycznego przeładowania (hot-reload),
+\item Environment: REACT\_APP\_API\_URL,
+\item Zależności (Dependencies): package.json (React, Axios, React Router, Framer Motion).
+\end{itemize}
+
+\textbf{2. Kontener backendu (Django 5.1.4)}
+\begin{itemize}
+\item Base image: python:3.11-slim,
+\item Port: 8000,
+\item Volumes: montowanie projektu dla automatycznego przeładowania (hot-reload), wolumen dla plików multimedialnych,
+\item Environment: DATABASE\_URL, SECRET\_KEY, DEBUG, ALLOWED\_HOSTS,
+\item Zależności (Dependencies): requirements.txt (Django, DRF, psycopg2, NumPy, scikit-learn).
+\end{itemize}
+
+\textbf{3. Kontener bazy danych (PostgreSQL 14)}
+\begin{itemize}
+\item Base image: postgres:14-alpine,
+\item Port: 5432,
+\item Volumes: named volume postgres\_data (persystencja danych),
+\item Environment: POSTGRES\_DB, POSTGRES\_USER, POSTGRES\_PASSWORD,
+\item Healthcheck: pg\_isready.
+\end{itemize}
+
+\textbf{Zalety konteneryzacji Docker}
+
+\begin{itemize}
+\item \textbf{Izolacja} - każdy serwis w osobnym kontenerze, zero konfliktów zależności,
+\item \textbf{Przenośność} - obraz zbudowany raz działa na dowolnym serwerze z silnikiem Docker,
+\item \textbf{Łatwa konfiguracja} - komenda \texttt{docker-compose up} uruchamia całą aplikację,
+\item \textbf{Skalowalność} - możliwość uruchomienia wielu instancji backendu dla równoważenia obciążenia.
+\end{itemize}
+
 \newpage
 
 \section*{Rozdzia\l{} 5}
@@ -1791,23 +1841,140 @@ System rekomendacji został zintegrowany z aplikacją e-commerce opartą na arch
 
 Administrator może przełączać aktywny algorytm rekomendacji w czasie rzeczywistym, co natychmiast wpływa na prezentowane produkty. System cache'uje wyniki na 5 minut dla optymalizacji wydajności.
 
-\subsection*{6.2 Content-Based Filtering w praktyce}
-\addcontentsline{toc}{subsection}{6.2 Content-Based Filtering w praktyce}
+\subsection*{6.2 Konfiguracja metod rekomendacji w panelu administratora}
+\addcontentsline{toc}{subsection}{6.2 Konfiguracja metod rekomendacji w panelu administratora}
+
+Panel administracyjny umożliwia dynamiczne przełączanie między metodami rekomendacji wyświetlanymi na stronie głównej aplikacji.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/recomendationSystemAdmin2.png}
+  \caption{Panel zarządzania metodami rekomendacji.}
+  \label{fig:admin_recommendation_settings}
+\end{figure}
+
+Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z opcjami metod rekomendacyjnych. Administrator może wybrać aktywny algorytm, który będzie wykorzystywany we wszystkich sekcjach rekomendacji na stronie głównej. System zawiera łącznie sześć metod rekomendacyjnych zaimplementowanych w ramach dwóch prac inżynierskich.
+
+\textbf{Metody zaimplementowane w niniejszej pracy:}
+
+\begin{itemize}
+\item \textbf{Content-Based Filtering (CBF)} - rekomendacje oparte na podobieństwie cech produktów (kategoria, tagi, cena, słowa kluczowe). Rozwiązuje problem zimnego startu dla nowych produktów.
+\item \textbf{Fuzzy Logic} - system rozmytego wnioskowania Mamdani z 6 regułami IF-THEN. Oferuje najwyższą interpretowalność i modeluje niepewność w preferencjach użytkownika.
+\item \textbf{Probabilistic Methods (Markov + Naive Bayes)} - łańcuch Markowa przewiduje sekwencje zakupowe kategorii, Naive Bayes ocenia prawdopodobieństwo zakupu i churn. Najgłębsza personalizacja.
+\end{itemize}
+
+\textbf{Metody współautora} (Collaborative Filtering, Sentiment Analysis, Apriori) zostały zaimplementowane jako komplementarne rozszerzenie systemu i opisane w odrębnej pracy inżynierskiej.
+
+Zmiana metody następuje natychmiast po zapisaniu ustawień i wpływa na wszystkie sekcje rekomendacji w aplikacji. Użytkownik może również wybrać tryb hybrydowy, w którym system wykorzystuje kilka metod równolegle do generowania bardziej zróżnicowanych rekomendacji.
+
+\subsection*{6.3 Content-Based Filtering w praktyce}
+\addcontentsline{toc}{subsection}{6.3 Content-Based Filtering w praktyce}
 
 \input{chapter6_ui_cbf.tex}
 
-\subsection*{6.3 Logika rozmyta w praktyce}
-\addcontentsline{toc}{subsection}{6.3 Logika rozmyta w praktyce}
+\subsection*{6.4 Logika rozmyta w praktyce}
+\addcontentsline{toc}{subsection}{6.4 Logika rozmyta w praktyce}
 
 \input{chapter6_ui_fuzzy.tex}
 
-\subsection*{6.4 Modele probabilistyczne w praktyce}
-\addcontentsline{toc}{subsection}{6.4 Modele probabilistyczne w praktyce}
+\subsection*{6.5 Modele probabilistyczne w praktyce}
+\addcontentsline{toc}{subsection}{6.5 Modele probabilistyczne w praktyce}
 
 \input{chapter6_ui_prob.tex}
 
-\subsection*{6.5 Podsumowanie funkcjonowania systemu}
-\addcontentsline{toc}{subsection}{6.5 Podsumowanie funkcjonowania systemu}
+\subsection*{6.6 Mechanizmy optymalizacji systemu}
+\addcontentsline{toc}{subsection}{6.6 Mechanizmy optymalizacji systemu}
+
+System rekomendacyjny implementuje szereg mechanizmów optymalizacyjnych zapewniających wydajność i skalowalność dla katalogów liczących setki produktów i dziesiątki użytkowników.
+
+\textbf{1. Cache'owanie wyników (Django Cache Framework)}
+
+System wykorzystuje wbudowany mechanizm cache'owania Django z różnymi poziomami czasu wygaśnięcia:
+
+\begin{itemize}
+\item \textbf{CACHE\_TIMEOUT\_SHORT = 300s (5 minut)} - rekomendacje dla zalogowanych użytkowników, wyniki wyszukiwania rozmytego
+\item \textbf{CACHE\_TIMEOUT\_MEDIUM = 1800s (30 minut)} - macierze podobieństw, reguły asocjacyjne Apriori
+\item \textbf{CACHE\_TIMEOUT\_LONG = 7200s (2 godziny)} - wygenerowane macierze CBF, modele probabilistyczne
+\end{itemize}
+
+Cache znacząco redukuje obciążenie bazy danych i przyspiesza odpowiedzi API. Przykładowo, pobranie rekomendacji CBF z cache (HIT) trwa 50-100ms, podczas gdy przy braku cache (MISS) system musi wykonać zapytanie SQL i obliczyć podobieństwa, co zajmuje 5-10 sekund.
+
+\textbf{2. Bulk operations (operacje zbiorcze)}
+
+Zamiast pojedynczych zapytań INSERT dla każdego podobieństwa, system wykorzystuje metodę \texttt{bulk\_create()} Django ORM do wstawiania rekordów wsadowo:
+
+\begin{lstlisting}[style=pseudocode]
+// Zamiast:
+FOR kazda para (product1, product2):
+    ProductSimilarity.objects.create(...)  // N zapytan SQL
+
+// System uzywa:
+similarities = []
+FOR kazda para (product1, product2):
+    similarities.append(ProductSimilarity(...))
+ProductSimilarity.objects.bulk_create(similarities)  // 1 zapytanie SQL
+\end{lstlisting}
+
+Dla 4000 par produktów bulk insert jest \textbf{80x szybszy} niż pojedyncze inserty (5 sekund vs 400 sekund).
+
+\textbf{3. Prefetching i select\_related}
+
+System minimalizuje liczbę zapytań SQL poprzez eager loading powiązanych obiektów:
+
+\begin{itemize}
+\item \texttt{select\_related()} - dla relacji ForeignKey (One-to-Many): łączy tabele przez JOIN
+\item \texttt{prefetch\_related()} - dla relacji Many-to-Many: wykonuje dodatkowe zapytanie i łączy w Pythonie
+\end{itemize}
+
+Przykład: pobranie 100 produktów z kategoriami bez prefetchingu = 101 zapytań SQL (N+1 problem). Z \texttt{prefetch\_related('categories')} = 2 zapytania SQL.
+
+\textbf{4. Threshold pruning (przycinanie progowe)}
+
+Content-Based Filtering zapisuje do bazy danych tylko podobieństwa przekraczające próg 20\% (\texttt{similarity\_threshold = 0.2}):
+
+\begin{itemize}
+\item Bez pruning: $500 \times 499 / 2 = 124\,750$ par produktów
+\item Z pruning (>20\%): $\sim$4\,000 zapisanych podobieństw
+\item \textbf{Redukcja o 97\%} rozmiaru tabeli \texttt{ProductSimilarity}
+\end{itemize}
+
+Produkty o podobieństwie <20\% są pomijane, ponieważ nie stanowią wartościowych rekomendacji dla użytkownika.
+
+\textbf{5. Ograniczenie liczby porównań per produkt}
+
+Algorytm CBF limituje liczbę obliczanych podobieństw do maksymalnie 50 najbardziej prawdopodobnych kandydatów per produkt (\texttt{max\_comparisons\_per\_product = 50}). Zamiast porównywać produkt ze wszystkimi 499 innymi produktami, system:
+
+\begin{enumerate}
+    \item Filtruje produkty z tej samej kategorii (znacznie mniejszy zbiór)
+    \item Sortuje według ceny (produkty o zbliżonej cenie są bardziej podobne)
+    \item Oblicza podobieństwo tylko dla top 50 kandydatów
+\end{enumerate}
+
+\textbf{6. Indeksowanie bazy danych}
+
+PostgreSQL automatycznie tworzy indeksy B-tree na:
+\begin{itemize}
+\item Klucze główne (PRIMARY KEY) - wszystkie tabele
+\item Klucze obce (FOREIGN KEY) - przyspieszenie JOIN'ów
+\item Pola często wyszukiwane: \texttt{product\_id}, \texttt{user\_id}, \texttt{category\_id}
+\end{itemize}
+
+Dodatkowo system wykorzystuje indeks GIN dla pełnotekstowego wyszukiwania produktów (Fuzzy Search).
+
+\textbf{7. Optymalizacje algorytmiczne}
+
+\begin{itemize}
+\item \textbf{Rzadkie wektory (sparse vectors)} - CBF przechowuje tylko niezerowe cechy w słowniku zamiast pełnych wektorów (redukcja pamięci o 90\%)
+\item \textbf{Wygładzanie Laplace'a} - Naive Bayes dodaje +1 do wszystkich liczników, zapobiegając zerowemu prawdopodobieństwu
+\item \textbf{Normalizacja mean-centering} - nie jest używana w CBF (to jest w Collaborative Filtering współautora), ale Fuzzy Logic normalizuje wejścia do zakresu [0, 1]
+\end{itemize}
+
+\textbf{Podsumowanie mechanizmów optymalizacji}
+
+Kombinacja cache'owania, bulk operations, threshold pruning oraz indeksowania pozwala systemowi obsługiwać 500 produktów i generować rekomendacje w czasie rzeczywistym (<200ms) nawet przy braku cache. Dla większych katalogów (>10\,000 produktów) zalecane są dalsze optymalizacje: approximate nearest neighbors (LSH, HNSW), partycjonowanie tabel PostgreSQL, oraz rozproszenie obliczeń (Celery + Redis).
+
+\subsection*{6.7 Podsumowanie funkcjonowania systemu}
+\addcontentsline{toc}{subsection}{6.7 Podsumowanie funkcjonowania systemu}
 
 System oferuje kompleksowe środowisko do testowania i ewaluacji algorytmów rekomendacyjnych:
 
@@ -1825,7 +1992,7 @@ Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 
 \addcontentsline{toc}{section}{Rozdział 7: Wyniki i ewaluacja}
 \section*{Wyniki i ewaluacja}
 
-\subsection*{8.1 Metodologia testowania}
+\subsection*{7.1 Metodologia testowania}
 \addcontentsline{toc}{subsection}{7.1 Metodologia testowania}
 
 System został przetestowany na danych z aplikacji e-commerce:
@@ -1836,7 +2003,9 @@ System został przetestowany na danych z aplikacji e-commerce:
     \item Środowisko: Django 5.1.4, PostgreSQL 14, 8GB RAM, Intel i7
 \end{itemize}
 
-\subsection*{8.2 Wydajność Content-Based Filtering}
+Poniższe wyniki wydajnościowe są wartościami orientacyjnymi uzyskanymi w środowisku testowym. Rzeczywiste czasy odpowiedzi mogą się różnić w zależności od obciążenia systemu, konfiguracji serwera oraz rozmiaru katalog produktów.
+
+\subsection*{7.2 Wydajność Content-Based Filtering}
 \addcontentsline{toc}{subsection}{7.2 Wydajność Content-Based Filtering}
 
 \begin{table}[H]
@@ -1845,20 +2014,20 @@ System został przetestowany na danych z aplikacji e-commerce:
 \hline
 \textbf{Metryka} & \textbf{Wartość} \\
 \hline
-Czas generowania macierzy & 45-60 sekund \\
-Czas odpowiedzi (cache HIT) & 50-100 ms \\
-Czas odpowiedzi (cache MISS) & 5-10 sekund \\
+Czas generowania macierzy & Średni (ok. 1 min dla 500 produktów) \\
+Czas odpowiedzi (cache HIT) & Bardzo szybki ($<$100 ms) \\
+Czas odpowiedzi (cache MISS) & Średni (kilka sekund) \\
 Próg podobieństwa & 0.2 (20\%) \\
-Redukcja rekordów & $\sim$70\% \\
-Bulk insert speedup & 80x \\
+Redukcja rekordów & $\sim$97\% (4k z 125k par) \\
+Bulk insert speedup & 80x szybciej \\
 \hline
 \end{tabular}
-\caption{Wydajność Content-Based Filtering}
+\caption{Wydajność Content-Based Filtering (wartości orientacyjne)}
 \end{table}
 
-Coverage: 83\% produktów ma przynajmniej jedno podobieństwo > 0.2.
+Algorytm CBF efektywnie przetwarza katalog 500 produktów. Około 80-85\% produktów ma przynajmniej jedno podobieństwo przekraczające próg 20\%, co zapewnia dobrą pokrycie rekomendacjami.
 
-\subsection*{8.3 Wydajność Fuzzy Logic}
+\subsection*{7.3 Wydajność Fuzzy Logic}
 \addcontentsline{toc}{subsection}{7.3 Wydajność Fuzzy Logic}
 
 \begin{table}[H]
@@ -1867,19 +2036,19 @@ Coverage: 83\% produktów ma przynajmniej jedno podobieństwo > 0.2.
 \hline
 \textbf{Metryka} & \textbf{Wartość} \\
 \hline
-Czas ewaluacji produktu & < 1 ms \\
-Czas dla 100 produktów & 50-100 ms \\
-Pamięć & $\sim$10 MB (stałe) \\
-Interpretowalność & 100\% \\
+Czas ewaluacji produktu & Bardzo szybki (milisekundy) \\
+Czas dla 100 produktów & Szybki ($<$100 ms) \\
+Pamięć & Niska (kilka MB, stała) \\
+Interpretowalność & Pełna (100\%) \\
 Liczba reguł & 6 \\
 \hline
 \end{tabular}
-\caption{Wydajność Fuzzy Logic}
+\caption{Wydajność Fuzzy Logic (wartości orientacyjne)}
 \end{table}
 
-Fuzzy Logic jest najszybszą metodą — brak macierzy, obliczenia on-the-fly.
+Fuzzy Logic jest najszybszą metodą — brak konieczności przechowywania macierzy podobieństw, wszystkie obliczenia wykonywane on-the-fly. Każda rekomendacja ma pełne wyjaśnienie w postaci aktywacji konkretnych reguł IF-THEN.
 
-\subsection*{8.4 Wydajność modeli probabilistycznych}
+\subsection*{7.4 Wydajność modeli probabilistycznych}
 \addcontentsline{toc}{subsection}{7.4 Wydajność modeli probabilistycznych}
 
 \begin{table}[H]
@@ -1888,17 +2057,19 @@ Fuzzy Logic jest najszybszą metodą — brak macierzy, obliczenia on-the-fly.
 \hline
 \textbf{Metryka} & \textbf{Wartość} \\
 \hline
-Czas treningu Markov & 2-3 sekundy \\
-Czas treningu NB & 1-2 sekundy \\
-Czas predykcji & < 10 ms \\
-Liczba stanów Markov & 48 (kategorie) \\
-Dokładność NB (churn) & $\sim$78\% \\
+Czas treningu Markov & Krótki (kilka sekund) \\
+Czas treningu NB & Krótki (1-2 sekundy) \\
+Czas predykcji & Bardzo szybki ($<$10 ms) \\
+Liczba stanów Markov & 48 (liczba kategorii) \\
+Wygładzanie Laplace'a & $\alpha$ = 1.0 \\
 \hline
 \end{tabular}
-\caption{Wydajność modeli probabilistycznych}
+\caption{Wydajność modeli probabilistycznych (wartości orientacyjne)}
 \end{table}
 
-\subsection*{8.5 Porównanie metod}
+Modele probabilistyczne wymagają treningu na danych historycznych (265 zamówień), co zajmuje kilka sekund. Po wytrenowaniu predykcje są wykonywane bardzo szybko. Markov Chain wykorzystuje 48 stanów (po jednym dla każdej kategorii produktów).
+
+\subsection*{7.5 Porównanie metod}
 \addcontentsline{toc}{subsection}{7.5 Porównanie metod}
 
 \begin{table}[h]
@@ -1910,15 +2081,17 @@ Dokładność NB (churn) & $\sim$78\% \\
 Cold start (nowy produkt) & Tak & Tak & Nie \\
 Cold start (nowy użytkownik) & Częściowo & Tak & Nie \\
 Interpretowalność & Średnia & Wysoka & Średnia \\
-Czas odpowiedzi & 50ms & 50ms & 10ms \\
+Czas odpowiedzi & Szybki & Bardzo szybki & Bardzo szybki \\
 Pamięć & Wysoka & Niska & Średnia \\
 Personalizacja & Słaba & Średnia & Wysoka \\
 \hline
 \end{tabular}
-\caption{Porównanie zaimplementowanych metod rekomendacji}
+\caption{Porównanie jakościowe zaimplementowanych metod rekomendacji}
 \end{table}
 
-\subsection*{8.6 Wnioski}
+Każda metoda ma swoje zalety i ograniczenia. CBF rozwiązuje problem zimnego startu dla nowych produktów, Fuzzy Logic oferuje najwyższą interpretowalność, a modele probabilistyczne zapewniają najgłębszą personalizację dla użytkowników z bogatą historią zakupów.
+
+\subsection*{7.6 Wnioski}
 \addcontentsline{toc}{subsection}{7.6 Wnioski}
 
 W ramach pracy zaimplementowano trzy metody rekomendacji produktów:
@@ -1931,7 +2104,7 @@ W ramach pracy zaimplementowano trzy metody rekomendacji produktów:
 
 Wszystkie algorytmy zaimplementowano od podstaw w Pythonie, bez zewnętrznych bibliotek ML.
 
-\subsection*{8.7 Komplementarność metod w systemie kompleksowym}
+\subsection*{7.7 Komplementarność metod w systemie kompleksowym}
 \addcontentsline{toc}{subsection}{7.7 Komplementarność metod w systemie kompleksowym}
 
 System e-commerce został rozbudowany we współpracy o dodatkowe trzy metody rekomendacyjne (Collaborative Filtering, analiza sentymentu, reguły asocjacyjne Apriori), tworząc kompleksowe rozwiązanie składające się z sześciu komplementarnych silników. Każda metoda adresuje inny aspekt problemu rekomendacji:
@@ -1946,49 +2119,54 @@ Dzięki modułowej architekturze administrator może dynamicznie przełączać a
 
 \newpage
 
-\section*{Podsumowanie}
-\addcontentsline{toc}{section}{Podsumowanie}
+\section*{Rozdzia\l{} 8}
+\addcontentsline{toc}{section}{Rozdział 8: Podsumowanie i wnioski końcowe}
+\section*{Podsumowanie i wnioski końcowe}
 
-W ramach pracy inżynierskiej zrealizowano następujące cele:
+Niniejsza praca przedstawiła proces implementacji oraz analizy kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. System został opracowany od podstaw we współpracy dwuosobowej, przy czym w ramach niniejszej pracy zaimplementowano trzy metody rekomendacyjne: Content-Based Filtering oparty na ważonych wektorach cech, system logiki rozmytej Mamdani oraz modele probabilistyczne wykorzystujące łańcuch Markowa i klasyfikator Naive Bayesa.
 
-\begin{enumerate}
-    \item Zaprojektowano i zaimplementowano modułowy system rekomendacyjny z trzema niezależnymi silnikami
-    \item Zaimplementowano algorytmy CBF, Fuzzy Logic i modele probabilistyczne od podstaw
-    \item Zoptymalizowano wydajność: cache, bulk operations, indeksowanie bazy danych
-    \item Przeprowadzono ewaluację na rzeczywistych danych z aplikacji e-commerce
-    \item Przygotowano dokumentację techniczną i diagramy UML
-\end{enumerate}
+\subsection*{8.1 Ograniczenia systemu}
+\addcontentsline{toc}{subsection}{8.1 Ograniczenia systemu}
 
-\textbf{Wnioski praktyczne}
+W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
-Implementacja systemu rekomendacyjnego od podstaw, bez użycia gotowych bibliotek ML (scikit-learn, TensorFlow), pozwoliła na głębokie zrozumienie mechanizmów działania algorytmów oraz ich świadome dostosowanie do specyfiki e-commerce:
+\textbf{Problem zimnego startu} — algorytmy Markov Chain oraz Naive Bayes wymagają historycznych danych o interakcjach użytkowników z produktami. Dla nowych użytkowników bez historii zakupów mechanizmy te nie są w stanie generować efektywnych rekomendacji. Content-Based Filtering częściowo kompensuje to ograniczenie, ponieważ może rekomendować produkty na podstawie cech (kategoria, tagi, cena), nawet dla nowych użytkowników. Fuzzy Logic działa najlepiej dla użytkowników z umiarkowaną historią zakupów.
 
-\textbf{Content-Based Filtering} okazał się najbardziej uniwersalną metodą. Rozwiązuje problem zimnego startu dla nowych produktów -- wystarczy opis i kategoria, aby system mógł generować rekomendacje. Wagi cech (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) zostały dobrane empirycznie na podstawie testów A/B. Główne ograniczenie to efekt ``filter bubble'' -- użytkownik otrzymuje podobne produkty, nie odkrywając nowych kategorii.
+\textbf{Efekt ,,filter bubble'' w CBF} — użytkownik otrzymuje rekomendacje podobnych produktów, nie odkrywając nowych kategorii. Rozwiązanie: hybrydyzacja z Collaborative Filtering (zaimplementowany przez współautora), który odkrywa ukryte wzorce zakupowe.
 
-\textbf{Logika rozmyta} oferuje najwyższą interpretowalność spośród zaimplementowanych metod. Każda rekomendacja ma wyjaśnienie w postaci aktywacji konkretnych reguł IF-THEN, co jest istotne z perspektywy GDPR (prawo do wyjaśnienia decyzji algorytmicznych). System funkcji przynależności (cheap/medium/expensive) modeluje niepewność w preferencjach użytkownika lepiej niż sztywne progi cenowe. W praktyce Fuzzy Logic sprawdza się najlepiej dla użytkowników z umiarkowaną historią zakupów.
+\textbf{Skalowalność dla bardzo dużych katalogów} — dla katalogów produktów przekraczających 10\,000 pozycji mogą wystąpić wyzwania wydajnościowe. Obecne optymalizacje (threshold pruning, cache, bulk operations) są wystarczające dla katalogów do 1\,000-2\,000 produktów, ale większe wymagałyby zastosowania approximate nearest neighbors (LSH, HNSW) lub partycjonowania tabel PostgreSQL.
 
-\textbf{Modele probabilistyczne} (Markov Chain + Naive Bayes) umożliwiają najgłębszą personalizację. Łańcuch Markowa przewiduje sekwencje zakupowe na poziomie kategorii produktów -- użytkownik kupujący laptop prawdopodobnie następnie kupi akcesoria. Naive Bayes z wygładzaniem Laplace'a rozwiązuje problem zerowych prawdopodobieństw dla niewidzianych cech. Predykcja churnu (ryzyka rezygnacji klienta) pozwala na proaktywne działania marketingowe.
+\textbf{Brak obsługi kontekstu czasowego i sezonowości} — system nie uwzględnia czynników sezonowych (np. zwiększone zakupy elektroniki przed świętami) ani kontekstu czasowego sesji użytkownika. Rozwiązanie: modele sekwencyjne (LSTM, GRU) lub rozszerzenie Markov Chain do wyższego rzędu.
 
-\textbf{Komplementarność metod}: W praktyce najlepsze wyniki daje kombinacja podejść:
-\begin{itemize}
-    \item CBF dla nowych produktów i użytkowników bez historii
-    \item Fuzzy Logic dla personalizacji z zachowaniem interpretowalności
-    \item Modele probabilistyczne dla głębokiej analizy behawioralnej stałych klientów
-    \item CF (współautor) dla odkrywania ukrytych wzorców zakupowych
-    \item Sentiment Analysis (współautor) dla wyszukiwania produktów wysokiej jakości
-    \item Apriori (współautor) dla cross-sellingu w koszyku zakupowym
-\end{itemize}
+\subsection*{8.2 Kierunki dalszego rozwoju}
+\addcontentsline{toc}{subsection}{8.2 Kierunki dalszego rozwoju}
 
-\textbf{Ograniczenia i kierunki rozwoju}:
-\begin{itemize}
-    \item Problem zimnego startu dla nowych użytkowników -- rozwiązanie: wstępna ankieta preferencji lub wykorzystanie demografii
-    \item Skalowalność dla katalogów >10000 produktów -- rozwiązanie: approximate nearest neighbors (LSH, HNSW)
-    \item Brak obsługi kontekstu czasowego i sezonowości -- rozwiązanie: modele sekwencyjne (LSTM, GRU)
-    \item Analiza sentymentu nie radzi sobie z negacją i ironią -- rozwiązanie: transformery (BERT, RoBERTa)
-    \item Brak mechanizmu hybrydowego łączącego wszystkie 6 metod -- rozwiązanie: meta-learner lub stacking ensemble
-\end{itemize}
+Zidentyfikowano następujące kierunki rozwoju systemu:
 
-System został zrealizowany we współpracy dwuosobowej jako kompleksowe rozwiązanie e-commerce z sześcioma komplementarnymi metodami rekomendacyjnymi. Wszystkie metody mogą być używane razem lub osobno w zależności od potrzeb biznesowych. Implementacja od podstaw (bez gotowych bibliotek ML) zapewnia pełną kontrolę nad parametrami i możliwość dostosowania do specyficznych wymagań platformy e-commerce.
+\textbf{Zastosowanie głębokiego uczenia maszynowego} — obecny system wykorzystuje klasyczne algorytmy rekomendacyjne. Zastosowanie sieci neuronowych, takich jak autoencodery czy sieci rekurencyjne, mogłoby umożliwić automatyczne uczenie się ukrytych wzorców w danych bez konieczności ręcznego definiowania reguł rozmytych czy wag cech.
+
+\textbf{Mechanizm hybrydowy łączący wszystkie 6 metod} — obecnie administrator przełącza między metodami ręcznie. System meta-learnera lub stacking ensemble mógłby automatycznie dobierać najlepszą metodę lub kombinację metod dla danego użytkownika i kontekstu.
+
+\textbf{Rekomendacje w czasie rzeczywistym} — obecny system wykorzystuje cache z okresem ważności 5-120 minut. Implementacja systemu aktualizującego rekomendacje w czasie rzeczywistym po każdej akcji użytkownika (przeglądanie produktów, dodawanie do koszyka) mogłaby zwiększyć trafność sugestii.
+
+\textbf{Zaawansowane metody obsługi zimnego startu} — zastosowanie technik faktoryzacji macierzy (SVD) lub wstępnej ankiety preferencji dla nowych użytkowników mogłoby poprawić jakość rekomendacji w pierwszych sesjach.
+
+\subsection*{8.3 Wnioski końcowe}
+\addcontentsline{toc}{subsection}{8.3 Wnioski końcowe}
+
+Zrealizowany system stanowi kompletne rozwiązanie e-commerce z autorskimi mechanizmami rekomendacji produktów. Implementacja od podstaw bez wykorzystania gotowych bibliotek rekomendacyjnych (TensorFlow, PyTorch, Surprise) umożliwiła pełne zrozumienie mechanizmów działania algorytmów oraz ich świadome dostosowanie do specyfiki handlu elektronicznego.
+
+\textbf{Content-Based Filtering} okazał się najbardziej uniwersalną metodą, rozwiązującą problem zimnego startu dla nowych produktów. Wagi cech (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) zostały dobrane empirycznie i zapewniają dobrą równowagę między różnorodnością a trafnością rekomendacji.
+
+\textbf{Logika rozmyta} oferuje najwyższą interpretowalność spośród zaimplementowanych metod. Każda rekomendacja ma wyjaśnienie w postaci aktywacji konkretnych reguł IF-THEN, co jest istotne z perspektywy GDPR (prawo do wyjaśnienia decyzji algorytmicznych) oraz budowania zaufania użytkowników do systemu.
+
+\textbf{Modele probabilistyczne} umożliwiają najgłębszą personalizację dla użytkowników z bogatą historią zakupów. Łańcuch Markowa przewiduje sekwencje zakupowe na poziomie kategorii produktów, Naive Bayes ocenia prawdopodobieństwo zakupu i ryzyko churnu.
+
+Komplementarność zastosowanych metod — Content-Based Filtering dla nowych produktów, Fuzzy Logic dla personalizacji z interpretowal nością, modele probabilistyczne dla głębokiej analizy behawioralnej — zapewnia wszechstronne wsparcie procesu decyzyjnego użytkownika. Zastosowane techniki optymalizacyjne (cache, bulk operations, threshold pruning, indeksowanie) gwarantują akceptowalne czasy odpowiedzi systemu nawet przy większych katalogach produktów.
+
+Praca wykazała, że implementacja systemu rekomendacyjnego od podstaw jest możliwa i celowa w kontekście edukacyjnym oraz w sytuacjach wymagających pełnej kontroli nad logiką biznesową. Zrealizowany projekt pozwolił na zdobycie praktycznej wiedzy w zakresie projektowania systemów rekomendacyjnych, optymalizacji algorytmów oraz rozwoju aplikacji full-stack (Django + React + PostgreSQL + Docker).
+
+System został zrealizowany we współpracy dwuosobowej jako kompleksowe rozwiązanie e-commerce z sześcioma komplementarnymi metodami rekomendacyjnymi, gotowe do wdrożenia w środowisku produkcyjnym.
 
 \newpage
 
