@@ -1280,6 +1280,26 @@ Dla katalogu 500 produktów:
     \item Po filtrowaniu (próg 0.2): ~4,000 zapisanych rekordów
 \end{itemize}
 
+\textbf{Diagram sekwencji: Content-Based Filtering}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/contentBasedSequenceDiagram.png}
+  \caption{Diagram sekwencji - Content-Based Filtering.}
+  \label{fig:cbf_sequence}
+\end{figure}
+
+Przepływ procesu generowania rekomendacji CBF:
+\begin{enumerate}
+    \item Żądanie użytkownika trafia do API (\texttt{/api/recommendations/content-based/?product\_id=\{id\}})
+    \item Backend (ContentBasedAPI) wykonuje zapytanie do modelu ProductSimilarity
+    \item Model pobiera top 10 podobnych produktów z bazy danych (sortowanie po \texttt{-similarity\_score})
+    \item System sprawdza cache - w przypadku trafienia zwracany jest wynik natychmiast
+    \item Backend zwraca odpowiedź 200 OK z listą rekomendacji (product\_id, name, price, similarity\_score)
+    \item Frontend wyświetla sekcję rekomendacji z podobnymi produktami
+\end{enumerate}
+
+System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i zapisuje wyniki do cache na 5 minut w celu optymalizacji wydajności.
 
 \subsection*{5.2 Logika rozmyta w systemie rekomendacji}
 \addcontentsline{toc}{subsection}{5.2 Logika rozmyta w systemie rekomendacji}
@@ -1616,6 +1636,28 @@ Metoda zwraca słownik z:
     \item \texttt{price\_membership} -- przynależności cenowe (cheap, medium, expensive)
 \end{itemize}
 
+\textbf{Diagram sekwencji: Fuzzy Logic}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/fuzzyLogicSequenceDiagram.png}
+  \caption{Diagram sekwencji - Fuzzy Logic.}
+  \label{fig:fuzzy_sequence}
+\end{figure}
+
+Przepływ procesu generowania rekomendacji Fuzzy Logic:
+\begin{enumerate}
+    \item Żądanie użytkownika trafia do API (\texttt{/api/fuzzy-recommendations/})
+    \item FuzzyLogicEngine buduje rozmyty profil użytkownika z historii zakupów (FuzzyUserProfile)
+    \item Dla każdego produktu system przeprowadza fuzzyfikację (obliczenie przynależności price, quality, popularity)
+    \item Następuje wnioskowanie - ewaluacja 6 reguł IF-THEN i obliczenie aktywacji
+    \item Defuzzyfikacja agreguje wyniki reguł do jednego fuzzy\_score metodą średniej ważonej
+    \item Backend zwraca produkty posortowane po fuzzy\_score wraz z rule\_activations dla transparentności
+    \item System cache'uje wyniki na 5 minut dla optymalizacji wydajności
+\end{enumerate}
+
+Algorytm Fuzzy Logic oferuje najwyższą interpretowalność - użytkownik może zobaczyć aktywację każdej reguły i zrozumieć, dlaczego produkt został polecony.
+
 \subsection*{5.3 Modele probabilistyczne -- Markov Chain i Naive Bayes}
 \addcontentsline{toc}{subsection}{5.3 Modele probabilistyczne -- Markov Chain i Naive Bayes}
 
@@ -1763,8 +1805,6 @@ System trenuje trzy komponenty:
     \item \textbf{Churn NB} -- na cechach użytkowników z etykietami will\_churn / will\_not\_churn
 \end{enumerate}
 
-\newpage
-
 \textbf{Predykcja zintegrowana}:
 
 Algorytm generowania rekomendacji w pseudokodzie:
@@ -1801,8 +1841,6 @@ System udostępnia dwa główne endpointy w \texttt{probabilistic\_views.py}:
     \item Zwraca top 6 produktów z przewidywanych kategorii
     \item Oblicza prawdopodobieństwo zakupu i oczekiwany czas do następnego zamówienia
 \end{itemize}
-
-\newpage
 
 Przykładowa odpowiedź:
 
@@ -1861,6 +1899,28 @@ Przykładowa odpowiedź:
 }
 \end{verbatim}
 
+\textbf{Diagram sekwencji: Probabilistic Models}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/probabilisticMethodsSequenceDiagram.png}
+  \caption{Diagram sekwencji - Probabilistic Models.}
+  \label{fig:prob_sequence}
+\end{figure}
+
+Przepływ procesu generowania rekomendacji probabilistycznych:
+\begin{enumerate}
+    \item Żądanie użytkownika trafia do API (\texttt{/api/markov-recommendations/})
+    \item System trenuje oba modele na aktualnych danych: CustomMarkovChain (macierz przejść między kategoriami) i CustomNaiveBayes (klasyfikatory purchase i churn)
+    \item Markov Chain analizuje ostatnie zamówienie użytkownika i przewiduje następne kategorie zakupów z prawdopodobieństwami
+    \item Naive Bayes oblicza prawdopodobieństwo zakupu (purchase\_probability) oraz ryzyko churnu dla użytkownika
+    \item ProbabilisticRecommendationEngine agreguje wyniki obu modeli (60\% Markov, 40\% NB) i wybiera top K produktów
+    \item Backend zwraca rekomendacje wraz z metadanymi: predicted\_categories, purchase\_probability, expected\_days\_to\_next\_order
+    \item System zapisuje predykcje do tabeli PurchaseProbability dla późniejszej analizy trendów
+\end{enumerate}
+
+Modele probabilistyczne oferują unikalną wartość biznesową: predykcję przyszłych zakupów (Markov) oraz identyfikację użytkowników zagrożonych churnem (Naive Bayes), co umożliwia proaktywne działania marketingowe.
+
 \subsection*{5.4 Podsumowanie implementacji algorytmów}
 \addcontentsline{toc}{subsection}{5.4 Podsumowanie implementacji algorytmów}
 
@@ -1903,8 +1963,8 @@ Panel administracyjny umożliwia dynamiczne przełączanie między metodami reko
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/recomendationSystemAdmin2.png}
-  \caption{Panel zarządzania metodami rekomendacji.}
+  \includegraphics[width=\textwidth]{images/recomendationSystem.png}
+  \caption{Panel wyboru metody rekomendacji.}
   \label{fig:admin_recommendation_settings}
 \end{figure}
 
@@ -2039,7 +2099,7 @@ System oferuje kompleksowe środowisko do testowania i ewaluacji algorytmów rek
     \item \textbf{Dla deweloperów}: Zaawansowane panele debugowania z szczegółowymi informacjami o obliczeniach, aktywacji reguł, wagach i podobieństwach
 \end{itemize}
 
-Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 265 zamówień, generując rekomendacje w czasie rzeczywistym (< 200ms) dla wszystkich trzech algorytmów.
+Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 265 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich trzech algorytmów.
 
 \newpage
 
@@ -2055,7 +2115,7 @@ System został przetestowany na danych z aplikacji e-commerce:
     \item 500 produktów w 48 kategoriach
     \item 20 użytkowników z historią zakupów
     \item 265 zamówień, 569 pozycji (OrderProduct)
-    \item Środowisko: Django 5.1.4, PostgreSQL 14, 8GB RAM, Intel i7
+    \item Środowisko: Django 5.1.4, PostgreSQL 14, 16GB RAM, Intel i7 8750H
 \end{itemize}
 
 Poniższe wyniki wydajnościowe są wartościami orientacyjnymi uzyskanymi w środowisku testowym. Rzeczywiste czasy odpowiedzi mogą się różnić w zależności od obciążenia systemu, konfiguracji serwera oraz rozmiaru katalog produktów.

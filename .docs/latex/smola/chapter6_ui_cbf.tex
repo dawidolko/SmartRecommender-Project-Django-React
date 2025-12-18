@@ -14,7 +14,7 @@ System oferuje zaawansowany panel debugowania dostępny przez endpoint \texttt{/
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug1.jpg}
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug1.png}
   \caption{Panel debugowania Content-Based Filtering.}
   \label{fig:cbf_debug1}
 \end{figure}
@@ -28,12 +28,12 @@ Dla konkretnego produktu panel pokazuje:
     \item Top 10 produktów podobnych z szczegółami obliczeń
     \item Wzór matematyczny dla każdej pary: $\frac{dot\_product}{norm_1 \times norm_2}$
     \item Cechy wspólne między produktami
-    \item Breakdown podobieństwa: ile % z kategorii, ile z tagów, ile z ceny, ile z keywords
+    \item Breakdown podobieństwa: ile procent z kategorii, ile z tagów, ile z ceny, ile z keywords
 \end{itemize}
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug2.jpg}
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug2.png}
   \caption{CBF - szczegółowa analiza podobieństwa produktu.}
   \label{fig:cbf_debug2}
 \end{figure}
@@ -52,39 +52,21 @@ Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/contentBasedAdmin1.jpg}
+  \includegraphics[width=0.92\textwidth]{images/recomendationSystemAdmin1.png}
   \caption{Panel administratora - rekomendacje CBF.}
   \label{fig:cbf_admin}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdmin1.jpg}
+  % DODAĆ ZDJĘCIE ZWIĄZANE Z CBF
   \caption{Panel administratora - rekomendacje Fuzzy Logic.}
   \label{fig:fuzzy_admin}
 \end{figure}
 
 Porównanie rysunków \ref{fig:cbf_admin} i \ref{fig:fuzzy_admin} demonstruje kluczową różnicę między metodami: przełączenie algorytmu z Content-Based Filtering na Fuzzy Logic powoduje natychmiastową zmianę rekomendowanych produktów. CBF poleca produkty o podobnych cechach (kategoria, tagi, cena), podczas gdy Fuzzy Logic uwzględnia dodatkowo rozmyty profil użytkownika i reguły wnioskowania.
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{images/contentBasedSequenceDiagram.png}
-  \caption{Diagram sekwencji - Content-Based Filtering.}
-  \label{fig:cbf_sequence}
-\end{figure}
-
-Proces generowania rekomendacji CBF przebiega następująco:
-\begin{enumerate}
-    \item Klient przegląda produkt na stronie ProductPage
-    \item Frontend wysyła żądanie GET do \newline
-    \texttt{/api/recommendations/content-based/?product\_id=\{id\}}
-    \item Backend (ContentBasedAPI) wykonuje zapytanie do modelu ProductSimilarity
-    \item Model pobiera top 10 podobnych produktów z bazy danych (sortowanie po \texttt{-similarity\_score})
-    \item Backend zwraca odpowiedź 200 OK z listą rekomendacji (product\_id, name, price, similarity\_score)
-    \item Frontend wyświetla sekcję "Podobne produkty" na stronie produktu
-\end{enumerate}
-
-Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik może zobaczyć produkty podobne do swoich poprzednich zakupów. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji.
+Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik może zobaczyć produkty podobne do swoich poprzednich zakupów. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji. Szczegółowy opis przepływu danych w systemie CBF przedstawiono w rozdziale 5.1.
 
 \newpage
 
