@@ -34,68 +34,6 @@ Panel debugowania dostępny przez endpoint \texttt{/api/fuzzy-debug/} prezentuje
   \label{fig:fuzzy_debug2}
 \end{figure}
 
-\textbf{Przykładowe dane z panelu debugowania}:
-
-\begin{verbatim}
-Algorithm: Fuzzy Logic Inference System (Mamdani-style)
-Description: System rekomendacji oparty na logice rozmytej
-z uproszczona defuzzyfikacja
-
-User Profile:
-- User: admin2 (ID: 2)
-- Profile Type: authenticated
-- Price Sensitivity: 0.6 - Medium
-- Tracked Categories: 26
-
-Category Interests:
-- wearables.watches: 0.132
-- networking.networkCards: 0.093
-- peripherals.microphones: 0.066
-- monitoring.cameras: 0.06
-- gadgets: 0.06
-
-Membership Functions:
-Price Functions:
-- CHEAP: μ = 1.0 dla ceny ≤ 100 PLN, spada do 0 przy 500 PLN
-- MEDIUM: μ = 1.0 dla ceny 500-1200 PLN
-- EXPENSIVE: μ = 1.0 dla ceny ≥ 2000 PLN
-\end{verbatim}
-
-\textbf{Przykład fuzzyfikacji produktu} (AMD Ryzen 9 7900X, cena: 400 PLN, rating: 3, views: 1):
-
-\begin{verbatim}
-Selected Product:
-- ID: 96
-- Name: AMD Ryzen 9 7900X
-- Price: 400 PLN
-- Rating: 3
-- View Count: 1
-- Categories: components.processors
-
-Fuzzification - Membership Degrees:
-Price: 400 PLN
-- Cheap: μ = 0.25
-- Medium: μ = 0.5
-- Expensive: μ = 0
-- Dominant: MEDIUM
-
-Quality: 3
-- Low: μ = 0.5
-- Medium: μ = 0.5
-- High: μ = 0
-- Dominant: LOW
-
-Popularity: 1 views
-- Low: μ = 1
-- Medium: μ = 0
-- High: μ = 0
-- Dominant: LOW
-
-Category Matching:
-- Max Match: 0.394
-- components.processors: 0.394
-\end{verbatim}
-
 \subsubsection*{6.3.2 Interfejs użytkownika - rekomendacje Fuzzy Logic}
 
 \begin{figure}[h!]

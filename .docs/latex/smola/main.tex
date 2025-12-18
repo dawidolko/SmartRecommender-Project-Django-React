@@ -1013,7 +1013,14 @@ Rysunek \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje
   \label{fig:erd2}
 \end{figure}
 
-Rysunek \ref{fig:erd2} pokazuje tabele algorytmów ML. System wykorzystuje dedykowane tabele do przechowywania wyników rekomendacji trzech zaimplementowanych metod.
+Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
+
+\begin{itemize}
+\item \textbf{method\_product\_similarity} - macierz podobieństw Content-Based Filtering (CBF) przechowująca similarity\_score między produktami,
+\item \textbf{method\_user\_product\_recommendation} - cache spersonalizowanych rekomendacji użytkownika dla wszystkich algorytmów,
+\item \textbf{method\_recommendation\_settings} - ustawienia aktywnego algorytmu rekomendacyjnego (CBF, Fuzzy Logic, Collaborative Filtering),
+\item \textbf{method\_purchase\_probability} - predykcje prawdopodobieństwa zakupu obliczone przez klasyfikator Naive Bayes.
+\end{itemize}
 
 \subsection*{4.5 Deployment i konteneryzacja Docker}
 \addcontentsline{toc}{subsection}{4.5 Deployment i konteneryzacja Docker}
@@ -1065,6 +1072,18 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 \item \textbf{Skalowalność} - możliwość uruchomienia wielu instancji backendu dla równoważenia obciążenia.
 \end{itemize}
 
+\subsection*{4.6 Podsumowanie stosu technologicznego}
+\addcontentsline{toc}{subsection}{4.6 Podsumowanie stosu technologicznego}
+
+Wybrane technologie (Django + React + PostgreSQL + Docker) tworzą nowoczesny, skalowalny i łatwy w utrzymaniu stos technologiczny. Kluczowe zalety:
+
+\begin{itemize}
+\item \textbf{Separacja kontynerów} - wyraźny podział frontend/backend/baza danych zapewnia modułowość i łatwość utrzymania,
+\item \textbf{Wydajność implementacji} - narzędzia (Django ORM, React Hooks, Docker Compose) przyspieszają rozwój aplikacji bez utraty kontroli nad algorytmami,
+\item \textbf{Wsparcie społeczności} - aktywna społeczność, obszerna dokumentacja oraz bogate ekosystemy bibliotek (Django REST Framework, React ecosystem),
+\item \textbf{Optymalizacja wydajności} - cache, indeksy bazodanowe, operacje wektorowe NumPy oraz threshold pruning zapewniają szybki czas odpowiedzi nawet dla dużych katalogów produktów.
+\end{itemize}
+
 \newpage
 
 \section*{Rozdzia\l{} 5}
@@ -1078,12 +1097,15 @@ Niniejszy rozdział opisuje szczegółowo implementację trzech metod rekomendac
 
 \subsubsection*{5.1.1 Architektura systemu CBF}
 
-System Content-Based Filtering został zaimplementowany w klasie \texttt{CustomContentBasedFilter} w pliku \texttt{custom\_recommendation\_engine.py}. Architektura składa się z trzech głównych komponentów:
+System Content-Based Filtering został zaimplementowany w klasie \\
+\texttt{CustomContentBasedFilter} w pliku \texttt{custom\_recommendation\_engine.py}. \\
+Architektura składa się z trzech głównych komponentów:
 
 \textbf{1. Ekstraktor cech} (Feature Extractor) -- odpowiada za budowę ważonego wektora cech dla każdego produktu. Analizuje cztery źródła danych:
 
 \begin{itemize}
-    \item \textbf{Kategorie} (waga 40\%) -- główna klasyfikacja produktu. Format cechy: \texttt{category\_\{nazwa\}}. Przykład: \texttt{category\_Electronics}, \texttt{category\_Laptops}.
+    \item \textbf{Kategorie} (waga 40\%) -- główna klasyfikacja produktu. Format cechy: \\
+    \texttt{category\_\{nazwa\}}. Przykład: \texttt{category\_Electronics}, \texttt{category\_Laptops}.
     \item \textbf{Tagi} (waga 30\%) -- dodatkowe deskryptory (np. "Gaming", "Premium", "Budget"). Format: \texttt{tag\_\{nazwa\}}.
     \item \textbf{Przedział cenowy} (waga 20\%) -- dyskretyzacja ceny: low (<100 PLN), medium (100-500), high (500-1500), premium (>1500).
     \item \textbf{Słowa kluczowe} (waga 10\%) -- top 10 słów z opisu produktu po filtracji stop-words.
@@ -1284,6 +1306,8 @@ System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_e
 
 \textbf{3. SimpleFuzzyInference} -- silnik wnioskowania Mamdani z 6 regułami IF-THEN i metodą defuzzyfikacji średniej ważonej.
 
+\medskip
+
 \textbf{Przepływ danych}:
 
 \begin{enumerate}
@@ -1342,33 +1366,74 @@ Interpretacja: Przedział $[500, 1200]$ ma pełną przynależność. Przejścia 
 \end{cases}
 \end{equation}
 
+\bigskip
+
 \textbf{Funkcje przynależności dla jakości (rating)}
 
 Oparte na średniej ocenie produktu (skala 1-5):
 
-\begin{itemize}
-    \item \textbf{low}: pełna przynależność dla rating $\leq 2.0$, zanika do 0 przy rating = 3.0
-    \item \textbf{medium}: trapezoid z pełną przynależnością dla $[3.0, 4.0]$
-    \item \textbf{high}: wzrasta od rating = 3.5, pełna przynależność dla rating $\geq 4.5$
-\end{itemize}
+\begin{equation}
+\mu_{\text{low}}(r) =
+\begin{cases}
+1.0, & r \leq 2.5 \\
+\frac{3.5 - r}{3.5 - 2.5}, & 2.5 < r < 3.5 \\
+0.0, & r \geq 3.5
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mu_{\text{medium}}(r) =
+\begin{cases}
+0.0, & r < 2.5 \\
+\frac{r - 2.5}{3.5 - 2.5}, & 2.5 \leq r < 3.5 \\
+1.0, & r = 3.5 \\
+\frac{4.5 - r}{4.5 - 3.5}, & 3.5 < r < 4.5 \\
+0.0, & r \geq 4.5
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mu_{\text{high}}(r) =
+\begin{cases}
+0.0, & r < 3.5 \\
+\frac{r - 3.5}{4.5 - 3.5}, & 3.5 \leq r < 4.5 \\
+1.0, & r \geq 4.5
+\end{cases}
+\end{equation}
+
+\bigskip
 
 \textbf{Funkcje przynależności dla popularności (order\_count)}
 
 Oparte na liczbie zamówień produktu:
 
-\begin{itemize}
-    \item \textbf{low}: produkty z $\leq 2$ zamówieniami (nowości, niszowe)
-    \item \textbf{medium}: produkty z 3-20 zamówieniami (standardowe)
-    \item \textbf{high}: produkty z $> 20$ zamówieniami (bestsellery)
-\end{itemize}
+\begin{equation}
+\mu_{\text{low}}(v) =
+\begin{cases}
+1.0, & v \leq 2 \\
+\frac{10 - v}{10 - 2}, & 2 < v < 10 \\
+0.0, & v \geq 10
+\end{cases}
+\end{equation}
 
-\textbf{Definicje funkcji przynależności dla ceny}:
+\begin{equation}
+\mu_{\text{medium}}(v) =
+\begin{cases}
+0.0, & v < 2 \\
+1.0, & 2 \leq v \leq 10 \\
+\frac{30 - v}{30 - 10}, & 10 < v < 30 \\
+0.0, & v \geq 30
+\end{cases}
+\end{equation}
 
-Funkcja \textbf{cheap} (trójkątna): $\mu = 1.0$ dla ceny $\leq 100$ PLN, liniowy spadek do $\mu = 0$ przy 500 PLN.
-
-Funkcja \textbf{medium} (trapezoidalna): $\mu = 0$ dla ceny $< 300$ PLN, wzrost do $\mu = 1.0$ w przedziale 300-500 PLN, plateau $\mu = 1.0$ w przedziale 500-1200 PLN, spadek do $\mu = 0$ przy 1500 PLN.
-
-Funkcja \textbf{expensive} (trójkątna): $\mu = 0$ dla ceny $\leq 1000$ PLN, liniowy wzrost do $\mu = 1.0$ przy 2000 PLN i powyżej.
+\begin{equation}
+\mu_{\text{high}}(v) =
+\begin{cases}
+0.0, & v < 10 \\
+\frac{v - 10}{30 - 10}, & 10 \leq v < 30 \\
+1.0, & v \geq 30
+\end{cases}
+\end{equation}
 
 \subsubsection*{5.2.3 Rozmyty profil użytkownika}
 
@@ -1428,6 +1493,8 @@ Dla użytkowników bez historii zakupów system stosuje neutralny profil domyśl
 
 System wykorzystuje 6 reguł rozmytych typu Mamdani. Każda reguła ma formę IF-THEN z przypisaną wagą określającą jej ważność:
 
+\medskip
+
 \textbf{R1: High Quality Bargain} (waga: 0.9)
 
 \begin{lstlisting}[style=pseudocode]
@@ -1436,6 +1503,8 @@ WTEDY recommendation JEST strong
 \end{lstlisting}
 
 Logika: Wysokiej jakości produkt w rozsądnej cenie to doskonała okazja. Najwyższa waga -- ta reguła najsilniej wpływa na wynik.
+
+\medskip
 
 \textbf{R2: Popular in Category} (waga: 0.7)
 
@@ -1446,6 +1515,8 @@ WTEDY recommendation JEST medium-high
 
 Logika: Popularny produkt z kategorii interesującej użytkownika. Popularność = walidacja społeczna.
 
+\medskip
+
 \textbf{R3: Price Sensitive Match} (waga: 0.6)
 
 \begin{lstlisting}[style=pseudocode]
@@ -1454,6 +1525,8 @@ WTEDY recommendation JEST moderate
 \end{lstlisting}
 
 Logika: Dla użytkowników wrażliwych cenowo (kupujących tanie produkty) promuj tanie opcje.
+
+\medskip
 
 \textbf{R4: Category Quality Match} (waga: 0.85)
 
@@ -1464,6 +1537,8 @@ WTEDY recommendation JEST strong
 
 Logika: Dopasowanie do kategorii + dobra jakość. Wysoka waga -- dopasowanie kategorii jest istotne.
 
+\medskip
+
 \textbf{R5: Premium Match} (waga: 0.8)
 
 \begin{lstlisting}[style=pseudocode]
@@ -1472,6 +1547,8 @@ WTEDY recommendation JEST strong
 \end{lstlisting}
 
 Logika: Dla użytkowników premium (nieczułych cenowo) promuj drogie produkty wysokiej jakości.
+
+\newpage
 
 \textbf{R6: Quality-Price Balance} (waga: 0.75)
 
@@ -1507,9 +1584,11 @@ Każda reguła jest ewaluowana za pomocą T-normy (minimum) dla operatora AND i 
 
 Dla każdej z 6 reguł obliczana jest jej aktywacja $\alpha_i$ poprzez aplikację odpowiednich operatorów rozmytych do wartości przynależności.
 
+\bigskip
+
 \textbf{Krok 3: Agregacja}
 
-Wyniki reguł są agregowane. W uproszczonej implementacji używam sumy ważonej (zamiast pełnej agregacji Mamdani):
+Wyniki reguł są agregowane. W uproszczonej implementacji wykorzystana została suma ważona (zamiast pełnej agregacji Mamdani):
 
 \begin{equation}
 \text{aggregated} = \sum_{i=1}^{6} \alpha_i
@@ -1553,6 +1632,8 @@ System probabilistyczny składa się z trzech komponentów zaimplementowanych w 
 \end{itemize}
 
 \textbf{3. ProbabilisticRecommendationEngine} -- silnik łączący oba modele w jeden system rekomendacji z wagami: Markov (60\%) + Naive Bayes (40\%).
+
+\medskip
 
 \textbf{Przepływ danych}:
 
@@ -1608,6 +1689,8 @@ Algorytm oblicza rozkład stacjonarny poprzez sumowanie liczby przejść do każ
 \subsubsection*{5.3.3 Naiwny klasyfikator Bayesa}
 
 Klasa \texttt{CustomNaiveBayes} implementuje multinomialny Naive Bayes z wygładzaniem Laplace'a.
+
+\medskip
 
 \textbf{Cechy użytkownika} (features):
 
@@ -1680,6 +1763,8 @@ System trenuje trzy komponenty:
     \item \textbf{Churn NB} -- na cechach użytkowników z etykietami will\_churn / will\_not\_churn
 \end{enumerate}
 
+\newpage
+
 \textbf{Predykcja zintegrowana}:
 
 Algorytm generowania rekomendacji w pseudokodzie:
@@ -1716,6 +1801,8 @@ System udostępnia dwa główne endpointy w \texttt{probabilistic\_views.py}:
     \item Zwraca top 6 produktów z przewidywanych kategorii
     \item Oblicza prawdopodobieństwo zakupu i oczekiwany czas do następnego zamówienia
 \end{itemize}
+
+\newpage
 
 Przykładowa odpowiedź:
 
@@ -1783,7 +1870,7 @@ W niniejszym rozdziale przedstawiono szczegółową implementację trzech metod 
 
 \textbf{Fuzzy Logic} -- system rozmytego wnioskowania Mamdani z 6 regułami IF-THEN, uwzględniający czynniki ceny, jakości i popularności. Algorytm buduje rozmyty profil użytkownika na podstawie historii zakupów i generuje spersonalizowane rekomendacje z wyjaśnieniem aktywacji reguł.
 
-\textbf{Modele probabilistyczne} -- łańcuch Markowa pierwszego rzędu (predykcja sekwencji zakupowych kategorii) oraz klasyfikator Naive Bayes (prawdopodobieństwo zakupu i churn). System wykorzystuje historię 265 zamówień do budowy macierzy przejść i modeli predykcyjnych.
+\textbf{Modele probabilistyczne} -- łańcuch Markowa pierwszego rzędu (predykcja sekwencji zakupowych kategorii) oraz klasyfikator Naive Bayes (prawdopodobieństwo zakupu i churn). System wykorzystuje historię zamówień do budowy macierzy przejść i modeli predykcyjnych.
 
 Wszystkie trzy metody zostały zintegrowane z systemem Django/React, oferują API REST oraz zaawansowane panele debugowania dla administratorów. Praktyczne funkcjonowanie systemu, interfejsy użytkownika oraz wyniki ewaluacji zostały przedstawione w kolejnych rozdziałach.
 
@@ -1823,6 +1910,8 @@ Panel administracyjny umożliwia dynamiczne przełączanie między metodami reko
 
 Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z opcjami metod rekomendacyjnych. Administrator może wybrać aktywny algorytm, który będzie wykorzystywany we wszystkich sekcjach rekomendacji na stronie głównej. System zawiera łącznie sześć metod rekomendacyjnych zaimplementowanych w ramach dwóch prac inżynierskich.
 
+\medskip
+
 \textbf{Zaimplementowane metody rekomendacyjne:}
 
 \begin{itemize}
@@ -1831,7 +1920,7 @@ Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z
 \item \textbf{Probabilistic Methods (Markov + Naive Bayes)} - łańcuch Markowa przewiduje sekwencje zakupowe kategorii, Naive Bayes ocenia prawdopodobieństwo zakupu i churn. Najgłębsza personalizacja.
 \end{itemize}
 
-Zmiana metody następuje natychmiast po zapisaniu ustawień i wpływa na wszystkie sekcje rekomendacji w aplikacji. Użytkownik może również wybrać tryb hybrydowy, w którym system wykorzystuje kilka metod równolegle do generowania bardziej zróżnicowanych rekomendacji.
+Zmiana metody następuje natychmiast po zapisaniu ustawień i wpływa na wszystkie sekcje rekomendacji w aplikacji. 
 
 \subsection*{6.3 Content-Based Filtering w praktyce}
 \addcontentsline{toc}{subsection}{6.3 Content-Based Filtering w praktyce}
@@ -2187,8 +2276,8 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 \newpage
 
 % Wykaz rysunków
-\section*{Wykaz ilustracji, rysunków i tabel}
-\addcontentsline{toc}{section}{Wykaz ilustracji, rysunków i tabel}
+\section*{Wykaz rysunków i tabel}
+\addcontentsline{toc}{section}{Wykaz rysunków i tabel}
 \small
 \listoffigures
 
