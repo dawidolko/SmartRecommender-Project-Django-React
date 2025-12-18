@@ -1,5 +1,3 @@
-% filepath: /SmartRecommender-Project-Django-React/.docs/latex/smola/main.tex
-
 \documentclass[a4paper,12pt,twoside]{article}
 
 \usepackage[utf8]{inputenc}
@@ -2076,7 +2074,7 @@ Rysunek \ref{fig:fuzzy_client} przedstawia główny widok rekomendacji Fuzzy Log
     \item \textbf{View Rule Activations}: niebieski przycisk umożliwiający podgląd szczegółowej aktywacji wszystkich 6 reguł IF-THEN dla danego produktu wraz z wyjaśnieniem, dlaczego produkt został polecony
 \end{itemize}
 
-Wszystkie produkty mają podobny Fuzzy Score (~53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (~62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika.
+Wszystkie pokazane produkty mają podobny Fuzzy Score (53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika.
 
 \medskip
 
@@ -2494,6 +2492,8 @@ Personalizacja & Słaba & Średnia & Wysoka \\
 
 Każda metoda ma swoje zalety i ograniczenia. CBF rozwiązuje problem zimnego startu dla nowych produktów, Fuzzy Logic oferuje najwyższą interpretowalność, a modele probabilistyczne zapewniają najgłębszą personalizację dla użytkowników z bogatą historią zakupów.
 
+\newpage
+
 \subsection*{7.6 Wnioski}
 \addcontentsline{toc}{subsection}{7.6 Wnioski}
 
@@ -2624,10 +2624,17 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 \newpage
 
 % Wykaz rysunków
-\section*{Wykaz rysunków}
-\addcontentsline{toc}{section}{Wykaz rysunków}
+\section*{Wykaz rysunków i tabel}
+\addcontentsline{toc}{section}{Wykaz rysunków i tabel}
 \small
 \listoffigures
+
+% Spis tabel
+{
+\addcontentsline{toc}{section}{Spis tabel}
+\small
+\listoftables
+}
 
 \newpage
 
@@ -2638,6 +2645,7 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 \textbf{Tytuł pracy w języku polskim:}\\
 System rekomendacji produktów wykorzystujący filtrację opartą na treści, logikę rozmytą i modele probabilistyczne
 
+\noindent
 \textbf{Tytuł pracy w języku angielskim:}\\
 Product Recommendation System Utilizing Content-Based Filtering, Fuzzy Logic, and Probabilistic Models
 
