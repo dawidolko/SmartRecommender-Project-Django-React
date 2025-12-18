@@ -46,25 +46,22 @@ Panel umożliwia administratorowi:
     \item Ręczne wyzwalanie przeliczenia macierzy
 \end{itemize}
 
+\newpage
+
 \subsubsection*{6.2.2 Interfejs użytkownika - sortowanie według CBF}
 
 Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania produktów na stronie głównej sklepu. Administrator może wybrać algorytm CBF w ustawieniach systemu rekomendacji, co powoduje wyświetlanie produktów podobnych do tych, które użytkownik wcześniej przeglądał lub kupił.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/recomendationSystemAdmin1.png}
-  \caption{Panel administratora - rekomendacje CBF.}
-  \label{fig:cbf_admin}
+  \includegraphics[width=0.92\textwidth]{images/recomendationSystem.png}
+  \caption{Rekomendacje Content-Based Filtering wyświetlane użytkownikowi na stronie głównej.}
+  \label{fig:cbf_recommendations}
 \end{figure}
 
-\begin{figure}[h!]
-  \centering
-  % DODAĆ ZDJĘCIE ZWIĄZANE Z CBF
-  \caption{Panel administratora - rekomendacje Fuzzy Logic.}
-  \label{fig:fuzzy_admin}
-\end{figure}
+\newpage
 
-Porównanie rysunków \ref{fig:cbf_admin} i \ref{fig:fuzzy_admin} demonstruje kluczową różnicę między metodami: przełączenie algorytmu z Content-Based Filtering na Fuzzy Logic powoduje natychmiastową zmianę rekomendowanych produktów. CBF poleca produkty o podobnych cechach (kategoria, tagi, cena), podczas gdy Fuzzy Logic uwzględnia dodatkowo rozmyty profil użytkownika i reguły wnioskowania.
+Rysunek \ref{fig:cbf_recommendations} przedstawia sekcję "Recommended For You (Content-Based)" wyświetlaną na stronie głównej aplikacji po wyborze algorytmu CBF przez administratora. System prezentuje 4 produkty podobne do wcześniej przeglądanych lub zakupionych artykułów, wybrane na podstawie analizy cech (kategoria, tagi, cena, słowa kluczowe). Każdy produkt zawiera zdjęcie, nazwę, cenę oraz przycisk dodania do koszyka.
 
 Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik może zobaczyć produkty podobne do swoich poprzednich zakupów. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji. Szczegółowy opis przepływu danych w systemie CBF przedstawiono w rozdziale 5.1.
 

@@ -36,7 +36,11 @@ Panel debugowania dostępny przez endpoint \texttt{/api/fuzzy-debug/} prezentuje
 
 \subsubsection*{6.3.2 Interfejs użytkownika - rekomendacje Fuzzy Logic}
 
-Rekomendacje oparte na logice rozmytej są prezentowane użytkownikowi w panelu klienta w sekcji "Recommended For You (Fuzzy Logic)". System wyświetla wykres kołowy przedstawiający rozkład kategorii w historii zakupów użytkownika oraz listę rekomendowanych produktów. Szczegółowy opis przepływu danych w systemie Fuzzy Logic przedstawiono w rozdziale 5.2.
+System Fuzzy Logic jest dostępny dla użytkowników w dedykowanej zakładce panelu klienta. Interfejs składa się z trzech podzakładek: "Fuzzy Recommendations" (rekomendacje produktów), "User Profile" (profil użytkownika) oraz "Fuzzy Rules" (reguły wnioskowania). Szczegółowy opis przepływu danych w systemie Fuzzy Logic przedstawiono w rozdziale 5.2.
+
+\newpage
+
+\textbf{Zakładka "Fuzzy Recommendations"}
 
 \begin{figure}[h!]
   \centering
@@ -45,51 +49,109 @@ Rekomendacje oparte na logice rozmytej są prezentowane użytkownikowi w panelu 
   \label{fig:fuzzy_client}
 \end{figure}
 
-Wykres "Category Distribution" pokazuje procentowy udział kategorii w historii zakupów użytkownika (np. electronics.phones, accessories.powerBanks, wearables.watches, peripherals.printers, office.accessories). Na podstawie tych danych system buduje rozmyty profil użytkownika i generuje spersonalizowane rekomendacje.
+Rysunek \ref{fig:fuzzy_client} przedstawia główny widok rekomendacji Fuzzy Logic. U góry strony znajdują się trzy zakładki nawigacyjne: "Fuzzy Recommendations", "User Profile" oraz "Fuzzy Rules", umożliwiające przełączanie między widokami. Sekcja "Recommended Products" wyświetla 4 produkty wybrane przez silnik wnioskowania rozmytego Mamdani. Każdy produkt zawiera:
 
-Sekcja "Recommended For You (Fuzzy Logic)" prezentuje produkty z najwyższym wynikiem fuzzy\_score, uwzględniając:
 \begin{itemize}
-    \item Dopasowanie do kategorii zainteresowań użytkownika
-    \item Wrażliwość cenową użytkownika
-    \item Jakość produktu (rating)
-    \item Popularność produktu (view\_count)
+    \item \textbf{Fuzzy Score}: całkowity wynik rekomendacji wyrażony w procentach (np. 53.9\%, 53.7\%, 53.6\%) - wynik agregacji wszystkich 6 reguł rozmytych z uwzględnieniem ich wag (suma ważona aktywacji reguł)
+    \item \textbf{Category Match}: stopień dopasowania kategorii produktu do ulubionych kategorii użytkownika wyrażony w procentach (np. 63.3\%, 62.6\%, 62.4\%)
+    \item \textbf{View Rule Activations}: niebieski przycisk umożliwiający podgląd szczegółowej aktywacji wszystkich 6 reguł IF-THEN dla danego produktu wraz z wyjaśnieniem, dlaczego produkt został polecony
 \end{itemize}
+
+System prezentuje przykładowe rekomendacje z interfejsu:
+\begin{itemize}
+    \item Baseus Magnetic Mini Wireless Charging 20W 20000mAh 2x MagSafe (\$69.99): Fuzzy Score 53.9\%, Category Match 63.3\%
+    \item TP-Link Archer T3U Plus (1300Mb/s a/b/g/n/ac) DualBand (\$24.99): Fuzzy Score 53.7\%, Category Match 62.6\%
+    \item UGREEN Power Strip 65W USB/USB C + 3x AC Outlets CD268 (\$49.99): Fuzzy Score 53.6\%, Category Match 62.4\%
+    \item Hama Premium Surge Protector - 4 Sockets, 1.5m (\$39.99): Fuzzy Score 53.6\%, Category Match 62.4\%
+\end{itemize}
+
+Wszystkie produkty mają podobny Fuzzy Score (~53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (~62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika.
+
+\medskip
+
+\textbf{Zakładka "User Profile"}
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient2.png}
-  \caption{Zakładka "Fuzzy Recommendations".}
+  \caption{Profil użytkownika Fuzzy Logic.}
   \label{fig:fuzzy_client2}
 \end{figure}
 
-Zakładka "Fuzzy Recommendations" wyświetla produkty wraz z:
+Zakładka "User Profile" (Rysunek \ref{fig:fuzzy_client2}) prezentuje rozmyty profil użytkownika zbudowany przez klasę \texttt{FuzzyUserProfile} na podstawie historii zakupów. Profil jest wykorzystywany przez system wnioskowania Mamdani do obliczania spersonalizowanych rekomendacji. Wyświetlane informacje:
+
 \begin{itemize}
-    \item \textbf{Fuzzy Score}: całkowity wynik rekomendacji (np. 58.1\%, 56.3\%)
-    \item \textbf{Category Match}: stopień dopasowania kategorii do preferencji użytkownika (np. 65.9\%, 60.6\%)
-    \item \textbf{View Rule Activations}: przycisk do podglądu aktywacji wszystkich 6 reguł rozmytych
+    \item \textbf{Profile Type}: typ profilu użytkownika\\
+    -- \textit{authenticated} - użytkownik zalogowany z pełną historią zakupów (jak na zrzucie ekranu)\\
+    -- \textit{guest} - użytkownik bez historii zakupów (profil domyślny z globalnych statystyk)
+
+    \item \textbf{Price Sensitivity}: wrażliwość cenowa użytkownika wyrażona w procentach\\
+    -- Przykład: 60\% oznacza umiarkowaną wrażliwość cenową ("Moderate price sensitivity")\\
+    -- Wartość obliczana na podstawie średniej ceny zakupionych produktów względem średniej w systemie\\
+    -- Wpływa na aktywację reguł R3 (Price Sensitive Match) i R5 (Premium Match)
+
+    \item \textbf{Favorite Categories}: lista ulubionych kategorii produktowych z procentowym udziałem w historii zakupów\\
+    Przykład z interfejsu:\\
+    -- \texttt{components.graphics} 13\% (karty graficzne)\\
+    -- \texttt{accessories.powerBanks} 8\% (powerbanki)\\
+    -- \texttt{networking.networkCards} 7\% (karty sieciowe)\\
+    -- \texttt{power.strips} 6\% (listwy zasilające)\\
+    -- \texttt{components.cases} 5\% (obudowy komputerowe)
 \end{itemize}
 
-Przykładowe rekomendacje z interfejsu:
-\begin{itemize}
-    \item Motorola edge 40 neo 5G (\$549.99): Fuzzy Score 58.1\%, Category Match 65.9\%
-    \item Apple iPad Air 11" M2 (\$749.99): Fuzzy Score 56.3\%, Category Match 60.6\%
-    \item Roborock Q8 Max+ White (\$649.99): Fuzzy Score 56.3\%, Category Match 60.6\%
-    \item JoyRoom Powerbank 10000mAh (\$49.99): Fuzzy Score 54.3\%, Category Match 64.3\%
-\end{itemize}
+System automatycznie aktualizuje profil po każdym nowym zamówieniu użytkownika, co pozwala na dynamiczną adaptację rekomendacji do zmieniających się preferencji. Kategorie są zapisywane w formacie hierarchicznym (kategoria\_główna.podkategoria) i przechowywane w polu JSON modelu \texttt{RecommendationSettings}.
+
+\medskip
+
+\textbf{Zakładka "Fuzzy Rules"}
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient3.png}
-  \caption{Zakładka "Your Fuzzy User Profile".}
+  \caption{Reguły wnioskowania Fuzzy Logic.}
   \label{fig:fuzzy_client3}
 \end{figure}
 
-Zakładka ``Your Fuzzy User Profile'' (Rysunek \ref{fig:fuzzy_client3}) prezentuje rozmyty profil użytkownika zbudowany na podstawie historii zakupów:
+Zakładka "Fuzzy Rules" (Rysunek \ref{fig:fuzzy_client3}) prezentuje szczegółowy opis 6 reguł wnioskowania IF-THEN wykorzystywanych przez system Mamdani. Strona wyświetla nagłówek "How Recommendations Are Made" oraz wyjaśnienie: "Our system uses 6 intelligent rules to find the best products for you. Each rule looks at different aspects like price, quality, and category match." Każda reguła jest opisana w zrozumiały dla użytkownika sposób:
+
 \begin{itemize}
-    \item \textbf{Profile Type}: typ profilu (authenticated/guest)
-    \item \textbf{Price Sensitivity}: wrażliwość cenowa w procentach (np. 60\%)
-    \item \textbf{Favorite Categories}: ulubione kategorie z wagami zainteresowania
+    \item \textbf{Rule 1 - R1: High Quality Bargain}\\
+    \textit{"Products with excellent ratings at reasonable prices get high recommendations"}\\
+    Warunek: IF quality is HIGH AND (price is CHEAP OR MEDIUM)\\
+    THEN recommendation degree is HIGH (weight: 0.9)\\
+    Interpretacja: Produkty wysokiej jakości w atrakcyjnej cenie otrzymują najwyższą wagę rekomendacji
+
+    \item \textbf{Rule 2 - R2: Popular in Category}\\
+    \textit{"Trending products in categories the user likes"}\\
+    Warunek: IF category matches user interest AND product is HIGHLY POPULAR\\
+    THEN recommendation degree is MEDIUM-HIGH (weight: 0.7)\\
+    Interpretacja: Popularne produkty z ulubionych kategorii użytkownika
+
+    \item \textbf{Rule 3 - R3: Price Sensitive Match}\\
+    \textit{"Budget-conscious users get cheap product recommendations boosted"}\\
+    Warunek: IF user is PRICE SENSITIVE AND product is CHEAP\\
+    THEN boost recommendation (weight: 0.6)\\
+    Interpretacja: Użytkownicy wrażliwi cenowo otrzymują wzmocnione rekomendacje tanich produktów
+
+    \item \textbf{Rule 4 - R4: Category Quality Match}\\
+    \textit{"Good quality products in preferred categories"}\\
+    Warunek: IF category matches strongly AND quality is MEDIUM-HIGH\\
+    THEN recommendation degree is HIGH (weight: 0.85)\\
+    Interpretacja: Wysokiej jakości produkty z preferowanych kategorii użytkownika
+
+    \item \textbf{Rule 5 - R5: Premium Match}\\
+    \textit{"Premium users get expensive high-quality products boosted"}\\
+    Warunek: IF user is NOT price sensitive AND product is EXPENSIVE AND quality is HIGH\\
+    THEN boost recommendation (weight: 0.8)\\
+    Interpretacja: Użytkownicy premium (niewrażliwi cenowo) otrzymują wzmocnione rekomendacje drogich produktów wysokiej jakości
+
+    \item \textbf{Rule 6 - R6: Budget-Friendly Popular}\\
+    Warunek: IF product is CHEAP AND POPULAR\\
+    THEN boost recommendation (weight: 0.75)\\
+    Interpretacja: Tanie i popularne produkty dla użytkowników wrażliwych cenowo
 \end{itemize}
+
+System używa tych reguł do obliczenia końcowego Fuzzy Score dla każdego produktu zgodnie ze wzorem agregacji przedstawionym w rozdziale 5.2.5. Wagi reguł (0.6-0.9) określają ich wpływ na ostateczną rekomendację - reguła R1 (0.9) ma największy wpływ, podczas gdy R3 (0.6) najmniejszy. Przycisk "View Rule Activations" w zakładce "Fuzzy Recommendations" pokazuje, które reguły zostały aktywowane dla konkretnego produktu, z jaką siłą (stopień aktywacji $\alpha_i$) oraz jaki był ich wkład w końcowy wynik.
 
 \subsubsection*{6.3.3 Wyszukiwanie rozmyte (Fuzzy Search)}
 
@@ -117,7 +179,7 @@ lev(tail(a), tail(b))
 \end{cases}
 \end{equation}
 
-System wyszukiwania rozmytego zwraca produkty, dla których odległość Levensteina między zapytaniem a nazwą produktu jest mniejsza niż ustalony próg (domyślnie 3).
+System wyszukiwania rozmytego zwraca produkty, dla których odległość Levensteina między zapytaniem a nazwą produktu jest mniejsza niż ustalony próg (domyślnie 0.5).
 
 \newpage
 

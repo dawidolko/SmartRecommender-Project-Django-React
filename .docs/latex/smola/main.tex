@@ -218,6 +218,8 @@ gdzie $f_i$ to waga cechy $i$ (np. należenie do kategorii, posiadanie tagu, prz
 
 gdzie $w_i$ to waga cechy $i$, a $f_i(p)$ to wartość cechy dla produktu $p$. Funkcja indykatorowa $\mathbf{1}_{feature}(p)$ przyjmuje wartość 1 jeśli produkt posiada daną cechę, 0 w przeciwnym razie.
 
+\medskip
+
 \textbf{Zalety CBF}:
 \begin{itemize}
     \item Brak problemu zimnego startu dla nowych produktów -- wystarczy opis i cechy
@@ -243,6 +245,8 @@ gdzie $w_i$ to waga cechy $i$, a $f_i(p)$ to wartość cechy dla produktu $p$. F
 \end{equation}
 
 gdzie $\vec{A}$ i $\vec{B}$ to wektory cech dwóch produktów. Wynik mieści się w przedziale $[0, 1]$ dla nieujemnych wektorów (w kontekście TF-IDF i wag binarnych).
+
+\medskip
 
 \textbf{Interpretacja podobieństwa kosinusowego}:
 \begin{itemize}
@@ -284,7 +288,7 @@ Logika rozmyta (Fuzzy Logic) została wprowadzona przez Lotfi Zadeha w przełomo
 
 gdzie $\mu_A(x)$ oznacza stopień przynależności elementu $x$ do zbioru $A$.
 
-\textbf{Przykład}: Dla zmiennej "cena" możemy zdefiniować trzy zbiory rozmyte:
+\textbf{Przykład}: Dla zmiennej "cena"~możemy zdefiniować trzy zbiory rozmyte:
 \begin{itemize}
     \item \textbf{cheap}: ceny niskie (pełna przynależność dla cen < 100 PLN)
     \item \textbf{medium}: ceny średnie (pełna przynależność dla cen 500-1200 PLN)
@@ -452,7 +456,7 @@ gdzie:
 P(X | C) = P(x_1, x_2, ..., x_n | C) = \prod_{i=1}^{n} P(x_i | C)
 \end{equation}
 
-Założenie to jest "naiwne" bo w rzeczywistości cechy są często skorelowane. Jednak Naive Bayes działa zaskakująco dobrze w praktyce.
+Założenie to jest "naiwne"~bo w rzeczywistości cechy są często skorelowane. Jednak Naive Bayes działa zaskakująco dobrze w praktyce.
 
 \textit{Klasyfikacja}:
 \begin{equation}
@@ -1135,10 +1139,10 @@ FUNKCJA ekstrahuj_cechy(produkt):
     cechy = pusty_slownik
 
     DLA KAZDEGO kategorii W produkt.kategorie:
-        cechy["category_" + kategoria.nazwa] = 0.40
+        cechy["category_"~+ kategoria.nazwa] = 0.40
 
     DLA KAZDEGO tagu W produkt.tagi:
-        cechy["tag_" + tag.nazwa] = 0.30
+        cechy["tag_"~+ tag.nazwa] = 0.30
 
     JEZELI produkt.cena < 100 WTEDY
         cechy["price_low"] = 0.20
@@ -1152,7 +1156,7 @@ FUNKCJA ekstrahuj_cechy(produkt):
 
     slowa_kluczowe = ekstrahuj_slowa_kluczowe(produkt.opis)
     DLA KAZDEGO slowa W slowa_kluczowe[0:5]:
-        cechy["keyword_" + slowo] = 0.10 / dlugosc(slowa_kluczowe)
+        cechy["keyword_"~+ slowo] = 0.10 / dlugosc(slowa_kluczowe)
 
     ZWROC cechy
 KONIEC FUNKCJA
@@ -1217,6 +1221,8 @@ KONIEC FUNKCJA
 
 Zamiast tworzyć pełne wektory o długości równej liczbie wszystkich możliwych cech (potencjalnie tysiące), algorytm operuje na słownikach. Iloczyn skalarny wymaga iteracji tylko po cechach wspólnych (przecięcie zbiorów kluczy).
 
+\medskip
+
 \textbf{Próg podobieństwa}:
 
 System zapisuje tylko podobieństwa większe niż 0.2 (20\%). Uzasadnienie:
@@ -1280,6 +1286,8 @@ Dla katalogu 500 produktów:
     \item Po filtrowaniu (próg 0.2): ~4,000 zapisanych rekordów
 \end{itemize}
 
+\newpage
+
 \textbf{Diagram sekwencji: Content-Based Filtering}
 
 \begin{figure}[H]
@@ -1291,7 +1299,8 @@ Dla katalogu 500 produktów:
 
 Przepływ procesu generowania rekomendacji CBF:
 \begin{enumerate}
-    \item Żądanie użytkownika trafia do API (\texttt{/api/recommendations/content-based/?product\_id=\{id\}})
+    \item Żądanie użytkownika trafia do API\\
+    (\texttt{/api/recommendations/content-based/?product\_id=\{id\}})
     \item Backend (ContentBasedAPI) wykonuje zapytanie do modelu ProductSimilarity
     \item Model pobiera top 10 podobnych produktów z bazy danych (sortowanie po \texttt{-similarity\_score})
     \item System sprawdza cache - w przypadku trafienia zwracany jest wynik natychmiast
@@ -1350,7 +1359,7 @@ System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_e
 
 Klasa \texttt{FuzzyMembershipFunctions} definiuje trzy funkcje dla zmiennej "cena":
 
-\textit{Funkcja "cheap" (tania)} -- trójkątna/trapezoidalna:
+\textit{Funkcja "cheap"~(tania)} -- trójkątna/trapezoidalna:
 
 \begin{equation}
 \mu_{cheap}(price) = \begin{cases}
@@ -1360,9 +1369,9 @@ Klasa \texttt{FuzzyMembershipFunctions} definiuje trzy funkcje dla zmiennej "cen
 \end{cases}
 \end{equation}
 
-Interpretacja: Produkty poniżej 100 PLN są w pełni "tanie". Od 100 do 500 PLN stopień "taności" maleje liniowo.
+Interpretacja: Produkty poniżej 100 PLN są w pełni "tanie". Od 100 do 500 PLN stopień "taności"~maleje liniowo.
 
-\textit{Funkcja "medium" (średnia)} -- trapezoidalna:
+\textit{Funkcja "medium"~(średnia)} -- trapezoidalna:
 
 \begin{equation}
 \mu_{medium}(price) = \begin{cases}
@@ -1374,9 +1383,9 @@ Interpretacja: Produkty poniżej 100 PLN są w pełni "tanie". Od 100 do 500 PLN
 \end{cases}
 \end{equation}
 
-Interpretacja: Przedział $[500, 1200]$ ma pełną przynależność. Przejścia są płynne -- cena 400 PLN jest częściowo "tania" i częściowo "średnia".
+Interpretacja: Przedział $[500, 1200]$ ma pełną przynależność. Przejścia są płynne -- cena 400 PLN jest częściowo "tania"~i częściowo "średnia".
 
-\textit{Funkcja "expensive" (droga)}:
+\textit{Funkcja "expensive"~(droga)}:
 
 \begin{equation}
 \mu_{expensive}(price) = \begin{cases}
@@ -1423,6 +1432,10 @@ Oparte na średniej ocenie produktu (skala 1-5):
 
 \bigskip
 
+Interpretacja: Produkty z oceną $\geq 4.5$ (maksymalna jakość) mają pełną przynależność do zbioru "high". Rating 3.5 jest punktem środkowym - produkt należy w równym stopniu do zbiorów rozmytych o sąsiednich kategoriach jakości. Przejścia są płynne, co odzwierciedla niepewność i subiektywność w ocenach użytkowników - produkt z ratingiem 4.0 jest częściowo "średni"~i częściowo "wysoki".
+
+\bigskip
+
 \textbf{Funkcje przynależności dla popularności (order\_count)}
 
 Oparte na liczbie zamówień produktu:
@@ -1454,6 +1467,10 @@ Oparte na liczbie zamówień produktu:
 1.0, & v \geq 30
 \end{cases}
 \end{equation}
+
+\bigskip
+
+Interpretacja: Funkcja trapezoidalna dla "medium"~zapewnia stabilny przedział pełnej przynależności $[2, 10]$ zamówień - produkty w tym przedziale są typowymi artykułami o standardowej popularności. Produkt z 5 zamówieniami jest w pełni "średnio popularny", ale nie jest ani "niszowy"~(low $\leq 2$) ani "bestsellerem"~(high $\geq 30$). Trapez eliminuje oscylacje klasyfikacji dla produktów o podobnej liczbie zamówień, w przeciwieństwie do funkcji trójkątnych używanych dla zbiorów skrajnych.
 
 \subsubsection*{5.2.3 Rozmyty profil użytkownika}
 
@@ -1748,7 +1765,7 @@ Klasa \texttt{CustomNaiveBayes} implementuje multinomialny Naive Bayes z wygład
 
 Model przechowuje:
 \begin{itemize}
-    \item \texttt{class\_priors} -- prawdopodobieństwa a priori $P(C)$ dla każdej klasy
+    \item \texttt{class\_priors} -- prawdopodobieństwa \textit{a priori} $P(C)$ dla każdej klasy
     \item \texttt{feature\_likelihoods} -- prawdopodobieństwa warunkowe $P(x_i | C)$
     \item \texttt{feature\_vocabularies} -- unikalne wartości każdej cechy (dla wygładzania Laplace'a)
 \end{itemize}
@@ -1757,7 +1774,7 @@ Model przechowuje:
 
 Faza treningu obejmuje:
 \begin{enumerate}
-    \item Zliczenie wystąpień każdej klasy i obliczenie prawdopodobieństw a priori: $P(C) = \frac{count(C)}{N}$
+    \item Zliczenie wystąpień każdej klasy i obliczenie prawdopodobieństw \textit{a priori}: $P(C) = \frac{count(C)}{N}$
     \item Dla każdej próbki treningowej -- aktualizacja słowników cech dla odpowiedniej klasy
     \item Budowa słownika unikalnych wartości cech (vocabulary) potrzebnego do wygładzania Laplace'a
 \end{enumerate}
@@ -1959,16 +1976,7 @@ Administrator może przełączać aktywny algorytm rekomendacji w czasie rzeczyw
 \subsection*{6.2 Konfiguracja metod rekomendacji w panelu administratora}
 \addcontentsline{toc}{subsection}{6.2 Konfiguracja metod rekomendacji w panelu administratora}
 
-Panel administracyjny umożliwia dynamiczne przełączanie między metodami rekomendacji wyświetlanymi na stronie głównej aplikacji.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{images/recomendationSystem.png}
-  \caption{Panel wyboru metody rekomendacji.}
-  \label{fig:admin_recommendation_settings}
-\end{figure}
-
-Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z opcjami metod rekomendacyjnych. Administrator może wybrać aktywny algorytm, który będzie wykorzystywany we wszystkich sekcjach rekomendacji na stronie głównej. System zawiera łącznie sześć metod rekomendacyjnych zaimplementowanych w ramach dwóch prac inżynierskich.
+Panel administracyjny umożliwia dynamiczne przełączanie między metodami rekomendacji wyświetlanymi na stronie głównej aplikacji. Administrator może wybrać aktywny algorytm poprzez dedykowany interfejs konfiguracyjny, który będzie wykorzystywany we wszystkich sekcjach rekomendacji. System zawiera łącznie sześć metod rekomendacyjnych zaimplementowanych w ramach dwóch prac inżynierskich.
 
 \medskip
 
@@ -1985,17 +1993,395 @@ Zmiana metody następuje natychmiast po zapisaniu ustawień i wpływa na wszystk
 \subsection*{6.3 Content-Based Filtering w praktyce}
 \addcontentsline{toc}{subsection}{6.3 Content-Based Filtering w praktyce}
 
-\input{chapter6_ui_cbf.tex}
+\subsubsection*{6.2.1 Panel debugowania Content-Based Filtering}
+
+System oferuje zaawansowany panel debugowania dostępny przez endpoint \texttt{/api/content-based-debug/}. Panel prezentuje:
+
+\textbf{Widok ogólny (bez parametru product\_id)}:
+
+\begin{itemize}
+    \item \textbf{Szczegóły algorytmu}: nazwa, metoda (Weighted Feature Vectors + Cosine Similarity), status
+    \item \textbf{Wagi cech}: category (40\%), tag (30\%), price (20\%), keywords (10\%)
+    \item \textbf{Statystyki bazy danych}: liczba produktów, zapisanych podobieństw, procent pokrycia
+    \item \textbf{Status cache}: HIT/MISS, czas wygaśnięcia
+    \item \textbf{Top 10 podobieństw}: produkty o najwyższym podobieństwie w systemie
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug1.png}
+  \caption{Panel debugowania Content-Based Filtering.}
+  \label{fig:cbf_debug1}
+\end{figure}
+
+\textbf{Widok szczegółowy (z parametrem product\_id)}:
+
+Dla konkretnego produktu panel pokazuje:
+
+\begin{itemize}
+    \item Wektor cech produktu z wagami (słownik feature → weight)
+    \item Top 10 produktów podobnych z szczegółami obliczeń
+    \item Wzór matematyczny dla każdej pary: $\frac{dot\_product}{norm_1 \times norm_2}$
+    \item Cechy wspólne między produktami
+    \item Breakdown podobieństwa: ile procent z kategorii, ile z tagów, ile z ceny, ile z keywords
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/contentBasedAdminDebug2.png}
+  \caption{CBF - szczegółowa analiza podobieństwa produktu.}
+  \label{fig:cbf_debug2}
+\end{figure}
+
+Panel umożliwia administratorowi:
+\begin{itemize}
+    \item Monitorowanie pokrycia rekomendacji (ile produktów ma podobieństwa)
+    \item Identyfikację produktów bez podobieństw (słabo opisane metadane)
+    \item Walidację działania wag (czy kategorie dominują prawidłowo)
+    \item Ręczne wyzwalanie przeliczenia macierzy
+\end{itemize}
+
+\newpage
+
+\subsubsection*{6.2.2 Interfejs użytkownika - sortowanie według CBF}
+
+Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania produktów na stronie głównej sklepu. Administrator może wybrać algorytm CBF w ustawieniach systemu rekomendacji, co powoduje wyświetlanie produktów podobnych do tych, które użytkownik wcześniej przeglądał lub kupił.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/recomendationSystem.png}
+  \caption{Rekomendacje Content-Based Filtering wyświetlane użytkownikowi na stronie głównej.}
+  \label{fig:cbf_recommendations}
+\end{figure}
+
+\newpage
+
+Rysunek \ref{fig:cbf_recommendations} przedstawia sekcję "Recommended For You (Content-Based)"~wyświetlaną na stronie głównej aplikacji po wyborze algorytmu CBF przez administratora. System prezentuje 4 produkty podobne do wcześniej przeglądanych lub zakupionych artykułów, wybrane na podstawie analizy cech (kategoria, tagi, cena, słowa kluczowe). Każdy produkt zawiera zdjęcie, nazwę, cenę oraz przycisk dodania do koszyka.
+
+Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik może zobaczyć produkty podobne do swoich poprzednich zakupów. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji. Szczegółowy opis przepływu danych w systemie CBF przedstawiono w rozdziale 5.1.
+
+\newpage
 
 \subsection*{6.4 Logika rozmyta w praktyce}
 \addcontentsline{toc}{subsection}{6.4 Logika rozmyta w praktyce}
 
-\input{chapter6_ui_fuzzy.tex}
+\subsubsection*{6.3.1 Panel debugowania Fuzzy Logic}
+
+Panel debugowania dostępny przez endpoint \texttt{/api/fuzzy-debug/} prezentuje:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug1.png}
+  \caption{Panel debugowania Fuzzy Logic.}
+  \label{fig:fuzzy_debug1}
+\end{figure}
+
+\textbf{Widok ogólny}:
+
+\begin{itemize}
+    \item \textbf{Szczegóły algorytmu}: metoda (Mamdani Fuzzy Inference), liczba reguł (6), T-norma (min), T-conorma (max)
+    \item \textbf{Funkcje przynależności}: definicje dla price, quality, popularity z progami
+    \item \textbf{Statystyki}: średni fuzzy\_score, rozkład wyników, aktywacja reguł
+    \item \textbf{Profil użytkownika}: jeśli podany user\_id — szczegóły profilu rozmytego
+\end{itemize}
+
+\textbf{Widok produktu} (z parametrem product\_id):
+
+\begin{itemize}
+    \item Wartości fuzzyfikacji (wszystkie przynależności)
+    \item Aktywacja każdej z 6 reguł z wyjaśnieniem
+    \item Obliczenie końcowe z breakdownem
+    \item Porównanie z innymi produktami
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug2.png}
+  \caption{Fuzzy Logic - ewaluacja produktu.}
+  \label{fig:fuzzy_debug2}
+\end{figure}
+
+\subsubsection*{6.3.2 Interfejs użytkownika - rekomendacje Fuzzy Logic}
+
+System Fuzzy Logic jest dostępny dla użytkowników w dedykowanej zakładce panelu klienta. Interfejs składa się z trzech podzakładek: "Fuzzy Recommendations"~(rekomendacje produktów), "User Profile"~(profil użytkownika) oraz "Fuzzy Rules"~(reguły wnioskowania). Szczegółowy opis przepływu danych w systemie Fuzzy Logic przedstawiono w rozdziale 5.2.
+
+\newpage
+
+\textbf{Zakładka "Fuzzy Recommendations"}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient1.png}
+  \caption{Panel klienta - rekomendacje Fuzzy Logic.}
+  \label{fig:fuzzy_client}
+\end{figure}
+
+Rysunek \ref{fig:fuzzy_client} przedstawia główny widok rekomendacji Fuzzy Logic. U góry strony znajdują się trzy zakładki nawigacyjne: "Fuzzy Recommendations", "User Profile"~oraz "Fuzzy Rules", umożliwiające przełączanie między widokami. Sekcja "Recommended Products"~wyświetla 4 produkty wybrane przez silnik wnioskowania rozmytego Mamdani. Każdy produkt zawiera:
+
+\begin{itemize}
+    \item \textbf{Fuzzy Score}: całkowity wynik rekomendacji wyrażony w procentach (np. 53.9\%, 53.7\%, 53.6\%) - wynik agregacji wszystkich 6 reguł rozmytych z uwzględnieniem ich wag (suma ważona aktywacji reguł)
+    \item \textbf{Category Match}: stopień dopasowania kategorii produktu do ulubionych kategorii użytkownika wyrażony w procentach (np. 63.3\%, 62.6\%, 62.4\%)
+    \item \textbf{View Rule Activations}: niebieski przycisk umożliwiający podgląd szczegółowej aktywacji wszystkich 6 reguł IF-THEN dla danego produktu wraz z wyjaśnieniem, dlaczego produkt został polecony
+\end{itemize}
+
+System prezentuje przykładowe rekomendacje z interfejsu:
+\begin{itemize}
+    \item Baseus Magnetic Mini Wireless Charging 20W 20000mAh 2x MagSafe (\$69.99): Fuzzy Score 53.9\%, Category Match 63.3\%
+    \item TP-Link Archer T3U Plus (1300Mb/s a/b/g/n/ac) DualBand (\$24.99): Fuzzy Score 53.7\%, Category Match 62.6\%
+    \item UGREEN Power Strip 65W USB/USB C + 3x AC Outlets CD268 (\$49.99): Fuzzy Score 53.6\%, Category Match 62.4\%
+    \item Hama Premium Surge Protector - 4 Sockets, 1.5m (\$39.99): Fuzzy Score 53.6\%, Category Match 62.4\%
+\end{itemize}
+
+Wszystkie produkty mają podobny Fuzzy Score (~53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (~62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika.
+
+\medskip
+
+\textbf{Zakładka "User Profile"}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient2.png}
+  \caption{Profil użytkownika Fuzzy Logic.}
+  \label{fig:fuzzy_client2}
+\end{figure}
+
+Zakładka "User Profile"~(Rysunek \ref{fig:fuzzy_client2}) prezentuje rozmyty profil użytkownika zbudowany przez klasę \texttt{FuzzyUserProfile} na podstawie historii zakupów. Profil jest wykorzystywany przez system wnioskowania Mamdani do obliczania spersonalizowanych rekomendacji. Wyświetlane informacje:
+
+\begin{itemize}
+    \item \textbf{Profile Type}: typ profilu użytkownika\\
+    -- \textit{authenticated} - użytkownik zalogowany z pełną historią zakupów (jak na zrzucie ekranu)\\
+    -- \textit{guest} - użytkownik bez historii zakupów (profil domyślny z globalnych statystyk)
+
+    \item \textbf{Price Sensitivity}: wrażliwość cenowa użytkownika wyrażona w procentach\\
+    -- Przykład: 60\% oznacza umiarkowaną wrażliwość cenową ("Moderate price sensitivity")\\
+    -- Wartość obliczana na podstawie średniej ceny zakupionych produktów względem średniej w systemie\\
+    -- Wpływa na aktywację reguł R3 (Price Sensitive Match) i R5 (Premium Match)
+
+    \item \textbf{Favorite Categories}: lista ulubionych kategorii produktowych z procentowym udziałem w historii zakupów\\
+    Przykład z interfejsu:\\
+    -- \texttt{components.graphics} 13\% (karty graficzne)\\
+    -- \texttt{accessories.powerBanks} 8\% (powerbanki)\\
+    -- \texttt{networking.networkCards} 7\% (karty sieciowe)\\
+    -- \texttt{power.strips} 6\% (listwy zasilające)\\
+    -- \texttt{components.cases} 5\% (obudowy komputerowe)
+\end{itemize}
+
+System automatycznie aktualizuje profil po każdym nowym zamówieniu użytkownika, co pozwala na dynamiczną adaptację rekomendacji do zmieniających się preferencji. Kategorie są zapisywane w formacie hierarchicznym (kategoria\_główna.podkategoria) i przechowywane w polu JSON modelu \texttt{RecommendationSettings}.
+
+\medskip
+
+\textbf{Zakładka "Fuzzy Rules"}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicClient3.png}
+  \caption{Reguły wnioskowania Fuzzy Logic.}
+  \label{fig:fuzzy_client3}
+\end{figure}
+
+Zakładka "Fuzzy Rules"~(Rysunek \ref{fig:fuzzy_client3}) prezentuje szczegółowy opis 6 reguł wnioskowania IF-THEN wykorzystywanych przez system Mamdani. Strona wyświetla nagłówek "How Recommendations Are Made"~oraz wyjaśnienie: "Our system uses 6 intelligent rules to find the best products for you. Each rule looks at different aspects like price, quality, and category match."~Każda reguła jest opisana w zrozumiały dla użytkownika sposób:
+
+\begin{itemize}
+    \item \textbf{Rule 1 - R1: High Quality Bargain}\\
+    \textit{"Products with excellent ratings at reasonable prices get high recommendations"}\\
+    Warunek: IF quality is HIGH AND (price is CHEAP OR MEDIUM)\\
+    THEN recommendation degree is HIGH (weight: 0.9)\\
+    Interpretacja: Produkty wysokiej jakości w atrakcyjnej cenie otrzymują najwyższą wagę rekomendacji
+
+    \item \textbf{Rule 2 - R2: Popular in Category}\\
+    \textit{"Trending products in categories the user likes"}\\
+    Warunek: IF category matches user interest AND product is HIGHLY POPULAR\\
+    THEN recommendation degree is MEDIUM-HIGH (weight: 0.7)\\
+    Interpretacja: Popularne produkty z ulubionych kategorii użytkownika
+
+    \item \textbf{Rule 3 - R3: Price Sensitive Match}\\
+    \textit{"Budget-conscious users get cheap product recommendations boosted"}\\
+    Warunek: IF user is PRICE SENSITIVE AND product is CHEAP\\
+    THEN boost recommendation (weight: 0.6)\\
+    Interpretacja: Użytkownicy wrażliwi cenowo otrzymują wzmocnione rekomendacje tanich produktów
+
+    \item \textbf{Rule 4 - R4: Category Quality Match}\\
+    \textit{"Good quality products in preferred categories"}\\
+    Warunek: IF category matches strongly AND quality is MEDIUM-HIGH\\
+    THEN recommendation degree is HIGH (weight: 0.85)\\
+    Interpretacja: Wysokiej jakości produkty z preferowanych kategorii użytkownika
+
+    \item \textbf{Rule 5 - R5: Premium Match}\\
+    \textit{"Premium users get expensive high-quality products boosted"}\\
+    Warunek: IF user is NOT price sensitive AND product is EXPENSIVE AND quality is HIGH\\
+    THEN boost recommendation (weight: 0.8)\\
+    Interpretacja: Użytkownicy premium (niewrażliwi cenowo) otrzymują wzmocnione rekomendacje drogich produktów wysokiej jakości
+
+    \item \textbf{Rule 6 - R6: Budget-Friendly Popular}\\
+    Warunek: IF product is CHEAP AND POPULAR\\
+    THEN boost recommendation (weight: 0.75)\\
+    Interpretacja: Tanie i popularne produkty dla użytkowników wrażliwych cenowo
+\end{itemize}
+
+System używa tych reguł do obliczenia końcowego Fuzzy Score dla każdego produktu zgodnie ze wzorem agregacji przedstawionym w rozdziale 5.2.5. Wagi reguł (0.6-0.9) określają ich wpływ na ostateczną rekomendację - reguła R1 (0.9) ma największy wpływ, podczas gdy R3 (0.6) najmniejszy. Przycisk "View Rule Activations"~w zakładce "Fuzzy Recommendations"~pokazuje, które reguły zostały aktywowane dla konkretnego produktu, z jaką siłą (stopień aktywacji $\alpha_i$) oraz jaki był ich wkład w końcowy wynik.
+
+\subsubsection*{6.3.3 Wyszukiwanie rozmyte (Fuzzy Search)}
+
+Wyszukiwanie rozmyte (Fuzzy Search) wykorzystuje algorytm odległości Levensteina do wyszukiwania produktów z tolerancją na literówki i błędy pisowni. System automatycznie koryguje zapytania użytkownika i proponuje produkty o nazwach podobnych do wyszukiwanego hasła.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzySearch1.jpg}
+  \caption{Wyszukiwarka rozmyta (Fuzzy Search).}
+  \label{fig:fuzzy_search}
+\end{figure}
+
+\newpage
+
+Rysunek \ref{fig:fuzzy_search} przedstawia interfejs wyszukiwarki rozmytej z przykładowym zapytaniem "laptop". Użytkownik kontroluje tolerancję wyszukiwania za pomocą suwaka "Fuzzy Threshold"~(wartość 0.3 oznacza próg 30\% podobieństwa). System zwraca produkty z metryką "Fuzzy Match"~(np. 86\%, 45\%), wskazującą stopień dopasowania nazwy do zapytania. Wyszukiwarka znajduje produkty zawierające słowo "Laptop"~(86\% match) oraz bardziej odległe jak "Desktop Hub"~(45\% match), co demonstruje tolerancję na nieprecyzyjne zapytania.
+
+Algorytm Levensteina oblicza minimalną liczbę operacji edycji (wstawienie, usunięcie, zamiana znaku) potrzebnych do przekształcenia jednego ciągu w drugi:
+
+\begin{equation}
+lev(a,b) = \begin{cases}
+|a| & \text{jeśli } |b| = 0 \\
+|b| & \text{jeśli } |a| = 0 \\
+lev(tail(a), tail(b)) & \text{jeśli } a[0] = b[0] \\
+1 + \min \begin{cases}
+lev(tail(a), b) \\
+lev(a, tail(b)) \\
+lev(tail(a), tail(b))
+\end{cases} & \text{w przeciwnym wypadku}
+\end{cases}
+\end{equation}
+
+System wyszukiwania rozmytego zwraca produkty, dla których odległość Levensteina między zapytaniem a nazwą produktu jest mniejsza niż ustalony próg (domyślnie 0.5).
+
+\newpage
 
 \subsection*{6.5 Modele probabilistyczne w praktyce}
 \addcontentsline{toc}{subsection}{6.5 Modele probabilistyczne w praktyce}
 
-\input{chapter6_ui_prob.tex}
+\subsubsection*{6.4.1 Panel debugowania modeli probabilistycznych}
+
+Panel debugowania prezentuje szczegółowe informacje o obu modelach:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug1.png}
+  \caption{Panel debugowania - Markov Chain.}
+  \label{fig:prob_debug1}
+\end{figure}
+
+\textbf{Statystyki Markov Chain} (z panelu debugowania):
+\begin{itemize}
+    \item Rząd łańcucha (Order): 1 (first-order Markov Chain)
+    \item Liczba stanów (kategorii): 48
+    \item Liczba przejść (transitions): 48
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug2.png}
+  \caption{Panel debugowania - Naive Bayes.}
+  \label{fig:prob_debug2}
+\end{figure}
+
+\newpage
+
+\textbf{Statystyki Naive Bayes} (z panelu debugowania):
+
+\textit{Purchase Prediction}:
+\begin{itemize}
+    \item Trained: Yes
+    \item Number of Features: 3
+    \item Classes: will\_not\_purchase
+    \item Class Priors: will\_not\_purchase = 1.0
+\end{itemize}
+
+\textit{Churn Prediction}:
+\begin{itemize}
+    \item Trained: Yes
+    \item Number of Features: 3
+    \item Classes: will\_churn, will\_not\_churn
+    \item Class Priors: will\_churn = 0.95, will\_not\_churn = 0.05
+\end{itemize}
+
+\subsubsection*{6.4.2 Interfejs użytkownika - rekomendacje probabilistyczne}
+
+Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkownikowi w panelu klienta w zakładce ``Smart Recommendations''. Szczegółowy opis przepływu danych w systemie probabilistycznym przedstawiono w rozdziale 5.3. System wyświetla dwie podzakładki:
+\begin{itemize}
+    \item \textbf{Next Purchase (Markov)}: produkty z kategorii przewidywanych przez łańcuch Markowa jako najbardziej prawdopodobne do zakupu
+    \item \textbf{Behavior Insights (Bayesian)}: analiza zachowań zakupowych użytkownika z wykorzystaniem Naive Bayes
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient1.png}
+  \caption{Zakładka "Next Purchase (Markov)".}
+  \label{fig:prob_client1}
+\end{figure}
+
+Zakładka "Next Purchase (Markov)"~prezentuje:
+\begin{itemize}
+    \item \textbf{Next Purchase Probability}: prawdopodobieństwo zakupu w ciągu 30 dni (np. 50\%)
+    \item \textbf{Expected Days Until Next Purchase}: przewidywany czas do następnego zakupu
+    \item \textbf{Likely Next Products}: lista produktów z najwyższym Prediction Score (np. Imou Cruiser 2 5MP: 13\%, A4Tech HD PK-910P: 13\%)
+    \item \textbf{Your Shopping Patterns}: najczęstsza sekwencja zakupów i długość cyklu (np. power.strips → laptop.hubs → office.accessories, 10 products per cycle)
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient2.png}
+  \caption{Zakładka "Behavior Insights (Bayesian)".}
+  \label{fig:prob_client2}
+\end{figure}
+
+Zakładka ``Behavior Insights (Bayesian)'' wykorzystuje model Naive Bayes do analizy preferencji zakupowych:
+\begin{itemize}
+    \item \textbf{Purchase Likelihood}: wykres słupkowy prawdopodobieństwa zakupu dla każdej kategorii
+    \item Kategorie z najwyższym prawdopodobieństwem: electronics.phones (10\%), power.strips (9\%), accessories.cables (9\%), office.accessories (9\%)
+    \item Model uczy się na podstawie historii zakupów wszystkich użytkowników i tworzy profil behawioralny
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient3.png}
+  \caption{Zakładka "Churn Risk Analysis".}
+  \label{fig:prob_client3}
+\end{figure}
+
+Zakładka ``Churn Risk Analysis'' (Rysunek \ref{fig:prob_client3}) prezentuje:
+\begin{itemize}
+    \item \textbf{Churn Risk}: poziom ryzyka rezygnacji klienta (np. 25\% - LOW RISK)
+    \item \textbf{Shopping Behavior Analysis}: analiza wzorców zakupowych użytkownika
+    \item \textbf{Personalized Suggestions}: spersonalizowane sugestie produktów
+\end{itemize}
+
+\subsubsection*{6.4.3 Panel administracyjny - widoki probabilistyczne}
+
+Panel administracyjny systemu rekomendacji probabilistycznych prezentuje zaawansowane analizy dla administratora:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin1.png}
+  \caption{Panel administracyjny - Markov Chain Analysis.}
+  \label{fig:prob_admin1}
+\end{figure}
+
+\newpage
+
+Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Chain Analysis'' zawierający:
+\begin{itemize}
+    \item \textbf{Sales Forecast}: wykres prognozy sprzedaży w czasie
+    \item \textbf{Detailed Forecast}: tabela z szczegółowymi predykcjami dla poszczególnych okresów
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin2.png}
+  \caption{Panel administracyjny - Bayesian Analysis.}
+  \label{fig:prob_admin2}
+\end{figure}
+
+\newpage
+
+Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' zawierający zaawansowane narzędzia analityczne dla administratora. Panel umożliwia analizę oczekiwanego popytu na produkty, identyfikację kategorii produktowych preferowanych przez użytkowników oraz monitorowanie metryk wydajności modelu Naive Bayes. System generuje rekomendacje dotyczące poziomu zapasów oraz identyfikuje produkty wymagające uzupełnienia magazynu na podstawie predykcji probabilistycznych.
 
 \subsection*{6.6 Mechanizmy optymalizacji systemu}
 \addcontentsline{toc}{subsection}{6.6 Mechanizmy optymalizacji systemu}
@@ -2352,6 +2738,20 @@ Mendel, J. M. (2001). \textit{Uncertain Rule-Based Fuzzy Logic Systems: Introduc
 
 \section*{Streszczenie}
 \addcontentsline{toc}{section}{Streszczenie}
+
+\noindent
+\textbf{Tytuł pracy w języku polskim:}\\
+System rekomendacji produktów oparty na filtracji treści, logice rozmytej i modelach probabilistycznych
+
+\textbf{Tytuł pracy w języku angielskim:}\\
+Product Recommendation System Based on Content-Based Filtering, Fuzzy Logic, and Probabilistic Models
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{Streszczenie:}
+
+\vspace{0.3cm}
 
 Niniejsza praca inżynierska przedstawia projekt i implementację systemu rekomendacji produktów dla platformy e-commerce, opartego na trzech zaawansowanych metodach uczenia maszynowego: filtracji opartej na treści (Content-Based Filtering), logice rozmytej (Fuzzy Logic) oraz modelach probabilistycznych (Markov Chain i Naive Bayes). System został zrealizowany jako część projektu e-commerce powstałego we współpracy dwuosobowej. Głównym celem pracy było opracowanie modułowego systemu rekomendacyjnego działającego bez zewnętrznych bibliotek uczenia maszynowego, zapewniającego pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
 
