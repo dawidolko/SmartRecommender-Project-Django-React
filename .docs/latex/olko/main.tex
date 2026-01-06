@@ -176,6 +176,7 @@ sześć różnych metod rekomendacyjnych, niniejsza praca koncentruje się na tr
 
 Zakres funkcjonalny systemu obejmuje:
 
+\noindent
 \textbf{Implementację trzech metod rekomendacyjnych:}
 \begin{itemize}
 \item Collaborative Filtering w wariancie Item-Based z metryką Adjusted Cosine Similarity \cite{sarwar2001item} — metoda analizuje wzorce zakupowe użytkowników w celu identyfikacji produktów podobnych do wcześniej nabytych,
@@ -183,6 +184,7 @@ Zakres funkcjonalny systemu obejmuje:
 \item Reguły asocjacyjne wykorzystujące algorytm Apriori \cite{agrawal1994} — metoda odkrywa wzorce współwystępowania produktów w koszyku zakupowym, wspierając strategie cross-sellingu.
 \end{itemize}
 
+\noindent
 \textbf{Opracowanie kompletnej aplikacji webowej:}
 \begin{itemize}
 \item Backend oparty na Django REST Framework zapewniający API dla wszystkich funkcjonalności systemu,
@@ -366,6 +368,7 @@ Taki podział użytkowników według ról i uprawnień wpływa bezpośrednio na 
 
 System został zaprojektowany z uwzględnieniem następujących wymagań funkcjonalnych pogrupowanych według obszarów:
 
+\noindent
 \textbf{Autentykacja i autoryzacja:}
 \begin{itemize}
 \item Rejestracja nowego użytkownika w systemie,
@@ -373,6 +376,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Wylogowanie i zarządzanie sesją (token JWT).
 \end{itemize}
 
+\noindent
 \textbf{Przeglądanie i wyszukiwanie produktów:}
 \begin{itemize}
 \item Przeglądanie katalogu produktów,
@@ -381,6 +385,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Sortowanie według ceny, popularności, sentymentu.
 \end{itemize}
 
+\noindent
 \textbf{Obsługa koszyka zakupowego:}
 \begin{itemize}
 \item Dodawanie produktów do koszyka,
@@ -390,6 +395,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Wyświetlanie rekomendacji Apriori (,,Często kupowane razem'').
 \end{itemize}
 
+\noindent
 \textbf{Obsługa zamówień (tylko użytkownicy zalogowani):}
 \begin{itemize}
 \item Składanie zamówień z danymi dostawy i płatności,
@@ -398,6 +404,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Wyświetlanie szczegółów zamkniętych zamówień.
 \end{itemize}
 
+\noindent
 \textbf{Zarządzanie kontem użytkownika:}
 \begin{itemize}
 \item Wyświetlanie profilu użytkownika,
@@ -406,6 +413,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Przeglądanie historii aktywności.
 \end{itemize}
 
+\noindent
 \textbf{System rekomendacji:}
 \begin{itemize}
 \item Wyświetlanie rekomendacji Collaborative Filtering na stronie głównej,
@@ -414,6 +422,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Wyświetlanie rekomendacji Apriori w koszyku zakupowym.
 \end{itemize}
 
+\noindent
 \textbf{Opinie i recenzje:}
 \begin{itemize}
 \item Wyświetlanie opinii innych użytkowników na stronie produktu,
@@ -422,6 +431,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \end{itemize}
 
 \newpage
+\noindent
 \textbf{Funkcje administracyjne - zarządzanie produktami:}
 \begin{itemize}
 \item Dodawanie nowych produktów do katalogu,
@@ -430,6 +440,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Zarządzanie kategoriami produktów.
 \end{itemize}
 
+\noindent
 \textbf{Funkcje administracyjne - zarządzanie zamówieniami:}
 \begin{itemize}
 \item Przeglądanie wszystkich zamówień w systemie,
@@ -438,6 +449,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Generowanie raportów sprzedażowych.
 \end{itemize}
 
+\noindent
 \textbf{Funkcje administracyjne - zarządzanie użytkownikami:}
 \begin{itemize}
 \item Lista wszystkich użytkowników w systemie,
@@ -446,6 +458,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Przeglądanie aktywności użytkowników.
 \end{itemize}
 
+\noindent
 \textbf{Funkcje administracyjne - statystyki i analityka:}
 \begin{itemize}
 \item Panel analityczny (dashboard) z kluczowymi wskaźnikami,
@@ -454,6 +467,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Statystyki produktów (najczęściej kupowane, najlepsze opinie).
 \end{itemize}
 
+\noindent
 \textbf{Funkcje administracyjne - debugowanie algorytmów rekomendacji:}
 \begin{itemize}
 \item Podgląd macierzy podobieństw Collaborative Filtering,
@@ -484,12 +498,14 @@ Diagram został zorganizowany wokół trzech głównych aktorów, z których ka�
 
 System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa odpowiada za konkretny aspekt funkcjonalności:
 
+\noindent
 \textbf{Warstwa prezentacji} - interfejsy użytkownika dostosowane do ról (klient, administrator):
 \begin{itemize}
 \item \textbf{Panel klienta} - panel główny (dashboard) z historią zamówień, sekcja rekomendacji, edycja profilu,
 \item \textbf{Panel administracyjny} - zarządzanie produktami/zamówieniami/użytkownikami, statystyki, panele debugowania.
 \end{itemize}
 
+\noindent
 \textbf{Warstwa logiki biznesowej} - implementacja trzech algorytmów rekomendacji oraz logiki e-commerce:
 \begin{itemize}
 \item \textbf{Moduł Collaborative Filtering} - generowanie macierzy podobieństwa produktów, rekomendacje oparte na produktach (item-based),
@@ -498,6 +514,7 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 \item \textbf{Logika transakcyjna} - składanie zamówień, zarządzanie statusami, walidacja danych.
 \end{itemize}
 
+\noindent
 \textbf{Warstwa danych} - relacyjna baza danych PostgreSQL przechowująca:
 \begin{itemize}
 \item Dane produktów (nazwa, opis, cena, kategorie, specyfikacje, zdjęcia),
@@ -554,6 +571,7 @@ Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
 
 Baza składa się z \textbf{25 tabel} podzielonych na 4 modułów funkcjonalnych:
 
+\noindent
 \textbf{1. Moduł produktów i użytkowników (12 tabel):}
 
 \begin{itemize}
@@ -571,6 +589,7 @@ Baza składa się z \textbf{25 tabel} podzielonych na 4 modułów funkcjonalnych
 \item \texttt{db\_complaint} - reklamacje powiązane z zamówieniami.
 \end{itemize}
 
+\noindent
 \textbf{2. Moduł opinii i analizy sentymentu (3 tabele):}
 
 \begin{itemize}
@@ -579,6 +598,7 @@ Baza składa się z \textbf{25 tabel} podzielonych na 4 modułów funkcjonalnych
 \item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktu.
 \end{itemize}
 
+\noindent
 \textbf{3. Moduł metod rekomendacji (5 tabel):}
 
 \begin{itemize}
@@ -589,6 +609,7 @@ Baza składa się z \textbf{25 tabel} podzielonych na 4 modułów funkcjonalnych
 \item \texttt{method\_recommendation\_settings} - konfiguracja algorytmów dla użytkownika.
 \end{itemize}
 
+\noindent
 \textbf{4. Moduł analityczny i prognozowanie (5 tabel):}
 
 \begin{itemize}
@@ -617,6 +638,7 @@ Rozdział przedstawia techniczne aspekty implementacji systemu e-commerce wyposa
 
 Aplikacja została zaprojektowana w architekturze klient-serwer opartej na technologiach Django (backend) oraz React (frontend). Komunikacja odbywa się poprzez RESTful API z uwierzytelnianiem tokenowym JSON Web Tokens (JWT). Struktura aplikacji wyraźnie rozdziela warstwę prezentacji (React SPA), logikę biznesową (widoki Django i serializery), oraz warstwę danych (PostgreSQL).
 
+\noindent
 \textbf{Główne założenia architektoniczne:}
 
 \begin{itemize}
@@ -629,6 +651,7 @@ Aplikacja została zaprojektowana w architekturze klient-serwer opartej na techn
 \subsection*{4.2 Stos technologiczny backendu}
 \addcontentsline{toc}{subsection}{4.2 Stos technologiczny backendu}
 
+\noindent
 \textbf{Django 5.1.4 (Python 3.11)} - stanowi fundament aplikacji serwerowej, zapewniając architekturę MVC, system ORM (Object-Relational Mapping - mapowanie obiektowo-relacyjne) dla abstrakcji bazy danych oraz mechanizmy bezpieczeństwa. Kluczowe komponenty:
 
 \begin{itemize}
@@ -648,6 +671,7 @@ Rozszerza Django o funkcjonalności API RESTful:
 \item \textbf{Pagination (paginacja)} - automatyczne stronicowanie wyników.
 \end{itemize}
 
+\noindent
 \textbf{Biblioteki Machine Learning}
 
 Do operacji numerycznych i obliczania podobieństw wykorzystano:
@@ -659,6 +683,7 @@ Do operacji numerycznych i obliczania podobieństw wykorzystano:
 \subsection*{4.3 Stos technologiczny frontendu}
 \addcontentsline{toc}{subsection}{4.3 Stos technologiczny frontendu}
 
+\noindent
 \textbf{React 18} - stanowi fundament aplikacji jednostronicowej (Single Page Application - SPA):
 
 \begin{itemize}
@@ -735,6 +760,7 @@ Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając sp
 
 Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 
+\noindent
 \textbf{1. Kontener frontendu (React 18)}
 \begin{itemize}
 \item Base image: node:18-alpine,
@@ -744,6 +770,7 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 \item Zależności (Dependencies): package.json (React, Axios, React Router, Framer Motion).
 \end{itemize}
 
+\noindent
 \textbf{2. Kontener backendu (Django 5.1.4)}
 \begin{itemize}
 \item Base image: python:3.11-slim,
@@ -753,6 +780,7 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 \item Zależności (Dependencies): requirements.txt (Django, DRF, psycopg2, NumPy, scikit-learn).
 \end{itemize}
 
+\noindent
 \textbf{3. Kontener bazy danych (PostgreSQL 14)}
 \begin{itemize}
 \item Base image: postgres:14-alpine,
