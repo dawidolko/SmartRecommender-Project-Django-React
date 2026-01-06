@@ -4,7 +4,7 @@ Panel debugowania prezentuje szczegółowe informacje o obu modelach:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug1.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug1.png}
   \caption{Panel debugowania - Markov Chain.}
   \label{fig:prob_debug1}
 \end{figure}
@@ -16,29 +16,14 @@ Panel debugowania prezentuje szczegółowe informacje o obu modelach:
     \item Liczba przejść (transitions): 48
 \end{itemize}
 
-\textbf{Top 10 przejść z najwyższym prawdopodobieństwem}:
-
-\begin{verbatim}
-| # | From Category        | To Category            | Probability | Count |
-|---|----------------------|------------------------|-------------|-------|
-| 1 | laptops.learning     | office.accessories     | 100.00%     | 1     |
-| 2 | computers.office     | drones                 | 100.00%     | 1     |
-| 3 | computers.learning   | power.strips           | 66.67%      | 0.67  |
-| 4 | computers.gaming     | peripherals.keyboards  | 50.00%      | 0.5   |
-| 5 | computers.gaming     | power.strips           | 50.00%      | 0.5   |
-| 6 | laptops.gaming       | electronics.televisions| 50.00%      | 0.5   |
-| 7 | laptops.gaming       | laptop.hubs            | 50.00%      | 0.5   |
-| 8 | laptops.office       | peripherals.keyboards  | 50.00%      | 0.5   |
-| 9 | laptops.office       | components.disks       | 50.00%      | 0.5   |
-|10 | components.processors| networking.networkCards| 33.33%      | 0.33  |
-\end{verbatim}
-
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug2.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug2.png}
   \caption{Panel debugowania - Naive Bayes.}
   \label{fig:prob_debug2}
 \end{figure}
+
+\newpage
 
 \textbf{Statystyki Naive Bayes} (z panelu debugowania):
 
@@ -58,38 +43,9 @@ Panel debugowania prezentuje szczegółowe informacje o obu modelach:
     \item Class Priors: will\_churn = 0.95, will\_not\_churn = 0.05
 \end{itemize}
 
-\textbf{Przykład analizy użytkownika} (client4, ID: 9):
-
-\begin{verbatim}
-User Analysis:
-- User: client4 (ID: 9)
-- Total Orders: 10
-- Total Spent: 31331.33 PLN
-- Avg Order Value: 3133.13 PLN
-- Days Since Last Order: 74
-- Last Category Purchased: cleaning.supplies
-
-Purchase Sequence (Last 10):
-components.powerSupply → electronics.tablets → camera.accessories →
-laptop.hubs → peripherals.speakers → laptop.hubs → electronics.phones →
-gadgets → laptop.hubs → cleaning.supplies
-
-Next Purchase Predictions (Markov Chain):
-1. peripherals.printers: 11.11%
-2. accessories.powerBanks: 7.41%
-3. peripherals.soundCards: 7.41%
-\end{verbatim}
-
 \subsubsection*{6.4.2 Interfejs użytkownika - rekomendacje probabilistyczne}
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{images/probabilisticMethodsSequenceDiagram.png}
-  \caption{Diagram sekwencji - Probabilistic Models.}
-  \label{fig:prob_sequence}
-\end{figure}
-
-Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkownikowi w panelu klienta w zakładce ``Smart Recommendations''. System wyświetla dwie podzakładki:
+Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkownikowi w panelu klienta w zakładce ``Smart Recommendations''. Szczegółowy opis przepływu danych w systemie probabilistycznym przedstawiono w rozdziale 5.3. System wyświetla dwie podzakładki:
 \begin{itemize}
     \item \textbf{Next Purchase (Markov)}: produkty z kategorii przewidywanych przez łańcuch Markowa jako najbardziej prawdopodobne do zakupu
     \item \textbf{Behavior Insights (Bayesian)}: analiza zachowań zakupowych użytkownika z wykorzystaniem Naive Bayes
@@ -97,7 +53,7 @@ Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkowniko
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient1.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient1.png}
   \caption{Zakładka "Next Purchase (Markov)".}
   \label{fig:prob_client1}
 \end{figure}
@@ -112,7 +68,7 @@ Zakładka "Next Purchase (Markov)" prezentuje:
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient2.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient2.png}
   \caption{Zakładka "Behavior Insights (Bayesian)".}
   \label{fig:prob_client2}
 \end{figure}
@@ -126,7 +82,7 @@ Zakładka ``Behavior Insights (Bayesian)'' wykorzystuje model Naive Bayes do ana
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient3.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsClient3.png}
   \caption{Zakładka "Churn Risk Analysis".}
   \label{fig:prob_client3}
 \end{figure}
@@ -144,10 +100,12 @@ Panel administracyjny systemu rekomendacji probabilistycznych prezentuje zaawans
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin1.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin1.png}
   \caption{Panel administracyjny - Markov Chain Analysis.}
   \label{fig:prob_admin1}
 \end{figure}
+
+\newpage
 
 Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Chain Analysis'' zawierający:
 \begin{itemize}
@@ -157,23 +115,14 @@ Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Chain Analysis'' zawiera
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin2.jpg}
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin2.png}
   \caption{Panel administracyjny - Bayesian Analysis.}
   \label{fig:prob_admin2}
 \end{figure}
 
-Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' z:
-\begin{itemize}
-    \item \textbf{Category Preferences}: wykres słupkowy preferencji kategorii użytkowników
-    \item \textbf{Performance Metrics}: metryki wydajności modelu Naive Bayes
-\end{itemize}
+\newpage
 
-Rysunek \ref{fig:prob_admin3} prezentuje panel ``Demand Forecast'' z:
-\begin{itemize}
-    \item \textbf{Demand Trends}: wykres trendów popytu w czasie
-    \item \textbf{Seasonality Analysis}: analiza sezonowości zakupów
-    \item \textbf{Stock Recommendations}: rekomendacje dotyczące poziomu zapasów
-\end{itemize}
+Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' zawierający zaawansowane narzędzia analityczne dla administratora. Panel umożliwia analizę oczekiwanego popytu na produkty, identyfikację kategorii produktowych preferowanych przez użytkowników oraz monitorowanie metryk wydajności modelu Naive Bayes. System generuje rekomendacje dotyczące poziomu zapasów oraz identyfikuje produkty wymagające uzupełnienia magazynu na podstawie predykcji probabilistycznych.
 
 \newpage
 
