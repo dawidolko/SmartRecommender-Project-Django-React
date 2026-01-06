@@ -161,16 +161,19 @@
 \addcontentsline{toc}{section}{Wstęp}
 
 \subsection*{Kontekst i motywacja}
+\addcontentsline{toc}{subsection}{Kontekst i motywacja}
 
 Nowoczesne platformy e-commerce oferują tysiące lub dziesiątki tysięcy produktów, co stanowi istotne wyzwanie zarówno dla klientów, jak i właścicieli sklepów internetowych. Użytkownik poszukujący smartfona staje przed wyborem setek modeli, w przypadku laptopów sytuacja wygląda podobnie. Bez wsparcia inteligentnych systemów rekomendacyjnych proces zakupowy staje się czasochłonny i frustrujący, co często prowadzi do rezygnacji z zakupu. Z perspektywy biznesowej oznacza to utratę potencjalnych klientów oraz sytuacje, w których nabywcy nie odkrywają produktów optymalnie dopasowanych do ich potrzeb.
 
 Systemy rekomendacyjne stanowią rozwiązanie tego problemu poprzez automatyczną analizę historii zakupów, opinii oraz zachowań użytkowników w celu proponowania produktów o najwyższej wartości dla konkretnego klienta.
 
 \subsection*{Cel pracy}
+\addcontentsline{toc}{subsection}{Cel pracy}
 
 Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletnego systemu e-commerce wyposażonego w autorskie mechanizmy rekomendacji produktów. Aplikacja została opracowana od podstaw jako autorskie rozwiązanie wykonane we współpracy dwuosobowej. W ramach systemu zaimplementowano łącznie sześć różnych metod rekomendacyjnych — trzech z nich dotyczy ta praca. Ich założeniem jest zapewnienie komplementarnych mechanizmów wsparcia decyzji zakupowych. Niniejsza praca koncentruje się na trzech spośród nich: Collaborative Filtering, analizie sentymentu oraz regułach asocjacyjnych. Mechanizmy rekomendacyjne zostały zaprojektowane i zaimplementowane samodzielnie na podstawie literatury naukowej, bez wykorzystania gotowych bibliotek rekomendacyjnych, co umożliwiło pełną kontrolę nad logiką algorytmów oraz ich świadome dostosowanie do specyfiki branży handlu elektronicznego.
 
 \subsection*{Zakres pracy}
+\addcontentsline{toc}{subsection}{Zakres pracy}
 
 \textbf{Zakres funkcjonalny systemu obejmuje:}
 
@@ -199,10 +202,12 @@ Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletn
 \section*{Teoretyczne podstawy systemów rekomendacyjnych}
 
 \subsection*{1.1 Historia i ewolucja systemów rekomendacyjnych}
+\addcontentsline{toc}{subsection}{1.1 Historia i ewolucja systemów rekomendacyjnych}
 
 Systemy rekomendacyjne powstały jako odpowiedź na problem wyboru spośród tysięcy produktów w sklepach internetowych. Rozwój tej dziedziny rozpoczął się w latach 90. XX wieku wraz z pojawieniem się pierwszych platform e-commerce. Wczesne zastosowania komercyjne systemów rekomendacji zostały opisane w literaturze specjalistycznej \cite{linden2003amazon}. Istotnym przełomem była również publikacja wprowadzająca metodę Item-Based Collaborative Filtering z metryką Adjusted Cosine Similarity \cite{sarwar2001item}, która stała się standardem przemysłowym. Konkursy i inicjatywy badawcze, takie jak Netflix Prize w latach 2006-2009, w którym fundusz nagród wynosił milion dolarów, znacząco przyspieszyły rozwój zaawansowanych technik rekomendacji \cite{bennett2007netflix}, przyciągając uwagę zarówno środowiska akademickiego, jak i przemysłowego. Obecnie systemy rekomendacyjne stanowią kluczowy element wiodących platform e-commerce (handlu elektronicznego) oraz serwisów VOD (Video on Demand - wideo na żądanie).
 
 \subsection*{1.2 Klasyfikacja metod rekomendacyjnych}
+\addcontentsline{toc}{subsection}{1.2 Klasyfikacja metod rekomendacyjnych}
 
 Istnieją trzy główne kategorie systemów rekomendacyjnych:
 
@@ -226,6 +231,7 @@ Systemy rekomendacyjne w e-commerce wykorzystują różne strategie sprzedażowe
 \textbf{Frequently Bought Together (często kupowane razem)} — rodzaj rekomendacji prezentujący produkty, które klienci regularnie kupują w tym samym koszyku. Przykład: laptop + mysz + podkładka pod mysz. Celem jest uproszczenie procesu zakupów i zwiększenie wartości koszyka.
 
 \subsection*{1.3 Matematyczne fundamenty algorytmów}
+\addcontentsline{toc}{subsection}{1.3 Matematyczne fundamenty algorytmów}
 
 Matematyczne podstawy trzech implementowanych algorytmów stanowią fundament dla szczegółowych opisów w kolejnych rozdziałach.
 
@@ -275,6 +281,7 @@ Wzrost(Lift) > 1: pozytywna korelacja, Wzrost = 1: niezależność, Wzrost < 1: 
 W celu uzasadnienia sensowności tworzenia dedykowanego systemu rekomendacji przeprowadzono analizę trzech reprezentatywnych rozwiązań rynkowych. Celem weryfikacji było zidentyfikowanie ograniczeń istniejących narzędzi oraz określenie wymagań dla planowanej aplikacji e-commerce wykorzystującej trzy metody: Collaborative Filtering \cite{sarwar2001item}, analizę sentymentu \cite{liu2012} oraz reguły asocjacyjne \cite{agrawal1994}.
 
 \subsection*{2.1 Amazon Personalize}
+\addcontentsline{toc}{subsection}{2.1 Amazon Personalize}
 
 Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji oparte na algorytmach stosowanych w Amazon.com \cite{linden2003amazon}. System wykorzystuje deep learning (głębokie uczenie - wielowarstwowe sieci neuronowe) oraz collaborative filtering, oferując trzy typy rekomendacji: User Personalization (personalizacja użytkownika), Similar Items (podobne produkty) oraz Personalized Ranking (spersonalizowane rankowanie).
 
@@ -289,6 +296,7 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 \end{itemize}
 
 \subsection*{2.2 Google Recommendations AI (Vertex AI)}
+\addcontentsline{toc}{subsection}{2.2 Google Recommendations AI (Vertex AI)}
 
 Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz multi-armed contextual bandits (wieloramienne bandyty kontekstowe - algorytmy balansujące eksplorację nowych opcji z wykorzystaniem sprawdzonych rozwiązań). System oferuje zaawansowane rekomendacje dla e-commerce, VOD (Video on Demand - wideo na żądanie) oraz platform newsowych, z automatycznym wykrywaniem trendów i sezonowości.
 
@@ -302,6 +310,7 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 \end{itemize}
 
 \subsection*{2.3 Apache Mahout}
+\addcontentsline{toc}{subsection}{2.3 Apache Mahout}
 
 Apache Mahout to open-source framework (otwartoźródłowy framework) implementujący klasyczne algorytmy collaborative filtering \cite{sarwar2001item} oraz matrix factorization (faktoryzacja macierzy - technika dekompozycji macierzy user-item) - ALS (Alternating Least Squares - metoda najmniejszych kwadratów na przemian), SVD (Singular Value Decomposition - rozkład według wartości osobliwych). Projekt powstał w 2008 roku, obecnie koncentruje się na Spark-based distributed algorithms (algorytmy rozproszone oparte na Apache Spark).
 
@@ -315,6 +324,7 @@ Apache Mahout to open-source framework (otwartoźródłowy framework) implementu
 \end{itemize}
 
 \subsection*{2.4 Podsumowanie analizy i uzasadnienie własnego rozwiązania}
+\addcontentsline{toc}{subsection}{2.4 Podsumowanie analizy i uzasadnienie własnego rozwiązania}
 
 Analiza rozwiązań alternatywnych ujawniła fundamentalny kompromis: \textbf{zaawansowanie technologiczne vs koszty i elastyczność}. Rozwiązania chmurowe od Amazona oraz Google oferują wysoką jakość rekomendacji dzięki algorytmom deep learning, ale wiążą się z wysokimi kosztami operacyjnymi, vendor lock-in (uzależnieniem od dostawcy) oraz brakiem kontroli nad algorytmami. Apache Mahout eliminuje koszty licencyjne, ale wymaga zaawansowanej wiedzy technicznej oraz kosztownej infrastruktury Spark.
 
@@ -577,6 +587,7 @@ Użytkownik otwiera wyszukiwarkę z paska nawigacyjnego, wpisuje zapytanie ,,lap
 Niezalogowany użytkownik dodaje laptop do koszyka. Przechodzi do widoku koszyka - system automatycznie wyświetla sekcję ,,Frequently Bought Together'' z trzema produktami wygenerowanymi przez algorytm Apriori (torba na laptopa, mysz bezprzewodowa, hub). Każda rekomendacja zawiera metryki lift i confidence. Użytkownik decyduje się dodać torbę i mysz jednym kliknięciem. Przy próbie finalizacji zamówienia system przekierowuje do logowania.
 
 \subsection*{3.6 Podsumowanie opisu projektu}
+\addcontentsline{toc}{subsection}{3.6 Podsumowanie opisu projektu}
 
 Planowana aplikacja e-commerce z zaawansowanym systemem rekomendacji została zaprojektowana z hierarchią trzech typów użytkowników (gość, klient, administrator), gdzie każdy poziom dziedziczy funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli. Diagram przypadków użycia jasno definiuje role aktorów oraz ich interakcje z systemem, podczas gdy szczegółowe scenariusze użycia ilustrują praktyczne zastosowania funkcjonalności w rzeczywistych przepływach zakupowych.
 
@@ -860,6 +871,7 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 \end{itemize}
 
 \subsection*{4.6 Podsumowanie stosu technologicznego}
+\addcontentsline{toc}{subsection}{4.6 Podsumowanie stosu technologicznego}
 
 Wybrane technologie (Django + React + PostgreSQL + Docker) tworzą nowoczesny, skalowalny i łatwy w utrzymaniu stos technologiczny. Kluczowe zalety:
 
@@ -1245,6 +1257,7 @@ Przepływ procesu generowania reguł asocjacyjnych algorytmem Apriori:
 \end{itemize}
 
 \subsection*{5.4 Podsumowanie implementacji}
+\addcontentsline{toc}{subsection}{5.4 Podsumowanie implementacji}
 
 Przedstawione pseudokody odzwierciedlają algorytmy zaimplementowane \\w aplikacji. Kluczowe aspekty techniczne:
 
@@ -1554,6 +1567,7 @@ System wykorzystuje mechanizm Django Signals do automatycznego przeliczania reko
 System używa operacji zbiorczych (bulk operations) dla zapisu wielu rekordów jednocześnie, co znacząco przyspiesza operacje zapisu do bazy danych.
 
 \subsection*{6.7 Podsumowanie funkcjonowania systemu}
+\addcontentsline{toc}{subsection}{6.7 Podsumowanie funkcjonowania systemu}
 
 Zaimplementowany system rekomendacji charakteryzuje się:
 
@@ -1592,6 +1606,7 @@ System jest w pełni funkcjonalny i gotowy do wdrożenia w środowisku produkcyj
 Niniejsza praca przedstawiła proces implementacji oraz analizy kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. System został opracowany od podstaw we współpracy dwuosobowej, przy czym w ramach niniejszej pracy zaimplementowano trzy metody rekomendacyjne: Collaborative Filtering z metryką Adjusted Cosine Similarity, analizę sentymentu opartą na podejściu słownikowym oraz reguły asocjacyjne wykorzystujące algorytm Apriori.
 
 \subsection*{Ograniczenia systemu}
+\addcontentsline{toc}{subsection}{Ograniczenia systemu}
 
 W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
@@ -1602,6 +1617,7 @@ W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 \textbf{Skalowalność dla bardzo dużych katalogów} — dla katalogów produktów przekraczających tysiące pozycji mogą wystąpić wyzwania wydajnościowe wymagające dalszych optymalizacji, takich jak partycjonowanie danych, rozproszenie obliczeń lub zastosowanie dedykowanych struktur danych.
 
 \subsection*{Kierunki dalszego rozwoju}
+\addcontentsline{toc}{subsection}{Kierunki dalszego rozwoju}
 
 Zidentyfikowano następujące kierunki rozwoju systemu:
 
@@ -1612,6 +1628,7 @@ Zidentyfikowano następujące kierunki rozwoju systemu:
 \textbf{Zaawansowane metody obsługi zimnego startu} — zastosowanie technik faktoryzacji macierzy, takich jak Singular Value Decomposition (SVD), mogłoby umożliwić generowanie rekomendacji dla nowych produktów na podstawie ich cech (kategoria, cena, marka, specyfikacja) oraz analogii do istniejących produktów \\w katalogu.
 
 \subsection*{Wnioski końcowe}
+\addcontentsline{toc}{subsection}{Wnioski końcowe}
 
 Zrealizowany system stanowi kompletne rozwiązanie e-commerce z autorskimi mechanizmami rekomendacji produktów, gotowe do wdrożenia w środowisku produkcyjnym. Implementacja od podstaw bez wykorzystania gotowych bibliotek rekomendacyjnych umożliwiła pełne zrozumienie mechanizmów działania algorytmów oraz ich świadome dostosowanie do specyfiki handlu elektronicznego. Komplementarność zastosowanych metod — Collaborative Filtering dla identyfikacji produktów podobnych, analiza sentymentu dla oceny jakości oraz algorytm Apriori dla cross-sellingu — zapewnia wszechstronne wsparcie procesu decyzyjnego użytkownika. Zastosowane techniki optymalizacyjne, w tym bitmap pruning, cache'owanie oraz indeksowanie bazy danych, gwarantują akceptowalne czasy odpowiedzi systemu nawet przy większych katalogach produktów.
 
