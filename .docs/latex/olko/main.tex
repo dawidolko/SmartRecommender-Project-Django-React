@@ -169,11 +169,12 @@ Systemy rekomendacyjne stanowią rozwiązanie tego problemu poprzez automatyczn�
 
 \subsection*{Cel pracy}
 
-Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. Aplikacja została opracowana od podstaw we współpracy dwuosobowej, w ramach której frontend, backend oraz baza danych zostały zrealizowane wspólnie, natomiast metody rekomendacyjne były implementowane osobno przez każdego z osobna. W ramach systemu zaimplementowano łącznie
+Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. Aplikacja została opracowana od podstaw we współpracy dwuosobowej, w ramach której części frontendu, backendu oraz bazy danych zostały zrealizowane wspólnie, natomiast metody rekomendacyjne były implementowane przez każdego z osobna. W ramach systemu zaimplementowano łącznie
 sześć różnych metod rekomendacyjnych, niniejsza praca koncentruje się na trzech spośród nich: Collaborative Filtering, analizie sentymentu oraz regułach asocjacyjnych. Mechanizmy rekomendacyjne zostały zaprojektowane i zaimplementowane samodzielnie na podstawie literatury naukowej, bez wykorzystania gotowych bibliotek rekomendacyjnych, co umożliwiło pełną kontrolę nad logiką algorytmów oraz ich świadome dostosowanie do specyfiki branży handlu elektronicznego.
 
 \subsection*{Zakres pracy}
 
+\noindent
 Zakres funkcjonalny systemu obejmuje:
 
 \noindent
@@ -208,6 +209,7 @@ Systemy rekomendacyjne powstały jako odpowiedź na problem wyboru spośród tys
 
 \subsection*{Klasyfikacja metod rekomendacyjnych}
 
+\noindent
 Istnieją trzy główne kategorie systemów rekomendacyjnych:
 
 \textbf{Collaborative Filtering} — jedna z najpopularniejszych metod w systemach komercyjnych. Zakłada, że użytkownicy o podobnych preferencjach będą mieli podobne wybory w przyszłości. Istnieją dwa warianty: oparty na użytkownikach (User-Based, porównuje użytkowników) oraz oparty na produktach (Item-Based, porównuje produkty). Zalety: odkrywa nieoczywiste powiązania między produktami. Wady: problem zimnego startu (ang. cold start) dla nowych użytkowników i produktów, macierz danych jest zazwyczaj rzadka (stopień wypełnienia zależy od liczby produktów, użytkowników oraz częstotliwości transakcji).
@@ -241,6 +243,7 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 
 \textbf{Możliwości systemu:} Amazon Personalize oferuje automatyczne skalowanie infrastruktury dostosowujące się do obciążenia, co pozwala obsługiwać zarówno małe sklepy internetowe, jak i platformy o skali Amazon.com. System automatycznie przetwarza dane użytkowników (kliknięcia, zakupy, wyświetlenia produktów) i generuje modele predykcyjne bez konieczności ręcznej optymalizacji hiperparametrów. Platforma zapewnia integrację z pozostałymi usługami AWS poprzez SDK dostępne w językach Python, Java, JavaScript oraz .NET, co umożliwia szybkie wdrożenie w istniejących aplikacjach. System automatycznie aktualizuje modele w czasie rzeczywistym na podstawie nowych interakcji użytkowników, zapewniając aktualność rekomendacji.
 
+\noindent
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
 \begin{itemize}
@@ -257,6 +260,7 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz al
 
 \textbf{Możliwości systemu:} Platforma zapewnia automatyczne wykrywanie trendów sezonowych oraz reagowanie na zmiany w zachowaniach użytkowników bez konieczności ręcznej rekonfiguracji. System oferuje funkcję ,,Frequently Bought Together'' (często kupowane razem), która analizuje koszyki zakupowe w sposób podobny do algorytmu Apriori. Google Recommendations AI automatycznie optymalizuje parametry modeli poprzez mechanizmy AutoML, co eliminuje potrzebę ręcznego dostrajania hiperparametrów. Platforma oferuje zaawansowane możliwości personalizacji rekomendacji z uwzględnieniem kontekstu sesji użytkownika (urządzenie, lokalizacja, pora dnia), co może zwiększać współczynnik konwersji.
 
+\noindent
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
 \begin{itemize}
@@ -272,6 +276,7 @@ Apache Mahout to otwartoźródłowy framework (ang. open-source framework) imple
 
 \textbf{Możliwości systemu:} Apache Mahout oferuje pełną kontrolę nad implementacją algorytmów rekomendacyjnych oraz możliwość dostosowania ich do specyficznych wymagań biznesowych. Framework eliminuje koszty licencyjne charakterystyczne dla rozwiązań komercyjnych, co czyni go atrakcyjnym dla organizacji o ograniczonym budżecie. System wykorzystuje Apache Spark do przetwarzania rozproszonych obliczeń, co umożliwia skalowanie do bardzo dużych zbiorów danych (miliony użytkowników, miliony produktów). Mahout oferuje implementacje zaawansowanych algorytmów faktoryzacji macierzy (ALS, SVD), które mogą osiągać wysoką jakość rekomendacji przy odpowiedniej konfiguracji. Jako projekt otwartoźródłowy, Mahout nie wiąże się z uzależnieniem od konkretnego dostawcy chmurowego.
 
+\noindent
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
 \begin{itemize}
@@ -285,6 +290,7 @@ Apache Mahout to otwartoźródłowy framework (ang. open-source framework) imple
 
 Analiza rozwiązań alternatywnych ujawniła fundamentalny kompromis: \textbf{zaawansowanie technologiczne vs koszty i elastyczność}. Rozwiązania chmurowe od Amazona oraz Google oferują wysoką jakość rekomendacji dzięki algorytmom deep learning, ale wiążą się z wysokimi kosztami operacyjnymi, uzależnieniem od dostawcy oraz brakiem kontroli nad algorytmami. Apache Mahout eliminuje koszty licencyjne, ale wymaga zaawansowanej wiedzy technicznej oraz kosztownej infrastruktury Spark.
 
+\noindent
 Uzasadnienie sensowności własnego rozwiązania:
 
 \begin{itemize}
@@ -299,6 +305,7 @@ Każde z analizowanych rozwiązań wymaga dodatkowej integracji lub samodzielnej
 
 Własna implementacja pozwala na spójną integrację wszystkich trzech metod w ramach jednej architektury systemowej oraz umożliwia dostosowanie logiki każdej metody do specyfiki branży e-commerce.
 
+\newpage
 \item \textbf{Optymalizacja kosztów dla małych i średnich platform}:
 
 Własna implementacja (Django + PostgreSQL) eliminuje koszty licencyjne rozwiązań chmurowych przy zachowaniu wysokiej jakości rekomendacji. System jest szczególnie atrakcyjny dla małych i średnich platform e-commerce (do 10000 produktów, do 10000 użytkowników), które potrzebują zaawansowanych funkcjonalności rekomendacji przy ograniczonym budżecie.
@@ -319,6 +326,7 @@ Aplikacja oparta na Django + React + PostgreSQL może być wdrożona na dowolnej
 Dla porównania: migracja z Amazon Personalize do Google Recommendations AI wymaga przepisania całej integracji (śledzenie zdarzeń, dane treningowe, wywołania API) oraz ponownego trenowania modeli, co może trwać tygodnie i powodować degradację jakości rekomendacji.
 \end{itemize}
 
+\noindent
 Własna implementacja systemu rekomendacji stanowi optymalny wybór dla małych i średnich platform e-commerce, łączący:
 \begin{itemize}
 \item Wysoką jakość rekomendacji (trzy komplementarne metody: Collaborative Filtering, Sentiment Analysis, Apriori),
@@ -429,7 +437,6 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Automatyczne przeliczanie sentymentu po dodaniu opinii.
 \end{itemize}
 
-\newpage
 \noindent
 \textbf{Funkcje administracyjne - zarządzanie produktami:}
 \begin{itemize}
@@ -538,6 +545,7 @@ Baza danych systemu składa się z 25 tabel zorganizowanych w cztery moduły fun
   \label{fig:erd1}
 \end{figure}
 
+\noindent
 Diagram \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje:
 
 \begin{itemize}
@@ -555,6 +563,7 @@ Diagram \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje
   \label{fig:erd2}
 \end{figure}
 
+\noindent
 Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
 
 \begin{itemize}
@@ -566,8 +575,10 @@ Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
 \end{itemize}
 
 \newpage
+\noindent
 \textbf{Charakterystyka tabel bazy danych}
 
+\noindent
 Baza składa się z \textbf{25 tabel} podzielonych na 4 modułów funkcjonalnych:
 
 \noindent
@@ -752,7 +763,7 @@ Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając sp
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/dockerView.jpg}
+  \includegraphics[width=1.1\textwidth]{images/dockerView.jpg}
   \caption{Deployment aplikacji w architekturze Docker Compose.}
   \label{fig:docker_view}
 \end{figure}
@@ -821,6 +832,39 @@ System rekomendacji został zintegrowany z aplikacją e-commerce w architekturze
 \item \texttt{method\_productassociation} - reguły Apriori,
 \item \texttt{method\_recommendation\_settings} - konfiguracja aktywnej metody.
 \end{itemize}
+
+\subsection*{Charakterystyka funkcjonowania systemu}
+
+\noindent
+Zaimplementowany system rekomendacji cechuje się:
+
+\noindent
+\textbf{Kompletnością zarządzania:}
+\begin{itemize}
+\item Panel administratora z dynamicznym przełączaniem metod,
+\item Sekcje debugowania dla wszystkich trzech algorytmów,
+\item Wizualizacja metryk i statystyk w czasie rzeczywistym.
+\end{itemize}
+
+\noindent
+\textbf{Integracją w aplikacji:}
+\begin{itemize}
+\item Strona główna z konfigurowalnymi rekomendacjami,
+\item Dashboard klienta z personalizacją,
+\item Wyszukiwarka z sortowaniem według sentymentu,
+\item Sekcje ,,Frequently Bought Together'' oparte na Apriori.
+\end{itemize}
+
+\noindent
+\textbf{Narzędziami diagnostycznymi:}
+\begin{itemize}
+\item Podgląd macierzy podobieństw Collaborative Filtering,
+\item Analiza źródeł sentymentu dla każdego produktu,
+\item Ranking reguł asocjacyjnych z metrykami,
+\item Statystyki wykonania algorytmów.
+\end{itemize}
+
+System jest w pełni funkcjonalny i gotowy do wdrożenia w środowisku produkcyjnym.
 \clearpage
 
 \newpage
@@ -1386,36 +1430,6 @@ System wykorzystuje mechanizm Django Signals do automatycznego przeliczania reko
 \textbf{Operacje zbiorcze}
 
 System używa operacji zbiorczych (bulk operations) dla zapisu wielu rekordów jednocześnie, co znacząco przyspiesza operacje zapisu do bazy danych.
-
-\subsection*{6.6 Charakterystyka funkcjonowania systemu}
-
-Zaimplementowany system rekomendacji cechuje się:
-
-\textbf{Kompletnością zarządzania:}
-\begin{itemize}
-\item Panel administratora z dynamicznym przełączaniem metod,
-\item Sekcje debugowania dla wszystkich trzech algorytmów,
-\item Wizualizacja metryk i statystyk w czasie rzeczywistym.
-\end{itemize}
-
-\textbf{Integracją w aplikacji:}
-\begin{itemize}
-\item Strona główna z konfigurowalnymi rekomendacjami,
-\item Dashboard klienta z personalizacją,
-\item Wyszukiwarka z sortowaniem według sentymentu,
-\item Sekcje ,,Frequently Bought Together'' oparte na Apriori.
-\end{itemize}
-
-\textbf{Narzędziami diagnostycznymi:}
-\begin{itemize}
-\item Podgląd macierzy podobieństw Collaborative Filtering,
-\item Analiza źródeł sentymentu dla każdego produktu,
-\item Ranking reguł asocjacyjnych z metrykami,
-\item Statystyki wykonania algorytmów.
-\end{itemize}
-
-System jest w pełni funkcjonalny i gotowy do wdrożenia w środowisku produkcyjnym.
-
 \clearpage
 
 \newpage
@@ -1478,6 +1492,7 @@ Niniejsza praca przedstawiła proces implementacji oraz analizy kompletnego syst
 
 \subsection*{Ograniczenia systemu}
 
+\noindent
 W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
 \textbf{Problem zimnego startu} — algorytmy Collaborative Filtering oraz Apriori wymagają historycznych danych o interakcjach użytkowników z produktami. Dla nowych użytkowników bez historii zakupów oraz nowych produktów bez opinii mechanizmy te nie są w stanie generować efektywnych rekomendacji. Analiza sentymentu częściowo kompensuje to ograniczenie, ponieważ może ocenić jakość produktu na podstawie jego opisu, specyfikacji technicznych oraz nazwy, nawet w przypadku braku opinii użytkowników.
@@ -1488,6 +1503,7 @@ W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
 \subsection*{Kierunki dalszego rozwoju}
 
+\noindent
 Zidentyfikowano następujące kierunki rozwoju systemu:
 
 \textbf{Zastosowanie głębokiego uczenia maszynowego} — obecny system wykorzystuje klasyczne algorytmy rekomendacyjne oparte na analizie podobieństw oraz regułach asocjacyjnych. Zastosowanie sieci neuronowych, takich jak autoencodery czy sieci rekurencyjne, mogłoby umożliwić automatyczne uczenie się ukrytych wzorców w danych bez konieczności ręcznego definiowania reguł. Przykładowo, sieci neuronowe mogłyby odkryć nieoczywiste zależności między produktami oraz preferencjami użytkowników, które nie są widoczne w tradycyjnych metrykach podobieństwa.
@@ -1565,8 +1581,8 @@ Dostępny online: \url{https://github.com/dawidolko/SmartRecommender-Project-Dja
 
 \newpage
 % Wykaz rysunków
-\section*{Wykaz rysunków }
-\addcontentsline{toc}{section}{Wykaz ilustracji, rysunków, wykresów i tabel}
+\section*{Wykaz rysunków}
+\addcontentsline{toc}{section}{Wykaz rysunków}
 \small
 \listoffigures
 
