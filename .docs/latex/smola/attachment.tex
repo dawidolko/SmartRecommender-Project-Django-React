@@ -1,0 +1,347 @@
+% filepath: /SmartRecommender-Project-Django-React/.docs/latex/smola/attachment.tex
+
+\newpage
+\section*{Załącznik A}
+\addcontentsline{toc}{section}{Załącznik A: Szczegółowe scenariusze użycia}
+\section*{Szczegółowe scenariusze użycia}
+
+Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiadających przypadkom użycia zaprezentowanym na diagramie w rozdziale 3.3. Scenariusze zostały opisane zgodnie z notacją: Aktor, Warunki początkowe, Przebieg scenariusza głównego, Warunki końcowe.
+
+\subsection*{Scenariusz 1: Przeglądanie i wyszukiwanie produktów}
+
+\noindent
+\textbf{Aktor:} Gość (użytkownik niezalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej aplikacji
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik otwiera stronę główną aplikacji w przeglądarce
+\item Użytkownik otwiera pasek wyszukiwania z standardową opcją 
+\item Użytkownik wpisuje szukaną frazę
+\item System sortuje produkty według wartości \texttt{sentiment\_score} malejąco
+\item Użytkownik przegląda listę produktów
+\item Użytkownik klika na wybrany produkt
+\item System wyświetla szczegółową stronę produktu z opisem, specyfikacjami, zdjęciami i opiniami
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi szczegółowe informacje o wybranym produkcie
+
+\subsection*{Scenariusz 2: Dodawanie produktów do koszyka}
+
+\noindent
+\textbf{Aktor:} Gość (użytkownik niezalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik przegląda szczegółową stronę produktu (laptop)
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik klika przycisk ,,Dodaj do koszyka''
+\item System dodaje produkt do koszyka i wyświetla powiadomienie o sukcesie
+\item Użytkownik klika ikonę koszyka w nawigacji
+\item System wyświetla widok koszyka z dodanymi produktami
+\item System automatycznie wywołuje algorytm Apriori dla produktów w koszyku
+\item System wyświetla sekcję ,,Frequently Bought Together'' z trzema produktami rekomendowanymi przez algorytm Apriori (torba na laptopa, mysz bezprzewodowa, hub USB-C)
+\item Każda rekomendacja zawiera metryki: lift, confidence oraz przycisk ,,Dodaj do koszyka''
+\item Użytkownik przegląda rekomendacje
+\item Użytkownik klika ,,Dodaj do koszyka'' przy torbie i myszy
+\item System dodaje wybrane produkty do koszyka i aktualizuje sumę całkowitą
+\end{enumerate}
+
+\textbf{Warunki końcowe:} Koszyk zawiera laptop, torbę i mysz, wyświetlona jest zaktualizowana suma
+
+\subsection*{Scenariusz 3: Rejestracja nowego użytkownika}
+
+\noindent
+\textbf{Aktor:} Gość (użytkownik niezalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik klika przycisk ,,Zarejestruj się'' w nawigacji
+\item System wyświetla formularz rejestracji
+\item Użytkownik wypełnia pola: imię, nazwisko, adres e-mail, hasło, potwierdzenie hasła
+\item Użytkownik klika przycisk ,,Zarejestruj''
+\item System waliduje dane: sprawdza czy e-mail jest unikalny, czy hasła się zgadzają, czy hasło spełnia wymagania bezpieczeństwa
+\item System tworzy nowe konto użytkownika w bazie danych
+\item System wyświetla komunikat o pomyślnej rejestracji
+\item System automatycznie loguje użytkownika i generuje token JWT
+\item System przekierowuje użytkownika do panelu klienta
+\end{enumerate}
+
+\textbf{Warunki końcowe:} Użytkownik jest zalogowany i posiada aktywne konto w systemie
+
+\subsection*{Scenariusz 4: Logowanie do systemu}
+
+\noindent
+\textbf{Aktor:} Gość (użytkownik niezalogowany, posiadający konto)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik klika przycisk ,,Zaloguj się'' w nawigacji
+\item System wyświetla formularz logowania
+\item Użytkownik wpisuje adres e-mail i hasło
+\item Użytkownik klika przycisk ,,Zaloguj''
+\item System weryfikuje dane logowania w bazie danych
+\item System generuje token JWT i zwraca go do klienta
+\item Frontend zapisuje token w localStorage przeglądarki
+\item System przekierowuje użytkownika do panelu klienta
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik jest zalogowany, posiada ważny token JWT
+
+\subsection*{Scenariusz 5: Śledzenie statusu zamówienia}
+
+\noindent
+\textbf{Aktor:} Klient (użytkownik zalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik jest zalogowany, posiada co najmniej jedno zamówienie
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik otwiera panel klienta
+\item Użytkownik klika zakładkę ,,My Orders''
+\item System pobiera wszystkie zamówienia użytkownika z bazy danych
+\item System wyświetla listę zamówień posortowaną od najnowszych
+\item Dla każdego zamówienia wyświetlane są: numer zamówienia, status (oczekujące/w realizacji/zakończone/anulowane)
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi szczegółowe informacje o statusie wybranego zamówienia
+
+\subsection*{Scenariusz 6: Wystawianie opinii o produkcie}
+
+\noindent
+\textbf{Aktor:} Klient (użytkownik zalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik posiada zakończone zamówienie zawierające produkt
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik otwiera panel klienta, zakładkę ,,My Orders''
+\item Użytkownik znajduje zakończone zamówienie
+\item Użytkownik klika przycisk ,,Add Review'' przy zakupionym produkcie
+\item System wyświetla formularz opinii
+\item Użytkownik wybiera ocenę gwiazdkową (1-5 gwiazdek)
+\item Użytkownik wpisuje treść tekstową opinii
+\item Użytkownik klika ,,Wyślij opinię''
+\item System zapisuje opinię w bazie danych z powiązaniem: użytkownik, produkt, zamówienie
+\item System automatycznie wywołuje algorytm analizy sentymentu dla nowej opinii
+\item Algorytm tokenizuje tekst, wyszukuje słowa w słowniku pozytywnym/negatywnym
+\item Algorytm oblicza sentiment\_score dla opinii zgodnie ze wzorem (2)
+\item System przelicza zagregowany sentyment produktu zgodnie ze wzorem (3) (wieloźródłowa agregacja z 5 źródeł)
+\item System aktualizuje pole \texttt{sentiment\_score} w rekordzie produktu
+\item System wyświetla komunikat o pomyślnym dodaniu opinii
+\item System odświeża widok produktu - zaktualizowany sentyment jest widoczny
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Opinia została dodana, sentyment produktu zaktualizowany
+
+\subsection*{Scenariusz 7: Zarządzanie kontem użytkownika}
+
+\noindent
+\textbf{Aktor:} Klient (użytkownik zalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik jest zalogowany
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik otwiera panel klienta
+\item Użytkownik klika zakładkę ,,Konto''
+\item System wyświetla formularz z danymi użytkownika: imię, nazwisko, e-mail
+\item Użytkownik edytuje wybrane pola (np. zmienia nazwisko)
+\item Użytkownik klika ,,Zapisz zmiany''
+\item System waliduje dane (sprawdza czy e-mail jest unikalny, jeśli został zmieniony)
+\item System aktualizuje rekord użytkownika w bazie danych
+\item System wyświetla komunikat o pomyślnym zapisaniu zmian
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Dane użytkownika zostały zaktualizowane
+
+\subsection*{Scenariusz 8: Administrator zarządza produktami}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, posiada uprawnienia administratora
+
+\noindent
+\textbf{Przebieg scenariusza głównego - dodawanie produktu:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję ,,Products''
+\item System wyświetla listę wszystkich produktów
+\item Administrator klika przycisk ,,Add New Product''
+\item System wyświetla formularz dodawania produktu
+\item Administrator wypełnia pola: nazwa, opis, cena, kategorie, specyfikacje techniczne, przesyła zdjęcie
+\item Administrator klika ,,Zapisz produkt''
+\item System waliduje dane (sprawdza czy wszystkie wymagane pola są wypełnione)
+\item System tworzy nowy rekord produktu w bazie danych
+\item System automatycznie wywołuje algorytm analizy sentymentu dla nowego produktu
+\item Algorytm oblicza sentiment\_score na podstawie nazwy i opisu (brak jeszcze opinii)
+\item System zapisuje obliczony sentyment w rekordzie produktu
+\item System wyświetla komunikat o pomyślnym dodaniu produktu
+\item System odświeża listę produktów
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Nowy produkt został dodany do katalogu z obliczonym sentymentem
+
+\subsection*{Scenariusz 9: Administrator zarządza zamówieniami}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję ,,Orders''
+\item System wyświetla listę wszystkich zamówień w systemie
+\item Dla każdego zamówienia wyświetlane są: numer, aktualny status
+\item Administrator klika na wybrane zamówienie ze statusem ,,oczekujące''
+\item Administrator klika przycisk ,,Zmień status''
+\item System wyświetla listę dostępnych statusów (w realizacji, zakończone, anulowane)
+\item Administrator wybiera ,,w realizacji''
+\item System aktualizuje status zamówienia w bazie danych
+\item System zapisuje zdarzenie zmiany statusu z timestampem
+\item System wyświetla komunikat o pomyślnej zmianie statusu
+\item Użytkownik właściciel zamówienia widzi zaktualizowany status w swoim panelu
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Status zamówienia został zmieniony, użytkownik ma dostęp do aktualnej informacji
+
+\subsection*{Scenariusz 10: Administrator zarządza użytkownikami}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję ,,Users''
+\item System wyświetla listę wszystkich użytkowników
+\item Dla każdego użytkownika wyświetlane są: ID, imię, nazwisko, e-mail, rola, data rejestracji
+\item Administrator może filtrować użytkowników według roli (klient/administrator)
+\item Administrator klika na wybranego użytkownika
+\item System wyświetla szczegóły użytkownika: profil, historia zamówień, statystyki
+\item Administrator może zmienić rolę użytkownika (nadać uprawnienia administratora) lub usunąć konto
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Administrator ma pełny wgląd w dane użytkowników i może zarządzać uprawnieniami
+
+\subsection*{Scenariusz 11: Administrator przegląda statystyki i dashboard}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item System automatycznie wyświetla dashboard ze statystykami
+\item Dashboard zawiera następujące kluczowe metryki:
+  \begin{itemize}
+  \item Całkowita liczba produktów w katalogu
+  \item Całkowita liczba zarejestrowanych użytkowników
+  \item Całkowita liczba zamówień (wszystkie statusy)
+  \item Całkowity przychód (suma wartości zamówień zakończonych)
+  \end{itemize}
+\item System wyświetla wykresy:
+  \begin{itemize}
+  \item Wykres słupkowy: miesięczny obrót (ostatnie 12 miesięcy)
+  \item Wykres kołowy: rozkład zamówień według kategorii produktów
+  \item Wykres liniowy: liczba nowych użytkowników (ostatnie 30 dni)
+  \end{itemize}
+\item Administrator klika sekcję ,,Statistics'' dla bardziej szczegółowych analiz
+\item System wyświetla widok do zmiany rekomentacji, odświeżanie reguł asocjacyjnych
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Administrator ma pełny wgląd w kluczowe wskaźniki biznesowe systemu
+
+\subsection*{Scenariusz 12: Administrator debuguje algorytmy rekomendacji}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, algorytmy rekomendacji zostały przeliczone
+
+\noindent
+\textbf{Przebieg scenariusza głównego - Collaborative Filtering:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję ,,Debug''
+\item Administrator wybiera zakładkę ,,Collaborative Filtering''
+\item System wyświetla panel debugowania Collaborative Filtering zawierający:
+  \begin{itemize}
+  \item Wzór matematyczny Adjusted Cosine Similarity
+  \item Statystyki: liczba par produktów, średnie podobieństwo, czas ostatniego przeliczenia
+  \item Tabelę z przykładowymi podobieństwami (product\_a, product\_b, similarity\_score)
+  \end{itemize}
+\item Administrator może wpisać ID produktu i zobaczyć top 10 najbardziej podobnych produktów
+\item System pobiera dane z tabeli ProductSimilarity i wyświetla wyniki
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Administrator zweryfikował poprawność działania algorytmu Collaborative Filtering
+
+\subsection*{Scenariusz 13: Przeglądanie rekomendacji na stronie głównej}
+
+\noindent
+\textbf{Aktor:} Klient (użytkownik zalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik jest zalogowany, posiada historię zakupów
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik loguje się do systemu
+\item System przekierowuje użytkownika do strony głównej
+\item System wywołuje algorytm Collaborative Filtering dla zalogowanego użytkownika
+\item Algorytm analizuje historię zakupów użytkownika
+\item Algorytm pobiera produkty podobne do wcześniej zakupionych (na podstawie macierzy podobieństw)
+\item System wyświetla sekcję ,,Rekomendowane dla Ciebie'' z 6 produktami
+\item Użytkownik przegląda rekomendacje
+\item Użytkownik klika na wybrany produkt
+\item System wyświetla szczegółową stronę produktu
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi spersonalizowane rekomendacje oparte na swojej historii zakupów

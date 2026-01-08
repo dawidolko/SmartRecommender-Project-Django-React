@@ -5,46 +5,40 @@
 \addcontentsline{toc}{section}{Załącznik A: Szczegółowe scenariusze użycia}
 \section*{Szczegółowe scenariusze użycia}
 
-Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiadających przypadkom użycia zaprezentowanym na diagramie w rozdziale 3.3. Scenariusze zostały opisane zgodnie z notacją: Aktor, Warunki początkowe, Przebieg scenariusza głównego, Warunki końcowe oraz Scenariusze alternatywne (jeśli występują).
+Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiadających przypadkom użycia zaprezentowanym na diagramie w rozdziale 3.3. Scenariusze zostały opisane zgodnie z notacją: Aktor, Warunki początkowe, Przebieg scenariusza głównego, Warunki końcowe.
 
 \subsection*{Scenariusz 1: Przeglądanie i wyszukiwanie produktów}
 
+\noindent
 \textbf{Aktor:} Gość (użytkownik niezalogowany)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej aplikacji
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik otwiera stronę główną aplikacji w przeglądarce
-\item System wyświetla katalog produktów z możliwością filtrowania i sortowania
-\item Użytkownik wybiera kategorię ,,Laptopy'' z menu nawigacyjnego
-\item System filtruje produkty i wyświetla tylko laptopy
-\item Użytkownik wybiera opcję sortowania ,,Najlepszy sentyment''
+\item Użytkownik otwiera pasek wyszukiwania z standardową opcją 
+\item Użytkownik wpisuje szukaną frazę
 \item System sortuje produkty według wartości \texttt{sentiment\_score} malejąco
 \item Użytkownik przegląda listę produktów
 \item Użytkownik klika na wybrany produkt
 \item System wyświetla szczegółową stronę produktu z opisem, specyfikacjami, zdjęciami i opiniami
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Użytkownik widzi szczegółowe informacje o wybranym produkcie
 
-\textbf{Scenariusze alternatywne:}
-\begin{itemize}
-\item \textbf{1a.} Użytkownik wpisuje zapytanie w wyszukiwarkę zamiast wybierać kategorię:
-  \begin{enumerate}
-  \item[1.] Użytkownik wpisuje frazę ,,laptop gaming'' w pole wyszukiwania
-  \item[2.] System wykonuje wyszukiwanie full-text w polach nazwa i opis produktu
-  \item[3.] System wyświetla przefiltrowane wyniki z możliwością dalszego sortowania
-  \item[4.] Powrót do kroku 7 scenariusza głównego
-  \end{enumerate}
-\end{itemize}
+\subsection*{Scenariusz 2: Dodawanie produktów do koszyka}
 
-\subsection*{Scenariusz 2: Dodawanie produktów do koszyka z rekomendacjami}
-
+\noindent
 \textbf{Aktor:} Gość (użytkownik niezalogowany)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik przegląda szczegółową stronę produktu (laptop)
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik klika przycisk ,,Dodaj do koszyka''
@@ -63,10 +57,13 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 
 \subsection*{Scenariusz 3: Rejestracja nowego użytkownika}
 
+\noindent
 \textbf{Aktor:} Gość (użytkownik niezalogowany)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik klika przycisk ,,Zarejestruj się'' w nawigacji
@@ -82,26 +79,15 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 
 \textbf{Warunki końcowe:} Użytkownik jest zalogowany i posiada aktywne konto w systemie
 
-\textbf{Scenariusze alternatywne:}
-\begin{itemize}
-\item \textbf{5a.} Podany adres e-mail już istnieje w systemie:
-  \begin{enumerate}
-  \item[1.] System wyświetla komunikat błędu: ,,Użytkownik z tym adresem e-mail już istnieje''
-  \item[2.] Powrót do kroku 3 scenariusza głównego
-  \end{enumerate}
-\item \textbf{5b.} Hasła nie są identyczne:
-  \begin{enumerate}
-  \item[1.] System wyświetla komunikat błędu: ,,Hasła muszą być identyczne''
-  \item[2.] Powrót do kroku 3 scenariusza głównego
-  \end{enumerate}
-\end{itemize}
-
 \subsection*{Scenariusz 4: Logowanie do systemu}
 
+\noindent
 \textbf{Aktor:} Gość (użytkownik niezalogowany, posiadający konto)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik klika przycisk ,,Zaloguj się'' w nawigacji
@@ -114,76 +100,39 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System przekierowuje użytkownika do panelu klienta
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Użytkownik jest zalogowany, posiada ważny token JWT
 
-\textbf{Scenariusze alternatywne:}
-\begin{itemize}
-\item \textbf{5a.} Nieprawidłowy e-mail lub hasło:
-  \begin{enumerate}
-  \item[1.] System wyświetla komunikat błędu: ,,Nieprawidłowe dane logowania''
-  \item[2.] Powrót do kroku 3 scenariusza głównego
-  \end{enumerate}
-\end{itemize}
+\subsection*{Scenariusz 5: Śledzenie statusu zamówienia}
 
-\subsection*{Scenariusz 5: Składanie zamówienia}
-
+\noindent
 \textbf{Aktor:} Klient (użytkownik zalogowany)
 
-\textbf{Warunki początkowe:} Użytkownik jest zalogowany, koszyk zawiera co najmniej jeden produkt
-
-\textbf{Przebieg scenariusza głównego:}
-\begin{enumerate}
-\item Użytkownik otwiera widok koszyka
-\item Użytkownik przegląda produkty w koszyku i sumę całkowitą
-\item Użytkownik klika przycisk ,,Przejdź do kasy''
-\item System wyświetla formularz zamówienia z danymi dostawy
-\item Użytkownik wypełnia/potwierdza dane: imię, nazwisko, adres dostawy, numer telefonu
-\item Użytkownik wybiera metodę płatności (przelew, karta, przy odbiorze)
-\item Użytkownik klika ,,Złóż zamówienie''
-\item System waliduje dane zamówienia
-\item System tworzy zamówienie w bazie danych ze statusem ,,oczekujące''
-\item System tworzy rekordy OrderItem dla każdego produktu w koszyku
-\item System czyści koszyk użytkownika
-\item System wyświetla potwierdzenie zamówienia z numerem zamówienia
-\item System przekierowuje użytkownika do panelu klienta z zakładką ,,My Orders''
-\end{enumerate}
-
-\textbf{Warunki końcowe:} Zamówienie zostało utworzone w systemie, koszyk jest pusty
-
-\textbf{Scenariusze alternatywne:}
-\begin{itemize}
-\item \textbf{8a.} Brak wymaganych danych dostawy:
-  \begin{enumerate}
-  \item[1.] System wyświetla komunikat błędu z listą brakujących pól
-  \item[2.] Powrót do kroku 5 scenariusza głównego
-  \end{enumerate}
-\end{itemize}
-
-\subsection*{Scenariusz 6: Śledzenie statusu zamówienia}
-
-\textbf{Aktor:} Klient (użytkownik zalogowany)
-
+\noindent
 \textbf{Warunki początkowe:} Użytkownik jest zalogowany, posiada co najmniej jedno zamówienie
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik otwiera panel klienta
 \item Użytkownik klika zakładkę ,,My Orders''
 \item System pobiera wszystkie zamówienia użytkownika z bazy danych
 \item System wyświetla listę zamówień posortowaną od najnowszych
-\item Dla każdego zamówienia wyświetlane są: numer zamówienia, data złożenia, suma całkowita, status (oczekujące/w realizacji/zakończone/anulowane)
-\item Użytkownik klika na wybrane zamówienie
-\item System wyświetla szczegóły zamówienia: listę produktów, ceny, adres dostawy, historię zmian statusu
+\item Dla każdego zamówienia wyświetlane są: numer zamówienia, status (oczekujące/w realizacji/zakończone/anulowane)
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Użytkownik widzi szczegółowe informacje o wybranym zamówieniu
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi szczegółowe informacje o statusie wybranego zamówienia
 
-\subsection*{Scenariusz 7: Wystawianie opinii o produkcie}
+\subsection*{Scenariusz 6: Wystawianie opinii o produkcie}
 
+\noindent
 \textbf{Aktor:} Klient (użytkownik zalogowany)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik posiada zakończone zamówienie zawierające produkt
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik otwiera panel klienta, zakładkę ,,My Orders''
@@ -203,27 +152,22 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System odświeża widok produktu - zaktualizowany sentyment jest widoczny
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Opinia została dodana, sentyment produktu zaktualizowany
 
-\textbf{Scenariusze alternatywne:}
-\begin{itemize}
-\item \textbf{3a.} Użytkownik już wystawił opinię dla tego produktu w tym zamówieniu:
-  \begin{enumerate}
-  \item[1.] System wyświetla komunikat: ,,Już wystawiłeś opinię dla tego produktu''
-  \item[2.] Scenariusz kończy się
-  \end{enumerate}
-\end{itemize}
+\subsection*{Scenariusz 7: Zarządzanie kontem użytkownika}
 
-\subsection*{Scenariusz 8: Zarządzanie kontem użytkownika}
-
+\noindent
 \textbf{Aktor:} Klient (użytkownik zalogowany)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik jest zalogowany
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik otwiera panel klienta
-\item Użytkownik klika zakładkę ,,Profile''
+\item Użytkownik klika zakładkę ,,Konto''
 \item System wyświetla formularz z danymi użytkownika: imię, nazwisko, e-mail
 \item Użytkownik edytuje wybrane pola (np. zmienia nazwisko)
 \item Użytkownik klika ,,Zapisz zmiany''
@@ -232,14 +176,18 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System wyświetla komunikat o pomyślnym zapisaniu zmian
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Dane użytkownika zostały zaktualizowane
 
-\subsection*{Scenariusz 9: Administrator zarządza produktami}
+\subsection*{Scenariusz 8: Administrator zarządza produktami}
 
+\noindent
 \textbf{Aktor:} Administrator
 
+\noindent
 \textbf{Warunki początkowe:} Administrator jest zalogowany, posiada uprawnienia administratora
 
+\noindent
 \textbf{Przebieg scenariusza głównego - dodawanie produktu:}
 \begin{enumerate}
 \item Administrator otwiera panel administracyjny
@@ -258,44 +206,25 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System odświeża listę produktów
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Nowy produkt został dodany do katalogu z obliczonym sentymentem
 
-\textbf{Przebieg scenariusza alternatywnego - edycja produktu:}
-\begin{enumerate}
-\item Administrator w liście produktów klika ikonę ,,Edytuj'' przy wybranym produkcie
-\item System wyświetla formularz edycji z wypełnionymi aktualnymi danymi
-\item Administrator modyfikuje wybrane pola (np. zmienia cenę)
-\item Administrator klika ,,Zapisz zmiany''
-\item System aktualizuje rekord produktu w bazie danych
-\item Jeśli zmieniono opis lub nazwę, system przelicza sentyment
-\item System wyświetla komunikat o pomyślnym zapisaniu zmian
-\end{enumerate}
+\subsection*{Scenariusz 9: Administrator zarządza zamówieniami}
 
-\textbf{Przebieg scenariusza alternatywnego - usuwanie produktu:}
-\begin{enumerate}
-\item Administrator w liście produktów klika ikonę ,,Usuń'' przy wybranym produkcie
-\item System wyświetla dialog potwierdzenia: ,,Czy na pewno chcesz usunąć ten produkt?''
-\item Administrator klika ,,Potwierdź''
-\item System sprawdza czy produkt nie jest używany w aktywnych zamówieniach
-\item System oznacza produkt jako nieaktywny lub usuwa rekord z bazy danych
-\item System wyświetla komunikat o pomyślnym usunięciu
-\item System odświeża listę produktów
-\end{enumerate}
-
-\subsection*{Scenariusz 10: Administrator zarządza zamówieniami}
-
+\noindent
 \textbf{Aktor:} Administrator
 
+\noindent
 \textbf{Warunki początkowe:} Administrator jest zalogowany
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Administrator otwiera panel administracyjny
 \item Administrator klika sekcję ,,Orders''
 \item System wyświetla listę wszystkich zamówień w systemie
-\item Dla każdego zamówienia wyświetlane są: numer, użytkownik, data, suma, aktualny status
+\item Dla każdego zamówienia wyświetlane są: numer, aktualny status
 \item Administrator klika na wybrane zamówienie ze statusem ,,oczekujące''
-\item System wyświetla szczegóły zamówienia: produkty, dane dostawy, historia statusów
 \item Administrator klika przycisk ,,Zmień status''
 \item System wyświetla listę dostępnych statusów (w realizacji, zakończone, anulowane)
 \item Administrator wybiera ,,w realizacji''
@@ -305,14 +234,18 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Użytkownik właściciel zamówienia widzi zaktualizowany status w swoim panelu
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Status zamówienia został zmieniony, użytkownik ma dostęp do aktualnej informacji
 
-\subsection*{Scenariusz 11: Administrator zarządza użytkownikami}
+\subsection*{Scenariusz 10: Administrator zarządza użytkownikami}
 
+\noindent
 \textbf{Aktor:} Administrator
 
+\noindent
 \textbf{Warunki początkowe:} Administrator jest zalogowany
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Administrator otwiera panel administracyjny
@@ -325,14 +258,18 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Administrator może zmienić rolę użytkownika (nadać uprawnienia administratora) lub usunąć konto
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Administrator ma pełny wgląd w dane użytkowników i może zarządzać uprawnieniami
 
-\subsection*{Scenariusz 12: Administrator przegląda statystyki i dashboard}
+\subsection*{Scenariusz 11: Administrator przegląda statystyki i dashboard}
 
+\noindent
 \textbf{Aktor:} Administrator
 
+\noindent
 \textbf{Warunki początkowe:} Administrator jest zalogowany
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Administrator otwiera panel administracyjny
@@ -351,21 +288,25 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \item Wykres liniowy: liczba nowych użytkowników (ostatnie 30 dni)
   \end{itemize}
 \item Administrator klika sekcję ,,Statistics'' dla bardziej szczegółowych analiz
-\item System wyświetla zaawansowane raporty: najpopularniejsze produkty, najlepsi klienci, współczynnik konwersji
+\item System wyświetla widok do zmiany rekomentacji, odświeżanie reguł asocjacyjnych
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Administrator ma pełny wgląd w kluczowe wskaźniki biznesowe systemu
 
-\subsection*{Scenariusz 13: Administrator debuguje algorytmy rekomendacji}
+\subsection*{Scenariusz 12: Administrator debuguje algorytmy rekomendacji}
 
+\noindent
 \textbf{Aktor:} Administrator
 
+\noindent
 \textbf{Warunki początkowe:} Administrator jest zalogowany, algorytmy rekomendacji zostały przeliczone
 
+\noindent
 \textbf{Przebieg scenariusza głównego - Collaborative Filtering:}
 \begin{enumerate}
 \item Administrator otwiera panel administracyjny
-\item Administrator klika sekcję ,,Debug ML''
+\item Administrator klika sekcję ,,Debug''
 \item Administrator wybiera zakładkę ,,Collaborative Filtering''
 \item System wyświetla panel debugowania Collaborative Filtering zawierający:
   \begin{itemize}
@@ -377,51 +318,18 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System pobiera dane z tabeli ProductSimilarity i wyświetla wyniki
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Administrator zweryfikował poprawność działania algorytmu Collaborative Filtering
 
-\textbf{Przebieg scenariusza alternatywnego - Apriori:}
-\begin{enumerate}
-\item Administrator wybiera zakładkę ,,Association Rules (Apriori)''
-\item System wyświetla panel debugowania Apriori zawierający:
-  \begin{itemize}
-  \item Wzory matematyczne: Support, Confidence, Lift
-  \item Parametry algorytmu: min\_support, min\_confidence
-  \item Statystyki: liczba wygenerowanych reguł, liczba transakcji analizowanych
-  \end{itemize}
-\item System wyświetla tabelę z regułami asocjacyjnymi posortowaną według lift
-\item Dla każdej reguły wyświetlane są: antecedent (produkt A), consequent (produkt B), support, confidence, lift
-\item Administrator może filtrować reguły według minimalnego lift
-\end{enumerate}
+\subsection*{Scenariusz 13: Przeglądanie rekomendacji na stronie głównej}
 
-\textbf{Przebieg scenariusza alternatywnego - Sentiment Analysis:}
-\begin{enumerate}
-\item Administrator wybiera zakładkę ,,Sentiment Analysis''
-\item System wyświetla panel debugowania analizy sentymentu zawierający:
-  \begin{itemize}
-  \item Wzór matematyczny polarności tekstu
-  \item Wzór wieloźródłowej agregacji z wagami
-  \item Statystyki: liczba opinii w systemie, rozkład opinii (pozytywne/neutralne/negatywne)
-  \end{itemize}
-\item System wyświetla histogram rozkładu sentiment\_score dla wszystkich produktów
-\item Administrator może wpisać ID produktu i zobaczyć szczegółową dekompozycję sentymentu:
-  \begin{itemize}
-  \item Sentyment z opinii (40\%)
-  \item Sentyment z opisu (25\%)
-  \item Sentyment z nazwy (15\%)
-  \item Sentyment ze specyfikacji (12\%)
-  \item Sentyment z kategorii (8\%)
-  \item Zagregowany wynik końcowy
-  \end{itemize}
-\end{enumerate}
-
-\textbf{Warunki końcowe:} Administrator zweryfikował poprawność działania wszystkich trzech algorytmów rekomendacji
-
-\subsection*{Scenariusz 14: Przeglądanie rekomendacji na stronie głównej}
-
+\noindent
 \textbf{Aktor:} Klient (użytkownik zalogowany)
 
+\noindent
 \textbf{Warunki początkowe:} Użytkownik jest zalogowany, posiada historię zakupów
 
+\noindent
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik loguje się do systemu
@@ -435,29 +343,5 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System wyświetla szczegółową stronę produktu
 \end{enumerate}
 
+\noindent
 \textbf{Warunki końcowe:} Użytkownik widzi spersonalizowane rekomendacje oparte na swojej historii zakupów
-
-\subsection*{Scenariusz 15: Wyszukiwanie produktów z filtrem sentymentu}
-
-\textbf{Aktor:} Gość lub Klient
-
-\textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej
-
-\textbf{Przebieg scenariusza głównego:}
-\begin{enumerate}
-\item Użytkownik otwiera wyszukiwarkę z paska nawigacyjnego
-\item Użytkownik wpisuje zapytanie ,,laptop gaming''
-\item Użytkownik wybiera filtr ,,Tylko produkty z pozytywnym sentymentem''
-\item Użytkownik klika ,,Szukaj''
-\item System wykonuje zapytanie do bazy danych:
-  \begin{itemize}
-  \item Full-text search w polach nazwa i opis produktu
-  \item Filtrowanie WHERE \texttt{sentiment\_score} $\geq$ 0.5
-  \item Sortowanie ORDER BY \texttt{sentiment\_score} DESC
-  \end{itemize}
-\item System wyświetla przefiltrowane wyniki (tylko laptopy gaming z pozytywnym sentymentem)
-\item Dla każdego produktu wyświetlane są: zdjęcie, nazwa, cena, sentiment\_score, liczba opinii
-\item Użytkownik przegląda wyniki i może dalej filtrować według kategorii lub zakresu cenowego
-\end{enumerate}
-
-\textbf{Warunki końcowe:} Użytkownik widzi listę produktów spełniających kryteria wyszukiwania i filtrów sentymentu
