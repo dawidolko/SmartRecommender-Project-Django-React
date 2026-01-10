@@ -165,7 +165,7 @@ W ramach realizacji celu głównego zdefiniowano następujące cele szczegółow
     \item Implementacja algorytmu filtracji opartej na treści (Content-Based Filtering) z wykorzystaniem ważonych wektorów cech (kategorie 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) i miary podobieństwa kosinusowego
     \item Opracowanie systemu wnioskowania rozmytego typu Mamdani z regułami IF-THEN i funkcjami przynależności (trójkątne i trapezoidalne) dla trzech wymiarów: wrażliwość cenowa, preferencje kategorialne, preferencja jakości
     \item Zbudowanie modeli probabilistycznych: łańcucha Markowa pierwszego rzędu dla predykcji sekwencji zakupowych oraz naiwnego klasyfikatora Bayesa dla predykcji odejścia klienta (ang. \textit{churn}) i prawdopodobieństwa zakupu
-    \item Optymalizacja wydajności systemu dla wdrożenia produkcyjnego (cache, bulk operations, indeksy bazodanowe, Docker)
+    \item Optymalizacja wydajności systemu dla wdrożenia produkcyjnego (pamięć podręczna, operacje zbiorcze, indeksy bazodanowe, Docker)
     \item Przeprowadzenie ewaluacji jakości rekomendacji na rzeczywistych danych (500 produktów, 20 użytkowników, 265 zamówień)
 \end{itemize}
 
@@ -545,7 +545,7 @@ W celu uzasadnienia sensowności tworzenia dedykowanego systemu rekomendacji prz
 
 \medskip
 
-Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji oparte na algorytmach stosowanych w Amazon.com. System wykorzystuje deep learning (głębokie uczenie - wielowarstwowe sieci neuronowe) oraz collaborative filtering, oferując trzy typy rekomendacji: User Personalization (personalizacja użytkownika), Similar Items (podobne produkty) oraz Personalized Ranking (spersonalizowane rankowanie).
+Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji oparte na algorytmach stosowanych w Amazon.com. System wykorzystuje głębokie uczenie (ang. \textit{deep learning} - wielowarstwowe sieci neuronowe) oraz filtrację kolaboratywną (ang. \textit{collaborative filtering}), oferując trzy typy rekomendacji: personalizację użytkownika (ang. \textit{User Personalization}), podobne produkty (ang. \textit{Similar Items}) oraz spersonalizowane rankowanie (ang. \textit{Personalized Ranking}).
 
 \textbf{Możliwości i funkcjonalności:}
 
@@ -565,10 +565,10 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 
 \begin{itemize}
 \item \textbf{Wysokie koszty operacyjne} - rozwiązania chmurowe wiążą się z regularnymi opłatami licencyjnymi, które mogą być znaczące dla małych i średnich platform e-commerce. Dla porównania, własna implementacja eliminuje te koszty przy zachowaniu kontroli nad funkcjonalnościami,
-\item \textbf{Brak natywnej analizy sentymentu, logiki rozmytej oraz modeli probabilistycznych} - Amazon Personalize koncentruje się wyłącznie na collaborative filtering i nie oferuje analizy opinii produktów, systemów rozmytych ani łańcuchów Markova. Wieloźródłowa agregacja sentymentu, logika rozmyta Mamdani oraz modele probabilistyczne wymagają integracji z dodatkowymi usługami AWS lub samodzielnej implementacji,
+\item \textbf{Brak natywnej analizy sentymentu, logiki rozmytej oraz modeli probabilistycznych} - Amazon Personalize koncentruje się wyłącznie na filtracji kolaboratywnej i nie oferuje analizy opinii produktów, systemów rozmytych ani łańcuchów Markova. Wieloźródłowa agregacja sentymentu, logika rozmyta Mamdani oraz modele probabilistyczne wymagają integracji z dodatkowymi usługami AWS lub samodzielnej implementacji,
 \item \textbf{Vendor lock-in} (uzależnienie od dostawcy) - głęboka integracja z ekosystemem AWS (S3, Lambda, EventBridge) oznacza, że migracja do innej platformy wymaga przepisania całej architektury systemu,
-\item \textbf{Brak kontroli nad algorytmami} - system działa jako ,,czarna skrzynka'' (black box), uniemożliwiając dostosowanie logiki rekomendacji. Przykład: niemożliwe jest zaimplementowanie ważonych wektorów cech dla Content-Based Filtering, funkcji przynależności dla logiki rozmytej czy zaawansowanych metryk podobieństwa,
-\item \textbf{Wymóg dużych zbiorów danych} - według dokumentacji AWS, system wymaga minimum 25000 interakcji dla zapewnienia wysokiej jakości rekomendacji. Dla nowych platform (cold start - problem zimnego startu) jakość jest ograniczona w początkowym okresie działania.
+\item \textbf{Brak kontroli nad algorytmami} - system działa jako czarna skrzynka (ang. \textit{black box}), uniemożliwiając dostosowanie logiki rekomendacji. Przykład: niemożliwe jest zaimplementowanie ważonych wektorów cech dla filtracji opartej na treści (ang. \textit{Content-Based Filtering}), funkcji przynależności dla logiki rozmytej czy zaawansowanych metryk podobieństwa,
+\item \textbf{Wymóg dużych zbiorów danych} - według dokumentacji AWS, system wymaga minimum 25000 interakcji dla zapewnienia wysokiej jakości rekomendacji. Dla nowych platform problem zimnego startu (ang. \textit{cold start}) oznacza ograniczoną jakość w początkowym okresie działania.
 \end{itemize}
 
 \medskip
@@ -598,9 +598,9 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 
 \begin{itemize}
 \item \textbf{Bardzo wysokie koszty operacyjne} - model cenowy oparty na liczbie predykcji (pay-per-prediction) generuje rosnące koszty wraz ze skalą ruchu użytkowników, co może stanowić barierę dla małych i średnich platform e-commerce o ograniczonym budżecie,
-\item \textbf{Brak wieloźródłowej agregacji sentymentu, logiki rozmytej i modeli probabilistycznych} - Google Recommendations AI oferuje funkcję ``Frequently Bought Together'' (często kupowane razem, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych, systemów rozmytych z funkcjami przynależności ani łańcuchów Markova jak w planowanym systemie,
+\item \textbf{Brak wieloźródłowej agregacji sentymentu, logiki rozmytej i modeli probabilistycznych} - Google Recommendations AI oferuje funkcję często kupowanych razem produktów (ang. \textit{Frequently Bought Together}, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych, systemów rozmytych z funkcjami przynależności ani łańcuchów Markova jak w planowanym systemie,
 \item \textbf{Wymóg bardzo dużych zbiorów danych} - rozwiązanie zaprojektowane dla platform o skali YouTube, co czyni je nadmiarowo złożonym dla małych sklepów internetowych,
-\item \textbf{Brak interpretowalności} - głęboka ,,black box'', gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag embeddings (reprezentacji wektorowych) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację. W przeciwieństwie do tego, logika rozmyta oferuje pełną przejrzystość reguł IF-THEN.
+\item \textbf{Brak interpretowalności} - głęboka czarna skrzynka, gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag reprezentacji wektorowych (ang. \textit{embeddings}) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację. W przeciwieństwie do tego, logika rozmyta oferuje pełną przejrzystość reguł IF-THEN.
 \end{itemize}
 
 \medskip
@@ -608,7 +608,7 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 
 \medskip
 
-Apache Mahout to framework open-source (otwartoźródłowy framework) implementujący klasyczne algorytmy collaborative filtering oraz matrix factorization (faktoryzacja macierzy - technika dekompozycji macierzy user-item) - ALS (Alternating Least Squares - metoda najmniejszych kwadratów na przemian), SVD (Singular Value Decomposition - rozkład według wartości osobliwych). Projekt powstał w 2008 roku, obecnie koncentruje się na Spark-based distributed algorithms (algorytmy rozproszone oparte na Apache Spark).
+Apache Mahout to otwartoźródłowy framework (ang. \textit{open-source framework}) implementujący klasyczne algorytmy filtracji kolaboratywnej oraz faktoryzacji macierzy (ang. \textit{matrix factorization} - technika dekompozycji macierzy użytkownik-produkt) - ALS (ang. \textit{Alternating Least Squares} - metoda najmniejszych kwadratów na przemian), SVD (ang. \textit{Singular Value Decomposition} - rozkład według wartości osobliwych). Projekt powstał w 2008 roku, obecnie koncentruje się na algorytmach rozproszonych opartych na Apache Spark (ang. \textit{Spark-based distributed algorithms}).
 
 \textbf{Możliwości i funkcjonalności:}
 
@@ -684,9 +684,9 @@ Dla porównania: migracja z Amazon Personalize do Google Recommendations AI wyma
 
 \item \textbf{Cel edukacyjny i interpretowalność}:
 
-Praca inżynierska ma charakter badawczy i edukacyjny. Implementacja algorytmów od podstaw (bez zewnętrznych bibliotek ML) zapewnia głębokie zrozumienie mechanizmów działania każdej metody, co jest niemożliwe przy wykorzystaniu gotowych usług chmurowych działających jako black-boxy.
+Praca inżynierska ma charakter badawczy i edukacyjny. Implementacja algorytmów od podstaw (bez zewnętrznych bibliotek uczenia maszynowego) zapewnia głębokie zrozumienie mechanizmów działania każdej metody, co jest niemożliwe przy wykorzystaniu gotowych usług chmurowych działających jako czarne skrzynki.
 
-Logika rozmyta z regułami IF-THEN oferuje pełną przejrzystość decyzji algorytmu (explainable AI), czego brakuje w modelach deep learning używanych przez Google i Amazon.
+Logika rozmyta z regułami IF-THEN oferuje pełną przejrzystość decyzji algorytmu (ang. \textit{explainable AI} - wyjaśnialna sztuczna inteligencja), czego brakuje w modelach głębokiego uczenia używanych przez Google i Amazon.
 \end{itemize}
 
 \textbf{Podsumowanie}:
@@ -948,7 +948,7 @@ Rozszerza Django o funkcjonalności API RESTful:
 \item \textbf{Pagination (paginacja)} - automatyczne stronicowanie wyników.
 \end{itemize}
 
-\textbf{Biblioteki Machine Learning}
+\textbf{Biblioteki uczenia maszynowego (ang. \textit{Machine Learning})}
 
 Do operacji numerycznych i obliczania podobieństw wykorzystano:
 \begin{itemize}
@@ -1039,7 +1039,7 @@ System wykorzystuje wbudowany mechanizm pamięci podręcznej Django z różnymi 
 \item \textbf{CACHE\_TIMEOUT\_LONG = 7200s (2 godziny)} - wygenerowane macierze CBF, modele probabilistyczne
 \end{itemize}
 
-Pamięć podręczna znacząco redukuje obciążenie bazy danych i przyspiesza odpowiedzi API. Przykładowo, pobranie rekomendacji CBF z pamięci (HIT) trwa 50-100ms, podczas gdy przy braku danych w pamięci (MISS) system musi wykonać zapytanie SQL i obliczyć podobieństwa, co zajmuje 5-10 sekund.
+Pamięć podręczna znacząco redukuje obciążenie bazy danych i przyspiesza odpowiedzi API. Przykładowo, pobranie rekomendacji CBF z pamięci (ang. \textit{cache HIT} - trafienie) trwa 50-100ms, podczas gdy przy braku danych w pamięci (ang. \textit{cache MISS} - chybienie) system musi wykonać zapytanie SQL i obliczyć podobieństwa, co zajmuje 5-10 sekund.
 
 \textbf{2. Operacje zbiorcze (bulk operations)}
 
@@ -2495,7 +2495,7 @@ Metryki ewaluacji obejmowały: (1) \textbf{Pokrycie katalogu} - procent produkt�
 
 \medskip
 
-\textbf{Collaborative Filtering (metoda współautora)} analizuje historię zakupów użytkowników i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika. Metoda wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty fotograficzne często kupują też plecaki turystyczne, Collaborative Filtering połączy te produkty mimo różnych kategorii. Wymaga jednak dużo danych historycznych aby działać efektywnie i napotyka problem zimnego startu dla nowych produktów bez historii zakupów. Wyniki podobieństw są zapisywane w modelu \texttt{ProductSimilarity} z oznaczeniem typu \texttt{collaborative}. Metoda jest szczególnie skuteczna w odkrywaniu cross-category recommendations (rekomendacje międzykategorialne), które zwiększają wartość koszyka zakupowego.
+\textbf{Collaborative Filtering (metoda współautora)} analizuje historię zakupów użytkowników i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika. Metoda wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty fotograficzne często kupują też plecaki turystyczne, filtracja kolaboratywna połączy te produkty mimo różnych kategorii. Wymaga jednak dużo danych historycznych aby działać efektywnie i napotyka problem zimnego startu dla nowych produktów bez historii zakupów. Wyniki podobieństw są zapisywane w modelu \texttt{ProductSimilarity} z oznaczeniem typu \texttt{collaborative}. Metoda jest szczególnie skuteczna w odkrywaniu rekomendacji międzykategorialnych (ang. \textit{cross-category recommendations}), które zwiększają wartość koszyka zakupowego.
 
 \textbf{Sentiment Analysis (metoda współautora)} analizuje opinie użytkowników z pięciu źródeł: treść opinii tekstowych, oceny gwiazdkowe (1-5), opinie zweryfikowane (potwierdzony zakup), opinie administratora oraz szczegółowe parametry produktu. System wykorzystuje dwa leksykony sentymentu: Opinion Lexicon (Hu \& Liu 2004) oraz AFINN-165 (Nielsen 2011) do przypisywania wag emocjonalnych słowom. Agregacja wieloźródłowa łączy wszystkie sygnały w jeden wskaźnik \texttt{sentiment\_score} (zakres -1 do +1), który określa ogólny sentyment wobec produktu. Metoda jest uniwersalna (działa tak samo dla każdego użytkownika) i nie wymaga personalizacji. Głównym ograniczeniem jest wrażliwość na negację, ironię oraz sarkazm w tekście opinii. Wyniki są zapisywane w tabeli \texttt{method\_product\_sentiment\_summary} i wykorzystywane do priorytetyzacji produktów z pozytywnymi opiniami.
 
@@ -2527,7 +2527,7 @@ Pokrycie katalogu & Pełne - każdy produkt ma cechy & Częściowe - tylko produ
 \hline
 Problem zimnego startu & Nie występuje dla nowych produktów & Występuje dla nowych produktów \\
 \hline
-Typ powiązań & Oczywiste w kategorii (laptop A $\rightarrow$ laptop B) & Nieoczywiste cross-category (aparat $\rightarrow$ plecak) \\
+Typ powiązań & Oczywiste w kategorii (laptop A $\rightarrow$ laptop B) & Nieoczywiste międzykategorialne (aparat $\rightarrow$ plecak) \\
 \hline
 Algorytm & Weighted TF-IDF + Cosine Similarity & Adjusted Cosine + centrowanie średniej \\
 \hline
@@ -2646,7 +2646,7 @@ Porównanie sześciu metod rekomendacyjnych wykazało, że każda z nich adresuj
 
 \textbf{Metody personalizowane vs uniwersalne:} Fuzzy Logic (profil cenowy użytkownika) personalizuje rekomendacje według wrażliwości cenowej i oferuje pełną interpretowalność (100\% - aktywacja 6 reguł IF-THEN). Sentiment Analysis (opinie społeczności) tworzy uniwersalny ranking jakości produktów dostępny dla wszystkich użytkowników. Fuzzy jest skuteczniejsza dla użytkowników o wyraźnych preferencjach, Sentiment jako globalny filtr jakości.
 
-\textbf{Metody sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje czasowe) przewidują przyszłe zakupy na podstawie łańcucha Markowa (60\%) i profilu behawioralnego Naive Bayes (40\%), umożliwiając identyfikację użytkowników zagrożonych odejściem. Apriori (współzakupy) odkrywa reguły asocjacyjne produktów komplementarnych efektywne w cross-sellingu. Modele probabilistyczne lepsze dla regularnych użytkowników (cykle zakupowe), Apriori dla akcesoriów i dodatków.
+\textbf{Metody sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje czasowe) przewidują przyszłe zakupy na podstawie łańcucha Markowa (60\%) i profilu behawioralnego Naive Bayes (40\%), umożliwiając identyfikację użytkowników zagrożonych odejściem. Apriori (współzakupy) odkrywa reguły asocjacyjne produktów komplementarnych efektywne w sprzedaży krzyżowej (ang. \textit{cross-selling}). Modele probabilistyczne lepsze dla regularnych użytkowników (cykle zakupowe), Apriori dla akcesoriów i dodatków.
 
 Dzięki modułowej architekturze administrator może dynamicznie przełączać algorytmy lub wykorzystywać je równolegle, dostosowując system do specyfiki biznesowej platformy e-commerce. Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 265 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich sześciu algorytmów.
 
