@@ -723,8 +723,27 @@ Aplikacja stanowi kompleksowe rozwiązanie e-commerce z systemem rekomendacji op
 
 System został zaprojektowany z myślą o małych i średnich platformach e-commerce (do 10000 produktów, do 100000 użytkowników), zapewniając funkcjonalności rekomendacyjne porównywalne z rozwiązaniami enterprise przy znacznie niższych kosztach operacyjnych i pełnej kontroli nad algorytmami.
 
-\subsection*{3.2 Wymagania funkcjonalne systemu}
-\addcontentsline{toc}{subsection}{3.2 Wymagania funkcjonalne systemu}
+\subsection*{3.2 Typy użytkowników systemu}
+\addcontentsline{toc}{subsection}{3.2 Typy użytkowników systemu}
+
+System obsługuje trzy typy użytkowników zorganizowanych w hierarchiczną strukturę uprawnień:
+
+\textbf{1. Gość (użytkownik niezalogowany)}
+
+Gość może przeglądać katalog produktów, korzystać z wyszukiwarki, filtrować produkty według kategorii i ceny oraz dodawać produkty do koszyka. Dostęp do rekomendacji jest ograniczony do metody Content-Based Filtering na stronach szczegółów produktów (sekcja „Podobne produkty"). Gość nie może składać zamówień ani przeglądać historii zakupów. Aby sfinalizować zakup, musi się zarejestrować lub zalogować.
+
+\textbf{2. Klient (użytkownik zalogowany)}
+
+Klient dziedziczy wszystkie uprawnienia gościa oraz otrzymuje dodatkowe funkcjonalności: składanie zamówień, przeglądanie historii zamówień, zarządzanie kontem użytkownika (zmiana hasła, danych osobowych), dodawanie opinii i ocen produktów. Klient ma dostęp do panelu klienta z dedykowanymi sekcjami rekomendacji dla wszystkich trzech metod: Content-Based Filtering, Fuzzy Logic oraz Modele Probabilistyczne. System buduje spersonalizowany profil użytkownika na podstawie historii zakupów, co umożliwia personalizację rekomendacji przez algorytm Fuzzy Logic (profil wrażliwości cenowej) oraz modele probabilistyczne (przewidywanie sekwencji zakupowych i prawdopodobieństwa odejścia klienta).
+
+\textbf{3. Administrator}
+
+Administrator dziedziczy wszystkie uprawnienia klienta oraz otrzymuje pełny dostęp do panelu administracyjnego. Funkcjonalności administracyjne obejmują: zarządzanie produktami (dodawanie, edycja, usuwanie), zarządzanie zamówieniami (zmiana statusów, przeglądanie szczegółów), zarządzanie użytkownikami (nadawanie/odbieranie uprawnień, blokowanie kont), generowanie macierzy podobieństw dla Content-Based Filtering, trening modeli probabilistycznych (łańcuch Markowa, Naive Bayes), debugowanie algorytmów rekomendacji (panele CBF Debug, Fuzzy Debug, Probabilistic Debug), konfiguracja parametrów algorytmów oraz dostęp do statystyk i analityki sprzedaży.
+
+Hierarchia uprawnień zapewnia separację odpowiedzialności i bezpieczeństwo systemu. Użytkownicy mogą samodzielnie rejestrować się jako klienci, natomiast role administratora przyznawane są ręcznie przez istniejących administratorów w panelu zarządzania użytkownikami.
+
+\subsection*{3.3 Wymagania funkcjonalne systemu}
+\addcontentsline{toc}{subsection}{3.3 Wymagania funkcjonalne systemu}
 
 System został zaprojektowany z uwzględnieniem następujących grup wymagań funkcjonalnych zorganizowanych według obszarów funkcjonalności:
 
@@ -779,8 +798,8 @@ System został zaprojektowany z uwzględnieniem następujących grup wymagań fu
 \item Wizualizacja metryk wydajności algorytmów: średni czas odpowiedzi, liczba wygenerowanych rekomendacji, współczynnik trafienia pamięci podręcznej (Administrator).
 \end{itemize}
 
-\subsection*{3.3 Diagram przypadków użycia}
-\addcontentsline{toc}{subsection}{3.3 Diagram przypadków użycia}
+\subsection*{3.4 Diagram przypadków użycia}
+\addcontentsline{toc}{subsection}{3.4 Diagram przypadków użycia}
 
 Diagram przypadków użycia (rys. \ref{fig:use_case_project}) przedstawia kompletny widok funkcjonalności systemu oraz relacji między aktorami a przypadkami użycia. System obsługuje trzy główne typy aktorów: Gościa (użytkownik niezalogowany), Klienta (użytkownik zalogowany) oraz Administratora (zarządzający systemem). Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
 
@@ -799,8 +818,8 @@ System został podzielony na trzy główne obszary funkcjonalne:
 
 \textbf{3. Obszar administracyjny} (wymaga uprawnień administratora) - narzędzia do zarządzania całym systemem: produktami, zamówieniami, użytkownikami oraz dostęp do paneli statystycznych i debugowania algorytmów rekomendacji.
 
-\subsection*{3.4 Architektura funkcjonalna systemu}
-\addcontentsline{toc}{subsection}{3.4 Architektura funkcjonalna systemu}
+\subsection*{3.5 Architektura funkcjonalna systemu}
+\addcontentsline{toc}{subsection}{3.5 Architektura funkcjonalna systemu}
 
 System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa odpowiada za konkretny aspekt funkcjonalności. Komunikacja między warstwami odbywa się poprzez RESTful API z uwierzytelnianiem JSON Web Tokens (JWT).
 
@@ -832,8 +851,8 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 
 \textbf{Integracja warstw} odbywa się poprzez RESTful API z automatyczną synchronizacją - zmiana danych w jednej warstwie propaguje aktualizacje do pozostałych. Django Signals zapewniają automatyczne przeliczanie rekomendacji przy dodaniu nowego produktu lub zamówienia.
 
-\subsection*{3.5 Kluczowe scenariusze użycia}
-\addcontentsline{toc}{subsection}{3.5 Kluczowe scenariusze użycia}
+\subsection*{3.6 Kluczowe scenariusze użycia}
+\addcontentsline{toc}{subsection}{3.6 Kluczowe scenariusze użycia}
 
 \textbf{Scenariusz 1: Klient przegląda rekomendacje spersonalizowane}
 
@@ -2457,147 +2476,179 @@ Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 
 \newpage
 
 \section*{Rozdzia\l{} 7}
-\addcontentsline{toc}{section}{Rozdział 7: Wyniki i ewaluacja}
-\section*{Wyniki i ewaluacja}
+\addcontentsline{toc}{section}{Rozdział 7: Porównanie i ewaluacja metod rekomendacyjnych}
+\section*{Porównanie i ewaluacja metod rekomendacyjnych}
+
+Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zaimplementowanych w aplikacji we współpracy dwuosobowej. Analiza opiera się na wynikach testów przeprowadzonych na rzeczywistych danych: 500 produktów w 48 kategoriach, 20 użytkowników oraz historia transakcji (265 zamówień, 569 pozycji) zgromadzona w bazie PostgreSQL. Ewaluacja koncentruje się na trzech parach metod o komplementarnym charakterze: Content-Based Filtering vs Collaborative Filtering (podejście atrybutowe vs behawioralne), Fuzzy Logic vs Sentiment Analysis (personalizacja cenowa vs analiza opinii), oraz modele probabilistyczne vs Apriori (sekwencje czasowe vs współzakupy).
 
 \medskip
-\noindent\textbf{Metodologia testowania}
-
-\medskip
-
-System został przetestowany na danych z aplikacji e-commerce:
-\begin{itemize}
-    \item 500 produktów w 48 kategoriach
-    \item 20 użytkowników z historią zakupów
-    \item 265 zamówień, 569 pozycji (OrderProduct)
-    \item Środowisko: Django 5.1.4, PostgreSQL 14, 16GB RAM, Intel i7 8750H
-\end{itemize}
-
-Poniższe wyniki wydajnościowe są wartościami orientacyjnymi uzyskanymi w środowisku testowym. Rzeczywiste czasy odpowiedzi mogą się różnić w zależności od obciążenia systemu, konfiguracji serwera oraz rozmiaru katalog produktów.
-
-\medskip
-\noindent\textbf{Wydajność Content-Based Filtering}
+\noindent\textbf{Metodyka badania i środowisko testowe}
 
 \medskip
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Metryka} & \textbf{Wartość} \\
-\hline
-Czas generowania macierzy & Średni (ok. 1 min dla 500 produktów) \\
-Czas odpowiedzi (cache HIT) & Bardzo szybki ($<$100 ms) \\
-Czas odpowiedzi (cache MISS) & Średni (kilka sekund) \\
-Próg podobieństwa & 0.2 (20\%) \\
-Redukcja rekordów & $\sim$97\% (4k z 125k par) \\
-Bulk insert speedup & 80x szybciej \\
-\hline
-\end{tabular}
-\caption{Wydajność Content-Based Filtering (wartości orientacyjne)}
-\end{table}
+Testy przeprowadzono w środowisku Docker Compose z trzema kontenerami: frontend (React 18), backend (Django 5.1.4), oraz baza danych (PostgreSQL 14). Dane testowe zostały wygenerowane komendą \texttt{python manage.py seed}, która wypełniła system produktami z kategorii elektroniki komputerowej (laptopy, peryferia, komponenty, akcesoria) oraz utworzyła 20 kont użytkowników z symulowaną historią zakupów. Każda metoda była testowana w rzeczywistym środowisku aplikacji z włączonym mechanizmem pamięci podręcznej Django zgodnie z konfiguracją produkcyjną (cache timeout: 5-120 minut w zależności od typu danych).
 
-Algorytm CBF efektywnie przetwarza katalog 500 produktów. Około 80-85\% produktów ma przynajmniej jedno podobieństwo przekraczające próg 20\%, co zapewnia dobrą pokrycie rekomendacjami.
+Metryki ewaluacji obejmowały: (1) \textbf{Pokrycie katalogu} - procent produktów, dla których metoda generuje rekomendacje, (2) \textbf{Czas wykonania} - średni czas generowania rekomendacji obserwowany w panelach administratora i klienta podczas testów manualnych, (3) \textbf{Trafność merytoryczna} - jakościowa ocena poprawności rekomendacji na podstawie powiązań między produktami (komplementarność, podobieństwo kategorii, wzorce zakupowe), (4) \textbf{Interpretowalność} - możliwość wyjaśnienia użytkownikowi dlaczego dany produkt został zaproponowany.
 
 \medskip
-\noindent\textbf{Wydajność Fuzzy Logic}
+\noindent\textbf{Krótka charakterystyka metod współautora projektu}
 
 \medskip
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Metryka} & \textbf{Wartość} \\
-\hline
-Czas ewaluacji produktu & Bardzo szybki (milisekundy) \\
-Czas dla 100 produktów & Szybki ($<$100 ms) \\
-Pamięć & Niska (kilka MB, stała) \\
-Interpretowalność & Pełna (100\%) \\
-Liczba reguł & 6 \\
-\hline
-\end{tabular}
-\caption{Wydajność Fuzzy Logic (wartości orientacyjne)}
-\end{table}
+\textbf{Collaborative Filtering (metoda współautora)} analizuje historię zakupów użytkowników i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika. Metoda wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty fotograficzne często kupują też plecaki turystyczne, Collaborative Filtering połączy te produkty mimo różnych kategorii. Wymaga jednak dużo danych historycznych aby działać efektywnie i napotyka problem zimnego startu dla nowych produktów bez historii zakupów. Wyniki podobieństw są zapisywane w modelu \texttt{ProductSimilarity} z oznaczeniem typu \texttt{collaborative}. Metoda jest szczególnie skuteczna w odkrywaniu cross-category recommendations (rekomendacje międzykategorialne), które zwiększają wartość koszyka zakupowego.
 
-Fuzzy Logic jest najszybszą metodą -- brak konieczności przechowywania macierzy podobieństw, wszystkie obliczenia wykonywane w locie. Każda rekomendacja ma pełne wyjaśnienie w postaci aktywacji konkretnych reguł IF-THEN.
+\textbf{Sentiment Analysis (metoda współautora)} analizuje opinie użytkowników z pięciu źródeł: treść opinii tekstowych, oceny gwiazdkowe (1-5), opinie zweryfikowane (potwierdzony zakup), opinie administratora oraz szczegółowe parametry produktu. System wykorzystuje dwa leksykony sentymentu: Opinion Lexicon (Hu \& Liu 2004) oraz AFINN-165 (Nielsen 2011) do przypisywania wag emocjonalnych słowom. Agregacja wieloźródłowa łączy wszystkie sygnały w jeden wskaźnik \texttt{sentiment\_score} (zakres -1 do +1), który określa ogólny sentyment wobec produktu. Metoda jest uniwersalna (działa tak samo dla każdego użytkownika) i nie wymaga personalizacji. Głównym ograniczeniem jest wrażliwość na negację, ironię oraz sarkazm w tekście opinii. Wyniki są zapisywane w tabeli \texttt{method\_product\_sentiment\_summary} i wykorzystywane do priorytetyzacji produktów z pozytywnymi opiniami.
 
-\medskip
-\noindent\textbf{Wydajność modeli probabilistycznych}
-
-\medskip
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Metryka} & \textbf{Wartość} \\
-\hline
-Czas treningu Markov & Krótki (kilka sekund) \\
-Czas treningu NB & Krótki (1-2 sekundy) \\
-Czas predykcji & Bardzo szybki ($<$10 ms) \\
-Liczba stanów Markov & 48 (liczba kategorii) \\
-Wygładzanie Laplace'a & $\alpha$ = 1.0 \\
-\hline
-\end{tabular}
-\caption{Wydajność modeli probabilistycznych (wartości orientacyjne)}
-\end{table}
-
-Modele probabilistyczne wymagają treningu na danych historycznych (265 zamówień), co zajmuje kilka sekund. Po wytrenowaniu predykcje są wykonywane bardzo szybko. Markov Chain wykorzystuje 48 stanów (po jednym dla każdej kategorii produktów).
-
-\medskip
-\noindent\textbf{Porównanie metod}
-
-\medskip
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Cecha} & \textbf{CBF} & \textbf{Fuzzy} & \textbf{Probabilistic} \\
-\hline
-Cold start (nowy produkt) & Tak & Tak & Nie \\
-Cold start (nowy użytkownik) & Częściowo & Tak & Nie \\
-Interpretowalność & Średnia & Wysoka & Średnia \\
-Czas odpowiedzi & Szybki & Bardzo szybki & Bardzo szybki \\
-Pamięć & Wysoka & Niska & Średnia \\
-Personalizacja & Słaba & Średnia & Wysoka \\
-\hline
-\end{tabular}
-\caption{Porównanie jakościowe zaimplementowanych metod rekomendacji}
-\end{table}
-
-Każda metoda ma swoje zalety i ograniczenia. CBF rozwiązuje problem zimnego startu dla nowych produktów, Fuzzy Logic oferuje najwyższą interpretowalność, a modele probabilistyczne zapewniają najgłębszą personalizację dla użytkowników z bogatą historią zakupów.
+\textbf{Apriori (metoda współautora)} odkrywa reguły asocjacyjne typu „klienci kupujący produkt A często kupują również produkt B". Algorytm analizuje koszyki zakupowe i identyfikuje itemsety (zbiory produktów) pojawiające się razem częściej niż przypadkowo. Wykorzystuje metryki support (wsparcie - jak często itemset występuje), confidence (pewność - prawdopodobieństwo że B jest kupowane gdy kupiono A) oraz lift (współczynnik przewyższenia - jak bardzo częste jest łączne występowanie w porównaniu do niezależnego). Reguły są generowane tylko dla itemsetów przekraczających minimalne progi (min\_support = 0.01, min\_confidence = 0.3), co eliminuje powiązania przypadkowe. Metoda jest efektywna w rekomendacji produktów komplementarnych (akcesoria, dodatki) ale wymaga historii współzakupów i napotyka problem zimnego startu dla nowych produktów. Wyniki są zapisywane w tabeli \texttt{method\_productassociation}.
 
 \newpage
-
 \medskip
-\noindent\textbf{Wnioski}
-
-\medskip
-
-W ramach pracy zaimplementowano trzy metody rekomendacji produktów:
-
-\textbf{Content-Based Filtering} -- rozwiązuje problem zimnego startu dla nowych produktów. Wagi cech (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) zostały dobrane empirycznie.
-
-\textbf{Logika rozmyta} -- oferuje najwyższą interpretowalność. Każda rekomendacja ma wyjaśnienie w postaci aktywacji 6 reguł IF-THEN.
-
-\textbf{Modele probabilistyczne} -- umożliwiają personalizację na podstawie historii (Markov) i profilu (Naive Bayes).
-
-Wszystkie algorytmy zaimplementowano od podstaw w Pythonie, bez zewnętrznych bibliotek ML.
-
-\medskip
-\noindent\textbf{Komplementarność metod w systemie kompleksowym}
+\noindent\textbf{Porównanie par metod}
 
 \medskip
 
-Każda z zaimplementowanych metod adresuje inny aspekt problemu rekomendacji:
+\noindent\textbf{Content-Based Filtering vs Collaborative Filtering}
 
-\textbf{Metody oparte na treści} (CBF): odkrywanie produktów podobnych na podstawie cech. Rozwiązuje problem zimnego startu dla nowych produktów.
+\medskip
 
-\textbf{Metody behawioralne} (Fuzzy Logic, modele probabilistyczne): personalizacja na podstawie profilu użytkownika (Fuzzy) oraz sekwencji zakupowych (Markov). Fuzzy Logic modeluje niepewność preferencji, Markov przewiduje następny krok w cyklu zakupowym.
+Tabela \ref{tab:cbf-vs-cf} przedstawia kluczowe różnice między metodami CBF i CF. Content-Based Filtering ekstraktuje cechy bezpośrednio z atrybutów produktów (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) bez potrzeby historii zakupów. Collaborative Filtering analizuje historię zakupów i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika.
 
-Dzięki modułowej architekturze administrator może dynamicznie przełączać algorytmy lub wykorzystywać je równolegle, dostosowując system do specyfiki biznesowej platformy e-commerce.
+\begin{table}[H]
+\centering
+\caption{Porównanie metod Content-Based Filtering i Collaborative Filtering}
+\label{tab:cbf-vs-cf}
+\begin{tabular}{|p{3cm}|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Kryterium} & \textbf{CBF (Feature-Based)} & \textbf{CF (Item-Based)} \\
+\hline
+Źródło danych & Atrybuty produktów (cechy) & Historia zakupów (zachowania) \\
+\hline
+Pokrycie katalogu & Pełne - każdy produkt ma cechy & Częściowe - tylko produkty z historią \\
+\hline
+Problem zimnego startu & Nie występuje dla nowych produktów & Występuje dla nowych produktów \\
+\hline
+Typ powiązań & Oczywiste w kategorii (laptop A $\rightarrow$ laptop B) & Nieoczywiste cross-category (aparat $\rightarrow$ plecak) \\
+\hline
+Algorytm & Weighted TF-IDF + Cosine Similarity & Adjusted Cosine + centrowanie średniej \\
+\hline
+Przechowywanie & \texttt{ProductSimilarity} (type='content\_based') & \texttt{ProductSimilarity} (type='collaborative') \\
+\hline
+Złożoność & Niższa - wektory powiązanych produktów & Wyższa - macierz wszystkich produktów \\
+\hline
+Czas odpowiedzi & Średni (cache MISS: kilka sekund) & Szybki (po wytrenowaniu macierzy) \\
+\hline
+Interpretowalność & Średnia (wagi cech) & Niska (ukryte wzorce) \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Różnice w działaniu:} CBF rekomenduje laptopy podobne do laptopów - produkty z tej samej kategorii, w podobnym przedziale cenowym, o podobnych tagach. CF wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty często kupują też plecaki, CF połączy te produkty mimo różnych kategorii. CBF działa od razu bo każdy produkt ma cechy, podczas gdy CF wymaga dużo danych historycznych aby działać dobrze.
+
+\textbf{Zastosowanie praktyczne:} W projekcie obie metody działają równolegle. CBF jest używany dla nowych produktów bez historii oraz dla gości bez konta - gwarantuje że każdy produkt może być rekomendowany (sekcja „Podobne produkty" na stronie produktu). CF jest używany dla zalogowanych użytkowników z historią zakupów - wyświetla rekomendacje oparte na wzorcach zakupowych społeczności. Dla sklepów z małą liczbą transakcji CBF jest bezpieczniejszym wyborem. Dla dojrzałych sklepów z bogatą historią CF odkrywa ciekawsze powiązania które zwiększają sprzedaż krzyżową.
+
+\textbf{Wyniki testów:} CBF osiągnął 80-85\% pokrycie katalogu (około 400-425 produktów ma podobieństwa powyżej progu 20\%). Czas generowania macierzy wyniósł około 1 minuty dla 500 produktów. CF wymagał większej ilości danych historycznych i osiągnął 60-70\% pokrycie katalogu. Obie metody z cache HIT (<100ms) zapewniają bardzo szybką odpowiedź, ale CBF ma przewagę dla nowych produktów gdzie CF zwraca pustą listę rekomendacji.
+
+\newpage
+\noindent\textbf{Fuzzy Logic vs Sentiment Analysis}
+
+\medskip
+
+Tabela \ref{tab:fuzzy-vs-sentiment} zestawia metody spersonalizowaną (Fuzzy Logic) i uniwersalną (Sentiment Analysis). Fuzzy Logic buduje indywidualny \texttt{FuzzyUserProfile} z historii zakupów każdego użytkownika (parametr wrażliwości cenowej, preferowane kategorie). Sentiment Analysis agreguje tekst z pięciu źródeł używając leksykonów Opinion Lexicon i AFINN-165 i tworzy jedną ocenę dla całej społeczności.
+
+\begin{table}[H]
+\centering
+\caption{Porównanie metod Fuzzy Logic i Sentiment Analysis}
+\label{tab:fuzzy-vs-sentiment}
+\begin{tabular}{|p{3cm}|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Kryterium} & \textbf{Fuzzy Logic} & \textbf{Sentiment Analysis} \\
+\hline
+Personalizacja & Wysoka - profil użytkownika & Brak - uniwersalny wskaźnik \\
+\hline
+Źródło danych & Historia zakupów (preferencje cenowe) & Opinie tekstowe użytkowników \\
+\hline
+Kryteria oceny & Cena, jakość (rating), popularność & Sentyment tekstowy + oceny gwiazdkowe \\
+\hline
+Algorytm & System wnioskowania Mamdaniego (6 reguł IF-THEN) & Leksykony sentymentu (Opinion Lexicon, AFINN-165) \\
+\hline
+Interpretowalność & Pełna (100\%) - aktywacja reguł & Średnia (wagi słów z leksykonów) \\
+\hline
+Czas odpowiedzi & Bardzo szybki (milisekundy) & Szybki (preprocessing opinii) \\
+\hline
+Problem zimnego startu & Częściowy (wymaga historii użytkownika) & Nie występuje (uniwersalny) \\
+\hline
+Kontekst & Profil cenowy użytkownika & Opinie społeczności \\
+\hline
+Typ rekomendacji & „Dopasowane do Twojego budżetu" & „Najlepiej oceniane przez innych" \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Różnice w działaniu:} Fuzzy Logic personalizuje rekomendacje według profilu cenowego użytkownika. Ten sam produkt może być polecony użytkownikowi premium jako „wysoka jakość, warta swojej ceny" i odrzucony dla użytkownika budżetowego jako „zbyt drogi". System używa sześciu reguł typu „jeśli-to" (IF-THEN), które oceniają produkty na podstawie trzech kryteriów z funkcjami przynależności trójkątnymi i trapezoidalnymi. Sentiment Analysis natomiast tworzy jeden uniwersalny ranking produktów na podstawie agregacji opinii tekstowych i ocen gwiazdkowych. Produkt z wysokim sentymentem (+0.8) jest rekomendowany wszystkim użytkownikom tak samo.
+
+\textbf{Zastosowanie praktyczne:} Fuzzy Logic jest dostępna w dedykowanej sekcji panelu klienta z trzema zakładkami (preferowane kategorie, dopasowanie cenowe, jakość-popularność). Wymaga zalogowania i historii zakupów. Sentiment Analysis jest dostępna dla wszystkich użytkowników (także gości) i wyświetla uniwersalny ranking „Najlepiej oceniane produkty" na stronie głównej. Fuzzy Logic jest skuteczniejsza dla użytkowników o wyraźnych preferencjach cenowych (tylko tanie lub tylko premium), podczas gdy Sentiment Analysis lepiej sprawdza się jako globalny filtr jakości.
+
+\textbf{Wyniki testów:} Fuzzy Logic osiągnęła najszybszy czas odpowiedzi (<100ms dla 100 produktów) dzięki brakowi konieczności przechowywania macierzy - wszystkie obliczenia wykonywane w locie. Interpretowalność 100\% - każda rekomendacja ma pełne wyjaśnienie aktywacji konkretnych reguł. Sentiment Analysis wymagała preprocessingu opinii tekstowych (tokenizacja, usuwanie stop words) ale działała uniwersalnie bez potrzeby budowania profili użytkowników. Głównym ograniczeniem Sentiment jest wrażliwość na negację i ironię („nie polecam" może być błędnie sklasyfikowane jako pozytywne jeśli leksykon wykryje słowo „polecam").
+
+\newpage
+\noindent\textbf{Modele Probabilistyczne vs Apriori}
+
+\medskip
+
+Tabela \ref{tab:prob-vs-apriori} porównuje metody sekwencyjne (modele probabilistyczne) i asocjacyjne (Apriori). Modele probabilistyczne (łańcuch Markowa + Naive Bayes) przewidują przyszłe zakupy na podstawie sekwencji czasowych oraz profilu behawioralnego użytkownika. Apriori odkrywa reguły współzakupów z koszyków produktowych bez uwzględniania kolejności.
+
+\begin{table}[H]
+\centering
+\caption{Porównanie modeli probabilistycznych i algorytmu Apriori}
+\label{tab:prob-vs-apriori}
+\begin{tabular}{|p{3cm}|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Kryterium} & \textbf{Modele Probabilistyczne} & \textbf{Apriori} \\
+\hline
+Źródło danych & Sekwencje zamówień w czasie & Koszyki zakupowe (itemsety) \\
+\hline
+Uwzględnienie czasu & Tak - kolejność zakupów & Nie - współwystępowanie \\
+\hline
+Algorytm & Markov Chain (60\%) + Naive Bayes (40\%) & Algoritm Apriori (support, confidence, lift) \\
+\hline
+Personalizacja & Wysoka - profil użytkownika & Brak - uniwersalne reguły \\
+\hline
+Typ predykcji & „Po laptopie następują akcesoria" & „Z laptopem kupują mysz" \\
+\hline
+Metryki & Prawdopodobieństwo przejścia, prawdopodobieństwo zakupu & Support, confidence, lift \\
+\hline
+Problem zimnego startu & Występuje (wymaga historii) & Występuje (wymaga współzakupów) \\
+\hline
+Czas treningu & Kilka sekund (Markov + NB) & Wysoki (dla dużych katalogów) \\
+\hline
+Czas predykcji & Bardzo szybki (<10ms) & Średni (wyszukiwanie reguł) \\
+\hline
+Zastosowanie & Przewidywanie następnej kategorii, analiza odejścia klienta & Rekomendacje produktów komplementarnych \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Różnice w działaniu:} Modele probabilistyczne analizują sekwencje zakupów w czasie i przewidują którą kategorię użytkownik prawdopodobnie kupi następną (np. „po laptopie zwykle następują akcesoria komputerowe"). Łańcuch Markowa pierwszego rzędu używa macierzy przejść między 48 kategoriami produktów trenowanej na rzeczywistych sekwencjach zamówień. Naive Bayes ocenia prawdopodobieństwo zakupu na podstawie pięciu cech użytkownika: łączna liczba zamówień, średnia wartość zamówienia, dni od ostatniego zakupu, ulubiona kategoria oraz częstotliwość zakupów. Apriori natomiast odkrywa reguły typu „klienci kupujący laptop często kupują również mysz bezprzewodową" bez uwzględniania kolejności czasowej. Analizuje koszyki zakupowe i identyfikuje itemsety pojawiające się razem częściej niż przypadkowo.
+
+\textbf{Zastosowanie praktyczne:} Modele probabilistyczne są widoczne w sekcji „Analiza probabilistyczna" panelu klienta z wizualizacją łańcucha przejść między kategoriami oraz predykcją prawdopodobieństwa odejścia klienta. Administrator ma dostęp do paneli „Markov Chain Analysis" i „Bayesian Analysis" z prognozami sprzedaży oraz identyfikacją użytkowników zagrożonych odejściem. Apriori wyświetla sekcję „Często kupowane razem" na stronach produktów oraz w koszyku zakupowym, sugerując produkty komplementarne. Modele probabilistyczne są skuteczniejsze dla użytkowników z regularną historią zakupów (wykrywają cykle zakupowe), podczas gdy Apriori lepiej sprawdza się w rekomendacji akcesoriów i dodatków (cross-selling).
+
+\textbf{Wyniki testów:} Modele probabilistyczne wymagały treningu na 265 zamówieniach (kilka sekund dla Markov Chain, 1-2 sekundy dla Naive Bayes). Po wytrenowaniu predykcje były wykonywane bardzo szybko (<10ms). Macierz przejść Markova zawierała 48 stanów (po jednym dla każdej kategorii) z wygładzaniem Laplace'a ($\alpha$ = 1.0) zapobiegającym zerowemu prawdopodobieństwu. Apriori generował reguły asocjacyjne z progami min\_support = 0.01 i min\_confidence = 0.3, co eliminowało powiązania przypadkowe ale wymagało wystarczającej liczby transakcji dla każdego itemsetu.
+
+\newpage
+\medskip
+\noindent\textbf{Podsumowanie ewaluacji}
+
+\medskip
+
+Porównanie sześciu metod rekomendacyjnych wykazało, że każda z nich adresuje inny aspekt problemu rekomendacji i najlepsze wyniki uzyskuje się stosując je komplementarnie:
+
+\textbf{Metody oparte na treści vs metody behawioralne:} Content-Based Filtering (cechy produktów) rozwiązuje problem zimnego startu dla nowych produktów i zapewnia pełne pokrycie katalogu. Collaborative Filtering (historia zakupów społeczności) odkrywa nieoczywiste powiązania międzykategorialne zwiększające sprzedaż krzyżową. CBF jest bezpieczniejszym wyborem dla nowych sklepów, CF dla dojrzałych platform z bogatą historią transakcji.
+
+\textbf{Metody personalizowane vs uniwersalne:} Fuzzy Logic (profil cenowy użytkownika) personalizuje rekomendacje według wrażliwości cenowej i oferuje pełną interpretowalność (100\% - aktywacja 6 reguł IF-THEN). Sentiment Analysis (opinie społeczności) tworzy uniwersalny ranking jakości produktów dostępny dla wszystkich użytkowników. Fuzzy jest skuteczniejsza dla użytkowników o wyraźnych preferencjach, Sentiment jako globalny filtr jakości.
+
+\textbf{Metody sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje czasowe) przewidują przyszłe zakupy na podstawie łańcucha Markowa (60\%) i profilu behawioralnego Naive Bayes (40\%), umożliwiając identyfikację użytkowników zagrożonych odejściem. Apriori (współzakupy) odkrywa reguły asocjacyjne produktów komplementarnych efektywne w cross-sellingu. Modele probabilistyczne lepsze dla regularnych użytkowników (cykle zakupowe), Apriori dla akcesoriów i dodatków.
+
+Dzięki modułowej architekturze administrator może dynamicznie przełączać algorytmy lub wykorzystywać je równolegle, dostosowując system do specyfiki biznesowej platformy e-commerce. Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 265 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich sześciu algorytmów.
 
 \newpage
 
