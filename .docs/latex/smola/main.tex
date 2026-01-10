@@ -851,55 +851,6 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 
 \textbf{Integracja warstw} odbywa się poprzez RESTful API z automatyczną synchronizacją - zmiana danych w jednej warstwie propaguje aktualizacje do pozostałych. Django Signals zapewniają automatyczne przeliczanie rekomendacji przy dodaniu nowego produktu lub zamówienia.
 
-\subsection*{3.6 Kluczowe scenariusze użycia}
-\addcontentsline{toc}{subsection}{3.6 Kluczowe scenariusze użycia}
-
-\textbf{Scenariusz 1: Klient przegląda rekomendacje spersonalizowane}
-
-Zalogowany użytkownik otwiera panel klienta. Dashboard wyświetla:
-\begin{itemize}
-\item \textbf{Statystyki zakupowe} - liczba zakupionych produktów, reklamacji, zamówień w bieżącym miesiącu, średnia wartość zamówienia,
-\item \textbf{Wykresy analityczne} - trendy zamówień w czasie (wykres liniowy) oraz rozkład wydatków po kategoriach (wykres kołowy),
-\item \textbf{Rekomendacje personalizowane} - sekcja z 4 produktami wygenerowanymi przez aktualnie aktywny algorytm wybrany w ustawieniach (CBF, Fuzzy Logic lub Probabilistic).
-\end{itemize}
-
-Użytkownik może przejść do dedykowanych zakładek z bardziej szczegółowymi rekomendacjami:
-\begin{itemize}
-\item \textit{Smart Recommendations} - zaawansowana analiza probabilistyczna (łańcuch Markowa, Naive Bayes) z wykresami rozkładu kategorii i predykcją następnych zakupów,
-\item \textit{Fuzzy Logic} - rekomendacje z pełnym wyjaśnieniem reguł rozmytych, profilu użytkownika i aktywacji reguł IF-THEN.
-\end{itemize}
-
-\textbf{Scenariusz 2: Administrator debuguje algorytmy rekomendacji}
-
-Administrator loguje się do panelu administracyjnego, otwiera sekcję "Debug". Przegląda panele debugowania trzech metod:
-\begin{itemize}
-\item \textit{CBF Debug} - macierz podobieństw produktów, wagi cech (kategorie 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%), statystyki pokrycia (83\% produktów ma podobieństwo > 0.2),
-\item \textit{Fuzzy Debug} - profile rozmyte użytkowników, funkcje przynależności (cheap/medium/expensive), aktywacja reguł IF-THEN,
-\item \textit{Probabilistic Debug} - macierz przejść Markova (48x48), prawdopodobieństwa zakupu Naive Bayes, predykcja odejścia klienta.
-\end{itemize}
-
-Administrator weryfikuje poprawność działania każdej metody, analizuje metryki wydajności i ewentualnie dostosowuje parametry (np. progi podobieństwa, wagi cech).
-
-\textbf{Scenariusz 3: Gość przegląda produkty}
-
-Niezalogowany użytkownik przegląda katalog produktów, dodaje laptop do koszyka. Przy próbie finalizacji zamówienia system przekierowuje do logowania lub rejestracji.
-
-\bigskip
-
-Zaprojektowana aplikacja e-commerce z zaawansowanym systemem rekomendacji została zbudowana w architekturze warstwowej z wyraźną separacją odpowiedzialności (Separation of Concerns). System obsługuje hierarchię trzech typów użytkowników (gość, klient, administrator), gdzie każdy poziom dziedziczy funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
-
-Kluczowe cechy projektu:
-\begin{itemize}
-\item \textbf{Modułowość} - trzy niezależne algorytmy rekomendacji (CBF, Fuzzy Logic, Probabilistic), które mogą działać osobno lub równolegle w ramach wspólnej infrastruktury,
-\item \textbf{Komplementarność metod} - każdy algorytm rozwiązuje inny aspekt problemu rekomendacji (zimny start, personalizacja, interpretowalność),
-\item \textbf{Architektura trójwarstwowa} - separacja prezentacji (React 18), logiki biznesowej (Django 5.1.4 + DRF 3.15.2) oraz danych (PostgreSQL 14),
-\item \textbf{RESTful API} - wszystkie funkcjonalności dostępne przez REST API z uwierzytelnianiem JWT,
-\item \textbf{Interpretowalność} - szczególnie moduł Fuzzy Logic oferuje pełne wyjaśnienie rekomendacji przez reguły IF-THEN (explainable AI),
-\item \textbf{Optymalizacja wydajności} - cache, bulk operations, indeksy bazodanowe zapewniają wydajność dla katalogów do 10000 produktów i 100000 użytkowników.
-\end{itemize}
-
-Architektura techniczna systemu, wybór stosu technologicznego oraz struktura bazy danych zostały szczegółowo omówione w rozdziale 4. Rozdział 5 prezentuje implementację trzech algorytmów rekomendacyjnych wraz z pseudokodami i analizą matematyczną. Praktyczne funkcjonowanie systemu, interfejsy użytkownika oraz panele debugowania przedstawiono w rozdziale 6.
-
 \newpage
 
 \section*{Rozdzia\l{} 4}
@@ -1635,21 +1586,21 @@ Poniższe wykresy przedstawiają graficzną reprezentację zaimplementowanych fu
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{fuzzy_price_membership.png}
+  \includegraphics[width=0.85\textwidth]{images/fuzzy_price_membership.png}
   \caption{Funkcje przynależności dla ceny produktu (cheap, medium, expensive). Oś X przedstawia cenę w PLN, oś Y stopień przynależności $\mu$ w przedziale [0, 1].}
   \label{fig:fuzzy_price}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{fuzzy_quality_membership.png}
+  \includegraphics[width=0.85\textwidth]{images/fuzzy_quality_membership.png}
   \caption{Funkcje przynależności dla jakości produktu (low, medium, high). Oś X przedstawia ocenę produktu w skali 1-5, oś Y stopień przynależności $\mu$.}
   \label{fig:fuzzy_quality}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{fuzzy_popularity_membership.png}
+  \includegraphics[width=0.85\textwidth]{images/fuzzy_popularity_membership.png}
   \caption{Funkcje przynależności dla popularności produktu (low, medium, high). Oś X przedstawia liczbę zamówień, oś Y stopień przynależności $\mu$.}
   \label{fig:fuzzy_popularity}
 \end{figure}
