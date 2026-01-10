@@ -142,10 +142,10 @@ Nowoczesne platformy e-commerce oferują tysiące lub dziesiątki tysięcy produ
 
 Systemy rekomendacyjne stanowią rozwiązanie tego problemu poprzez automatyczną analizę preferencji użytkowników w celu proponowania produktów dopasowanych do indywidualnych potrzeb, zwiększając jednocześnie konwersję i wartość sprzedaży \cite{ricci2015recommender}.
 
-System został zrealizowany jako część projektu e-commerce powstałego we współpracy dwuosobowej. Niniejsza praca koncentruje się na implementacji trzech metod rekomendacyjnych: filtracji opartej na treści (Content-Based Filtering), logiki rozmytej (Fuzzy Logic) oraz modeli probabilistycznych (łańcuch Markowa i naiwny klasyfikator Bayesa).
+System został zrealizowany jako część większego projektu e-commerce powstałego we współpracy dwuosobowej, w której funkcjonalności systemu rekomendacji zostały podzielone między dwóch studentów. Piotr Smoła (niniejsza praca) odpowiadał za implementację trzech metod: filtracji opartej na treści (Content-Based Filtering), logiki rozmytej (Fuzzy Logic) oraz modeli probabilistycznych (łańcuch Markowa i naiwny klasyfikator Bayesa). Dawid Olko (praca równoległa) odpowiadał za pozostałe trzy metody: algorytm Apriori (reguły asocjacyjne), analizę sentymentu opinii użytkowników oraz collaborative filtering (filtrację kolaboratywną). Niniejsza praca koncentruje się szczegółowo na aspektach algorytmicznych i jakościowych trzech pierwszych metod, z uwzględnieniem problemu zimnego startu, interpretowalności wyników oraz personalizacji doświadczenia użytkownika.
 
-\subsection*{Motywacja i kontekst problemu}
-\addcontentsline{toc}{subsection}{Motywacja i kontekst problemu}
+\medskip
+\noindent\textbf{Motywacja i kontekst problemu}
 
 Problem rekomendacji w platformach e-commerce jest złożony i wieloaspektowy. Preferencje użytkowników są subiektywne i trudne do modelowania matematycznego. Dane o użytkownikach są często niekompletne lub niedostępne, zwłaszcza dla nowych użytkowników i produktów - zjawisko znane jako problem zimnego startu (cold start problem). Katalogi produktów dynamicznie się zmieniają, co wymaga ciągłej aktualizacji modeli rekomendacyjnych. Dodatkowo, użytkownicy oczekują nie tylko trafnych rekomendacji, ale również ich wyjaśnienia - dlaczego dany produkt został zaproponowany.
 
@@ -153,10 +153,10 @@ Istniejące rozwiązania komercyjne (Amazon Personalize, Google Recommendations 
 
 Rzeczona praca odpowiada na powyższe wyzwania poprzez zaprojektowanie i implementację modułowego systemu rekomendacyjnego łączącego trzy komplementarne podejścia: filtrację opartą na treści (Content-Based Filtering, CBF), logikę rozmytą (Fuzzy Logic) oraz modele probabilistyczne (łańcuchy Markowa i naiwny klasyfikator Bayesa). Każda z tych metod rozwiązuje inne aspekty problemu rekomendacji i oferuje unikalne możliwości personalizacji. System został zaimplementowany od podstaw, bez wykorzystania zewnętrznych bibliotek uczenia maszynowego, co zapewnia pełną kontrolę nad algorytmami oraz możliwość ich dostosowania do specyficznych wymagań platformy e-commerce.
 
-\subsection*{Cel i zakres pracy}
-\addcontentsline{toc}{subsection}{Cel i zakres pracy}
+\medskip
+\noindent\textbf{Cel i zakres pracy}
 
-Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce, który łączy sześć zaawansowanych i komplementarnych metod uczenia maszynowego. System został zbudowany od podstaw, z ograniczeniem wykorzystania gotowych bibliotek uczenia maszynowego, co zapewniło pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
+Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce, który łączy trzy zaawansowane i komplementarne metody uczenia maszynowego. System został zbudowany od podstaw, z ograniczeniem wykorzystania gotowych bibliotek uczenia maszynowego, co zapewniło pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
 
 W ramach realizacji celu głównego zdefiniowano następujące cele szczegółowe:
 
@@ -236,7 +236,7 @@ gdzie $w_i$ to waga cechy $i$, a $f_i(p)$ to wartość cechy dla produktu $p$. F
 
 \textbf{Wady CBF}:
 \begin{itemize}
-    \item Problem "filter bubble"~-- rekomenduje tylko podobne produkty, użytkownik nie odkrywa nowych kategorii
+    \item Problem bańki filtrującej (ang. \textit{filter bubble})~-- rekomenduje tylko podobne produkty, użytkownik nie odkrywa nowych kategorii
     \item Wymaga dobrze opisanych cech produktów -- jakość rekomendacji zależy od jakości metadanych
     \item Nie odkrywa nieoczywistych powiązań między produktami (np. "użytkownicy kupujący kawę często kupują cukier")
     \item Ograniczenie do podobieństwa cech -- nie uwzględnia kontekstu użytkownika
@@ -367,7 +367,7 @@ Najczęściej używane T-conormy:
     \alpha = T(\mu_{cheap}(price), \mu_{high}(quality)) = \min(\mu_{cheap}, \mu_{high})
     \end{equation}
 
-    \item \textbf{Agregacja} -- połączenie wyników wszystkich reguł za pomocą T-conormy. Jeśli wiele reguł prowadzi do tego samego konsekwentu:
+    \item \textbf{Agregacja} -- połączenie wyników wszystkich reguł za pomocą T-conormy. Jeśli wiele reguł prowadzi do tego samego wniosku (następnika):
     \begin{equation}
     \mu_{output} = S(\alpha_1, \alpha_2, ..., \alpha_n) = \max(\alpha_1, \alpha_2, ..., \alpha_n)
     \end{equation}
@@ -401,7 +401,7 @@ Reguła rozmyta ma postać \cite{ross2010fuzzy}:
 \text{IF } x_1 \text{ IS } A_1 \text{ AND } x_2 \text{ IS } A_2 \text{ THEN } y \text{ IS } B
 \end{equation}
 
-gdzie $A_1$, $A_2$, $B$ to zbiory rozmyte definiujące warunki i konsekwencje reguły. Operator AND realizowany jest przez T-normę, najczęściej minimum lub iloczyn algebraiczny.
+gdzie $A_1$, $A_2$, $B$ to zbiory rozmyte definiujące poprzedniki (warunki) i następnik (wniosek) reguły. Operator AND realizowany jest przez T-normę, najczęściej minimum lub iloczyn algebraiczny.
 
 \medskip
 \noindent\textbf{Modele probabilistyczne -- podstawy teoretyczne}
@@ -489,7 +489,7 @@ gdzie $|V_i|$ to liczba unikalnych wartości cechy $x_i$. Dodanie 1 do licznika 
 
 \textit{Warianty Naive Bayes}:
 \begin{itemize}
-    \item \textbf{Multinomial NB} -- dla danych zliczeniowych (np. częstość słów)
+    \item \textbf{Multinomial NB} -- dla danych wyliczeniowych (np. częstość słów)
     \item \textbf{Bernoulli NB} -- dla cech binarnych (obecność/brak)
     \item \textbf{Gaussian NB} -- dla cech ciągłych (zakłada rozkład normalny)
 \end{itemize}
@@ -597,7 +597,7 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
 \begin{itemize}
-\item \textbf{Bardzo wysokie koszty operacyjne} - koszty usług GCP są często wyższe niż konkurencyjnych rozwiązań chmurowych, co czyni je nieopłacalnymi dla małych i średnich platform e-commerce. Model cenowy oparty na liczbie predykcji generuje rosnące koszty wraz ze skalą ruchu użytkowników,
+\item \textbf{Bardzo wysokie koszty operacyjne} - model cenowy oparty na liczbie predykcji (pay-per-prediction) generuje rosnące koszty wraz ze skalą ruchu użytkowników, co może stanowić barierę dla małych i średnich platform e-commerce o ograniczonym budżecie,
 \item \textbf{Brak wieloźródłowej agregacji sentymentu, logiki rozmytej i modeli probabilistycznych} - Google Recommendations AI oferuje funkcję ``Frequently Bought Together'' (często kupowane razem, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych, systemów rozmytych z funkcjami przynależności ani łańcuchów Markova jak w planowanym systemie,
 \item \textbf{Wymóg bardzo dużych zbiorów danych} - rozwiązanie zaprojektowane dla platform o skali YouTube, co czyni je nadmiarowo złożonym dla małych sklepów internetowych,
 \item \textbf{Brak interpretowalności} - głęboka ,,black box'', gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag embeddings (reprezentacji wektorowych) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację. W przeciwieństwie do tego, logika rozmyta oferuje pełną przejrzystość reguł IF-THEN.
@@ -672,7 +672,7 @@ Własna implementacja (Django + PostgreSQL) eliminuje wysokie koszty licencyjne 
 Własna implementacja umożliwia unikalne podejścia niedostępne w gotowych rozwiązaniach:
 \begin{itemize}
 \item \textbf{Ważone wektory cech} dla CBF - kategorie 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%,
-\item \textbf{Funkcje przynależności Mamdani} dla logiki rozmytej - modelowanie niepewności preferencji użytkowników,
+\item \textbf{System wnioskowania Mamdaniego} dla logiki rozmytej - modelowanie niepewności preferencji użytkowników z wykorzystaniem funkcji przynależności,
 \item \textbf{Łańcuch Markowa pierwszego rzędu} - predykcja następnej kategorii zakupu na podstawie macierzy przejść.
 \end{itemize}
 
@@ -717,7 +717,7 @@ Rozdział przedstawia szczegółowy opis projektowanej aplikacji e-commerce z za
 Aplikacja stanowi kompleksowe rozwiązanie e-commerce z systemem rekomendacji opartym o trzy metody:
 \begin{itemize}
 \item \textbf{Content-Based Filtering} - odkrywanie produktów podobnych na podstawie cech produktowych (kategorie, tagi, cena, słowa kluczowe),
-\item \textbf{Fuzzy Logic} - personalizacja rekomendacji z wykorzystaniem logiki rozmytej i funkcji przynależności Mamdani,
+\item \textbf{Fuzzy Logic} - personalizacja rekomendacji z wykorzystaniem systemu wnioskowania Mamdaniego i funkcji przynależności,
 \item \textbf{Modele probabilistyczne} - predykcja sekwencji zakupowych (łańcuch Markowa) oraz prawdopodobieństwa zakupu (Naive Bayes).
 \end{itemize}
 
@@ -1270,14 +1270,7 @@ Architektura składa się z trzech głównych komponentów:
 
 \textbf{Przepływ danych w systemie CBF}:
 
-\begin{enumerate}
-    \item Pobranie produktów z bazy z \texttt{prefetch\_related()} dla kategorii i tagów
-    \item Ekstrakcja ważonych cech dla każdego produktu
-    \item Obliczenie podobieństw dla wszystkich par produktów
-    \item Filtracja podobieństw poniżej progu 0.2 (20\%)
-    \item Zapis do tabeli \texttt{ProductSimilarity} za pomocą \texttt{bulk\_create()}
-    \item Cache wyników na 2 godziny
-\end{enumerate}
+System rozpoczyna przetwarzanie od pobrania produktów z bazy danych wykorzystując optymalizację \texttt{prefetch\_related()} dla kategorii i tagów w celu minimalizacji liczby zapytań SQL. Następnie dla każdego produktu wykonywana jest ekstrakcja ważonych cech (kategorie 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) do postaci wektorów cech. Algorytm oblicza podobieństwa kosinusowe dla wszystkich par produktów, po czym filtruje wyniki poniżej progu 0.2 (20\%) w celu eliminacji nieistotnych podobieństw. Wygenerowane pary podobieństw są zapisywane do tabeli \texttt{ProductSimilarity} za pomocą operacji zbiorczej \texttt{bulk\_create()} dla optymalizacji wydajności. Wyniki są buforowane w pamięci podręcznej na 2 godziny w celu przyspieszenia kolejnych zapytań.
 
 \medskip
 \noindent\textbf{Implementacja ekstrakcji cech}
@@ -1455,16 +1448,7 @@ Dla katalogu 500 produktów:
   \label{fig:cbf_sequence}
 \end{figure}
 
-Przepływ procesu generowania rekomendacji CBF:
-\begin{enumerate}
-    \item Żądanie użytkownika trafia do API\\
-    (\texttt{/api/recommendations/content-based/?product\_id=\{id\}})
-    \item Backend (ContentBasedAPI) wykonuje zapytanie do modelu ProductSimilarity
-    \item Model pobiera top 10 podobnych produktów z bazy danych (sortowanie po \texttt{-similarity\_score})
-    \item System sprawdza pamięć podręczną - w przypadku trafienia zwracany jest wynik natychmiast
-    \item Backend zwraca odpowiedź 200 OK z listą rekomendacji (product\_id, name, price, similarity\_score)
-    \item Frontend wyświetla sekcję rekomendacji z podobnymi produktami
-\end{enumerate}
+Proces generowania rekomendacji Content-Based Filtering rozpoczyna się w momencie gdy żądanie użytkownika trafia do endpointa API \texttt{/api/recommendations/content-based/?product\_id=\{id\}}. Backend, reprezentowany przez klasę \texttt{ContentBasedAPI}, wykonuje zapytanie do modelu \texttt{ProductSimilarity}, pobierając top 10 produktów podobnych do wskazanego, posortowanych według malejącego współczynnika \texttt{similarity\_score}. System sprawdza pamięć podręczną -- w przypadku trafienia (cache HIT) wynik zwracany jest natychmiast, eliminując konieczność dostępu do bazy danych. Backend zwraca odpowiedź HTTP 200 OK z listą rekomendacji w formacie JSON, zawierającą dla każdego produktu: identyfikator, nazwę, cenę oraz współczynnik podobieństwa. Frontend (komponent React) wyświetla otrzymane rekomendacje w sekcji "Similar Products" na stronie produktu.
 
 System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i zapisuje wyniki w pamięci podręcznej na 5 minut w celu optymalizacji wydajności.
 
@@ -1500,19 +1484,7 @@ System logiki rozmytej został zaimplementowany w module \texttt{fuzzy\_logic\_e
 
 \textbf{Przepływ danych}:
 
-\begin{enumerate}
-    \item Pobranie produktów do ewaluacji
-    \item Pobranie/budowa rozmytego profilu użytkownika
-    \item Dla każdego produktu:
-    \begin{enumerate}
-        \item Fuzzyfikacja ceny, jakości, popularności
-        \item Ewaluacja 6 reguł rozmytych
-        \item Agregacja wyników reguł
-        \item Defuzzyfikacja do wyniku liczbowego
-    \end{enumerate}
-    \item Sortowanie produktów według fuzzy\_score
-    \item Zwrócenie top N rekomendacji
-\end{enumerate}
+Proces rozpoczyna się od pobrania produktów dostępnych do ewaluacji oraz zbudowania rozmytego profilu użytkownika na podstawie historii zakupów. Dla każdego produktu w katalogu system przeprowadza fuzzyfikację (obliczenie stopni przynależności dla ceny, jakości i popularności), następnie ewaluuje 6 reguł rozmytych zdefiniowanych w bazie wiedzy, agreguje wyniki aktywnych reguł oraz wykonuje defuzzyfikację w celu uzyskania liczbowego wyniku \texttt{fuzzy\_score}. Po przetworzeniu wszystkich produktów system sortuje je według malejącego \texttt{fuzzy\_score} i zwraca top N rekomendacji użytkownikowi.
 
 \medskip
 \noindent\textbf{Funkcje przynależności -- szczegóły implementacji}
@@ -1635,6 +1607,33 @@ Oparte na liczbie zamówień produktu:
 \bigskip
 
 Interpretacja: Funkcja trapezoidalna dla "medium"~zapewnia stabilny przedział pełnej przynależności $[2, 10]$ zamówień - produkty w tym przedziale są typowymi artykułami o standardowej popularności. Produkt z 5 zamówieniami jest w pełni "średnio popularny", ale nie jest ani "niszowy"~(low $\leq 2$) ani "bestsellerem"~(high $\geq 30$). Trapez eliminuje oscylacje klasyfikacji dla produktów o podobnej liczbie zamówień, w przeciwieństwie do funkcji trójkątnych używanych dla zbiorów skrajnych.
+
+\bigskip
+
+\textbf{Wizualizacja funkcji przynależności}
+
+Poniższe wykresy przedstawiają graficzną reprezentację zaimplementowanych funkcji przynależności dla trzech zmiennych wejściowych systemu rozmytego.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fuzzy_price_membership.png}
+  \caption{Funkcje przynależności dla ceny produktu (cheap, medium, expensive). Oś X przedstawia cenę w PLN, oś Y stopień przynależności $\mu$ w przedziale [0, 1].}
+  \label{fig:fuzzy_price}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fuzzy_quality_membership.png}
+  \caption{Funkcje przynależności dla jakości produktu (low, medium, high). Oś X przedstawia ocenę produktu w skali 1-5, oś Y stopień przynależności $\mu$.}
+  \label{fig:fuzzy_quality}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fuzzy_popularity_membership.png}
+  \caption{Funkcje przynależności dla popularności produktu (low, medium, high). Oś X przedstawia liczbę zamówień, oś Y stopień przynależności $\mu$.}
+  \label{fig:fuzzy_popularity}
+\end{figure}
 
 \medskip
 \noindent\textbf{Rozmyty profil użytkownika}
@@ -1839,16 +1838,7 @@ Algorytm Fuzzy Logic oferuje najwyższą interpretowalność - użytkownik może
   \label{fig:fuzzy_sequence}
 \end{figure}
 
-Przepływ procesu generowania rekomendacji Fuzzy Logic:
-\begin{enumerate}
-    \item Żądanie użytkownika trafia do API (\texttt{/api/fuzzy-recommendations/})
-    \item FuzzyLogicEngine buduje rozmyty profil użytkownika z historii zakupów (FuzzyUserProfile)
-    \item Dla każdego produktu system przeprowadza fuzzyfikację (obliczenie przynależności price, quality, popularity)
-    \item Następuje wnioskowanie - ewaluacja 6 reguł IF-THEN i obliczenie aktywacji
-    \item Defuzzyfikacja agreguje wyniki reguł do jednego fuzzy\_score metodą średniej ważonej
-    \item Backend zwraca produkty posortowane po fuzzy\_score wraz z rule\_activations dla transparentności
-    \item System buforuje wyniki w pamięci podręcznej na 5 minut dla optymalizacji wydajności
-\end{enumerate}
+Proces generowania rekomendacji Fuzzy Logic rozpoczyna się gdy żądanie użytkownika trafia do endpointa API \texttt{/api/fuzzy-recommendations/}. Silnik logiki rozmytej (\texttt{FuzzyLogicEngine}) buduje rozmyty profil użytkownika (\texttt{FuzzyUserProfile}) na podstawie historii zakupów, ekstrahując preferencje cenowe, kategorialne oraz jakościowe. Dla każdego produktu w katalogu system przeprowadza proces fuzzyfikacji, obliczając stopnie przynależności do zbiorów rozmytych dla trzech wymiarów: ceny (cheap/medium/expensive), jakości (low/medium/high) oraz popularności (low/medium/high). Następnie system wykonuje wnioskowanie rozmyte -- ewaluuje 6 reguł IF-THEN zdefiniowanych w bazie wiedzy i oblicza aktywację każdej reguły na podstawie T-norm (minimum). Proces defuzzyfikacji agreguje wyniki wszystkich aktywnych reguł do jednej wartości \texttt{fuzzy\_score} metodą średniej ważonej. Backend zwraca listę produktów posortowanych według malejącego \texttt{fuzzy\_score}, wraz z dodatkowymi metadanymi \texttt{rule\_activations} zapewniającymi transparentność decyzji algorytmu. System buforuje wygenerowane rekomendacje w pamięci podręcznej na 5 minut w celu optymalizacji wydajności zapytań powtarzalnych.
 
 \subsection*{5.3 Modele probabilistyczne -- Markov Chain i Naive Bayes}
 \addcontentsline{toc}{subsection}{5.3 Modele probabilistyczne -- Markov Chain i Naive Bayes}
@@ -1874,15 +1864,7 @@ System probabilistyczny składa się z trzech komponentów zaimplementowanych w 
 
 \textbf{Przepływ danych}:
 
-\begin{enumerate}
-    \item Pobranie historii zamówień wszystkich użytkowników
-    \item Budowa sekwencji kategorii dla każdego użytkownika
-    \item Trening modelu Markowa na sekwencjach
-    \item Budowa cech użytkowników dla Naive Bayes
-    \item Trening modelu NB na danych historycznych
-    \item Predykcja: Markov przewiduje następne kategorie, NB ocenia prawdopodobieństwo zakupu
-    \item Agregacja wyników i generowanie rekomendacji
-\end{enumerate}
+System rozpoczyna przetwarzanie od pobrania historii zamówień wszystkich użytkowników z bazy danych. Następnie buduje sekwencje kategorii produktowych dla każdego użytkownika (np. Electronics → Clothing → Books). Model Markowa jest trenowany na tych sekwencjach w celu wyuczenia macierzy przejść między kategoriami. Równolegle system ekstrahuje cechy behawioralne użytkowników (liczba zamówień, średnia wartość koszyka, czas od ostatniego zakupu) i trenuje klasyfikator Naive Bayesa na danych historycznych. W fazie predykcji łańcuch Markowa przewiduje następne najbardziej prawdopodobne kategorie zakupów, podczas gdy Naive Bayes ocenia prawdopodobieństwo zakupu oraz ryzyko odejścia klienta. Silnik rekomendacji agreguje wyniki obu modeli (60\% Markov, 40\% NB) i generuje finalne rekomendacje produktowe.
 
 \medskip
 \noindent\textbf{Łańcuch Markowa dla sekwencji zakupowych}
@@ -2067,16 +2049,7 @@ System udostępnia dwa główne endpointy w \texttt{probabilistic\_views.py}:
   \label{fig:prob_sequence}
 \end{figure}
 
-Przepływ procesu generowania rekomendacji probabilistycznych:
-\begin{enumerate}
-    \item Żądanie użytkownika trafia do API (\texttt{/api/markov-recommendations/})
-    \item System trenuje oba modele na aktualnych danych: CustomMarkovChain (macierz przejść między kategoriami) i CustomNaiveBayes (klasyfikatory purchase i churn)
-    \item Markov Chain analizuje ostatnie zamówienie użytkownika i przewiduje następne kategorie zakupów z prawdopodobieństwami
-    \item Naive Bayes oblicza prawdopodobieństwo zakupu (purchase\_probability) oraz ryzyko odejścia klienta dla użytkownika
-    \item ProbabilisticRecommendationEngine agreguje wyniki obu modeli (60\% Markov, 40\% NB) i wybiera top K produktów
-    \item Backend zwraca rekomendacje wraz z metadanymi: predicted\_categories, purchase\_probability, expected\_days\_to\_next\_order
-    \item System zapisuje predykcje do tabeli PurchaseProbability dla późniejszej analizy trendów
-\end{enumerate}
+Proces generowania rekomendacji probabilistycznych rozpoczyna się gdy żądanie użytkownika trafia do endpointa API \texttt{/api/markov-recommendations/}. System inicjalizuje i trenuje oba modele na aktualnych danych transakcyjnych: \texttt{CustomMarkovChain} buduje macierz przejść między kategoriami produktowymi na podstawie sekwencji zamówień, podczas gdy \texttt{CustomNaiveBayes} uczy klasyfikatorów prawdopodobieństwa zakupu oraz ryzyka odejścia klienta (churn). Łańcuch Markowa analizuje ostatnie zamówienie użytkownika i przewiduje następne najbardziej prawdopodobne kategorie zakupów wraz z prawdopodobieństwami przejść. Równolegle klasyfikator Naive Bayesa oblicza prawdopodobieństwo zakupu (\texttt{purchase\_probability}) oraz ryzyko odejścia klienta na podstawie cech behawioralnych użytkownika (liczba zamówień, średnia wartość koszyka, czas od ostatniego zakupu). Silnik rekomendacji probabilistycznych (\texttt{ProbabilisticRecommendationEngine}) agreguje wyniki obu modeli w proporcji 60\% wagi dla Markova i 40\% dla Bayesa, wybierając top K produktów o najwyższym prawdopodobieństwie zakupu. Backend zwraca odpowiedź zawierającą listę rekomendacji wraz z metadanymi biznesowymi: przewidywane kategorie (\texttt{predicted\_categories}), prawdopodobieństwo zakupu oraz estymowaną liczbę dni do następnego zamówienia (\texttt{expected\_days\_to\_next\_order}). System zapisuje wygenerowane predykcje do tabeli \texttt{PurchaseProbability} w celu późniejszej analizy trendów zakupowych oraz weryfikacji trafności modelu.
 
 Modele probabilistyczne oferują unikalną wartość biznesową: predykcję przyszłych zakupów (Markov) oraz identyfikację użytkowników zagrożonych odejściem (Naive Bayes), co umożliwia proaktywne działania marketingowe.
 
