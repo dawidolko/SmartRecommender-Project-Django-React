@@ -138,11 +138,11 @@
 \section*{Wstęp}
 \addcontentsline{toc}{section}{Wstęp}
 
-Nowoczesne platformy e-commerce oferują tysiące lub dziesiątki tysięcy produktów, co stanowi istotne wyzwanie zarówno dla klientów, jak i właścicieli sklepów internetowych. Użytkownik poszukujący produktu staje przed wyborem setek opcji, co często prowadzi do rezygnacji z zakupu. Bez wsparcia inteligentnych systemów rekomendacyjnych proces zakupowy staje się czasochłonny i frustrujący. Z perspektywy biznesowej oznacza to utratę potencjalnych klientów oraz sytuacje, w których nabywcy nie odkrywają produktów optymalnie dopasowanych do ich potrzeb.
+Współczesny handel elektroniczny charakteryzuje się ogromną różnorodnością oferty - przeciętny sklep internetowy może posiadać nawet dziesiątki tysięcy pozycji w katalogu. Taka obfitość, choć korzystna teoretycznie, paradoksalnie utrudnia proces decyzyjny klientom, którzy przytłoczeni liczbą dostępnych wariantów często porzucają zakupy. Dla właścicieli platform e-commerce przekłada się to bezpośrednio na utracone transakcje oraz niższą wartość sprzedaży - klienci kupują produkty niekoniecznie najlepiej dopasowane do swoich potrzeb lub w ogóle rezygnują z zakupu.
 
-Systemy rekomendacyjne stanowią rozwiązanie tego problemu poprzez automatyczną analizę preferencji użytkowników w celu proponowania produktów dopasowanych do indywidualnych potrzeb, zwiększając jednocześnie konwersję i wartość sprzedaży \cite{ricci2015recommender}.
+Mechanizmy rekomendacyjne adresują ten problem przez inteligentną selekcję i prezentację produktów najbardziej odpowiadających indywidualnym potrzebom użytkownika, co skutkuje wzrostem konwersji oraz średniej wartości zamówienia \cite{ricci2015recommender}.
 
-System został zrealizowany jako część większego projektu e-commerce powstałego we współpracy dwuosobowej, w której funkcjonalności systemu rekomendacji zostały podzielone między dwóch studentów. Piotr Smoła (niniejsza praca) odpowiadał za implementację trzech metod: filtracji opartej na treści (Content-Based Filtering), logiki rozmytej (Fuzzy Logic) oraz modeli probabilistycznych (łańcuch Markowa i naiwny klasyfikator Bayesa). Dawid Olko (praca równoległa) odpowiadał za pozostałe trzy metody: algorytm Apriori (reguły asocjacyjne), analizę sentymentu opinii użytkowników oraz collaborative filtering (filtrację kolaboratywną). Niniejsza praca koncentruje się szczegółowo na aspektach algorytmicznych i jakościowych trzech pierwszych metod, z uwzględnieniem problemu zimnego startu, interpretowalności wyników oraz personalizacji doświadczenia użytkownika.
+Prezentowany system stanowi rezultat pracy dwuosobowego zespołu projektowego nad kompleksową platformą handlu elektronicznego. W ramach współpracy dokonano podziału odpowiedzialności algorytmicznych: niniejsza praca obejmuje trzy spośród sześciu zaimplementowanych metod rekomendacyjnych - filtrację bazującą na atrybutach produktowych (Content-Based Filtering), wnioskowanie rozmyte (Fuzzy Logic) oraz modele o charakterze probabilistycznym (łańcuchy Markowa połączone z klasyfikatorem Bayesowskim). Trzy pozostałe metody - filtracja kolaboratywna, analiza sentymentu tekstów oraz reguły asocjacyjne Apriori - zostały zrealizowane przez współautora projektu (Dawid Olko). Zakres merytoryczny niniejszego opracowania koncentruje się wokół zagadnień algorytmicznych trzech pierwszych metod, ze szczególnym uwzględnieniem strategii radzenia sobie z brakiem danych historycznych, możliwości interpretacji wyników przez człowieka oraz mechanizmów personalizacji rekomendacji.
 
 \medskip
 \noindent\textbf{Motywacja i kontekst problemu}
@@ -154,10 +154,10 @@ Rzeczona praca odpowiada na te wyzwania poprzez modułowy system łączący trzy
 \newpage
 \noindent\textbf{Cel i zakres pracy}
 
-Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce. Aplikacja została zrealizowana jako część większego projektu e-commerce powstałego we współpracy dwuosobowej, w której funkcjonalności systemu rekomendacji zostały podzielone między dwóch studentów. Niniejsza praca odpowiada za implementację trzech metod: filtracji opartej na treści (Content-Based Filtering), logiki rozmytej (Fuzzy Logic) oraz modeli probabilistycznych (łańcuch Markowa i naiwny klasyfikator Bayesa). Współautor projektu (Dawid Olko) odpowiadał za pozostałe trzy metody: algorytm Apriori (reguły asocjacyjne), analizę sentymentu opinii użytkowników oraz collaborative filtering (filtrację kolaboratywną). Łącznie system integruje sześć komplementarnych metod rekomendacyjnych, co zapewnia wszechstronne wsparcie procesu zakupowego użytkownika.
+Celem pracy jest opracowanie oraz wdrożenie zaawansowanego mechanizmu rekomendacyjnego w ramach funkcjonalnej platformy e-commerce. Realizacja odbywała się w trybie współpracy zespołowej, gdzie odpowiedzialność za różne komponenty systemu została rozdzielona pomiędzy dwóch autorów - niniejsza praca dokumentuje projektowanie i budowę trzech metod analitycznych (Content-Based Filtering, Fuzzy Logic, modele probabilistyczne), podczas gdy współautor (Dawid Olko) zajmował się trzema metodami komplementarnymi (Collaborative Filtering, Sentiment Analysis, Apriori). Całość tworzy spójny ekosystem sześciu algorytmów wzajemnie uzupełniających się funkcjonalnie.
 
 \medskip
-\noindent W ramach realizacji celu głównego zdefiniowano następujące cele szczegółowe:
+\noindent Szczegółowe cele realizacyjne obejmują:
 
 \begin{itemize}
     \item Zaprojektowanie architektury modułowego systemu rekomendacyjnego z architekturą trójwarstwową (Django + React + PostgreSQL)
@@ -168,7 +168,7 @@ Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu
     \item Przeprowadzenie ewaluacji jakości rekomendacji na rzeczywistych danych (500 produktów, 20 użytkowników, 200 zamówień)
 \end{itemize}
 
-Zakres pracy obejmuje trzy główne obszary: podstawy teoretyczne metod rekomendacyjnych, projekt i implementację systemu oraz ewaluację jego działania. System został zintegrowany z aplikacją webową e-commerce (Django 5.1.4 + React 18 + PostgreSQL 14), umożliwiającą weryfikację zaimplementowanych algorytmów w warunkach zbliżonych do rzeczywistych.
+Merytoryczny zakres opracowania obejmuje teoretyczne fundamenty algorytmów rekomendacyjnych, proces projektowania i wytwarzania oprogramowania oraz weryfikację empiryczną. Implementacja została osadzona w środowisku Django 5.1.4 / React 18 / PostgreSQL 14, co umożliwiło testowanie w warunkach zbliżonych do scenariuszy produkcyjnych.
 
 Niniejsza praca koncentruje się szczegółowo na aspektach algorytmicznych i jakościowych trzech metod, z uwzględnieniem problemu zimnego startu, interpretowalności wyników oraz personalizacji doświadczenia użytkownika:
 \begin{itemize}
@@ -190,11 +190,11 @@ System rekomendacji produktów został oparty na trzech zaawansowanych metodach 
 
 \medskip
 
-Systemy rekomendacyjne powstały jako rozwiązanie problemu wyboru spośród dziesiątek tysięcy produktów dostępnych w sklepach internetowych. Rozwój tej dziedziny datuje się na lata 90. XX wieku, kiedy pojawiły się pierwsze platformy handlu elektronicznego. Wczesne komercyjne zastosowania systemów rekomendacji w Amazon.com (Linden et al., 2003) bazowały na algorytmie Item-Based Collaborative Filtering, który analizował wzorce zakupowe użytkowników w celu identyfikacji produktów często kupowanych razem. System rekomendacji ``Customers who bought this item also bought...'' (Klienci, którzy kupili ten produkt, kupili również...) przyczynił się do wzrostu sprzedaży o 29\% w pierwszym roku wdrożenia, demonstrując realne korzyści biznesowe personalizacji. Kluczowym elementem było wykorzystanie macierzy podobieństw między produktami obliczanej w trybie offline (przetwarzanie wsadowe wykonywane periodycznie), co pozwalało na generowanie rekomendacji w czasie rzeczywistym nawet dla katalogów liczących miliony produktów. Amazon zastosował metrykę Adjusted Cosine Similarity (skorygowane podobieństwo kosinusowe) do obliczania podobieństwa produktów na podstawie wektorów ocen użytkowników, normalizując różnice w sposobie oceniania przez poszczególnych użytkowników.
+Geneza systemów rekomendacyjnych sięga początków cyfrowego handlu w latach 90., gdy dynamiczny wzrost oferty sklepów internetowych stworzył potrzebę narzędzi wspierających nawigację po tysiącach produktów. Przełomowe znaczenie miało wdrożenie przez Amazon.com mechanizmu Item-Based Collaborative Filtering (Linden et al., 2003), który identyfikował produkty komplementarne na podstawie historycznych współwystąpień w koszykach zakupowych. Funkcjonalność "Customers who bought..." osiągnęła 29% wzrost przychodów już w pierwszym roku, dowodząc ekonomicznej wartości personalizacji. Techniczne rozwiązanie opierało się na prekompilowanych macierzach podobieństw produktowych (batch processing), co umożliwiło real-time response nawet przy milionowych katalogach. Amazon wykorzystał Adjusted Cosine Similarity z normalizacją per-user, eliminując bias wynikający z indywidualnych skal oceniania.
 
-Istotnym katalizatorem rozwoju zaawansowanych technik rekomendacji były konkursy badawcze, szczególnie Netflix Prize organizowany w latach 2006-2009. Konkurs ten, z pulą nagród wynoszącą milion dolarów, przyciągnął uwagę środowiska akademickiego oraz przemysłowego, znacząco przyspieszając rozwój algorytmów faktoryzacji macierzy, zespołów modeli oraz metod deep learning. Współcześnie systemy rekomendacyjne stanowią fundament funkcjonowania wiodących platform e-commerce (handlu elektronicznego), serwisów VOD (Video on Demand - wideo na żądanie), platform muzycznych oraz mediów społecznościowych.
+Akceleratorem badań nad zaawansowanymi algorytmami stał się Netflix Prize (2006-2009) - konkurs z nagrodą miliona dolarów, który zintensyfikował prace nad faktoryzacją macierzową, ensemble learning oraz deep learning approaches. Obecnie mechanizmy rekomendacyjne stanowią infrastrukturalny element ekosystemu digital commerce, streaming media (VOD), platform muzycznych i social networks.
 
-Ewolucja systemów rekomendacyjnych przebiegała od prostych metod statystycznych (najbardziej popularne produkty, najlepiej ocenione) przez collaborative filtering (analiza wzorców zakupowych użytkowników), content-based filtering (analiza cech produktów), aż po zaawansowane metody hybrydowe łączące multiple podejścia. Obecne trendy obejmują wykorzystanie deep learning (sieci neuronowe), contextual bandits (algorytmy balansujące eksplorację i eksploatację), explainable AI (interpretowalność decyzji algorytmicznych) oraz personalizację w czasie rzeczywistym.
+Trajektoria rozwoju prowadziła od prymitywnych rankingów popularności, przez filtry kolaboratywne i content-based, ku hybrydowym architectures. Współczesne trendy obejmują neural networks, exploration-exploitation balancing (contextual bandits), explainability (XAI) oraz real-time personalization.
 
 \medskip
 \noindent\textbf{Content-Based Filtering -- podstawy teoretyczne}
@@ -592,14 +592,14 @@ Coverage = \frac{|\text{products with recommendations}|}{|\text{all products}|}
 \addcontentsline{toc}{section}{Rozdział 2: Weryfikacja i analiza rozwiązań alternatywnych}
 \section*{Weryfikacja i analiza rozwiązań alternatywnych}
 
-W celu uzasadnienia sensowności tworzenia dedykowanego systemu rekomendacji przeprowadzono analizę trzech reprezentatywnych rozwiązań rynkowych. Celem weryfikacji było zidentyfikowanie ograniczeń istniejących narzędzi oraz określenie wymagań dla planowanej aplikacji e-commerce.
+Decyzja o implementacji własnego silnika rekomendacyjnego została poprzedzona szczegółową analizą trzech wiodących platform dostępnych komercyjnie. Weryfikacja miała charakter eksploracyjny - chodziło o identyfikację barier funkcjonalnych i ekonomicznych, które skłoniłyby do inwestycji w custom development zamiast adopcji rozwiązania zewnętrznego.
 
 \medskip
 \noindent\textbf{Amazon Personalize}
 
 \medskip
 
-Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji oparte na algorytmach stosowanych w Amazon.com. System wykorzystuje głębokie uczenie (ang. \textit{deep learning} - wielowarstwowe sieci neuronowe) oraz filtrację kolaboratywną (ang. \textit{collaborative filtering}), oferując trzy typy rekomendacji: personalizację użytkownika (ang. \textit{User Personalization}), podobne produkty (ang. \textit{Similar Items}) oraz spersonalizowane rankowanie (ang. \textit{Personalized Ranking}).
+Amazon Personalize stanowi zarządzaną usługę w infrastrukturze AWS, implementującą algorytmy rekomendacyjne stosowane przez platformę handlową Amazon.com. Architektura opiera się na sieciach neuronowych oraz filtracji kolaboratywnej, udostępniając trzy główne tryby działania: personalizację użytkownika, produkty pokrewne oraz spersonalizowane rankowanie list.
 
 \medskip
 
@@ -613,14 +613,14 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 \item \textbf{Integracja AWS} - natywne wsparcie Lambda, S3, EventBridge, Kinesis (latencja <100ms dla 99. percentyla).
 \end{itemize}
 
-\noindent\textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
+\noindent\textbf{Kluczowe ograniczenia względem planowanego systemu:}
 
 \begin{itemize}
-\item \textbf{Wysokie koszty operacyjne} - rozwiązania chmurowe wiążą się z regularnymi opłatami licencyjnymi, które mogą być znaczące dla małych i średnich platform e-commerce. Dla porównania, własna implementacja eliminuje te koszty przy zachowaniu kontroli nad funkcjonalnościami,
-\item \textbf{Brak natywnej analizy sentymentu, logiki rozmytej oraz modeli probabilistycznych} - Amazon Personalize koncentruje się wyłącznie na filtracji kolaboratywnej i nie oferuje analizy opinii produktów, systemów rozmytych ani łańcuchów Markova. Wieloźródłowa agregacja sentymentu, logika rozmyta Mamdani oraz modele probabilistyczne wymagają integracji z dodatkowymi usługami AWS lub samodzielnej implementacji,
-\item \textbf{Vendor lock-in} (uzależnienie od dostawcy) - głęboka integracja z ekosystemem AWS (S3, Lambda, EventBridge) oznacza, że migracja do innej platformy wymaga przepisania całej architektury systemu,
-\item \textbf{Brak kontroli nad algorytmami} - system działa jako czarna skrzynka (ang. \textit{black box}), uniemożliwiając dostosowanie logiki rekomendacji. Przykład: niemożliwe jest zaimplementowanie ważonych wektorów cech dla filtracji opartej na treści (ang. \textit{Content-Based Filtering}), funkcji przynależności dla logiki rozmytej czy zaawansowanych metryk podobieństwa,
-\item \textbf{Wymóg dużych zbiorów danych} - według dokumentacji AWS, system wymaga minimum 25000 interakcji dla zapewnienia wysokiej jakości rekomendacji. Dla nowych platform problem zimnego startu (ang. \textit{cold start}) oznacza ograniczoną jakość w początkowym okresie działania.
+\item \textbf{Struktura kosztowa} - model subskrypcyjny generuje stałe obciążenie budżetowe, proporcjonalne do skali ruchu. Dla platform o ograniczonych zasobach finansowych może stanowić barierę entry,
+\item \textbf{Zakres funkcjonalny} - platforma koncentruje się na filtracji kolaboratywnej bez natywnego wsparcia dla analizy tekstowej opinii, wnioskowania rozmytego czy modeli probabilistycznych (łańcuchy Markowa, klasyfikatory Bayesowskie). Implementacja tych komponentów wymaga rozbudowy o dodatkowe usługi AWS,
+\item \textbf{Uzależnienie infrastrukturalne} - głęboka integracja z ekosystemem AWS (S3, Lambda, EventBridge) tworzy bariery migracyjne. Przeniesienie do alternatywnego środowiska wymaga reimplementacji całości,
+\item \textbf{Transparentność algorytmiczna} - architektura czarnoskrzynkowa uniemożliwia modyfikację logiki decyzyjnej. Brak dostępu do wag cech, parametrów podobieństwa czy funkcji przynależności,
+\item \textbf{Próg danych wejściowych} - dokumentacja AWS wskazuje 25000 interakcji jako minimum dla ade kwatnej jakości. Dla startupów w fazie zimnego startu oznacza to obniżoną trafność rekomendacji.
 \end{itemize}
 
 \medskip
@@ -628,7 +628,7 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 
 \medskip
 
-Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz multi-armed contextual bandits (wieloramienne bandyty kontekstowe - algorytmy balansujące eksplorację nowych opcji z wykorzystaniem sprawdzonych rozwiązań). System oferuje zaawansowane rekomendacje dla e-commerce, VOD (Video on Demand - wideo na żądanie) oraz platform newsowych, z automatycznym wykrywaniem trendów i sezonowości.
+Google Recommendations AI stanowi ofertę platformy GCP, bazującą na sieciach neuronowych oraz wieloramiennych bandytach kontekstowych - klasie algorytmów optymalizujących balans między eksploracją nowych wariantów a eksploatacją sprawdzonych rozwiązań. Przeznaczenie obejmuje e-commerce, serwisy VOD oraz agregatory treści newsowych, z automatyczną detekcją wzorców sezonowych.
 
 \medskip
 
@@ -645,13 +645,13 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 
 \newpage
 
-\noindent\textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
+\noindent\textbf{Kluczowe ograniczenia względem planowanego systemu:}
 
 \begin{itemize}
-\item \textbf{Bardzo wysokie koszty operacyjne} - model cenowy oparty na liczbie predykcji (pay-per-prediction) generuje rosnące koszty wraz ze skalą ruchu użytkowników, co może stanowić barierę dla małych i średnich platform e-commerce o ograniczonym budżecie,
-\item \textbf{Brak wieloźródłowej agregacji sentymentu, logiki rozmytej i modeli probabilistycznych} - Google Recommendations AI oferuje funkcję często kupowanych razem produktów (ang. \textit{Frequently Bought Together}, podobną do algorytmu Apriori), ale nie wspiera agregacji sentymentu z wielu źródeł tekstowych, systemów rozmytych z funkcjami przynależności ani łańcuchów Markova jak w planowanym systemie,
-\item \textbf{Wymóg bardzo dużych zbiorów danych} - rozwiązanie zaprojektowane dla platform o skali YouTube, co czyni je nadmiarowo złożonym dla małych sklepów internetowych,
-\item \textbf{Brak interpretowalności} - głęboka czarna skrzynka, gdzie nawet administratorzy z dostępem do Vertex AI nie mogą zobaczyć wag reprezentacji wektorowych (ang. \textit{embeddings}) ani logiki sieci neuronowej, co uniemożliwia debugowanie i optymalizację. W przeciwieństwie do tego, logika rozmyta oferuje pełną przejrzystość reguł IF-THEN.
+\item \textbf{Model ekonomiczny} - wycena pay-per-prediction skutkuje wzrostem kosztów proporcjonalnym do liczby zapytań. Dla platform o średnim i niskim ruchu może stanowić ekonomiczną barierę,
+\item \textbf{Zakres analityczny} - obecność mechanizmu "Frequently Bought Together" nie kompensuje braku wieloźródłowej analizy sentymentu, wnioskowania rozmytego oraz modeli sekwencyjnych (łańcuchy Markowa). Rozszerzenie o te komponenty wymaga dodatkowych integracji,
+\item \textbf{Skala docelowa} - architektura zoptymalizowana pod kątem platform mega-scale (YouTube) wprowadza nadmiarową złożoność dla małych i średnich sklepów,
+\item \textbf{Interpretowalność} - dostęp do embeddings czy logiki sieciowej jest niemożliwy nawet dla administratorów Vertex AI. Brak możliwości analizy mechanizmów decyzyjnych utrudnia debugowanie i optymalizację. Kontrast względem transparentnych reguł IF-THEN logiki rozmytej.
 \end{itemize}
 
 \medskip
@@ -659,7 +659,7 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 
 \medskip
 
-Apache Mahout to otwartoźródłowy framework (ang. \textit{open-source framework}) implementujący klasyczne algorytmy filtracji kolaboratywnej oraz faktoryzacji macierzy (ang. \textit{matrix factorization} - technika dekompozycji macierzy użytkownik-produkt) - ALS (ang. \textit{Alternating Least Squares} - metoda najmniejszych kwadratów na przemian), SVD (ang. \textit{Singular Value Decomposition} - rozkład według wartości osobliwych). Projekt powstał w 2008 roku, obecnie koncentruje się na algorytmach rozproszonych opartych na Apache Spark (ang. \textit{Spark-based distributed algorithms}).
+Apache Mahout reprezentuje otwartoźródłowy framework implementujący klasyczne algorytmy filtracji kolaboratywnej i faktoryzacji macierzowej - ALS (metoda najmniejszych kwadratów na przemian) oraz SVD (rozkład według wartości osobliwych). Projekt zapoczątkowany w 2008 roku ewoluował w kierunku algorytmów rozproszonych na infrastrukturze Apache Spark.
 
 \medskip
 
@@ -674,78 +674,78 @@ Apache Mahout to otwartoźródłowy framework (ang. \textit{open-source framewor
 \item \textbf{Modele probabilistyczne} - Naive Bayes, Logistic Regression, Random Forest.
 \end{itemize}
 
-\noindent\textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
+\noindent\textbf{Istotne bariery wdrożeniowe:}
 
 \begin{itemize}
-\item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów) oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie z Apache Spark,
-\item \textbf{Koszty infrastruktury} - chociaż licencja Apache 2.0 jest darmowa, utrzymanie klastra Spark wymaga dedykowanych zasobów serwerowych oraz czasu na implementację integracji (REST API, baza danych, cache, frontend), co generuje znaczące koszty operacyjne,
-\item \textbf{Brak analizy sentymentu, logiki rozmytej i modeli probabilistycznych} - Apache Mahout nie oferuje sentiment analysis, fuzzy logic ani Markov Chains. Wymagana jest integracja z zewnętrznymi bibliotekami (np. Stanford CoreNLP dla sentymentu) lub samodzielna implementacja słownikowej analizy sentymentu, systemu Mamdani dla logiki rozmytej oraz łańcucha Markowa,
-\item \textbf{Wolniejszy rozwój projektu} - aktywność projektu spadła w ostatnich latach (2-3 commity miesięcznie w 2023-2024 vs 20-30 commitów w latach 2012-2014), co skutkuje ograniczoną dokumentacją dla nowszych wersji.
+\item \textbf{Próg kompetencyjny} - uruchomienie wymaga skonfigurowania infrastruktury przetwarzania rozproszonego (klaster Apache Spark, zarządca zasobów YARN, systemy monitorowania). Badanie Stack Overflow Developer Survey 2023 wskazuje, że zaledwie niewielki odsetek deweloperów posiada kompetencje w zakresie technologii Spark,
+\item \textbf{Całkowite koszty posiadania} - licencja otwarta eliminuje opłaty licencyjne, lecz obsługa klastra generuje wydatki na serwery dedykowane, konfigurację integracji z pozostałymi komponentami systemu (warstwa REST, baza relacyjna, pamięć podręczna, interfejs użytkownika) oraz bieżące utrzymanie,
+\item \textbf{Braki funkcjonalne} - platforma nie dostarcza mechanizmów analizy sentymentu recenzji, wnioskowania rozmytego ani modeli probabilistycznych typu łańcuchy Markowa. Realizacja tych funkcji wymagałaby integracji bibliotek zewnętrznych (np. Stanford CoreNLP) lub implementacji od podstaw (klasyfikator sentymentu słownikowego, system Mamdani, modele Bayesowskie),
+\item \textbf{Spowolnienie rozwoju} - aktywność maintainerów znacząco spadła (z 20-30 commitów miesięcznie w latach 2012-2014 do 2-3 w okresie 2023-2024), co skutkuje lukami w dokumentacji aktualnych wersji.
 \end{itemize}
 
-\textbf{Alternatywy open-source}: Biblioteka Surprise (Python) oferuje implementacje SVD, SVD++, NMF, KNN z built-in dataset loaders i cross-validation, ale również nie wspiera Content-Based Filtering, Fuzzy Logic, Sentiment Analysis ani Association Rules.
+\textbf{Rozwiązania biblioteczne}: Framework Surprise (Python) udostępnia algorytmy rozkładu macierzowego (SVD, SVD++, NMF) oraz metody sąsiedztwa (KNN) z wbudowanymi mechanizmami walidacji krzyżowej. Zakres funkcjonalny ogranicza się jednak wyłącznie do filtracji kolaboratywnej - brak obsługi metod treściowych, wnioskowania rozmytego, analizy sentymentu czy reguł asocjacyjnych.
 
 \medskip
 \noindent\textbf{Podsumowanie analizy i uzasadnienie własnego rozwiązania}
 
 \medskip
 
-Analiza rozwiązań alternatywnych ujawniła fundamentalny kompromis: \textbf{zaawansowanie technologiczne vs koszty i elastyczność}. Rozwiązania chmurowe od Amazona oraz Google oferują wysoką jakość rekomendacji dzięki algorytmom deep learning, ale wiążą się z wysokimi kosztami operacyjnymi, vendor lock-in (uzależnieniem od dostawcy) oraz brakiem kontroli nad algorytmami. Apache Mahout eliminuje koszty licencyjne, ale wymaga zaawansowanej wiedzy technicznej oraz kosztownej infrastruktury Spark.
+Przeprowadzona weryfikacja rozwiązań dostępnych na rynku wykazała wyraźny dylemat decyzyjny: \textbf{dojrzałość technologiczna kontra autonomia implementacyjna i ekonomia projektu}. Usługi zarządzane (Amazon Personalize, Google Recommendations AI) zapewniają algorytmy oparte o uczenie głębokie i automatyczną optymalizację hiperparametrów, lecz generują znaczące obciążenie budżetowe, uzależnienie od ekosystemu dostawcy oraz nieprzejrzystość logiki decyzyjnej. Platforma Apache Mahout znosi bariery licencyjne, jednakże stawia wysokie wymagania wobec kompetencji zespołu oraz infrastruktury obliczeniowej (klaster Spark).
 
 \begin{itemize}
-\item \textbf{Integracja trzech komplementarnych metod w jednym systemie}:
+\item \textbf{Synergiczne połączenie trzech metod rekomendacyjnych}:
 
-Żadne z analizowanych rozwiązań nie oferuje natywnej integracji Content-Based Filtering, logiki rozmytej oraz modeli probabilistycznych w jednym systemie:
+Weryfikacja wykazała, że ani platformy chmurowe, ani rozwiązania biblioteczne nie udostępniają jednoczesnej obsługi filtracji opartej na treści, wnioskowania rozmytego oraz modeli probabilistycznych:
 \begin{itemize}
-\item Amazon Personalize: brak CBF, Fuzzy Logic i modeli probabilistycznych,
-\item Google Recommendations AI: brak CBF, Fuzzy Logic i łańcuchów Markova,
-\item Apache Mahout: brak wszystkich trzech metod w najnowszej wersji.
+\item Amazon Personalize - wyłącznie filtracja kolaboratywna oraz modele głębokiego uczenia,
+\item Google Recommendations AI - brak mechanizmów opartych na treści, rozmytych i łańcuchów Markowa,
+\item Apache Mahout - koncentracja na metodach kolaboratywnych (ALS, SGD).
 \end{itemize}
 
-Własna implementacja łączy:
+Architektura autorska integruje:
 \begin{itemize}
-\item Content-Based Filtering - rozwiązuje cold start dla nowych produktów,
-\item Fuzzy Logic - personalizacja z wysoką interpretowalnością,
-\item Modele probabilistyczne (Markov + Naive Bayes) - predykcja sekwencji zakupowych.
+\item Filtrację opartą na treści - eliminacja problemu zimnego startu dla produktów bez historii interakcji,
+\item Wnioskowanie rozmyte - adaptacja do preferencji użytkowników z zachowaniem przejrzystości mechanizmu decyzyjnego,
+\item Modele probabilistyczne (łańcuchy Markowa, klasyfikator Bayesowski) - prognozowanie sekwencji transakcyjnych.
 \end{itemize}
 
-\item \textbf{Optymalizacja kosztów dla małych i średnich platform}:
+\item \textbf{Ekonomia rozwiązania dla segmentu MSP}:
 
-Własna implementacja (Django + PostgreSQL) eliminuje wysokie koszty licencyjne rozwiązań chmurowych przy zachowaniu wysokiej jakości rekomendacji. System jest szczególnie atrakcyjny dla małych i średnich platform e-commerce (do 10000 produktów, do 100000 użytkowników), które potrzebują zaawansowanych funkcjonalności rekomendacji przy ograniczonym budżecie.
+Zastosowanie stosu technologicznego Django + PostgreSQL pozwala uniknąć opłat subskrypcyjnych charakterystycznych dla usług zarządzanych, zachowując jednocześnie wysoką skuteczność predykcji. Rozwiązanie dedykowane jest platformom o średniej skali (katalogi do 10 tysięcy pozycji, baza użytkowników do 100 tysięcy kont), które wymagają zaawansowanych mechanizmów rekomendacji przy ograniczonych środkach finansowych.
 
-\item \textbf{Kontrola nad logiką biznesową i możliwość dostosowania}:
+\item \textbf{Pełna kontrola parametryzacji i dostosowanie do specyfiki biznesowej}:
 
-Własna implementacja umożliwia unikalne podejścia niedostępne w gotowych rozwiązaniach:
+Implementacja własna pozwala na zastosowanie strategii niedostępnych w rozwiązaniach gotowych:
 \begin{itemize}
-\item \textbf{Ważone wektory cech} dla CBF - kategorie 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%,
-\item \textbf{System wnioskowania Mamdaniego} dla logiki rozmytej - modelowanie niepewności preferencji użytkowników z wykorzystaniem funkcji przynależności,
-\item \textbf{Łańcuch Markowa pierwszego rzędu} - predykcja następnej kategorii zakupu na podstawie macierzy przejść.
+\item \textbf{Wektoryzacja atrybutów z wagami} dla filtracji opartej na treści - alokacja wag: kategorie 40\%, tagi 30\%, przedział cenowy 20\%, deskryptory tekstowe 10\%,
+\item \textbf{Mechanizm wnioskowania Mamdaniego} dla logiki rozmytej - reprezentacja niepewności preferencyjnych poprzez funkcje przynależności i reguły rozmyte,
+\item \textbf{Proces Markowa pierwszego rzędu} - estymacja przyszłych kategorii transakcyjnych na bazie macierzy prawdopodobieństw przejścia.
 \end{itemize}
 
-\item \textbf{Elastyczność technologiczna i brak uzależnienia od dostawcy}:
+\item \textbf{Niezależność infrastrukturalna i przenośność}:
 
-Aplikacja oparta na Django + React + PostgreSQL może być wdrożona na dowolnej platformie: AWS, GCP, Azure, własne serwery lub localhost. Migracja między platformami wymaga jedynie zmiany parametrów połączenia - logika rekomendacji pozostaje niezmieniona.
+Stos Django + React + PostgreSQL zapewnia możliwość uruchomienia na dowolnym środowisku: chmury publiczne (AWS, GCP, Azure), infrastruktura on-premise, środowisko deweloperskie lokalne. Przeniesienie między platformami ogranicza się do rekonfiguracji parametrów połączeniowych - warstwa algorytmiczna pozostaje niemodyfikowana.
 
-Dla porównania: migracja z Amazon Personalize do Google Recommendations AI wymaga przepisania całej integracji (śledzenie zdarzeń, dane treningowe, wywołania API) oraz ponownego uczenia modeli, co może trwać tygodnie i powodować degradację jakości rekomendacji.
+Kontrast: przejście pomiędzy usługami Amazon Personalize a Google Recommendations AI wymusza reimplementację całego interfejsu (strumienie zdarzeń, zbiory uczące, wywołania API), ponowne wytrenowanie modeli oraz okres degradacji jakości sugestii podczas migracji.
 
-\item \textbf{Cel edukacyjny i interpretowalność}:
+\item \textbf{Wymiar dydaktyczny i przejrzystość decyzyjna}:
 
-Praca inżynierska ma charakter badawczy i edukacyjny. Implementacja algorytmów od podstaw (bez zewnętrznych bibliotek uczenia maszynowego) zapewnia głębokie zrozumienie mechanizmów działania każdej metody, co jest niemożliwe przy wykorzystaniu gotowych usług chmurowych działających jako czarne skrzynki.
+Charakter pracy inżynierskiej zakłada eksplorację badawczą oraz cel edukacyjny. Budowa algorytmów od podstaw (bez gotowych bibliotek uczenia maszynowego) umożliwia dogłębną analizę mechanizmów każdej metody, czego nie oferują usługi zarządzane działające w modelu black-box.
 
-Logika rozmyta z regułami IF-THEN oferuje pełną przejrzystość decyzji algorytmu (ang. \textit{explainable AI} - wyjaśnialna sztuczna inteligencja), czego brakuje w modelach głębokiego uczenia używanych przez Google i Amazon.
+Wnioskowanie rozmyte oparte o reguły IF-THEN gwarantuje transparentność procesu decyzyjnego (koncepcja \textit{explainable AI} - interpretowalnej sztucznej inteligencji), podczas gdy modele głębokiego uczenia stosowane przez Amazon i Google charakteryzują się nieinterpretowalnością.
 \end{itemize}
 
-Własna implementacja systemu rekomendacji stanowi optymalny wybór dla małych i średnich platform e-commerce, łączący:
+Autorska architektura silnika rekomendacyjnego stanowi racjonalny wybór dla platform e-commerce o średniej skali operacyjnej, oferując następujące cechy charakterystyczne:
 \begin{itemize}
-\item Wysoką jakość rekomendacji (trzy komplementarne metody pokrywające różne aspekty problemu),
-\item Pełną kontrolę nad algorytmami i możliwość dostosowania do specyfiki biznesowej,
-\item Niskie koszty operacyjne (brak opłat licencyjnych rozwiązań chmurowych),
-\item Interpretowalność wyników i możliwość debugowania,
-\item Elastyczność technologiczną (brak uzależnienia od konkretnego dostawcy chmury),
-\item Wartość edukacyjną (implementacja od podstaw).
+\item Skuteczność predykcyjna (trzy metody uzupełniające się wzajemnie w różnych aspektach problemu),
+\item Kontrola parametryzacji algorytmów z możliwością adaptacji do kontekstu biznesowego,
+\item Minimalizacja wydatków bieżących (brak opłat subskrypcyjnych charakterystycznych dla rozwiązań chmurowych),
+\item Przejrzystość mechanizmów decyzyjnych umożliwiająca diagnostykę,
+\item Przenośność technologiczna (eliminacja uzależnienia od pojedynczego providera infrastruktury),
+\item Wartość poznawcza wynikająca z implementacji od podstaw.
 \end{itemize}
 
-Rozwiązanie jest szczególnie atrakcyjne dla platform potrzebujących zaawansowanych funkcjonalności rekomendacji przy ograniczonym budżecie oraz możliwości dostosowania logiki do specyficznych wymagań biznesowych.
+Prezentowana architektura odpowiada szczególnie na potrzeby organizacji wymagających zaawansowanych funkcjonalności rekomendacyjnych w warunkach ograniczonego budżetu oraz konieczności dopasowania logiki do specyficznych wymagań domenowych.
 
 \newpage
 
@@ -753,19 +753,19 @@ Rozwiązanie jest szczególnie atrakcyjne dla platform potrzebujących zaawansow
 \addcontentsline{toc}{section}{Rozdział 3: Projekt systemu rekomendacyjnego}
 \section*{Projekt systemu rekomendacyjnego}
 
-Rozdział przedstawia szczegółowy opis projektowanej aplikacji e-commerce z zaawansowanym systemem rekomendacji produktów. Zaprezentowano wymagania funkcjonalne, diagram przypadków użycia ilustrujący interakcje użytkowników z systemem oraz architekturę funkcjonalną rozwiązania zrealizowanego we współpracy dwuosobowej.
+Rozdział omawia projekt platformy e-commerce wyposażonej w wielometodowy silnik rekomendacyjny. Przedstawiono specyfikację wymagań funkcjonalnych, model przypadków użycia obrazujący interakcje aktorów z aplikacją oraz strukturę architektoniczną systemu zrealizowanego w ramach projektu zespołowego.
 
 \subsection*{3.1 Cel i zakres aplikacji}
 \addcontentsline{toc}{subsection}{3.1 Cel i zakres aplikacji}
 
-Aplikacja stanowi kompleksowe rozwiązanie e-commerce z systemem rekomendacji opartym o trzy metody:
+Platforma stanowi zintegrowane środowisko e-commerce wykorzystujące trzy komplementarne podejścia do generowania rekomendacji:
 \begin{itemize}
-\item \textbf{Content-Based Filtering} - odkrywanie produktów podobnych na podstawie cech produktowych (kategorie, tagi, cena, słowa kluczowe),
-\item \textbf{Fuzzy Logic} - personalizacja rekomendacji z wykorzystaniem systemu wnioskowania Mamdaniego i funkcji przynależności,
-\item \textbf{Modele probabilistyczne} - predykcja sekwencji zakupowych (łańcuch Markowa) oraz prawdopodobieństwa zakupu (Naive Bayes).
+\item \textbf{Filtracja oparta na treści} - identyfikacja produktów podobnych przez analizę atrybutów (kategorie, tagi, przedziały cenowe, deskryptory tekstowe),
+\item \textbf{Logika rozmyta} - dostosowanie sugestii z zastosowaniem mechanizmu Mamdaniego oraz rozmytych funkcji przynależności,
+\item \textbf{Modele probabilistyczne} - prognozowanie sekwencji transakcyjnych (łańcuchy Markowa) i prawdopodobieństwa zakupu (klasyfikator Bayesa naiwnego).
 \end{itemize}
 
-System został zaprojektowany z myślą o małych i średnich platformach e-commerce (do 10000 produktów, do 100000 użytkowników), zapewniając funkcjonalności rekomendacyjne porównywalne z rozwiązaniami enterprise przy znacznie niższych kosztach operacyjnych i pełnej kontroli nad algorytmami.
+Architektura została zaprojektowana dla segmentu małych oraz średnich sklepów internetowych (katalogi do 10 tysięcy pozycji, bazy użytkowników do 100 tysięcy kont), dostarczając możliwości rekomendacyjne porównywalne do rozwiązań klasy enterprise przy redukcji kosztów operacyjnych oraz pełnej autonomii algorytmicznej.
 
 \subsection*{3.2 Typy użytkowników systemu}
 \addcontentsline{toc}{subsection}{3.2 Typy użytkowników systemu}
@@ -2698,27 +2698,27 @@ Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 
 \addcontentsline{toc}{section}{Rozdział 7: Porównanie i ewaluacja metod rekomendacyjnych}
 \section*{Porównanie i ewaluacja metod rekomendacyjnych}
 
-Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zaimplementowanych w aplikacji we współpracy dwuosobowej. Analiza opiera się na wynikach testów przeprowadzonych na rzeczywistych danych: 500 produktów w 48 kategoriach, 20 użytkowników oraz historia transakcji (200 zamówień, około 600 pozycji) zgromadzona w bazie PostgreSQL. Ewaluacja koncentruje się na trzech parach metod o komplementarnym charakterze: Content-Based Filtering vs Collaborative Filtering (podejście atrybutowe vs behawioralne), Fuzzy Logic vs Sentiment Analysis (personalizacja cenowa vs analiza opinii), oraz modele probabilistyczne vs Apriori (sekwencje czasowe vs współzakupy).
+Rozdział zawiera empiryczną ewaluację sześciu algorytmów rekomendacyjnych zrealizowanych w ramach współpracy zespołowej. Weryfikacja oparta jest na eksperymencie przeprowadzonym na zbiorze rzeczywistym: katalog 500 produktów w 48 kategoriach, populacja 20 kont użytkowników, historia transakcyjna obejmująca 200 zamówień z około 600 pozycjami, przechowywana w PostgreSQL. Badanie konfrontuje trzy pary metod o uzupełniającym się charakterze: filtracja oparta na treści vs filtracja kolaboratywna (podejście atrybutowe kontra behawioralne), logika rozmyta vs analiza sentymentu (personalizacja kontra uniwersalność), modele probabilistyczne vs reguły asocjacyjne Apriori (sekwencje temporalne kontra koszyki zakupowe).
 
 \medskip
 \noindent\textbf{Metodyka badania i środowisko testowe}
 
 \medskip
 
-Testy przeprowadzono w środowisku Docker Compose z trzema kontenerami: frontend (React 18), backend (Django 5.1.4), oraz baza danych (PostgreSQL 14). Dane testowe zostały wygenerowane komendą \texttt{python manage.py seed}, która wypełniła system produktami z kategorii elektroniki komputerowej (laptopy, peryferia, komponenty, akcesoria) oraz utworzyła 20 kont użytkowników z symulowaną historią zakupów. Każda metoda była testowana w rzeczywistym środowisku aplikacji z włączonym mechanizmem pamięci podręcznej Django zgodnie z konfiguracją produkcyjną (cache timeout: 5-120 minut w zależności od typu danych).
+Badania przeprowadzono w architekturze kontenerowej Docker Compose obejmującej trzy komponenty: interfejs użytkownika (React 18), aplikację serwerową (Django 5.1.4) oraz bazę danych (PostgreSQL 14). Zbiór testowy wygenerowano poleceniem \texttt{python manage.py seed}, które wypełniło katalog produktami z dziedziny elektroniki użytkowej (laptopy, urządzenia peryferyjne, komponenty, akcesoria) oraz utworzyło 20 kont z wygenerowaną historią transakcji. Weryfikację przeprowadzono w warunkach zbliżonych do środowiska produkcyjnego z aktywnym systemem cachowania Django (limity czasowe: 5-120 minut w zależności od rodzaju danych).
 
-Metryki ewaluacji obejmowały: (1) \textbf{Pokrycie katalogu} - procent produktów, dla których metoda generuje rekomendacje, (2) \textbf{Czas wykonania} - średni czas generowania rekomendacji obserwowany w panelach administratora i klienta podczas testów manualnych, (3) \textbf{Trafność merytoryczna} - jakościowa ocena poprawności rekomendacji na podstawie powiązań między produktami (komplementarność, podobieństwo kategorii, wzorce zakupowe), (4) \textbf{Interpretowalność} - możliwość wyjaśnienia użytkownikowi dlaczego dany produkt został zaproponowany.
+Zastosowany zestaw metryk obejmował: (1) \textbf{Zasięg katalogowy} - udział procentowy produktów, dla których algorytm generuje sugestie, (2) \textbf{Czas generowania} - średnia latencja tworzenia rekomendacji zaobserwowana w interfejsach administracyjnym oraz klienckim podczas weryfikacji manualnej, (3) \textbf{Poprawność merytoryczna} - jakościowa ocena sensowności sugestii w kontekście relacji między produktami (komplementarność, zbieżność kategorialna, wzorce zakupowe), (4) \textbf{Wyjaśnialność} - możliwość uzasadnienia użytkownikowi przyczyny zaproponowania określonego produktu.
 
 \medskip
 \noindent\textbf{Krótka charakterystyka metod współautora projektu}
 
 \medskip
 
-\textbf{Collaborative Filtering (metoda współautora)} analizuje historię zakupów użytkowników i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika. Metoda wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty fotograficzne często kupują też plecaki turystyczne, filtracja kolaboratywna połączy te produkty mimo różnych kategorii. Wymaga jednak dużo danych historycznych aby działać efektywnie i napotyka problem zimnego startu dla nowych produktów bez historii zakupów. Wyniki podobieństw są zapisywane w modelu \texttt{ProductSimilarity} z oznaczeniem typu \texttt{collaborative}. Metoda jest szczególnie skuteczna w odkrywaniu rekomendacji międzykategorialnych (ang. \textit{cross-category recommendations}), które zwiększają wartość koszyka zakupowego.
+\textbf{Collaborative Filtering (algorytm współautora)} wykorzystuje zapisy transakcyjne użytkowników do konstrukcji macierzy podobieństw produktowych w oparciu o Adjusted Cosine Similarity z normalizacją względem średnich użytkowników. Algorytm identyfikuje asocjacje niewidoczne w analizie atrybutowej - przykładowo, częste współ występowanie aparatów fotograficznych i plecaków turystycznych w koszykach zakupowych prowadzi do ich połączenia mimo odmiennej klasyfikacji kategorialnej. Metoda charakteryzuje się podatnością na problem zimnego startu (nowe produkty bez historii transakcyjnej) oraz wymaga znacznego wolumenu danych historycznych dla efektywnego działania. Wyniki persystowane są w encji \texttt{ProductSimilarity} z oznaczeniem \texttt{type='collaborative'}. Algorytm wykazuje szczególną efektywność w odkrywaniu rekomendacji międzyka tegorialnych (\textit{cross-category recommendations}), zwiększających wartość średniego koszyka.
 
-\textbf{Sentiment Analysis (metoda współautora)} analizuje opinie użytkowników z pięciu źródeł: treść opinii tekstowych, oceny gwiazdkowe (1-5), opinie zweryfikowane (potwierdzony zakup), opinie administratora oraz szczegółowe parametry produktu. System wykorzystuje dwa leksykony sentymentu: Opinion Lexicon (Hu \& Liu 2004) oraz AFINN-165 (Nielsen 2011) do przypisywania wag emocjonalnych słowom. Agregacja wieloźródłowa łączy wszystkie sygnały w jeden wskaźnik \texttt{sentiment\_score} (zakres -1 do +1), który określa ogólny sentyment wobec produktu. Metoda jest uniwersalna (działa tak samo dla każdego użytkownika) i nie wymaga personalizacji. Głównym ograniczeniem jest wrażliwość na negację, ironię oraz sarkazm w tekście opinii. Wyniki są zapisywane w tabeli\\ \texttt{method\_product\_sentiment\_summary} i wykorzystywane do priorytetyzacji produktów z pozytywnymi opiniami.
+\textbf{Sentiment Analysis (algorytm współautora)} przeprowadza ekstrakcję tonu emocjonalnego z pięciu strumieni informacyjnych: teksty recenzji użytkowników, oceny w skali 1-5, recenzje zweryfikowane (potwierdzone zakupem), opinie moderatorskie oraz specyfikacje produktowe. Implementacja wykorzystuje dwa słowniki sentymentu: Opinion Lexicon (Hu \& Liu 2004) oraz AFINN-165 (Nielsen 2011) do przypisania wag emocjonalnych terminom. Mechanizm agregacji wieloźródłowej syntetyzuje wszystkie sygnały w unifikowany wskaźnik \texttt{sentiment\_score} o dziedzinie [-1, +1], reprezentujący zagregowany ton wobec produktu. Algorytm charakteryzuje się uniwersalnością (identyczne wyniki niezależnie od użytkownika) i brakiem mechanizmów personalizacyjnych. Kluczowym ograniczeniem jest podatność na konstrukcje negujące, ironiczne oraz sarkastyczne w materiale tekstowym. Rezultaty cachowane są w encji \texttt{method\_product\_sentiment\_summary} i wykorzystywane do rangowania produktów według odbioru społecznego.
 
-\textbf{Apriori (metoda współautora)} odkrywa reguły asocjacyjne typu „klienci kupujący produkt A często kupują również produkt B". Algorytm analizuje koszyki zakupowe i identyfikuje itemsety (zbiory produktów) pojawiające się razem częściej niż przypadkowo. Wykorzystuje metryki support (wsparcie - jak często itemset występuje), confidence (pewność - prawdopodobieństwo że B jest kupowane gdy kupiono A) oraz lift (współczynnik przewyższenia - jak bardzo częste jest łączne występowanie w porównaniu do niezależnego). Reguły są generowane tylko dla itemsetów przekraczających minimalne progi (min\_support = 0.01, min\_confidence = 0.3), co eliminuje powiązania przypadkowe. Metoda jest efektywna w rekomendacji produktów komplementarnych (akcesoria, dodatki) ale wymaga historii współzakupów i napotyka problem zimnego startu dla nowych produktów. Wyniki są zapisywane w tabeli \texttt{method\_productassociation}.
+\textbf{Apriori (algorytm współautora)} identyfikuje reguły asocjacyjne postaci „konsumenci nabywający pozycję A z dużym prawdopodobieństwem nabywają pozycję B". Mechanizm analizuje kompozycję koszyków transakcyjnych i wykrywa zbiory produktowe występujące wspólnie z częstością przekraczającą losowe oczekiwanie. Ewaluacja opiera się na trzech metrykach: support (wsparcie - częstość występowania zbioru), confidence (ufność - prawdopodobieństwo warunkowe nabycia B przy zakupie A) oraz lift (wzmocnienie - stosunek częstości współwystępowania do niezależnego oczekiwania). Generacja reguł wymaga przekroczenia progów min\_support = 0.01 oraz min\_confidence = 0.1, eliminując asocjacje losowe. Algorytm efektywnie rekomenduje produkty komplementarne (akcesoria, rozszerzenia), lecz wymaga historii transakcyjnej współzakupów i wykazuje problem zimnego startu dla nowych pozycji katalogowych. Rezultaty zapisywane są w tabeli \texttt{method\_productassociation}.
 
 \newpage
 \medskip
