@@ -156,7 +156,7 @@ Rzeczona praca odpowiada na powyższe wyzwania poprzez zaprojektowanie i impleme
 \medskip
 \noindent\textbf{Cel i zakres pracy}
 
-Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce, który łączy trzy zaawansowane i komplementarne metody uczenia maszynowego. System został zbudowany od podstaw, z ograniczeniem wykorzystania gotowych bibliotek uczenia maszynowego, co zapewniło pełną kontrolę nad algorytmami i możliwość ich dostosowania do specyficznych wymagań biznesowych.
+Głównym celem pracy jest zaprojektowanie i implementacja kompleksowego systemu rekomendacji produktów dla platformy e-commerce. Aplikacja została zrealizowana jako część większego projektu e-commerce powstałego we współpracy dwuosobowej, w której funkcjonalności systemu rekomendacji zostały podzielone między dwóch studentów. Niniejsza praca odpowiada za implementację trzech metod: filtracji opartej na treści (Content-Based Filtering), logiki rozmytej (Fuzzy Logic) oraz modeli probabilistycznych (łańcuch Markowa i naiwny klasyfikator Bayesa). Współautor projektu (Dawid Olko) odpowiadał za pozostałe trzy metody: algorytm Apriori (reguły asocjacyjne), analizę sentymentu opinii użytkowników oraz collaborative filtering (filtrację kolaboratywną). Łącznie system integruje sześć komplementarnych metod rekomendacyjnych, co zapewnia wszechstronne wsparcie procesu zakupowego użytkownika.
 
 W ramach realizacji celu głównego zdefiniowano następujące cele szczegółowe:
 
@@ -242,7 +242,9 @@ gdzie $w_i$ to waga cechy $i$, a $f_i(p)$ to wartość cechy dla produktu $p$. F
     \item Ograniczenie do podobieństwa cech -- nie uwzględnia kontekstu użytkownika
 \end{itemize}
 
-\textbf{Podobieństwo kosinusowe} (Cosine Similarity) jest standardową metryką w CBF \cite{salton1989automatic}. Dla dwóch wektorów $\vec{A}$ i $\vec{B}$:
+\textbf{Uzasadnienie wyboru podobieństwa kosinusowego i TF-IDF:} W metodzie Content-Based Filtering produkty są reprezentowane jako wektory w wielowymiarowej przestrzeni cech, gdzie każdy wymiar odpowiada jednej cesze (kategoria, tag, cena). Do porównania takich wektorowych reprezentacji produktów wybrano podobieństwo kosinusowe (ang. \textit{Cosine Similarity}) ze względu na dwie kluczowe właściwości: (1) mierzy kąt między wektorami, a nie ich długość, co czyni je odporne na różnice w liczbie cech między produktami (laptop z 20 tagami vs laptop z 5 tagami), (2) normalizuje wynik do zakresu $[0, 1]$, co umożliwia intuicyjną interpretację jako procent podobieństwa. Schemat ważenia TF-IDF (ang. \textit{Term Frequency - Inverse Document Frequency}) został wybrany do reprezentacji tekstowych cech (tagi, słowa kluczowe), ponieważ automatycznie przypisuje niższą wagę cechom powszechnym (np. tag "elektronika" występujący w 80\% produktów) i wyższą wagę cechom rzadkim, wyróżniającym (np. tag "gaming 4K" występujący tylko w konkretnych laptopach), co zwiększa precyzję rekomendacji. Oba te wybory są standardem w systemach rekomendacyjnych opartych na treści \cite{salton1989automatic}.
+
+\textbf{Podobieństwo kosinusowe} -- dla dwóch wektorów $\vec{A}$ i $\vec{B}$:
 
 \begin{equation}
 \text{cos}(\theta) = \frac{\vec{A} \cdot \vec{B}}{||\vec{A}|| \times ||\vec{B}||} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \times \sqrt{\sum_{i=1}^{n} B_i^2}}
@@ -482,7 +484,7 @@ P(x_i = v | C) = \frac{count(x_i = v, C) + 1}{count(C) + |V_i|}
 
 gdzie $|V_i|$ to liczba unikalnych wartości cechy $x_i$. Dodanie 1 do licznika i $|V|$ do mianownika zapewnia, że żadne prawdopodobieństwo nie będzie zerowe.
 
-\textit{Logarytm dla stabilności numerycznej}: Iloczyn wielu małych prawdopodobieństw prowadzi do underflow. Rozwiązanie -- praca w przestrzeni logarytmów:
+\textit{Logarytm dla stabilności numerycznej}: Iloczyn wielu małych prawdopodobieństw prowadzi do niedomiaru arytmetycznego (ang. \textit{underflow} - sytuacja, gdy wartość liczbowa jest zbyt mała aby można było ją reprezentować w pamięci komputera, co powoduje zaokrąglenie do zera). Rozwiązanie -- praca w przestrzeni logarytmów:
 \begin{equation}
 \log P(C | X) = \log P(C) + \sum_{i=1}^{n} \log P(x_i | C) + const
 \end{equation}
@@ -1048,7 +1050,7 @@ Dodatkowo system wykorzystuje indeks GIN dla pełnotekstowego wyszukiwania produ
 \item \textbf{Normalizacja} - Fuzzy Logic normalizuje wejścia do zakresu [0, 1]
 \end{itemize}
 
-Kombinacja pamięci podręcznej, operacji zbiorczych, przycinania progowego oraz indeksowania pozwala systemowi obsługiwać 500 produktów i generować rekomendacje w czasie rzeczywistym (<200ms) nawet przy braku danych w pamięci podręcznej. Dla większych katalogów (>10\,000 produktów) zalecane są dalsze optymalizacje: approximate nearest neighbors (LSH, HNSW), partycjonowanie tabel PostgreSQL, oraz rozproszenie obliczeń (Celery + Redis).
+Kombinacja pamięci podręcznej, operacji zbiorczych, przycinania progowego oraz indeksowania pozwala systemowi obsługiwać 500 produktów i generować rekomendacje w czasie rzeczywistym (<200ms) nawet przy braku danych w pamięci podręcznej. Dla większych katalogów (>10\,000 produktów) zalecane są dalsze optymalizacje: przybliżone wyszukiwanie najbliższych sąsiadów (ang. \textit{approximate nearest neighbors} - algorytmy LSH, HNSW), partycjonowanie tabel PostgreSQL, oraz rozproszenie obliczeń przy użyciu kolejki zadań asynchronicznych Celery z brokerem Redis.
 
 \subsection*{4.5 Baza danych PostgreSQL}
 \addcontentsline{toc}{subsection}{4.5 Baza danych PostgreSQL}
@@ -2397,7 +2399,7 @@ Panel administracyjny systemu rekomendacji probabilistycznych prezentuje zaawans
 Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Analysis'' zawierający:
 \begin{itemize}
     \item \textbf{Markov Chain Analysis}: ogólne statystyki łańcucha Markowa (total predicted units, forecast period, products analyzed, average daily forecast)
-    \item \textbf{Sales Forecast}: wykres prognozy sprzedaży w czasie
+    \item \textbf{Sales Forecast}: wykres prognozy sprzedaży w czasie na podstawie macierzy przejść łańcucha Markowa. Prognoza jest wyznaczana poprzez symulację sekwencji zakupowych: algorytm rozpoczyna od bieżącego rozkładu prawdopodobieństw kategorii produktowych, następnie iteracyjnie mnoży go przez macierz przejść, przewidując prawdopodobieństwo zakupu w każdej kategorii dla kolejnych okresów czasowych (dni/tygodni). Łączna sprzedaż jest sumą predykcji dla wszystkich kategorii z uwzględnieniem średniej wartości produktu w każdej kategorii.
     \item \textbf{Detailed Forecast}: tabela z szczegółowymi predykcjami dla poszczególnych okresów
 \end{itemize}
 
@@ -2539,7 +2541,7 @@ Typ rekomendacji & „Dopasowane do Twojego budżetu" & „Najlepiej oceniane pr
 
 \textbf{Zastosowanie praktyczne:} Fuzzy Logic jest dostępna w dedykowanej sekcji panelu klienta z trzema zakładkami (preferowane kategorie, dopasowanie cenowe, jakość-popularność). Wymaga zalogowania i historii zakupów. Sentiment Analysis jest dostępna dla wszystkich użytkowników (także gości) i wyświetla uniwersalny ranking „Najlepiej oceniane produkty" na stronie głównej. Fuzzy Logic jest skuteczniejsza dla użytkowników o wyraźnych preferencjach cenowych (tylko tanie lub tylko premium), podczas gdy Sentiment Analysis lepiej sprawdza się jako globalny filtr jakości.
 
-\textbf{Wyniki testów:} Fuzzy Logic osiągnęła najszybszy czas odpowiedzi (<100ms dla 100 produktów) dzięki brakowi konieczności przechowywania macierzy - wszystkie obliczenia wykonywane w locie. Interpretowalność 100\% - każda rekomendacja ma pełne wyjaśnienie aktywacji konkretnych reguł. Sentiment Analysis wymagała preprocessingu opinii tekstowych (tokenizacja, usuwanie stop words) ale działała uniwersalnie bez potrzeby budowania profili użytkowników. Głównym ograniczeniem Sentiment jest wrażliwość na negację i ironię („nie polecam" może być błędnie sklasyfikowane jako pozytywne jeśli leksykon wykryje słowo „polecam").
+\textbf{Wyniki testów:} Fuzzy Logic osiągnęła najszybszy czas odpowiedzi (<100ms dla 100 produktów) dzięki brakowi konieczności przechowywania macierzy - wszystkie obliczenia wykonywane w locie. Wyniki dotyczą zastosowanego w pracy prostego systemu rozmytego Mamdaniego z 6 regułami IF-THEN i 3 zmiennymi wejściowymi (cena, jakość, popularność). Interpretowalność 100\% - każda rekomendacja ma pełne wyjaśnienie aktywacji konkretnych reguł. Sentiment Analysis wymagała preprocessingu opinii tekstowych (tokenizacja, usuwanie stop words) ale działała uniwersalnie bez potrzeby budowania profili użytkowników. Głównym ograniczeniem Sentiment jest wrażliwość na negację i ironię („nie polecam" może być błędnie sklasyfikowane jako pozytywne jeśli leksykon wykryje słowo „polecam").
 
 \newpage
 \noindent\textbf{Modele Probabilistyczne vs Apriori}
@@ -2620,7 +2622,7 @@ W trakcie realizacji projektu zidentyfikowano następujące ograniczenia:
 
 \textbf{Efekt ,,filter bubble'' w CBF} -- użytkownik otrzymuje rekomendacje podobnych produktów, nie odkrywając nowych kategorii. Rozwiązanie: hybrydyzacja z innymi metodami rekomendacyjnymi.
 
-\textbf{Skalowalność dla bardzo dużych katalogów} -- dla katalogów produktów przekraczających 10\,000 pozycji mogą wystąpić wyzwania wydajnościowe. Obecne optymalizacje (threshold pruning, cache, bulk operations) są wystarczające dla katalogów do 1\,000-2\,000 produktów, ale większe wymagałyby zastosowania approximate nearest neighbors (LSH, HNSW) lub partycjonowania tabel PostgreSQL.
+\textbf{Skalowalność dla bardzo dużych katalogów} -- dla katalogów produktów przekraczających 10\,000 pozycji mogą wystąpić wyzwania wydajnościowe. Obecne optymalizacje (przycinanie progowe, pamięć podręczna, operacje zbiorcze) są wystarczające dla katalogów do 1\,000-2\,000 produktów, ale większe wymagałyby zastosowania przybliżonego wyszukiwania najbliższych sąsiadów (algorytmy LSH, HNSW) lub partycjonowania tabel PostgreSQL.
 
 \textbf{Brak obsługi kontekstu czasowego i sezonowości} -- system nie uwzględnia czynników sezonowych (np. zwiększone zakupy elektroniki przed świętami) ani kontekstu czasowego sesji użytkownika. Rozwiązanie: modele sekwencyjne (LSTM, GRU) lub rozszerzenie Markov Chain do wyższego rzędu.
 
