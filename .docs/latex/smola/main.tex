@@ -842,14 +842,105 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 \item \textbf{Logika transakcyjna} - składanie zamówień, zarządzanie statusami, walidacja danych, uwierzytelnianie JWT.
 \end{itemize}
 
-\textbf{Warstwa danych} - relacyjna baza danych PostgreSQL 14 przechowująca:
+\textbf{Warstwa danych} - relacyjna baza danych PostgreSQL 14:
+
+\medskip
+\noindent\textbf{Struktura bazy danych}
+
+\medskip
+
+Baza składa się z \textbf{25 tabel} podzielonych na 4 moduły funkcjonalne. Poniżej przedstawiono diagramy ERD ilustrujące relacje między tabelami oraz szczegółową charakterystykę modułów.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{images/appErd.png}
+  \caption{Diagram ERD głównych tabel aplikacji.}
+  \label{fig:erd1_v2}
+\end{figure}
+
+Rysunek \ref{fig:erd1_v2} przedstawia rdzeń aplikacji e-commerce. Diagram ilustruje podstawowe tabele systemu oraz ich relacje:
+
 \begin{itemize}
-\item Dane produktów (nazwa, opis, cena, kategorie, specyfikacje, zdjęcia) - 500 produktów w 48 kategoriach,
-\item Dane użytkowników (konta, profile, uprawnienia, role) - 20 użytkowników testowych,
-\item Dane transakcyjne (zamówienia, produkty w zamówieniach, statusy) - 265 zamówień z 569 pozycjami,
-\item Dane opinii (recenzje tekstowe, oceny gwiazdkowe, timestamps) - $\sim$1750 opinii,
-\item Wyniki algorytmów (macierze podobieństwa CBF, profile rozmyte, macierz przejść Markova, predykcje Naive Bayes) - przechowywane w dedykowanych tabelach.
+\item \textbf{db\_user $\rightarrow$ db\_order} (1:N) - jeden użytkownik składa wiele zamówień,
+\item \textbf{db\_order $\rightarrow$ db\_order\_product} (1:N) - zamówienie zawiera wiele produktów,
+\item \textbf{db\_product $\leftrightarrow$ db\_category} (N:M) - produkt należy do wielu kategorii,
+\item \textbf{db\_product $\rightarrow$ db\_opinion} (1:N) - produkt ma wiele opinii.
 \end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{images/methodsErd.png}
+  \caption{Diagram ERD tabel metod rekomendacyjnych.}
+  \label{fig:erd2_v2}
+\end{figure}
+
+Diagram \ref{fig:erd2_v2} pokazuje tabele algorytmów uczenia maszynowego i ich powiązania z głównymi tabelami aplikacji. Każda metoda rekomendacyjna (CBF, Fuzzy Logic, Probabilistic Models) posiada dedykowane tabele przechowujące wyniki obliczeń.
+
+\medskip
+
+Szczegółowa charakterystyka modułów bazodanowych:
+
+\textbf{1. Moduł produktów i użytkowników (12 tabel):}
+
+\begin{itemize}
+\item \texttt{db\_product} - dane produktów (ID, nazwa, cena, opis),
+\item \texttt{db\_category} - kategorie produktów z hierarchią,
+\item \texttt{db\_product\_category} - relacja Many-to-Many produktów i kategorii,
+\item \texttt{db\_photo\_product} - ścieżki do zdjęć produktów,
+\item \texttt{db\_specification} - szczegółowe parametry techniczne produktów,
+\item \texttt{db\_tag} - tagi do filtrowania produktów,
+\item \texttt{db\_sale} - promocje i rabaty,
+\item \texttt{db\_user} - konta użytkowników (role: admin/client),
+\item \texttt{db\_order} - zamówienia z timestampami i statusami,
+\item \texttt{db\_order\_product} - produkty w zamówieniach (ilość, cena),
+\item \texttt{db\_cart\_item} - koszyk zakupowy przed finalizacją,
+\item \texttt{db\_complaint} - reklamacje powiązane z zamówieniami.
+\end{itemize}
+
+\textbf{2. Moduł opinii i analizy sentymentu (3 tabele):}
+
+\begin{itemize}
+\item \texttt{db\_opinion} - opinie użytkowników (treść, rating 1-5),
+\item \texttt{method\_sentiment\_analysis} - wyniki analizy sentymentu dla opinii,
+\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktu.
+\end{itemize}
+
+\textbf{3. Moduł metod rekomendacji (5 tabel):}
+
+\begin{itemize}
+\item \texttt{method\_product\_similarity} - macierz podobieństw produktów (Content-Based Filtering),
+\item \texttt{method\_user\_product\_recommendation} - spersonalizowane rekomendacje użytkowników,
+\item \texttt{method\_productassociation} - reguły asocjacyjne Apriori,
+\item \texttt{method\_user\_interactions} - historia interakcji użytkowników,
+\item \texttt{method\_recommendation\_settings} - konfiguracja algorytmów dla użytkownika.
+\end{itemize}
+
+\textbf{4. Moduł analityczny i prognozowanie (5 tabel):}
+
+\begin{itemize}
+\item \texttt{method\_purchase\_probability} - prawdopodobieństwo zakupu produktu przez użytkownika,
+\item \texttt{method\_sales\_forecast} - prognoza sprzedaży produktów,
+\item \texttt{method\_user\_purchase\_pattern} - wzorce zakupowe użytkowników,
+\item \texttt{method\_product\_demand\_forecast} - prognoza popytu i poziomy magazynowe,
+\item \texttt{method\_risk\_assessment} - ocena ryzyka dla użytkowników i produktów.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Wsad danych testowych}
+
+\medskip
+
+W celu umożliwienia testowania i walidacji algorytmów rekomendacyjnych system został zasilony danymi testowymi:
+
+\begin{itemize}
+\item \textbf{Produkty}: 500 produktów elektronicznych rozłożonych w 48 kategoriach (laptopy, smartfony, akcesoria, AGD, gaming) z pełnymi metadanymi (nazwa, opis, kategorie, tagi, cena, specyfikacje techniczne, zdjęcia),
+\item \textbf{Użytkownicy}: 20 kont testowych z różnymi profilami zakupowymi (użytkownicy aktywni z historią zakupów, użytkownicy sporadyczni, nowi użytkownicy bez historii),
+\item \textbf{Zamówienia}: 265 zamówień zawierających łącznie 569 pozycji produktowych, wygenerowanych z realistycznymi timestampami rozłożonymi w czasie 6 miesięcy w celu umożliwienia analizy trendów i sezonowości,
+\item \textbf{Opinie}: Około 1750 opinii użytkowników z tekstowymi recenzjami i ocenami gwiazdkowymi (1-5), wygenerowanych dla różnych produktów w celu testowania analizy sentymentu,
+\item \textbf{Wyniki algorytmów}: Wstępnie wygenerowane macierze podobieństw (CBF), profile rozmyte użytkowników (Fuzzy Logic), macierze przejść kategorii (Markov Chain) oraz predykcje zakupowe (Naive Bayes) dla wszystkich użytkowników testowych.
+\end{itemize}
+
+Wszystkie migracje Django ORM zostały wygenerowane automatycznie na podstawie modeli Python i zarządzane przez system wersjonowania \texttt{django.db.migrations}. Dane testowe umożliwiają demonstrację wszystkich funkcjonalności systemu rekomendacyjnego oraz walidację poprawności algorytmów w realistycznych scenariuszach biznesowych.
 
 \textbf{Integracja warstw} odbywa się poprzez RESTful API z automatyczną synchronizacją - zmiana danych w jednej warstwie propaguje aktualizacje do pozostałych. Django Signals zapewniają automatyczne przeliczanie rekomendacji przy dodaniu nowego produktu lub zamówienia.
 
@@ -861,12 +952,13 @@ System został zaprojektowany w architekturze warstwowej, gdzie każda warstwa o
 
 Rozdział opisuje architekturę techniczną zrealizowanego systemu e-commerce wraz z modułem rekomendacyjnym. Przedstawiono wybór i uzasadnienie stosu technologicznego, strukturę warstwy backendowej (Django REST Framework) oraz frontendowej (React), model relacyjnej bazy danych PostgreSQL, a także mechanizmy konteneryzacji i wdrożenia aplikacji z wykorzystaniem Docker Compose.
 
-\subsection*{4.1 Architektura systemu}
-\addcontentsline{toc}{subsection}{4.1 Architektura systemu}
+\subsection*{4.1 Stos technologiczny}
+\addcontentsline{toc}{subsection}{4.1 Stos technologiczny}
 
 Aplikacja została zaprojektowana w architekturze klient-serwer opartej na technologiach Django (backend) oraz React (frontend). Komunikacja odbywa się poprzez RESTful API z uwierzytelnianiem tokenowym JSON Web Tokens (JWT). Struktura aplikacji wyraźnie rozdziela warstwę prezentacji (React SPA), logikę biznesową (widoki Django i serializery) oraz warstwę danych (PostgreSQL).
 
-\textbf{Główne założenia architektoniczne:}
+\medskip
+\noindent\textbf{Główne założenia architektoniczne:}
 
 \begin{itemize}
 \item \textbf{Separacja frontendu i backendu} - możliwość niezależnego rozwoju i skalowania obu warstw,
@@ -875,10 +967,8 @@ Aplikacja została zaprojektowana w architekturze klient-serwer opartej na techn
 \item \textbf{Modułowa struktura} - każdy algorytm rekomendacji stanowi niezależny moduł.
 \end{itemize}
 
-\subsection*{4.2 Stos technologiczny backendu}
-\addcontentsline{toc}{subsection}{4.2 Stos technologiczny backendu}
-
-\textbf{Django 5.1.4 (Python 3.11)}
+\medskip
+\noindent\textbf{Backend: Django 5.1.4 (Python 3.11)}
 
 Django stanowi fundament aplikacji serwerowej, zapewniając architekturę MVC, system ORM (Object-Relational Mapping - mapowanie obiektowo-relacyjne) dla abstrakcji bazy danych oraz mechanizmy bezpieczeństwa (CSRF, XSS, SQL injection prevention). Architektura backendu opiera się na wzorcu Model-View-Serializer (MVS). Django zapewnia komponenty ORM, Signals oraz Middleware:
 
@@ -909,10 +999,8 @@ Do operacji numerycznych i obliczania podobieństw wykorzystano:
 \item \textbf{scikit-learn} - funkcja cosine\_similarity() dla operacji macierzowych.
 \end{itemize}
 
-\subsection*{4.3 Stos technologiczny frontendu}
-\addcontentsline{toc}{subsection}{4.3 Stos technologiczny frontendu}
-
-\textbf{React 18}
+\medskip
+\noindent\textbf{Frontend: React 18}
 
 Warstwa prezentacji została zrealizowana jako aplikacja jednostronicowa (Single Page Application - SPA) w technologii React 18. Kluczowe cechy wykorzystanej biblioteki:
 
@@ -933,10 +1021,28 @@ Warstwa prezentacji została zrealizowana jako aplikacja jednostronicowa (Single
 
 \newpage
 
-\subsection*{4.4 Projekt architektury systemu}
-\addcontentsline{toc}{subsection}{4.4 Projekt architektury systemu}
+\medskip
+\noindent\textbf{Baza danych: PostgreSQL 14}
 
-Po wyborze stosu technologicznego (Django, React, PostgreSQL, Docker) zaprojektowano szczegółową architekturę aplikacji, definiując strukturę modułów backendu i frontendu oraz mechanizmy optymalizacji wydajności.
+\medskip
+
+PostgreSQL 14 został wybrany jako system zarządzania bazą danych ze względu na następujące cechy:
+
+\begin{itemize}
+\item \textbf{Zaawansowane indeksy} - wsparcie dla B-tree (domyślne), GIN (wyszukiwanie pełnotekstowe), BRIN (optymalizacja dla dużych tabel),
+\item \textbf{Typ danych JSONB} - natywne przechowywanie i indeksowanie struktur JSON (wykorzystane w tabeli \texttt{method\_user\_purchase\_pattern} dla sezonowości zakupów),
+\item \textbf{Transakcje ACID} - gwarancja atomowości, spójności, izolacji i trwałości operacji krytycznych (zamówienia, płatności),
+\item \textbf{Klucze obce i constrainty} - automatyczne wymuszanie integralności referencyjnej oraz walidacji danych (np. rating 1-5 w opiniach),
+\item \textbf{Optymalizacja JOIN} - wydajne łączenie tabel w złożonych zapytaniach rekomendacyjnych,
+\item \textbf{Full-text search} - wbudowane mechanizmy wyszukiwania tekstowego dla produktów.
+\end{itemize}
+
+Szczegółowa charakterystyka struktury bazy danych oraz diagramy ERD zostały przedstawione w rozdziale 3.5 (Architektura funkcjonalna systemu).
+
+\subsection*{4.2 Architektura praktyczna: komponenty systemu i wdrożenie}
+\addcontentsline{toc}{subsection}{4.2 Architektura praktyczna: komponenty systemu i wdrożenie}
+
+Po wyborze stosu technologicznego (Django, React, PostgreSQL, Docker) zaprojektowano szczegółową architekturę aplikacji, definiując strukturę modułów backendu i frontendu oraz mechanizmy wdrożenia. Niniejsza sekcja przedstawia system z punktu widzenia zrealizowanego rozwiązania, opisując jak poszczególne komponenty zostały zbudowane, jak ze sobą współpracują oraz jak aplikacja została wdrożona z wykorzystaniem konteneryzacji Docker.
 
 \medskip
 \noindent\textbf{Struktura backendu Django}
@@ -1052,112 +1158,10 @@ Dodatkowo system wykorzystuje indeks GIN dla pełnotekstowego wyszukiwania produ
 
 Kombinacja pamięci podręcznej, operacji zbiorczych, przycinania progowego oraz indeksowania pozwala systemowi obsługiwać 500 produktów i generować rekomendacje w czasie rzeczywistym (<200ms) nawet przy braku danych w pamięci podręcznej. Dla większych katalogów (>10\,000 produktów) zalecane są dalsze optymalizacje: przybliżone wyszukiwanie najbliższych sąsiadów (ang. \textit{approximate nearest neighbors} - algorytmy LSH, HNSW), partycjonowanie tabel PostgreSQL, oraz rozproszenie obliczeń przy użyciu kolejki zadań asynchronicznych Celery z brokerem Redis.
 
-\subsection*{4.5 Baza danych PostgreSQL}
-\addcontentsline{toc}{subsection}{4.5 Baza danych PostgreSQL}
+\medskip
+\noindent\textbf{Deployment i konteneryzacja Docker}
 
-\textbf{Wybór PostgreSQL 14}
-
-PostgreSQL został wybrany jako system zarządzania bazą danych ze względu na następujące cechy:
-
-\begin{itemize}
-\item \textbf{Zaawansowane indeksy} - wsparcie dla B-tree (domyślne), GIN (wyszukiwanie pełnotekstowe), BRIN (optymalizacja dla dużych tabel),
-\item \textbf{Typ danych JSONB} - natywne przechowywanie i indeksowanie struktur JSON (wykorzystane w tabeli \texttt{method\_user\_purchase\_pattern} dla sezonowości zakupów),
-\item \textbf{Transakcje ACID} - gwarancja atomowości, spójności, izolacji i trwałości operacji krytycznych (zamówienia, płatności),
-\item \textbf{Klucze obce i constrainty} - automatyczne wymuszanie integralności referencyjnej oraz walidacji danych (np. rating 1-5 w opiniach),
-\item \textbf{Optymalizacja JOIN} - wydajne łączenie tabel w złożonych zapytaniach rekomendacyjnych,
-\item \textbf{Full-text search} - wbudowane mechanizmy wyszukiwania tekstowego dla produktów.
-\end{itemize}
-
-\textbf{Struktura bazy danych}
-
-Baza składa się z \textbf{25 tabel} podzielonych na 4 moduły funkcjonalne:
-
-\textbf{1. Moduł produktów i użytkowników (12 tabel):}
-
-\begin{itemize}
-\item \texttt{db\_product} - dane produktów (ID, nazwa, cena, opis),
-\item \texttt{db\_category} - kategorie produktów z hierarchią,
-\item \texttt{db\_product\_category} - relacja Many-to-Many produktów i kategorii,
-\item \texttt{db\_photo\_product} - ścieżki do zdjęć produktów,
-\item \texttt{db\_specification} - szczegółowe parametry techniczne produktów,
-\item \texttt{db\_tag} - tagi do filtrowania produktów,
-\item \texttt{db\_sale} - promocje i rabaty,
-\item \texttt{db\_user} - konta użytkowników (role: admin/client),
-\item \texttt{db\_order} - zamówienia z timestampami i statusami,
-\item \texttt{db\_order\_product} - produkty w zamówieniach (ilość, cena),
-\item \texttt{db\_cart\_item} - koszyk zakupowy przed finalizacją,
-\item \texttt{db\_complaint} - reklamacje powiązane z zamówieniami.
-\end{itemize}
-
-\textbf{2. Moduł opinii i analizy sentymentu (3 tabele):}
-
-\begin{itemize}
-\item \texttt{db\_opinion} - opinie użytkowników (treść, rating 1-5),
-\item \texttt{method\_sentiment\_analysis} - wyniki analizy sentymentu dla opinii,
-\item \texttt{method\_product\_sentiment\_summary} - zagregowany sentyment produktu.
-\end{itemize}
-
-\textbf{3. Moduł metod rekomendacji (5 tabel):}
-
-\begin{itemize}
-\item \texttt{method\_product\_similarity} - macierz podobieństw produktów (Collaborative Filtering),
-\item \texttt{method\_user\_product\_recommendation} - spersonalizowane rekomendacje użytkowników,
-\item \texttt{method\_productassociation} - reguły asocjacyjne Apriori,
-\item \texttt{method\_user\_interactions} - historia interakcji użytkowników,
-\item \texttt{method\_recommendation\_settings} - konfiguracja algorytmów dla użytkownika.
-\end{itemize}
-
-\textbf{4. Moduł analityczny i prognozowanie (5 tabel):}
-
-\begin{itemize}
-\item \texttt{method\_purchase\_probability} - prawdopodobieństwo zakupu produktu przez użytkownika,
-\item \texttt{method\_sales\_forecast} - prognoza sprzedaży produktów,
-\item \texttt{method\_user\_purchase\_pattern} - wzorce zakupowe użytkowników,
-\item \texttt{method\_product\_demand\_forecast} - prognoza popytu i poziomy magazynowe,
-\item \texttt{method\_risk\_assessment} - ocena ryzyka dla użytkowników i produktów.
-\end{itemize}
-
-Wszystkie migracje Django ORM zostały wygenerowane automatycznie na podstawie modeli Python i zarządzane przez system wersjonowania \texttt{django.db.migrations}.
-
-\newpage
-
-\textbf{Diagramy ERD}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=1\textwidth]{images/appErd.png}
-  \caption{Diagram ERD głównych tabel aplikacji.}
-  \label{fig:erd1}
-\end{figure}
-
-Rysunek \ref{fig:erd1} przedstawia rdzeń aplikacji e-commerce. Kluczowe relacje:
-
-\begin{itemize}
-\item \textbf{db\_user $\rightarrow$ db\_order} (1:N) - jeden użytkownik składa wiele zamówień,
-\item \textbf{db\_order $\rightarrow$ db\_order\_product} (1:N) - zamówienie zawiera wiele produktów,
-\item \textbf{db\_product $\leftrightarrow$ db\_category} (N:M) - produkt należy do wielu kategorii,
-\item \textbf{db\_product $\rightarrow$ db\_opinion} (1:N) - produkt ma wiele opinii.
-\end{itemize}
-
-\newpage
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=1\textwidth]{images/methodsErd.png}
-  \caption{Diagram ERD tabel metod rekomendacyjnych.}
-  \label{fig:erd2}
-\end{figure}
-
-Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
-
-\begin{itemize}
-\item \textbf{method\_product\_similarity} - macierz podobieństw Content-Based Filtering (CBF) przechowująca similarity\_score między produktami,
-\item \textbf{method\_user\_product\_recommendation} - cache spersonalizowanych rekomendacji użytkownika dla wszystkich algorytmów,
-\item \textbf{method\_recommendation\_settings} - ustawienia aktywnego algorytmu rekomendacyjnego (CBF, Fuzzy Logic, Collaborative Filtering),
-\item \textbf{method\_purchase\_probability} - predykcje prawdopodobieństwa zakupu obliczone przez klasyfikator Naive Bayes.
-\end{itemize}
-
-\subsection*{4.6 Deployment i konteneryzacja Docker}
-\addcontentsline{toc}{subsection}{4.6 Deployment i konteneryzacja Docker}
+\medskip
 
 Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając spójność środowiska między środowiskiem deweloperskim (development), testowym (staging) i produkcyjnym (production).
 
@@ -1197,14 +1201,7 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 \item Healthcheck: pg\_isready.
 \end{itemize}
 
-\textbf{Zalety konteneryzacji Docker}
-
-\begin{itemize}
-\item \textbf{Izolacja} - każdy serwis w osobnym kontenerze, zero konfliktów zależności,
-\item \textbf{Przenośność} - obraz zbudowany raz działa na dowolnym serwerze z silnikiem Docker,
-\item \textbf{Łatwa konfiguracja} - komenda \texttt{docker-compose up} uruchamia całą aplikację,
-\item \textbf{Skalowalność} - możliwość uruchomienia wielu instancji backendu dla równoważenia obciążenia.
-\end{itemize}
+Wybór architektury Docker Compose zapewnia izolację serwisów (zero konfliktów zależności między kontenerami), przenośność środowiska (obraz zbudowany raz działa na dowolnym serwerze z silnikiem Docker), łatwą konfigurację (komenda \texttt{docker-compose up} uruchamia całą aplikację) oraz możliwość skalowania (uruchomienie wielu instancji backendu dla równoważenia obciążenia).
 
 \newpage
 
@@ -1305,6 +1302,25 @@ Progi cenowe zostały dobrane empirycznie na podstawie rozkładu cen w katalogu:
 \end{itemize}
 
 Dyskretyzacja eliminuje problem dużej wariancji cen i pozwala na porównywanie produktów z różnych kategorii cenowych.
+
+\medskip
+\noindent\textbf{Konfiguracja parametrów CBF}
+
+\medskip
+
+Parametry algorytmu Content-Based Filtering są definiowane w pliku \texttt{custom\_recommendation\_engine.py} jako stałe klasy \texttt{ContentBasedRecommendation}:
+
+\begin{itemize}
+    \item \texttt{CATEGORY\_WEIGHT = 0.40} -- waga kategorii produktu (40\%)
+    \item \texttt{TAG\_WEIGHT = 0.30} -- waga tagów (30\%)
+    \item \texttt{PRICE\_WEIGHT = 0.20} -- waga przedziału cenowego (20\%)
+    \item \texttt{KEYWORD\_WEIGHT = 0.10} -- waga słów kluczowych z opisu (10\%)
+    \item \texttt{SIMILARITY\_THRESHOLD = 0.2} -- minimalny próg podobieństwa do zapisu (20\%)
+    \item \texttt{MAX\_COMPARISONS\_PER\_PRODUCT = 50} -- limit porównań na produkt
+    \item \texttt{PRICE\_THRESHOLDS = [100, 500, 1500]} -- progi dyskretyzacji ceny w PLN
+\end{itemize}
+
+Wagi zostały dobrane empirycznie poprzez testowanie różnych konfiguracji na rzeczywistym katalogu produktów i wybór kombinacji zapewniającej najlepszą równowagę między precyzją (produkty są rzeczywiście podobne) a różnorodnością (nie tylko produkty identyczne). Administrator może dostosować te parametry bezpośrednio w kodzie źródłowym, po czym wymagane jest ponowne wygenerowanie macierzy podobieństw poprzez wywołanie endpointa \texttt{POST /api/generate-similarities/}.
 
 \medskip
 \noindent\textbf{Algorytm podobieństwa kosinusowego}
@@ -1579,6 +1595,37 @@ Oparte na liczbie zamówień produktu:
 \bigskip
 
 Interpretacja: Funkcja trapezoidalna dla "medium"~zapewnia stabilny przedział pełnej przynależności $[2, 10]$ zamówień - produkty w tym przedziale są typowymi artykułami o standardowej popularności. Produkt z 5 zamówieniami jest w pełni "średnio popularny", ale nie jest ani "niszowy"~(low $\leq 2$) ani "bestsellerem"~(high $\geq 30$). Trapez eliminuje oscylacje klasyfikacji dla produktów o podobnej liczbie zamówień, w przeciwieństwie do funkcji trójkątnych używanych dla zbiorów skrajnych.
+
+\bigskip
+
+\textbf{Konfiguracja parametrów Fuzzy Logic}
+
+\medskip
+
+Parametry systemu rozmytego są definiowane w pliku \texttt{fuzzy\_logic\_engine.py} w klasie \texttt{FuzzyMembershipFunctions}. System umożliwia dostosowanie progów funkcji przynależności poprzez modyfikację stałych:
+
+\textbf{Progi dla ceny (PLN):}
+\begin{itemize}
+    \item \texttt{CHEAP\_MAX = 100, CHEAP\_MID = 500} -- produkt tani: pełna przynależność $\leq 100$ PLN, spadek liniowy do 500 PLN
+    \item \texttt{MEDIUM\_START = 100, MEDIUM\_END = 1500} -- produkt średni: wzrost od 100 PLN, spadek od 1500 PLN
+    \item \texttt{EXPENSIVE\_START = 500, EXPENSIVE\_PEAK = 1500} -- produkt drogi: wzrost od 500 PLN, pełna przynależność $\geq 1500$ PLN
+\end{itemize}
+
+\textbf{Progi dla jakości (rating 1-5):}
+\begin{itemize}
+    \item \texttt{LOW\_QUALITY\_MAX = 2.5, LOW\_QUALITY\_MID = 3.5} -- niska jakość: pełna dla $\leq 2.5$, spadek do 3.5
+    \item \texttt{MEDIUM\_QUALITY\_START = 2.5, MEDIUM\_QUALITY\_END = 4.5} -- średnia: maksimum przy 3.5
+    \item \texttt{HIGH\_QUALITY\_START = 3.5, HIGH\_QUALITY\_MIN = 4.5} -- wysoka: wzrost od 3.5, pełna dla $\geq 4.5$
+\end{itemize}
+
+\textbf{Progi dla popularności (liczba zamówień):}
+\begin{itemize}
+    \item \texttt{LOW\_POPULARITY\_MAX = 2, LOW\_POPULARITY\_MID = 10} -- niska: pełna dla $\leq 2$, spadek do 10
+    \item \texttt{MEDIUM\_POPULARITY\_START = 2, MEDIUM\_POPULARITY\_END = 30} -- średnia: trapez $[2, 10]$
+    \item \texttt{HIGH\_POPULARITY\_START = 10, HIGH\_POPULARITY\_MIN = 30} -- wysoka: wzrost od 10, pełna dla $\geq 30$
+\end{itemize}
+
+Progi zostały dobrane empirycznie na podstawie statystyk rzeczywistego katalogu (rozkłady cen, ocen, zamówień). Zmiana parametrów nie wymaga regeneracji danych -- system oblicza rekomendacje w locie, więc nowe progi obowiązują natychmiast po zmianie kodu i restarcie serwera Django. Administrator może dostosować wartości do specyfiki swojego katalogu produktów (np. sklep z elektroniką premium może przesunąć progi cenowe w górę).
 
 \bigskip
 
@@ -1988,6 +2035,37 @@ END FUNCTION
 Wagi agregacji (Markov 60\%, NB 40\%) zostały dobrane empirycznie -- Markov Chain lepiej przewiduje następną kategorię, podczas gdy Naive Bayes moduluje wynik na podstawie ogólnego prawdopodobieństwa zakupu użytkownika.
 
 \medskip
+\noindent\textbf{Konfiguracja parametrów modeli probabilistycznych}
+
+\medskip
+
+Parametry modeli probabilistycznych są definiowane w pliku \texttt{custom\_recommendation\_engine.py}:
+
+\textbf{Parametry łańcucha Markowa (CustomMarkovChain):}
+\begin{itemize}
+    \item \texttt{LAPLACE\_ALPHA = 1.0} -- parametr wygładzania Laplace'a zapobiegający zerowemu prawdopodobieństwu dla niewidzianych przejść
+    \item \texttt{MIN\_TRANSITION\_PROB = 0.001} -- minimalny próg prawdopodobieństwa przejścia (filtry szumu)
+    \item \texttt{ORDER = 1} -- rząd łańcucha Markowa (1 = uwzględnia tylko ostatnią kategorię zakupu)
+\end{itemize}
+
+\textbf{Parametry Naive Bayes (CustomNaiveBayes):}
+\begin{itemize}
+    \item \texttt{LAPLACE\_ALPHA = 1.0} -- parametr wygładzania dla cech dyskretnych
+    \item \texttt{MIN\_SAMPLES\_PER\_CLASS = 5} -- minimalna liczba przykładów w klasie do treningu
+    \item \texttt{FEATURE\_DISCRETIZATION\_BINS = [0, 30, 90, 180]} -- progi dyskretyzacji \texttt{days\_since\_last\_order}
+\end{itemize}
+
+\textbf{Parametry integracji (ProbabilisticRecommendationEngine):}
+\begin{itemize}
+    \item \texttt{MARKOV\_WEIGHT = 0.6} -- waga predykcji łańcucha Markowa (60\%)
+    \item \texttt{NB\_WEIGHT = 0.4} -- waga predykcji Naive Bayes (40\%)
+    \item \texttt{TOP\_K\_CATEGORIES = 5} -- liczba top kategorii z Markova dla ekspansji do produktów
+    \item \texttt{RECOMMENDATIONS\_LIMIT = 10} -- liczba zwracanych rekomendacji
+\end{itemize}
+
+Parametry zostały dobrane empirycznie poprzez walidację krzyżową na zbiorze testowym 265 zamówień. Administrator może dostosować wagi \texttt{MARKOV\_WEIGHT} i \texttt{NB\_WEIGHT} w zależności od preferencji: zwiększenie wagi Markova faworyzuje sekwencje kategorialne (użytkownik kupujący laptop prawdopodobnie kupi akcesoria), podczas gdy zwiększenie wagi NB faworyzuje ogólny profil użytkownika (często kupujący użytkownicy dostaną wyższe wyniki niezależnie od kategorii). Zmiana parametrów wymaga ponownego treningu modeli poprzez wywołanie \texttt{POST /api/train-probabilistic-models/} w panelu administratora.
+
+\medskip
 \noindent\textbf{API probabilistyczne}
 
 \medskip
@@ -2084,9 +2162,27 @@ Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik mo�
 
 \subsubsection*{6.2.2 Panel administracyjny}
 
-System oferuje zaawansowany panel debugowania dostępny przez endpoint \texttt{/api/content-based-debug/}. Panel prezentuje:
+\textbf{Cel i przeznaczenie panelu debugowania}
 
-\textbf{Widok ogólny (bez parametru product\_id)}:
+System Content-Based Filtering udostępnia zaawansowany panel debugowania przeznaczony dla administratorów oraz deweloperów systemu. Panel służy do monitorowania poprawności działania algorytmu, diagnozowania problemów z rekomendacjami oraz optymalizacji parametrów wag cech. Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/content-based-debug/}, który zwraca dane w formacie JSON -- interfejs webowy wizualizuje te dane w czytelny sposób. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w sekcji "Admin Tools" $\rightarrow$ "Content-Based Debug" w panelu administracyjnym aplikacji.
+
+\medskip
+
+Główne zastosowania panelu:
+\begin{itemize}
+    \item \textbf{Weryfikacja pokrycia rekomendacji} - sprawdzenie, ile produktów w katalogu ma obliczone podobieństwa (produkty bez podobieństw nie będą rekomendowane użytkownikom)
+    \item \textbf{Diagnostyka problemów} - identyfikacja produktów ze słabo opisanymi metadanymi (brak kategorii, tagów), które uzyskują niskie podobieństwa
+    \item \textbf{Optymalizacja wag} - analiza breakdownu podobieństwa pozwala zweryfikować, czy wagi cech (40\% kategoria, 30\% tagi, 20\% cena, 10\% keywords) są odpowiednio dobrane
+    \item \textbf{Monitorowanie wydajności} - śledzenie statusu pamięci podręcznej (cache HIT/MISS) oraz czasów generowania macierzy podobieństw
+\end{itemize}
+
+\medskip
+
+Panel oferuje dwa widoki: ogólny (statystyki całego systemu) oraz szczegółowy (analiza konkretnego produktu). Poniżej przedstawiono szczegółowy opis obu widoków.
+
+\medskip
+
+\textbf{Widok ogólny (bez parametru product\_id)}
 
 \begin{itemize}
     \item \textbf{Szczegóły algorytmu}: nazwa, metoda (Weighted Feature Vectors + Cosine Similarity), status
@@ -2158,7 +2254,7 @@ Rysunek \ref{fig:fuzzy_client} przedstawia główny widok rekomendacji Fuzzy Log
     \item \textbf{View Rule Activations}: niebieski przycisk umożliwiający podgląd szczegółowej aktywacji wszystkich 6 reguł IF-THEN dla danego produktu wraz z wyjaśnieniem, dlaczego produkt został polecony
 \end{itemize}
 
-Wszystkie pokazane produkty mają podobny Fuzzy Score (53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika.
+Wszystkie pokazane produkty mają podobny Fuzzy Score (53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika. W kontekście danych testowych (użytkownik z historią zakupów z kategorii "Laptopy"~oraz "Akcesoria komputerowe", średnia cena zakupów ~1200 PLN) wyniki są sensowne: Fuzzy Score 53-54\% odpowiada produktom częściowo dopasowanym do profilu (produkty z kategorii preferowanych, ale w różnych przedziałach cenowych - część droższa, część tańsza od średniej użytkownika), Category Match 62-63\% oznacza silne powiązanie z ulubionymi kategoriami użytkownika (produkt należy do kategorii, w której użytkownik ma >60\% historii zakupów).
 
 \medskip
 
@@ -2243,9 +2339,27 @@ System wyszukiwania zwraca produkty, dla których odległość Levensteina międ
 
 \subsubsection*{6.3.2 Panel administracyjny}
 
-Panel debugowania dostępny przez endpoint \texttt{/api/fuzzy-debug/} prezentuje szczegółowe informacje o systemie wnioskowania rozmytego:
+\textbf{Cel i przeznaczenie panelu debugowania}
 
-\textbf{Widok ogólny (bez parametru product\_id)}:
+System Fuzzy Logic udostępnia specjalistyczny panel debugowania przeznaczony dla administratorów i ekspertów systemów rozmytych. Panel służy do weryfikacji poprawności funkcji przynależności, analizy aktywacji reguł IF-THEN oraz debugowania procesu wnioskowania Mamdani. Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/fuzzy-debug/}, który zwraca szczegółowe dane JSON o stanie systemu rozmytego -- interfejs webowy prezentuje te dane w formie tabel i wykresów. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w sekcji "Admin Tools" $\rightarrow$ "Fuzzy Logic Debug" w panelu administracyjnym aplikacji.
+
+\medskip
+
+Główne zastosowania panelu:
+\begin{itemize}
+    \item \textbf{Weryfikacja funkcji przynależności} - sprawdzenie czy progi dla price/quality/popularity są odpowiednio zdefiniowane (np. czy produkt za 300 PLN ma przynależność 0.6 do "cheap" i 0.4 do "medium")
+    \item \textbf{Analiza aktywacji reguł} - dla każdego produktu panel pokazuje, które z 6 reguł IF-THEN zostały aktywowane oraz z jaką siłą (wartość aktywacji $\alpha$ reguły)
+    \item \textbf{Debugowanie defuzzyfikacji} - śledzenie procesu agregacji wyników reguł (średnia ważona) oraz sprawdzenie, czy końcowy Fuzzy Score jest sensowny
+    \item \textbf{Optymalizacja parametrów} - identyfikacja reguł, które nigdy się nie aktywują lub dominują zbyt silnie, co pozwala na dostrojenie wag reguł
+\end{itemize}
+
+\medskip
+
+Panel oferuje dwa widoki: ogólny (statystyki systemu i profili użytkowników) oraz szczegółowy (analiza konkretnego produktu z ewaluacją wszystkich reguł). Poniżej przedstawiono szczegółowy opis obu widoków.
+
+\medskip
+
+\textbf{Widok ogólny (bez parametru product\_id)}
 
 \begin{itemize}
     \item \textbf{Szczegóły algorytmu}: metoda (Mamdani Fuzzy Inference), liczba reguł (6), T-norma (min), T-conorma (max)
@@ -2339,10 +2453,27 @@ Zakładka ``Churn Risk Analysis'' (Rysunek \ref{fig:prob_client3}) prezentuje:
 
 \subsubsection*{6.4.2 Panel administracyjny}
 
-Panel administracyjny systemu rekomendacji probabilistycznych prezentuje zaawansowane analizy dla administratora. System oferuje dwa główne widoki: panel debugowania (dostępny przez endpoint \texttt{/api/probabilistic-debug/}) oraz panele administracyjne Markov Analysis i Bayesian Analysis.
+\textbf{Cel i przeznaczenie panelu debugowania}
+
+System Probabilistic Models udostępnia kompleksowy panel debugowania przeznaczony dla administratorów oraz data scientists. Panel służy do weryfikacji poprawności treningu modeli probabilistycznych (Markov Chain, Naive Bayes), analizy macierzy przejść między kategoriami produktowymi oraz monitorowania predykcji zakupowych i ryzyka odejścia klientów (churn). Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/probabilistic-debug/}, który zwraca statystyki modeli oraz wyniki predykcji w formacie JSON -- interfejs webowy wizualizuje te dane w formie tabel, macierzy przejść oraz wykresów prawdopodobieństw. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w sekcji "Admin Tools" $\rightarrow$ "Probabilistic Models Debug" w panelu administracyjnym aplikacji.
 
 \medskip
-\noindent\textbf{Panel debugowania modeli probabilistycznych}
+
+Główne zastosowania panelu:
+\begin{itemize}
+    \item \textbf{Weryfikacja macierzy przejść Markova} - sprawdzenie, czy przejścia między kategoriami produktowymi są sensowne (np. czy użytkownicy kupujący laptopy często następnie kupują akcesoria komputerowe)
+    \item \textbf{Monitorowanie predykcji Naive Bayes} - analiza prawdopodobieństw zakupu (\textit{will\_purchase}) oraz ryzyka odejścia klienta (\textit{will\_churn}) dla wszystkich użytkowników systemu
+    \item \textbf{Diagnostyka treningu modeli} - sprawdzenie, czy modele są prawidłowo wytrenowane (liczba stanów, liczba cech, rozkłady klas), czy zawierają wystarczająco dużo danych treningowych
+    \item \textbf{Optymalizacja parametrów} - analiza rozkładów prawdopodobieństw pozwala na dostrojenie wag agregacji (obecnie 60\% Markov + 40\% Naive Bayes)
+\end{itemize}
+
+\medskip
+
+Panel oferuje dwa główne widoki: panel debugowania (statystyki modeli Markov Chain i Naive Bayes) oraz panele administracyjne (analiza biznesowa predykcji dla konkretnych użytkowników). Poniżej przedstawiono szczegółowy opis obu widoków.
+
+\medskip
+
+\noindent\textbf{Panel debugowania - statystyki modeli}
 
 \begin{figure}[H]
   \centering
