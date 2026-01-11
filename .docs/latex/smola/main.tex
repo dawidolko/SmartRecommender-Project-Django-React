@@ -147,11 +147,9 @@ System został zrealizowany jako część większego projektu e-commerce powsta�
 \medskip
 \noindent\textbf{Motywacja i kontekst problemu}
 
-Problem rekomendacji w platformach e-commerce jest złożony i wieloaspektowy. Preferencje użytkowników są subiektywne i trudne do modelowania matematycznego. Dane o użytkownikach są często niekompletne lub niedostępne, zwłaszcza dla nowych użytkowników i produktów - zjawisko znane jako problem zimnego startu (cold start problem). Katalogi produktów dynamicznie się zmieniają, co wymaga ciągłej aktualizacji modeli rekomendacyjnych. Dodatkowo, użytkownicy oczekują nie tylko trafnych rekomendacji, ale również ich wyjaśnienia - dlaczego dany produkt został zaproponowany.
+Problem rekomendacji w platformach e-commerce jest wieloaspektowy: preferencje użytkowników są subiektywne, dane często niekompletne (problem zimnego startu dla nowych użytkowników i produktów), a katalogi dynamiczne. Istniejące rozwiązania komercyjne (Amazon Personalize, Google Recommendations AI) działają jako czarne skrzynki bez kontroli nad algorytmami. Biblioteki open-source (Apache Mahout, Surprise) nie oferują logiki rozmytej ani zaawansowanych modeli probabilistycznych w jednym systemie.
 
-Istniejące rozwiązania komercyjne (Amazon Personalize, Google Recommendations AI) oferują zaawansowane mechanizmy rekomendacji, jednak działają jako czarne skrzynki (black-box), nie pozwalając na kontrolę nad algorytmami ani ich dostosowanie do specyficznych wymagań biznesowych. Biblioteki open-source (Apache Mahout, Surprise) rozwiązują problem kosztów, ale nie oferują implementacji logiki rozmytej ani zaawansowanych modeli probabilistycznych w jednym spójnym systemie.
-
-Rzeczona praca odpowiada na powyższe wyzwania poprzez zaprojektowanie i implementację modułowego systemu rekomendacyjnego łączącego trzy komplementarne podejścia: filtrację opartą na treści (Content-Based Filtering, CBF), logikę rozmytą (Fuzzy Logic) oraz modele probabilistyczne (łańcuchy Markowa i naiwny klasyfikator Bayesa). Każda z tych metod rozwiązuje inne aspekty problemu rekomendacji i oferuje unikalne możliwości personalizacji. System został zaimplementowany od podstaw, bez wykorzystania zewnętrznych bibliotek uczenia maszynowego, co zapewnia pełną kontrolę nad algorytmami oraz możliwość ich dostosowania do specyficznych wymagań platformy e-commerce.
+Rzeczona praca odpowiada na te wyzwania poprzez modułowy system łączący trzy komplementarne podejścia: filtrację opartą na treści (CBF), logikę rozmytą oraz modele probabilistyczne (Markov, Naive Bayes). System zaimplementowano od podstaw, zapewniając pełną kontrolę i możliwość dostosowania do wymagań platformy e-commerce.
 
 \medskip
 \noindent\textbf{Cel i zakres pracy}
@@ -166,7 +164,7 @@ W ramach realizacji celu głównego zdefiniowano następujące cele szczegółow
     \item Opracowanie systemu wnioskowania rozmytego typu Mamdani z regułami IF-THEN i funkcjami przynależności (trójkątne i trapezoidalne) dla trzech wymiarów: wrażliwość cenowa, preferencje kategorialne, preferencja jakości
     \item Zbudowanie modeli probabilistycznych: łańcucha Markowa pierwszego rzędu dla predykcji sekwencji zakupowych oraz naiwnego klasyfikatora Bayesa dla predykcji odejścia klienta (ang. \textit{churn}) i prawdopodobieństwa zakupu
     \item Optymalizacja wydajności systemu dla wdrożenia produkcyjnego (pamięć podręczna, operacje zbiorcze, indeksy bazodanowe, Docker)
-    \item Przeprowadzenie ewaluacji jakości rekomendacji na rzeczywistych danych (500 produktów, 20 użytkowników, 265 zamówień)
+    \item Przeprowadzenie ewaluacji jakości rekomendacji na rzeczywistych danych (500 produktów, 20 użytkowników, 200 zamówień)
 \end{itemize}
 
 Zakres pracy obejmuje trzy główne obszary: podstawy teoretyczne metod rekomendacyjnych, projekt i implementację systemu oraz ewaluację jego działania. System został zintegrowany z aplikacją webową e-commerce (Django 5.1.4 + React 18 + PostgreSQL 14), umożliwiającą weryfikację zaimplementowanych algorytmów w warunkach zbliżonych do rzeczywistych.
@@ -549,18 +547,14 @@ W celu uzasadnienia sensowności tworzenia dedykowanego systemu rekomendacji prz
 
 Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji oparte na algorytmach stosowanych w Amazon.com. System wykorzystuje głębokie uczenie (ang. \textit{deep learning} - wielowarstwowe sieci neuronowe) oraz filtrację kolaboratywną (ang. \textit{collaborative filtering}), oferując trzy typy rekomendacji: personalizację użytkownika (ang. \textit{User Personalization}), podobne produkty (ang. \textit{Similar Items}) oraz spersonalizowane rankowanie (ang. \textit{Personalized Ranking}).
 
-\textbf{Możliwości i funkcjonalności:}
+\textbf{Możliwości:}
 
 \begin{itemize}
-\item \textbf{User Personalization} - algorytm HRNN (Hierarchical Recurrent Neural Network - hierarchiczna rekurencyjna sieć neuronowa) generuje spersonalizowane rankingi produktów na podstawie pełnej historii interakcji użytkownika (przeglądanie, dodawanie do koszyka, zakupy). Model automatycznie wykrywa długoterminowe preferencje oraz krótkoterminowe intencje zakupowe, adaptując rekomendacje w czasie rzeczywistym,
-
-\item \textbf{Similar Items} - rekomendacje produktów podobnych wykorzystujące algorytm SIMS (Similar Items), który analizuje wzorce współwystępowania produktów w sesjach użytkowników. Efektywnie rozwiązuje problem zimnego startu dla nowych użytkowników, bazując wyłącznie na podobieństwie produktów bez konieczności znajomości profilu użytkownika,
-
-\item \textbf{Personalized Ranking} - algorytm re-rankingowy przyjmujący listę kandydatów i sortujący je według przewidywanej trafności dla konkretnego użytkownika. Wykorzystywany do personalizacji wyników wyszukiwania, stron kategorii oraz list promocyjnych,
-
-\item \textbf{Automatyczne dostrajanie hiperparametrów} - system automatycznie dobiera hiperparametry modeli (learning rate, liczba warstw ukrytych, wymiarowość embeddingów) oraz skaluje infrastrukturę w zależności od obciążenia,
-
-\item \textbf{Integracja z ekosystemem AWS} - natywne wsparcie dla AWS Lambda, S3, EventBridge oraz Kinesis umożliwia budowanie rozwiązań czasu rzeczywistego z latencją poniżej 100ms dla 99. percentyla zapytań.
+\item \textbf{User Personalization} - HRNN (Hierarchical Recurrent Neural Network) generuje rankingi na podstawie historii interakcji,
+\item \textbf{Similar Items} - algorytm SIMS analizuje współwystępowanie produktów, rozwiązując problem zimnego startu,
+\item \textbf{Personalized Ranking} - re-ranking list produktów według przewidywanej trafności,
+\item \textbf{Automatyka} - autodostrajanie hiperparametrów i skalowanie infrastruktury,
+\item \textbf{Integracja AWS} - natywne wsparcie Lambda, S3, EventBridge, Kinesis (latencja <100ms dla 99. percentyla).
 \end{itemize}
 
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
@@ -580,20 +574,15 @@ Amazon Personalize to zarządzana usługa AWS oferująca systemy rekomendacji op
 
 Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz multi-armed contextual bandits (wieloramienne bandyty kontekstowe - algorytmy balansujące eksplorację nowych opcji z wykorzystaniem sprawdzonych rozwiązań). System oferuje zaawansowane rekomendacje dla e-commerce, VOD (Video on Demand - wideo na żądanie) oraz platform newsowych, z automatycznym wykrywaniem trendów i sezonowości.
 
-\textbf{Możliwości i funkcjonalności:}
+\textbf{Możliwości:}
 
 \begin{itemize}
-\item \textbf{Wieloramienne bandyty kontekstowe (Multi-Armed Contextual Bandits)} - algorytmy dynamicznie równoważące eksplorację nowych rekomendacji (w celu zbierania informacji o preferencjach użytkowników) z eksploatacją sprawdzonych rozwiązań (maksymalizujących natychmiastową konwersję). System w każdej iteracji podejmuje decyzję czy pokazać użytkownikowi produkt o znanej wysokiej skuteczności (eksploatacja) czy też produkt niedostatecznie przetestowany, ale potencjalnie bardziej dopasowany (eksploracja). Podejście to zapobiega utknięciu systemu w lokalnym optimum rekomendacji,
-
-\item \textbf{Automatyczna detekcja trendów i sezonowości} - modele czasowe (temporal models) wykrywają wzorce zakupowe związane z porą roku, dniami tygodnia oraz wydarzeniami specjalnymi (Black Friday, święta), automatycznie dostosowując wagi rekomendacji,
-
-\item \textbf{Frequently Bought Together} - funkcja analizująca koszyki zakupowe i identyfikująca produkty często kupowane razem, podobna do algorytmu Apriori dla reguł asocjacyjnych,
-
-\item \textbf{Optymalizacja dla różnych celów biznesowych} - system pozwala definiować cele optymalizacji: maksymalizacja współczynnika klikalności (CTR), wartości koszyka (AOV - Average Order Value), retention (utrzymanie użytkowników) lub revenue (przychód),
-
-\item \textbf{Integracja z Google Analytics 4} - natywne wsparcie dla śledzenia zdarzeń e-commerce (product\_view, add\_to\_cart, purchase) umożliwia szybkie wdrożenie bez konieczności budowania własnej infrastruktury analitycznej,
-
-\item \textbf{Obsługa zimnego startu} - algorytmy wykorzystujące metadata produktów (kategoria, marka, cena) oraz sygnały kontekstowe (lokalizacja, urządzenie, pora dnia) zapewniają rekomendacje nawet dla nowych użytkowników bez historii interakcji.
+\item \textbf{Multi-Armed Contextual Bandits} - balans eksploracji (nowe rekomendacje) vs eksploatacji (sprawdzone rozwiązania),
+\item \textbf{Detekcja trendów} - automatyczne wykrywanie sezonowości i dostosowywanie wag,
+\item \textbf{Frequently Bought Together} - analiza koszyków (podobna do Apriori),
+\item \textbf{Cele biznesowe} - optymalizacja pod CTR, AOV, retention lub revenue,
+\item \textbf{Google Analytics 4} - natywna integracja śledzenia e-commerce,
+\item \textbf{Cold start} - wykorzystanie metadanych i sygnałów kontekstowych.
 \end{itemize}
 
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
@@ -612,20 +601,15 @@ Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz mu
 
 Apache Mahout to otwartoźródłowy framework (ang. \textit{open-source framework}) implementujący klasyczne algorytmy filtracji kolaboratywnej oraz faktoryzacji macierzy (ang. \textit{matrix factorization} - technika dekompozycji macierzy użytkownik-produkt) - ALS (ang. \textit{Alternating Least Squares} - metoda najmniejszych kwadratów na przemian), SVD (ang. \textit{Singular Value Decomposition} - rozkład według wartości osobliwych). Projekt powstał w 2008 roku, obecnie koncentruje się na algorytmach rozproszonych opartych na Apache Spark (ang. \textit{Spark-based distributed algorithms}).
 
-\textbf{Możliwości i funkcjonalności:}
+\textbf{Możliwości:}
 
 \begin{itemize}
-\item \textbf{Licencja open-source Apache 2.0} - kod źródłowy dostępny bez opłat licencyjnych, możliwość pełnej modyfikacji i dostosowania do specyficznych wymagań biznesowych bez ograniczeń vendor lock-in,
-
-\item \textbf{Collaborative Filtering z ALS (Alternating Least Squares)} - algorytm faktoryzacji macierzy user-item rozkładający macierz interakcji na dwie macierze niższego wymiaru (user factors i item factors). ALS iteracyjnie optymalizuje reprezentacje wektorowe użytkowników i produktów, minimalizując błąd predykcji dla znanych interakcji. Skaluje się efektywnie dla dużych zbiorów danych dzięki możliwości równoległego przetwarzania,
-
-\item \textbf{SVD i SVD++ (Singular Value Decomposition)} - techniki rozkładu macierzy identyfikujące ukryte czynniki (latent factors) wpływające na preferencje użytkowników. SVD++ rozszerza klasyczne SVD o implicit feedback (sygnały niejawne: przeglądanie produktów, czas spędzony na stronie), zwiększając dokładność predykcji,
-
-\item \textbf{Przetwarzanie rozproszone na Apache Spark} - architektura oparta na Spark umożliwia skalowanie dla katalogów produktów liczących miliony pozycji oraz baz użytkowników rzędu dziesiątek milionów. Distributed computing (przetwarzanie rozproszone) skraca czas trenowania modeli z godzin do minut,
-
-\item \textbf{Integracja z ekosystemem Hadoop} - natywne wsparcie dla HDFS (Hadoop Distributed File System), Hive oraz HBase zapewnia spójność z istniejącą infrastrukturą big data w przedsiębiorstwach,
-
-\item \textbf{Modele probabilistyczne} - implementacje Naive Bayes, Logistic Regression oraz Random Forest dla zadań klasyfikacji i predykcji, możliwe do wykorzystania w scenariuszach uzupełniających collaborative filtering.
+\item \textbf{Licencja Apache 2.0} - open-source bez opłat, pełna modyfikowalność,
+\item \textbf{Collaborative Filtering z ALS} - faktoryzacja macierzy user-item, efektywna równoległość,
+\item \textbf{SVD i SVD++} - rozkład macierzy z implicit feedback (przeglądanie, czas na stronie),
+\item \textbf{Apache Spark} - przetwarzanie rozproszone, skalowanie dla milionów produktów i użytkowników,
+\item \textbf{Ekosystem Hadoop} - integracja z HDFS, Hive, HBase,
+\item \textbf{Modele probabilistyczne} - Naive Bayes, Logistic Regression, Random Forest.
 \end{itemize}
 
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
@@ -935,7 +919,7 @@ W celu umożliwienia testowania i walidacji algorytmów rekomendacyjnych system 
 \begin{itemize}
 \item \textbf{Produkty}: 500 produktów elektronicznych rozłożonych w 48 kategoriach (laptopy, smartfony, akcesoria, AGD, gaming) z pełnymi metadanymi (nazwa, opis, kategorie, tagi, cena, specyfikacje techniczne, zdjęcia),
 \item \textbf{Użytkownicy}: 20 kont testowych z różnymi profilami zakupowymi (użytkownicy aktywni z historią zakupów, użytkownicy sporadyczni, nowi użytkownicy bez historii),
-\item \textbf{Zamówienia}: 265 zamówień zawierających łącznie 569 pozycji produktowych, wygenerowanych z realistycznymi timestampami rozłożonymi w czasie 6 miesięcy w celu umożliwienia analizy trendów i sezonowości,
+\item \textbf{Zamówienia}: 200 zamówień zawierających łącznie około 600 pozycji produktowych (losowo 1-5 produktów na zamówienie), wygenerowanych z realistycznymi timestampami rozłożonymi w czasie 6 miesięcy w celu umożliwienia analizy trendów i sezonowości,
 \item \textbf{Opinie}: Około 1750 opinii użytkowników z tekstowymi recenzjami i ocenami gwiazdkowymi (1-5), wygenerowanych dla różnych produktów w celu testowania analizy sentymentu,
 \item \textbf{Wyniki algorytmów}: Wstępnie wygenerowane macierze podobieństw (CBF), profile rozmyte użytkowników (Fuzzy Logic), macierze przejść kategorii (Markov Chain) oraz predykcje zakupowe (Naive Bayes) dla wszystkich użytkowników testowych.
 \end{itemize}
@@ -2555,7 +2539,7 @@ System oferuje kompleksowe środowisko do testowania i ewaluacji algorytmów rek
     \item \textbf{Dla deweloperów}: Zaawansowane panele debugowania z szczegółowymi informacjami o obliczeniach, aktywacji reguł, wagach i podobieństwach
 \end{itemize}
 
-Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 265 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich trzech algorytmów.
+Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 200 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich trzech algorytmów.
 
 \newpage
 
@@ -2563,7 +2547,7 @@ Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 
 \addcontentsline{toc}{section}{Rozdział 7: Porównanie i ewaluacja metod rekomendacyjnych}
 \section*{Porównanie i ewaluacja metod rekomendacyjnych}
 
-Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zaimplementowanych w aplikacji we współpracy dwuosobowej. Analiza opiera się na wynikach testów przeprowadzonych na rzeczywistych danych: 500 produktów w 48 kategoriach, 20 użytkowników oraz historia transakcji (265 zamówień, 569 pozycji) zgromadzona w bazie PostgreSQL. Ewaluacja koncentruje się na trzech parach metod o komplementarnym charakterze: Content-Based Filtering vs Collaborative Filtering (podejście atrybutowe vs behawioralne), Fuzzy Logic vs Sentiment Analysis (personalizacja cenowa vs analiza opinii), oraz modele probabilistyczne vs Apriori (sekwencje czasowe vs współzakupy).
+Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zaimplementowanych w aplikacji we współpracy dwuosobowej. Analiza opiera się na wynikach testów przeprowadzonych na rzeczywistych danych: 500 produktów w 48 kategoriach, 20 użytkowników oraz historia transakcji (200 zamówień, około 600 pozycji) zgromadzona w bazie PostgreSQL. Ewaluacja koncentruje się na trzech parach metod o komplementarnym charakterze: Content-Based Filtering vs Collaborative Filtering (podejście atrybutowe vs behawioralne), Fuzzy Logic vs Sentiment Analysis (personalizacja cenowa vs analiza opinii), oraz modele probabilistyczne vs Apriori (sekwencje czasowe vs współzakupy).
 
 \medskip
 \noindent\textbf{Metodyka badania i środowisko testowe}
@@ -2693,7 +2677,7 @@ Tabela \ref{tab:prob-vs-apriori} porównuje metody sekwencyjne (modele probabili
 \hline
 Uwzględnienie czasu & Tak - kolejność zakupów & Nie - współwystępowanie \\
 \hline
-Algorytm & Markov Chain (60\%) + Naive Bayes (40\%) & Algoritm Apriori (support, confidence, lift) \\
+Algorytm & Markov Chain (predykcja sekwencji) + Naive Bayes (prawdopodobieństwo zakupu) & Algoritm Apriori (support, confidence, lift) \\
 \hline
 Personalizacja & Wysoka - profil użytkownika & Brak - uniwersalne reguły \\
 \hline
@@ -2712,11 +2696,11 @@ Zastosowanie & Przewidywanie następnej kategorii, analiza odejścia klienta & R
 \end{tabular}
 \end{table}
 
-\textbf{Różnice w działaniu:} Modele probabilistyczne analizują sekwencje zakupów w czasie i przewidują którą kategorię użytkownik prawdopodobnie kupi następną (np. „po laptopie zwykle następują akcesoria komputerowe"). Łańcuch Markowa pierwszego rzędu używa macierzy przejść między 48 kategoriami produktów trenowanej na rzeczywistych sekwencjach zamówień. Naive Bayes ocenia prawdopodobieństwo zakupu na podstawie pięciu cech użytkownika: łączna liczba zamówień, średnia wartość zamówienia, dni od ostatniego zakupu, ulubiona kategoria oraz częstotliwość zakupów. Apriori natomiast odkrywa reguły typu „klienci kupujący laptop często kupują również mysz bezprzewodową" bez uwzględniania kolejności czasowej. Analizuje koszyki zakupowe i identyfikuje itemsety pojawiające się razem częściej niż przypadkowo.
+\textbf{Różnice w działaniu:} Modele probabilistyczne analizują sekwencje zakupów w czasie i przewidują którą kategorię użytkownik prawdopodobnie kupi następną (np. „po laptopie zwykle następują akcesoria komputerowe"). Łańcuch Markowa pierwszego rzędu używa macierzy przejść między 48 kategoriami produktów trenowanej na rzeczywistych sekwencjach zamówień. Naive Bayes ocenia prawdopodobieństwo zakupu na podstawie pięciu cech użytkownika: łączna liczba zamówień, średnia wartość zamówienia, dni od ostatniego zakupu, ulubiona kategoria oraz częstotliwość zakupów. Oba modele działają komplementarnie: Markov odpowiada na pytanie „co użytkownik kupi", a Naive Bayes na pytanie „czy użytkownik w ogóle dokona zakupu w najbliższym czasie". Apriori natomiast odkrywa reguły typu „klienci kupujący laptop często kupują również mysz bezprzewodową" bez uwzględniania kolejności czasowej. Analizuje koszyki zakupowe i identyfikuje itemsety pojawiające się razem częściej niż przypadkowo.
 
 \textbf{Zastosowanie praktyczne:} Modele probabilistyczne są widoczne w sekcji „Analiza probabilistyczna" panelu klienta z wizualizacją łańcucha przejść między kategoriami oraz predykcją prawdopodobieństwa odejścia klienta. Administrator ma dostęp do paneli „Markov Chain Analysis" i „Bayesian Analysis" z prognozami sprzedaży oraz identyfikacją użytkowników zagrożonych odejściem. Apriori wyświetla sekcję „Często kupowane razem" na stronach produktów oraz w koszyku zakupowym, sugerując produkty komplementarne. Modele probabilistyczne są skuteczniejsze dla użytkowników z regularną historią zakupów (wykrywają cykle zakupowe), podczas gdy Apriori lepiej sprawdza się w rekomendacji akcesoriów i dodatków (cross-selling).
 
-\textbf{Wyniki testów:} Modele probabilistyczne wymagały treningu na 265 zamówieniach (kilka sekund dla Markov Chain, 1-2 sekundy dla Naive Bayes). Po wytrenowaniu predykcje były wykonywane bardzo szybko (<10ms). Macierz przejść Markova zawierała 48 stanów (po jednym dla każdej kategorii) z wygładzaniem Laplace'a ($\alpha$ = 1.0) zapobiegającym zerowemu prawdopodobieństwu. Apriori generował reguły asocjacyjne z progami min\_support = 0.01 i min\_confidence = 0.3, co eliminowało powiązania przypadkowe ale wymagało wystarczającej liczby transakcji dla każdego itemsetu.
+\textbf{Wyniki testów:} Modele probabilistyczne wymagały treningu na 200 zamówieniach (kilka sekund dla Markov Chain, 1-2 sekundy dla Naive Bayes). Po wytrenowaniu predykcje były wykonywane bardzo szybko (<10ms). Macierz przejść Markova zawierała 48 stanów (po jednym dla każdej kategorii) z wygładzaniem Laplace'a ($\alpha$ = 1.0) zapobiegającym zerowemu prawdopodobieństwu. Apriori generował reguły asocjacyjne z progami min\_support = 0.01 i min\_confidence = 0.1, co eliminowało powiązania przypadkowe ale wymagało wystarczającej liczby transakcji dla każdego itemsetu.
 
 \newpage
 \medskip
@@ -2730,9 +2714,9 @@ Porównanie sześciu metod rekomendacyjnych wykazało, że każda z nich adresuj
 
 \textbf{Metody personalizowane vs uniwersalne:} Fuzzy Logic (profil cenowy użytkownika) personalizuje rekomendacje według wrażliwości cenowej i oferuje pełną interpretowalność (100\% - aktywacja 6 reguł IF-THEN). Sentiment Analysis (opinie społeczności) tworzy uniwersalny ranking jakości produktów dostępny dla wszystkich użytkowników. Fuzzy jest skuteczniejsza dla użytkowników o wyraźnych preferencjach, Sentiment jako globalny filtr jakości.
 
-\textbf{Metody sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje czasowe) przewidują przyszłe zakupy na podstawie łańcucha Markowa (60\%) i profilu behawioralnego Naive Bayes (40\%), umożliwiając identyfikację użytkowników zagrożonych odejściem. Apriori (współzakupy) odkrywa reguły asocjacyjne produktów komplementarnych efektywne w sprzedaży krzyżowej (ang. \textit{cross-selling}). Modele probabilistyczne lepsze dla regularnych użytkowników (cykle zakupowe), Apriori dla akcesoriów i dodatków.
+\textbf{Metody sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje czasowe) przewidują przyszłe zakupy łącząc łańcuch Markowa (predykcja kategorii) i profil behawioralny Naive Bayes (prawdopodobieństwo zakupu), umożliwiając identyfikację użytkowników zagrożonych odejściem. Apriori (współzakupy) odkrywa reguły asocjacyjne produktów komplementarnych efektywne w sprzedaży krzyżowej (ang. \textit{cross-selling}). Modele probabilistyczne lepsze dla regularnych użytkowników (cykle zakupowe), Apriori dla akcesoriów i dodatków.
 
-Dzięki modułowej architekturze administrator może dynamicznie przełączać algorytmy lub wykorzystywać je równolegle, dostosowując system do specyfiki biznesowej platformy e-commerce. Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 265 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich sześciu algorytmów.
+Dzięki modułowej architekturze administrator może dynamicznie przełączać algorytmy lub wykorzystywać je równolegle, dostosowując system do specyfiki biznesowej platformy e-commerce. Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 200 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich sześciu algorytmów.
 
 \newpage
 
