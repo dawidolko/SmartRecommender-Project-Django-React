@@ -2730,7 +2730,7 @@ Zastosowany zestaw metryk obejmował: (1) \textbf{Zasięg katalogowy} - udział 
 
 \medskip
 
-Tabela \ref{tab:cbf-vs-cf} przedstawia kluczowe różnice między metodami CBF i CF. Content-Based Filtering ekstraktuje cechy bezpośrednio z atrybutów produktów (kategoria 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%) bez potrzeby historii zakupów. Collaborative Filtering analizuje historię zakupów i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika.
+Tabela \ref{tab:cbf-vs-cf} zestawia charakterystyki porównawczych algorytmów. Filtracja oparta na treści ekstrahuje atrybuty bezpośrednio z danych produktowych (alokacja wag: kategoria 40\%, tagi 30\%, punkt cenowy 20\%, deskryptory 10\%) eliminując zależność od zapisu historycznego. Filtracja kolaboratywna konstruuje macierz podobieństw produktowych w oparciu o analizę zachowań transakcyjnych z wykorzystaniem Adjusted Cosine Similarity z normalizacją per-użytkownik.
 
 \begin{table}[H]
 \centering
@@ -2764,15 +2764,15 @@ Interpretowalność & Średnia (wagi cech) & Niska (ukryte wzorce) \\
 \end{tabular}
 \end{table}
 
-\textbf{Różnice w działaniu:} CBF rekomenduje laptopy podobne do laptopów - produkty z tej samej kategorii, w podobnym przedziale cenowym, o podobnych tagach. CF wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty często kupują też plecaki, CF połączy te produkty mimo różnych kategorii. CBF działa od razu bo każdy produkt ma cechy, podczas gdy CF wymaga dużo danych historycznych aby działać dobrze.
+\textbf{Różnice w działaniu:} Filtracja oparta na treści sugeruje produkty o zbieżnych atrybutach - dla laptopa rekomenduje inne laptopy z tej samej klasy cenowej, kategorii oraz zbiorów tagowych. Filtracja kolaboratywna identyfikuje asocjacje niewynikające z analizy atrybutowej - przykładowo, jeśli konsumenci aparatów fotograficznych systematycznie nabywają plecaki turystyczne, algorytm wywoła połączenie mimo różnej klasyfikacji kategorialnej. Metoda oparta na treści funkcjonuje natychmiastowo (każdy produkt posiada atrybuty), podczas gdy podejście kolaboratywne wymaga znacznego wolumenu historii transakcyjnej dla efektywnego uczenia.
 
 \medskip
 
-\textbf{Zastosowanie praktyczne:} W projekcie obie metody działają równolegle. CBF jest używany dla nowych produktów bez historii oraz dla gości bez konta - gwarantuje że każdy produkt może być rekomendowany (sekcja „Podobne produkty" na stronie produktu). CF jest używany dla zalogowanych użytkowników z historią zakupów - wyświetla rekomendacje oparte na wzorcach zakupowych społeczności. Dla sklepów z małą liczbą transakcji CBF jest bezpieczniejszym wyborem. Dla dojrzałych sklepów z bogatą historią CF odkrywa ciekawsze powiązania które zwiększają sprzedaż krzyżową.
+\textbf{Zastosowanie praktyczne:} W realizowanym systemie oba algorytmy funkcjonują równolegle. Metoda oparta na treści obsługuje produkty bez historii transakcyjnej oraz użytkowników niezalogowanych - zapewnia pokrycie całego katalogu (moduł „Podobne produkty" w widoku szczegółowym). Podejście kolaboratywne aktywne jest dla użytkowników uwierzytelnionych z historią zakupów - generuje sugestie oparte na wzorcach konsumpcyjnych populacji. Dla platform o ograniczonej bazie transakcyjnej metoda oparta na treści stanowi bezpieczniejszy wybór. Dla sklepów o dojrzałej historii zakupów algorytm kolaboratywny ujawnia wartościowe asocjacje międzykategorialne wspierające sprzedaż krzyżową.
 
 \medskip
 
-\textbf{Wyniki testów:} CBF osiągnął 80-85\% pokrycie katalogu (około 400-425 produktów ma podobieństwa powyżej progu 20\%). Czas generowania macierzy wyniósł około 1 minuty dla 500 produktów. CF wymagał większej ilości danych historycznych i osiągnął 60-70\% pokrycie katalogu. Obie metody z cache HIT (<100ms) zapewniają bardzo szybką odpowiedź, ale CBF ma przewagę dla nowych produktów gdzie CF zwraca pustą listę rekomendacji.
+\textbf{Wyniki testów:} Metoda oparta na treści osiągnęła zasięg 80-85\% katalogu (około 400-425 pozycji przekracza próg podobieństwa 20\%). Czas konstrukcji macierzy wyniósł około 1 minuty dla zbioru 500 produktów. Algorytm kolaboratywny, wymagający większego wolumenu danych historycznych, uzyskał zasięg 60-70\% katalogu. Obie metody przy trafień w cache (<100ms) zapewniają natychmiastową odpowiedź, lecz metoda oparta na treści wykazuje przewagę dla produktów bez historii, gdzie podejście kolaboratywne zwraca zbiór pusty.
 
 \bigskip
 
@@ -2780,7 +2780,7 @@ Interpretowalność & Średnia (wagi cech) & Niska (ukryte wzorce) \\
 
 \medskip
 
-Tabela \ref{tab:fuzzy-vs-sentiment} zestawia metody spersonalizowaną (Fuzzy Logic) i uniwersalną (Sentiment Analysis). Fuzzy Logic buduje indywidualny \texttt{FuzzyUserProfile} z historii zakupów każdego użytkownika (parametr wrażliwości cenowej, preferowane kategorie). Sentiment Analysis agreguje tekst z pięciu źródeł używając leksykonów Opinion Lexicon i AFINN-165 i tworzy jedną ocenę dla całej społeczności.
+Tabela \ref{tab:fuzzy-vs-sentiment} konfrontuje algorytm spersonalizowany (logika rozmyta) z uniwersalnym (analiza sentymentu). Wnioskowanie rozmyte konstruuje indywidualny \texttt{FuzzyUserProfile} w oparciu o historię transakcyjną użytkownika (wskaźnik wrażliwości cenowej, preferowane klasy produktowe). Analiza sentymentu agreguje materiał tekstowy z pięciu źródeł z wykorzystaniem leksykonów Opinion Lexicon oraz AFINN-165, generując unifikowany wskaźnik dla całej populacji.
 
 \begin{table}[H]
 \centering
@@ -2814,15 +2814,15 @@ Typ rekomendacji & „Dopasowane do Twojego budżetu" & „Najlepiej oceniane pr
 \end{tabular}
 \end{table}
 
-\textbf{Różnice w działaniu:} Fuzzy Logic personalizuje rekomendacje według profilu cenowego użytkownika. Ten sam produkt może być polecony użytkownikowi premium jako „wysoka jakość, warta swojej ceny" i odrzucony dla użytkownika budżetowego jako „zbyt drogi". System używa sześciu reguł typu „jeśli-to" (IF-THEN), które oceniają produkty na podstawie trzech kryteriów z funkcjami przynależności trójkątnymi i trapezoidalnymi. Sentiment Analysis natomiast tworzy jeden uniwersalny ranking produktów na podstawie agregacji opinii tekstowych i ocen gwiazdkowych. Produkt z wysokim sentymentem (+0.8) jest rekomendowany wszystkim użytkownikom tak samo.
+\textbf{Różnice w działaniu:} Logika rozmyta dostosowuje sugestie do profilu wydatkowego użytkownika. Identyczny produkt może uzyskać pozytywną ocenę dla użytkownika segmentu premium („wysoka jakość adekwatna do ceny") oraz negatywną dla użytkownika budżetowego („przekracza tolerancję cenową"). Mechanizm operuje na sześciu regułach wnioskowania IF-THEN, ewaluujących produkty według trzech kryteriów z rozmytymi funkcjami przynależności (trójkątne, trapezoidalne). Analiza sentymentu konstruuje natomiast globalny ranking w oparciu o agregację recenzji tekstowych oraz ocen gwiazdkowych. Produkt o wysokim wskaźniku sentymentu (+0.8) rekomendowany jest identycznie dla wszystkich użytkowników.
 
 \medskip
 
-\textbf{Zastosowanie praktyczne:} Fuzzy Logic jest dostępna w dedykowanej sekcji panelu klienta z trzema zakładkami (preferowane kategorie, dopasowanie cenowe, jakość-popularność). Wymaga zalogowania i historii zakupów. Sentiment Analysis jest dostępna dla wszystkich użytkowników (także gości) i wyświetla uniwersalny ranking „Najlepiej oceniane produkty" na stronie głównej. Fuzzy Logic jest skuteczniejsza dla użytkowników o wyraźnych preferencjach cenowych (tylko tanie lub tylko premium), podczas gdy Sentiment Analysis lepiej sprawdza się jako globalny filtr jakości.
+\textbf{Zastosowanie praktyczne:} Wnioskowanie rozmyte udostępnione jest w dedykowanym module panelu klienckiego z trzema widokami (preferowane kategorie, dopasowanie budżetowe, ewaluacja jakość-popularność). Wymaga uwierzytelnienia oraz historii transakcyjnej. Analiza sentymentu dostępna jest dla całej populacji użytkowników (włącznie z gośćmi) i prezentuje globalny ranking „Produkty najlepiej oceniane" w widoku głównym. Logika rozmyta wykazuje wyższą skuteczność dla użytkowników o wyraźnych wzorcach wydatkowych (segment budżetowy lub premium), podczas gdy analiza sentymentu funkcjonuje efektywnie jako uniwersalny filtr jakościowy.
 
 \medskip
 
-\textbf{Wyniki testów:} Fuzzy Logic osiągnęła najszybszy czas odpowiedzi (<100ms dla 100 produktów) dzięki brakowi konieczności przechowywania macierzy - wszystkie obliczenia wykonywane w locie. Wyniki dotyczą zastosowanego w pracy prostego systemu rozmytego Mamdaniego z 6 regułami IF-THEN i 3 zmiennymi wejściowymi (cena, jakość, popularność). Interpretowalność 100\% - każda rekomendacja ma pełne wyjaśnienie aktywacji konkretnych reguł. Sentiment Analysis wymagała preprocessingu opinii tekstowych (tokenizacja, usuwanie stop words) ale działała uniwersalnie bez potrzeby budowania profili użytkowników. Głównym ograniczeniem Sentiment jest wrażliwość na negację i ironię („nie polecam" może być błędnie sklasyfikowane jako pozytywne jeśli leksykon wykryje słowo „polecam").
+\textbf{Wyniki testów:} Wnioskowanie rozmyte osiągnęło najkrótszy czas odpowiedzi (<100ms dla ewaluacji 100 produktów) dzięki eliminacji konieczności przechowywania macierzy - kalkulacje realizowane są dynamicznie. Wyniki odnoszą się do zaimplementowanego systemu Mamdaniego wykorzystującego 6 reguł IF-THEN oraz 3 zmienne wejściowe (punkt cenowy, wskaźnik jakości, popularność). Osiągnięto pełną wyjaśnialność (100\%) - każda sugestia zawiera szczegółowe uzasadnienie aktywacji konkretnych reguł. Analiza sentymentu wymagała wstępnego przetwarzania materiału tekstowego (tokenizacja, eliminacja stop words), lecz działała uniwersalnie bez konstrukcji profili użytkowników. Kluczowym ograniczeniem analizy sentymentu jest podatność na negację oraz ironię w tekście („nie polecam" może zostać błędnie sklasyfikowane jako pozytywne przy wykryciu terminu „polecam" przez leksykon).
 
 \bigskip
 
@@ -2830,7 +2830,7 @@ Typ rekomendacji & „Dopasowane do Twojego budżetu" & „Najlepiej oceniane pr
 
 \medskip
 
-Tabela \ref{tab:prob-vs-apriori} porównuje metody sekwencyjne (modele probabilistyczne) i asocjacyjne (Apriori). Modele probabilistyczne (łańcuch Markowa + Naive Bayes) przewidują przyszłe zakupy na podstawie sekwencji czasowych oraz profilu behawioralnego użytkownika. Apriori odkrywa reguły współzakupów z koszyków produktowych bez uwzględniania kolejności.
+Tabela \ref{tab:prob-vs-apriori} konfrontuje algorytmy sekwencyjne (modele probabilistyczne) z asocjacyjnymi (Apriori). Modele probabilistyczne (łańcuchy Markowa + klasyfikator Bayesa naiwnego) prognozują przyszłe transakcje w oparciu o sekwencje temporalne oraz profil behawioralny użytkownika. Apriori identyfikuje reguły współwystępowania produktów w koszykach zakupowych bez uwzględnienia wymiaru czasowego.
 
 \begin{table}[H]
 \centering
@@ -2866,32 +2866,32 @@ Zastosowanie & Przewidywanie następnej kategorii, analiza odejścia klienta & R
 \end{tabular}
 \end{table}
 
-\textbf{Różnice w działaniu:} Modele probabilistyczne analizują sekwencje zakupów w czasie i przewidują którą kategorię użytkownik prawdopodobnie kupi następną (np. „po laptopie zwykle następują akcesoria komputerowe"). Łańcuch Markowa pierwszego rzędu używa macierzy przejść między 48 kategoriami produktów trenowanej na rzeczywistych sekwencjach zamówień. Naive Bayes ocenia prawdopodobieństwo zakupu na podstawie pięciu cech użytkownika: łączna liczba zamówień, średnia wartość zamówienia, dni od ostatniego zakupu, ulubiona kategoria oraz częstotliwość zakupów. Oba modele działają komplementarnie: Markov odpowiada na pytanie „co użytkownik kupi", a Naive Bayes na pytanie „czy użytkownik w ogóle dokona zakupu w najbliższym czasie". Apriori natomiast odkrywa reguły typu „klienci kupujący laptop często kupują również mysz bezprzewodową" bez uwzględniania kolejności czasowej. Analizuje koszyki zakupowe i identyfikuje itemsety pojawiające się razem częściej niż przypadkowo.
+\textbf{Różnice w działaniu:} Modele probabilistyczne ewaluują sekwencje transakcyjne w domenie czasowej, prognozując kolejną kategorię nabywczą (np. „po nabyciu laptopa typowo następują akcesoria komputerowe"). Proces Markowa pierwszego rzędu operuje na macierzy przejść pomiędzy 48 kategoriami, wytrenowanej na faktycznych sekwencjach zamówień. Klasyfikator Bayesa naiwnego estymuje prawdopodobieństwo transakcji w oparciu o pięć cech użytkownika: liczność zamówień historycznych, średnia wartość transakcji, liczba dni od ostatniego zakupu, dominująca kategoria oraz częstotliwość konsumpcji. Oba modele działają synergicznie: Markov odpowiada na pytanie „jaką kategorię nabędzie użytkownik", podczas gdy Bayes estymuje „czy użytkownik w najbliższym okresie dokona zakupu". Apriori identyfikuje natomiast reguły postaci „konsumenci nabywający laptop często nabywają mysz bezprzewodową" bez uwzględnienia wymiaru temporalnego. Mechanizm analizuje kompozycje koszyków i wykrywa zbiory produktowe występujące wspólnie z częstością ponadprzypadkową.
 
 \medskip
 
-\textbf{Zastosowanie praktyczne:} Modele probabilistyczne są widoczne w sekcji „Analiza probabilistyczna" panelu klienta z wizualizacją łańcucha przejść między kategoriami oraz predykcją prawdopodobieństwa odejścia klienta. Administrator ma dostęp do paneli „Markov Chain Analysis" i „Bayesian Analysis" z prognozami sprzedaży oraz identyfikacją użytkowników zagrożonych odejściem. Apriori wyświetla sekcję „Często kupowane razem" na stronach produktów oraz w koszyku zakupowym, sugerując produkty komplementarne. Modele probabilistyczne są skuteczniejsze dla użytkowników z regularną historią zakupów (wykrywają cykle zakupowe), podczas gdy Apriori lepiej sprawdza się w rekomendacji akcesoriów i dodatków (cross-selling).
+\textbf{Zastosowanie praktyczne:} Modele probabilistyczne prezentowane są w module „Analiza probabilistyczna" interfejsu klienckiego z wizualizacją grafu przejść między kategoriami oraz estymacją prawdopodobieństwa churnu. Administrator dysponuje dostępem do paneli „Markov Chain Analysis" oraz „Bayesian Analysis" zawierających prognozy sprzedażowe i identyfikację użytkowników zagrożonych odejściem. Apriori generuje moduł „Często kupowane razem" w widokach produktowych oraz w koszyku zakupowym, sugerując produkty komplementarne. Modele probabilistyczne wykazują wyższą skuteczność dla użytkowników o regularnej historii transakcyjnej (wykrywanie cykli zakupowych), podczas gdy Apriori efektywnie wspiera rekomendację akcesoriów oraz rozszerzeń (sprzedaż krzyżowa).
 
 \medskip
 
-\textbf{Wyniki testów:} Modele probabilistyczne wymagały treningu na 200 zamówieniach (kilka sekund dla Markov Chain, 1-2 sekundy dla Naive Bayes). Po wytrenowaniu predykcje były wykonywane bardzo szybko (<10ms). Macierz przejść Markova zawierała 48 stanów (po jednym dla każdej kategorii) z wygładzaniem Laplace'a ($\alpha$ = 1.0) zapobiegającym zerowemu prawdopodobieństwu. Apriori generował reguły asocjacyjne z progami min\_support = 0.01 i min\_confidence = 0.1, co eliminowało powiązania przypadkowe ale wymagało wystarczającej liczby transakcji dla każdego itemsetu.
+\textbf{Wyniki testów:} Modele probabilistyczne wymagały uczenia na zbiorze 200 zamówień (kilka sekund dla procesu Markowa, 1-2 sekundy dla klasyfikatora Bayesa). Po fazie treningu predykcje realizowane były z wysoką szybkością (<10ms). Macierz przejść Markowa obejmowała 48 stanów (odpowiadających kategoriom produktowym) z wygładzaniem Laplace'a ($\alpha$ = 1.0) eliminującym zerowe prawdopodobieństwa. Apriori generował reguły asocjacyjne przy progach min\_support = 0.01 oraz min\_confidence = 0.1, co eliminowało asocjacje losowe, lecz wymagało wystarczającej liczności transakcji dla każdego zbioru produktowego.
 
 \medskip
 \noindent\textbf{Podsumowanie ewaluacji}
 
 \medskip
 
-Porównanie sześciu metod rekomendacyjnych wykazało, że każda z nich adresuje inny aspekt problemu rekomendacji i najlepsze wyniki uzyskuje się stosując je komplementarnie:
+Ewaluacja sześciu algorytmów rekomendacyjnych wykazała, że każdy z nich adresuje odmienny wymiar problematyki rekomendacji, a optymalne rezultaty osiąga się poprzez ich synergiczne zastosowanie:
 
-\textbf{Metody oparte na treści vs metody behawioralne:} Content-Based Filtering (cechy produktów) rozwiązuje problem zimnego startu dla nowych produktów i zapewnia pełne pokrycie katalogu. Collaborative Filtering (historia zakupów społeczności) odkrywa nieoczywiste powiązania międzykategorialne zwiększające sprzedaż krzyżową. CBF jest bezpieczniejszym wyborem dla nowych sklepów, CF dla dojrzałych platform z bogatą historią transakcji.
-
-\medskip
-
-\textbf{Metody personalizowane vs uniwersalne:} Fuzzy Logic (profil cenowy użytkownika) personalizuje rekomendacje według wrażliwości cenowej i oferuje pełną interpretowalność (100\% - aktywacja 6 reguł IF-THEN). Sentiment Analysis (opinie społeczności) tworzy uniwersalny ranking jakości produktów dostępny dla wszystkich użytkowników. Fuzzy jest skuteczniejsza dla użytkowników o wyraźnych preferencjach, Sentiment jako globalny filtr jakości.
+\textbf{Algorytmy atrybutowe vs behawioralne:} Filtracja oparta na treści (analiza cech produktowych) eliminuje problem zimnego startu dla nowych pozycji katalogowych i gwarantuje pełne pokrycie. Filtracja kolaboratywna (wzorce zakupowe populacji) ujawnia nieoczywiste asocjacje międzykategorialne wspierające sprzedaż krzyżową. Metoda oparta na treści stanowi bezpieczniejszy wybór dla młodych platform, podczas gdy podejście kolaboratywne dedykowane jest dojrzałym systemom o bogatej historii transakcyjnej.
 
 \medskip
 
-\textbf{Metody sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje czasowe) przewidują przyszłe zakupy łącząc łańcuch Markowa (predykcja kategorii) i profil behawioralny Naive Bayes (prawdopodobieństwo zakupu), umożliwiając identyfikację użytkowników zagrożonych odejściem. Apriori (współzakupy) odkrywa reguły asocjacyjne produktów komplementarnych efektywne w sprzedaży krzyżowej (ang. \textit{cross-selling}). Modele probabilistyczne lepsze dla regularnych użytkowników (cykle zakupowe), Apriori dla akcesoriów i dodatków.
+\textbf{Algorytmy spersonalizowane vs uniwersalne:} Logika rozmyta (profil wydatkowy użytkownika) dostosowuje sugestie według wrażliwości cenowej, oferując pełną wyjaśnialność (transparentność 100\% - wizualizacja aktywacji 6 reguł IF-THEN). Analiza sentymentu (opinie społeczności) generuje globalny ranking jakościowy dostępny dla całej populacji. Wnioskowanie rozmyte wykazuje wyższą skuteczność dla użytkowników o wyrazistych preferencjach, podczas gdy analiza sentymentu funkcjonuje efektywnie jako uniwersalny filtr jakości.
+
+\medskip
+
+\textbf{Algorytmy sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje temporalne) prognozują przyszłe transakcje poprzez połączenie łańcuchów Markowa (predykcja kategorii) oraz profilu behawioralnego Bayesa (prawdopodobieństwo transakcji), umożliwiając identyfikację użytkowników zagrożonych churnem. Apriori (współwystępowania) identyfikuje reguły asocjacyjne produktów komplementarnych efektywne w sprzedaży krzyżowej (\textit{cross-selling}). Modele probabilistyczne osiągają lepsze wyniki dla użytkowników o regularnej aktywności (cykle zakupowe), Apriori dla rekomendacji akcesoriów oraz rozszerzeń.
 
 Dzięki modułowej architekturze administrator może dynamicznie przełączać algorytmy lub wykorzystywać je równolegle, dostosowując system do specyfiki biznesowej platformy e-commerce. Praktyczne testy wykazały, że system efektywnie obsługuje 500 produktów, 20 użytkowników oraz 200 zamówień, wydajnie generując rekomendacje w czasie rzeczywistym dla wszystkich sześciu algorytmów.
 
