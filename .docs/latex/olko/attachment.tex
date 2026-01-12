@@ -1,4 +1,4 @@
-% filepath: /SmartRecommender-Project-Django-React/.docs/latex/olko/attachment.tex
+% filepath: /SmartRecommender-Project-Django-React/.docs/latex/smola/attachment.tex
 
 \newpage
 \section*{Załącznik A}
@@ -345,3 +345,404 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 
 \noindent
 \textbf{Warunki końcowe:} Użytkownik widzi spersonalizowane rekomendacje oparte na swojej historii zakupów
+
+\subsection*{Scenariusz 14: Przeglądanie podobnych produktów (Content-Based Filtering)}
+
+\noindent
+\textbf{Aktor:} Klient lub Gość
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik przegląda szczegółową stronę produktu (np. laptop Dell XPS 15)
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik otwiera stronę szczegółową produktu
+\item System automatycznie wywołuje endpoint \texttt{GET /api/recommendations/content-based/?product\_id=\{id\}}
+\item Backend wywołuje metodę \texttt{ContentBasedAPI} z parametrem \texttt{product\_id}
+\item System wykonuje zapytanie do tabeli \texttt{ProductSimilarity} filtrując po \texttt{product1\_id = \{id\}} oraz \texttt{type='content\_based'}
+\item System sortuje wyniki malejąco według \texttt{similarity\_score}
+\item System pobiera Top 10 najbardziej podobnych produktów z bazy danych
+\item Backend zwraca JSON z listą produktów zawierającą: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{similarity\_score}
+\item Frontend wyświetla sekcję „Podobne produkty" z kafelkami produktów
+\item Każdy kafelek zawiera zdjęcie, nazwę, cenę oraz wskaźnik podobieństwa (np. „85\% podobny")
+\item Użytkownik przegląda rekomendacje
+\item Użytkownik klika na wybrany podobny produkt
+\item System przekierowuje do strony szczegółowej wybranego produktu
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi produkty podobne do oglądanego, obliczone na podstawie cech (kategorie 40\%, tagi 30\%, cena 20\%, słowa kluczowe 10\%)
+
+\subsection*{Scenariusz 15: Generowanie macierzy podobieństw Content-Based Filtering}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, katalog zawiera produkty
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję „Admin Tools"
+\item Administrator wybiera zakładkę „Content-Based Filtering"
+\item System wyświetla panel zarządzania CBF z przyciskiem „Generate Similarity Matrix"
+\item Administrator klika „Generate Similarity Matrix"
+\item System wywołuje endpoint \texttt{POST /api/admin/content-based/generate}
+\item Backend uruchamia algorytm \texttt{ContentBasedRecommendationEngine.generate\_similarities()}
+\item System pobiera wszystkie produkty z bazy danych
+\item Dla każdego produktu system ekstraktuje cechy:
+  \begin{itemize}
+  \item Kategorie (waga 40\%) - konwersja do wektora one-hot
+  \item Tagi (waga 30\%) - ekstrakcja unikalnych tagów
+  \item Przedział cenowy (waga 20\%) - normalizacja do zakresu [0,1]
+  \item Słowa kluczowe z opisu (waga 10\%) - tokenizacja i TF-IDF
+  \end{itemize}
+\item System oblicza podobieństwo cosinusowe między każdą parą produktów zgodnie ze wzorem Weighted Cosine Similarity
+\item System filtruje pary z podobieństwem $>$ 20\% (próg minimalny)
+\item System usuwa stare rekordy z tabeli \texttt{ProductSimilarity} dla \texttt{type='content\_based'}
+\item System zapisuje nowe podobieństwa do tabeli \texttt{ProductSimilarity}
+\item System wyświetla komunikat o sukcesie: „Wygenerowano 1247 podobieństw dla 500 produktów w czasie 58 sekund"
+\item Administrator widzi zaktualizowane statystyki: liczba par produktów, średnie podobieństwo, timestamp ostatniego przeliczenia
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Macierz podobieństw została wygenerowana i zapisana w bazie danych, rekomendacje CBF są aktualne
+
+\subsection*{Scenariusz 16: Debugowanie algorytmu Content-Based Filtering}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, macierz podobieństw została wygenerowana
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję „Debug"
+\item Administrator wybiera zakładkę „Content-Based Debug"
+\item System wyświetla panel debugowania CBF zawierający:
+  \begin{itemize}
+  \item Wzór matematyczny Weighted Cosine Similarity z opisem wag cech
+  \item Statystyki globalne: liczba produktów w katalogu, liczba wygenerowanych par, średnie podobieństwo, czas ostatniego przeliczenia
+  \item Histogram rozkładu podobieństw (przedziały: 20-40\%, 40-60\%, 60-80\%, 80-100\%)
+  \end{itemize}
+\item Administrator wprowadza ID produktu w pole „Product ID for analysis"
+\item Administrator klika „Analyze Product"
+\item System wywołuje endpoint \texttt{GET /api/admin/content-based/debug/?product\_id=\{id\}}
+\item System pobiera wybrany produkt oraz jego Top 10 najbardziej podobnych produktów
+\item System wyświetla szczegółową analizę dla wybranego produktu:
+  \begin{itemize}
+  \item Podstawowe dane: nazwa, kategorie, tagi, cena
+  \item Ekstrahowane cechy: wektor kategorii, lista tagów, znormalizowana cena, słowa kluczowe
+  \item Tabelę Top 10 podobnych produktów z kolumnami: ID, nazwa, similarity\_score, wspólne kategorie, wspólne tagi
+  \end{itemize}
+\item Administrator analizuje wyniki i weryfikuje poprawność podobieństw
+\item Administrator może wyeksportować dane do CSV klikając „Export to CSV"
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Administrator zweryfikował poprawność działania algorytmu CBF dla wybranego produktu
+
+\subsection*{Scenariusz 17: Przeglądanie rekomendacji Fuzzy Logic w panelu klienta}
+
+\noindent
+\textbf{Aktor:} Klient (użytkownik zalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik jest zalogowany, posiada historię zakupów
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik loguje się do systemu
+\item Użytkownik otwiera panel klienta
+\item Użytkownik klika zakładkę „Fuzzy Logic Recommendations"
+\item System wywołuje endpoint \texttt{GET /api/fuzzy-logic-recommendations/?limit=10}
+\item Backend wywołuje \texttt{FuzzyLogicAPI} z parametrem \texttt{user\_id} (z tokenu JWT)
+\item System inicjalizuje silnik rozmyty \texttt{FuzzyEngine.initialize\_fuzzy\_system(user\_id)}
+\item System buduje profil użytkownika \texttt{FuzzyUserProfile}:
+  \begin{itemize}
+  \item Oblicza parametr \texttt{price\_sensitivity} na podstawie średniej ceny zakupionych produktów
+  \item Ekstraktuje preferowane kategorie z historii zakupów (top 3 kategorie)
+  \end{itemize}
+\item System pobiera wszystkie produkty z bazy danych z metrykami: cena, średni rating, liczba zamówień
+\item Dla każdego produktu system wykonuje wnioskowanie rozmyte:
+  \begin{itemize}
+  \item Fuzzyfikacja - oblicza przynależność ceny, jakości i popularności do zbiorów rozmytych (cheap/medium/expensive, low/medium/high)
+  \item Aplikacja 6 reguł IF-THEN typu Mamdani (R1: preferred category match, R2: quality-price balance, R3: price sensitive match, R4: premium match, R5: popular high quality, R6: budget friendly)
+  \item Agregacja wyników reguł z wagami (R1: 0.9, R2: 0.85, R3: 0.6, R4: 0.75, R5: 0.8, R6: 0.7)
+  \item Defuzzyfikacja - oblicza końcowy \texttt{fuzzy\_score} metodą średniej ważonej
+  \end{itemize}
+\item System sortuje produkty malejąco według \texttt{fuzzy\_score}
+\item System zwraca JSON z Top 10 rekomendacji zawierający: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{fuzzy\_score}, \texttt{activated\_rules}
+\item Frontend wyświetla trzy zakładki:
+  \begin{itemize}
+  \item „Fuzzy Recommendations" - lista Top 10 produktów z fuzzy\_score i aktywowanymi regułami
+  \item „User Profile" - wyświetla \texttt{price\_sensitivity} (np. 60\% - moderate) oraz preferowane kategorie
+  \item „Fuzzy Rules" - opis 6 reguł IF-THEN z wyjaśnieniem logiki
+  \end{itemize}
+\item Użytkownik przegląda rekomendacje dopasowane do jego profilu cenowego
+\item Użytkownik klika przycisk „View Rule Activations" przy wybranym produkcie
+\item System wyświetla szczegóły aktywacji reguł: które reguły zostały aktywowane, z jaką siłą ($\alpha_i$), jaki był ich wkład w końcowy wynik
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi spersonalizowane rekomendacje dopasowane do jego wrażliwości cenowej oraz preferowanych kategorii z pełną przejrzystością procesu decyzyjnego
+
+\subsection*{Scenariusz 18: Wyszukiwanie tolerujące błędy (Fuzzy Search)}
+
+\noindent
+\textbf{Aktor:} Klient lub Gość
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik znajduje się na stronie głównej
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik otwiera pasek wyszukiwania
+\item Użytkownik przełącza opcję wyszukiwania na „Fuzzy Search"
+\item System wyświetla suwak „Fuzzy Threshold" (domyślnie 0.5 = 50\%)
+\item Użytkownik wpisuje frazę z literówką: „loptap" (zamiast „laptop")
+\item Użytkownik ustawia próg podobieństwa na 0.3 (30\%)
+\item Użytkownik klika przycisk „Search"
+\item System wywołuje endpoint \texttt{GET /api/search/fuzzy/?query=loptap\&threshold=0.3}
+\item Backend iteruje po wszystkich produktach w katalogu
+\item Dla każdego produktu system oblicza odległość Levenshteina między zapytaniem a nazwą produktu:
+  \begin{itemize}
+  \item Algorytm rekurencyjny oblicza minimalną liczbę operacji edycji (wstawienie, usunięcie, zamiana znaku)
+  \item System normalizuje odległość do zakresu [0,1] dzieląc przez maksymalną długość
+  \item Oblicza \texttt{fuzzy\_match\_score} = 1 - normalized\_distance
+  \end{itemize}
+\item System filtruje produkty z \texttt{fuzzy\_match\_score} $\geq$ 0.3 (próg użytkownika)
+\item System sortuje wyniki malejąco według \texttt{fuzzy\_match\_score}
+\item Backend zwraca JSON z produktami: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{fuzzy\_match\_score}
+\item Frontend wyświetla wyniki wyszukiwania:
+  \begin{itemize}
+  \item Laptop Dell XPS 15 - 86\% match (zawiera „Laptop")
+  \item Laptop HP Pavilion - 86\% match (zawiera „Laptop")
+  \item Desktop Hub USB-C - 45\% match (częściowe dopasowanie)
+  \end{itemize}
+\item Użytkownik widzi produkty mimo błędu w zapytaniu
+\item Użytkownik klika na wybrany produkt
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik znalazł poszukiwane produkty mimo literówki dzięki algorytmowi Levenshteina
+
+\subsection*{Scenariusz 19: Debugowanie algorytmu Fuzzy Logic}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, system posiada użytkowników z historią zakupów
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję „Debug"
+\item Administrator wybiera zakładkę „Fuzzy Logic Debug"
+\item System wyświetla widok ogólny panelu debugowania zawierający:
+  \begin{itemize}
+  \item Szczegóły algorytmu: metoda Mamdani Fuzzy Inference, liczba reguł (6), T-norma (min), T-conorma (max)
+  \item Definicje funkcji przynależności dla price (cheap: 0-500 PLN, medium: 300-1500 PLN, expensive: 1000+ PLN)
+  \item Definicje funkcji przynależności dla quality (low: 0-2.5, medium: 2.0-4.0, high: 3.5-5.0)
+  \item Definicje funkcji przynależności dla popularity (low: 0-10 zamówień, medium: 5-50, high: 30+ zamówień)
+  \item Listę profili użytkowników z parametrem price\_sensitivity
+  \end{itemize}
+\item Administrator wprowadza ID produktu w pole „Product ID for detailed analysis"
+\item Administrator klika „Analyze Product"
+\item System wywołuje endpoint \texttt{GET /api/admin/fuzzy-debug/?product\_id=\{id\}}
+\item System pobiera wybrany produkt oraz wykonuje szczegółową ewaluację rozmytą
+\item System wyświetla widok szczegółowy dla produktu:
+  \begin{itemize}
+  \item Dane produktu: nazwa, cena, średni rating, liczba zamówień
+  \item Wartości fuzzyfikacji:
+    \begin{itemize}
+    \item Price: cheap=0.3, medium=0.7, expensive=0.0
+    \item Quality: low=0.0, medium=0.2, high=0.8
+    \item Popularity: low=0.0, medium=0.6, high=0.4
+    \end{itemize}
+  \item Aktywacja wszystkich 6 reguł z siłą aktywacji $\alpha_i$:
+    \begin{itemize}
+    \item R1 (Preferred Category Match): $\alpha_1$ = 0.85, waga = 0.9, wkład = 0.765
+    \item R2 (Quality-Price Balance): $\alpha_2$ = 0.7, waga = 0.85, wkład = 0.595
+    \item R3 (Price Sensitive Match): $\alpha_3$ = 0.3, waga = 0.6, wkład = 0.18
+    \item R4 (Premium Match): $\alpha_4$ = 0.0, waga = 0.75, wkład = 0.0
+    \item R5 (Popular High Quality): $\alpha_5$ = 0.6, waga = 0.8, wkład = 0.48
+    \item R6 (Budget Friendly): $\alpha_6$ = 0.2, waga = 0.7, wkład = 0.14
+    \end{itemize}
+  \item Agregacja: suma wkładów = 2.16, fuzzy\_score = 2.16 / 4.6 = 0.47 (47\%)
+  \end{itemize}
+\item Administrator analizuje które reguły dominują dla danego produktu
+\item Administrator może dostroić wagi reguł klikając „Edit Rule Weights"
+\item System zapisuje nowe wagi w konfiguracji
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Administrator zweryfikował proces wnioskowania rozmytego i zoptymalizował wagi reguł
+
+\subsection*{Scenariusz 20: Przeglądanie rekomendacji probabilistycznych w panelu klienta}
+
+\noindent
+\textbf{Aktor:} Klient (użytkownik zalogowany)
+
+\noindent
+\textbf{Warunki początkowe:} Użytkownik jest zalogowany, posiada historię zakupów, modele probabilistyczne zostały wytrenowane
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Użytkownik loguje się do systemu
+\item Użytkownik otwiera panel klienta
+\item Użytkownik klika zakładkę „Probabilistic Recommendations"
+\item System wywołuje endpoint \texttt{GET /api/probabilistic-recommendations/?user\_id=\{id\}}
+\item Backend wywołuje \texttt{ProbabilisticAPI} z parametrem \texttt{user\_id}
+\item System pobiera historię zamówień użytkownika z bazy danych wywołując \texttt{get\_user\_orders(user\_id)}
+\item System ekstraktuje sekwencję kategorii produktów z zamówień uporządkowanych chronologicznie
+\item System wywołuje \texttt{MarkovChain.predict\_next\_products(order\_sequence)}:
+  \begin{itemize}
+  \item Identyfikuje ostatnią zakupioną kategorię (np. „Laptopy")
+  \item Odczytuje macierz przejść dla kategorii „Laptopy"
+  \item Pobiera Top 3 kategorie z najwyższym prawdopodobieństwem przejścia (np. Akcesoria komputerowe: 0.45, Peryferia: 0.30, Torby: 0.15)
+  \item Dla każdej kategorii pobiera Top produkty
+  \end{itemize}
+\item System wywołuje \texttt{NaiveBayes.predict\_purchase\_probability(user\_profile)}:
+  \begin{itemize}
+  \item Ekstraktuje 5 cech użytkownika: liczba zamówień, średnia wartość, dni od ostatniego zakupu, ulubiona kategoria, częstotliwość
+  \item Stosuje twierdzenie Bayesa dla klasyfikacji binarnej (kupi/nie kupi)
+  \item Oblicza prawdopodobieństwo zakupu w najbliższym okresie
+  \end{itemize}
+\item System agreguje wyniki: 60\% waga dla Markov, 40\% waga dla Naive Bayes
+\item Backend zwraca JSON z Top 10 rekomendacji zawierający: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{markov\_probability}, \texttt{bayes\_probability}, \texttt{combined\_score}
+\item Frontend wyświetla trzy zakładki:
+  \begin{itemize}
+  \item „Probabilistic Recommendations" - lista Top 10 produktów z prawdopodobieństwami
+  \item „Markov Chain Visualization" - graf przejść między kategoriami z prawdopodobieństwami
+  \item „Purchase Probability Analysis" - wykres prawdopodobieństwa zakupu oraz analiza cech użytkownika
+  \end{itemize}
+\item Użytkownik przegląda rekomendacje oparte na sekwencjach zakupowych
+\item Użytkownik klika zakładkę „Markov Chain Visualization"
+\item System wyświetla interaktywny graf pokazujący możliwe przejścia z obecnej kategorii do kolejnych
+\item Użytkownik klika zakładkę „Purchase Probability Analysis"
+\item System wyświetla:
+  \begin{itemize}
+  \item Prawdopodobieństwo zakupu: 73\% (high probability)
+  \item Breakdown cech: liczba zamówień: 12 (pozytywny wpływ +0.15), średnia wartość: 450 PLN (pozytywny +0.10), dni od ostatniego: 15 (pozytywny +0.20)
+  \item Rekomendacja: „Użytkownik jest aktywny, wysokie prawdopodobieństwo konwersji"
+  \end{itemize}
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Użytkownik widzi rekomendacje przewidujące jego przyszłe zakupy oparte na łańcuchach Markowa i klasyfikatorze Bayesa
+
+\subsection*{Scenariusz 21: Trenowanie modeli probabilistycznych przez administratora}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, system posiada historię zamówień
+
+\noindent
+\textbf{Przebieg scenariusza głównego:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję „Admin Tools"
+\item Administrator wybiera zakładkę „Probabilistic Models"
+\item System wyświetla panel zarządzania modelami probabilistycznymi
+\item Administrator widzi status modeli:
+  \begin{itemize}
+  \item Markov Chain: ostatni trening 2024-01-15, liczba stanów: 48 kategorii, wygładzanie Laplace'a: $\alpha$ = 1.0
+  \item Naive Bayes: ostatni trening 2024-01-15, liczba próbek treningowych: 200 zamówień, accuracy: 78\%
+  \end{itemize}
+\item Administrator klika przycisk „Train Markov Chain Model"
+\item System wywołuje endpoint \texttt{POST /api/admin/probabilistic/train-markov}
+\item Backend uruchamia \texttt{MarkovChainEngine.train()}:
+  \begin{itemize}
+  \item Pobiera wszystkie zamówienia z bazy danych uporządkowane chronologicznie per użytkownik
+  \item Ekstraktuje sekwencje kategorii dla każdego użytkownika
+  \item Buduje macierz przejść 48x48 (48 kategorii produktowych)
+  \item Oblicza prawdopodobieństwa przejść: $P(s_j | s_i) = \frac{count(s_i \rightarrow s_j) + \alpha}{\sum_k count(s_i \rightarrow s_k) + \alpha \cdot N}$
+  \item Stosuje wygładzanie Laplace'a ($\alpha$ = 1.0) zapobiegające zerowemu prawdopodobieństwu
+  \item Zapisuje macierz w cache Django z timeout 24h
+  \end{itemize}
+\item System wyświetla komunikat: „Markov Chain trained successfully. 48 states, 2304 transitions, training time: 3.2s"
+\item Administrator klika przycisk „Train Naive Bayes Model"
+\item System wywołuje endpoint \texttt{POST /api/admin/probabilistic/train-bayes}
+\item Backend uruchamia \texttt{NaiveBayesEngine.train()}:
+  \begin{itemize}
+  \item Pobiera wszystkich użytkowników z zamówieniami
+  \item Dla każdego użytkownika ekstraktuje 5 cech: liczba zamówień, średnia wartość, dni od ostatniego, ulubiona kategoria, częstotliwość
+  \item Tworzy etykiety binarne (aktywny/nieaktywny) na podstawie heurystyki (zakup w ostatnich 30 dniach)
+  \item Oblicza prawdopodobieństwa warunkowe dla każdej cechy: $P(feature | class)$
+  \item Oblicza prawdopodobieństwa a priori: $P(active)$, $P(inactive)$
+  \item Waliduje model na zbiorze testowym (80\%/20\% split)
+  \item Zapisuje model w tabeli cache
+  \end{itemize}
+\item System wyświetla komunikat: „Naive Bayes trained successfully. Training samples: 200, Test accuracy: 78\%, training time: 1.8s"
+\item Administrator widzi zaktualizowane timestampy i metryki
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Modele probabilistyczne (Markov Chain i Naive Bayes) zostały wytrenowane na aktualnych danych, rekomendacje są aktualne
+
+\subsection*{Scenariusz 22: Debugowanie modeli probabilistycznych}
+
+\noindent
+\textbf{Aktor:} Administrator
+
+\noindent
+\textbf{Warunki początkowe:} Administrator jest zalogowany, modele zostały wytrenowane
+
+\noindent
+\textbf{Przebieg scenariusza głównego - Markov Chain:}
+\begin{enumerate}
+\item Administrator otwiera panel administracyjny
+\item Administrator klika sekcję „Debug"
+\item Administrator wybiera zakładkę „Markov Chain Debug"
+\item System wyświetla panel debugowania zawierający:
+  \begin{itemize}
+  \item Wzór matematyczny macierzy przejść z wygładzaniem Laplace'a
+  \item Statystyki: liczba stanów (48 kategorii), łączna liczba przejść, wygładzanie $\alpha$ = 1.0, timestamp ostatniego treningu
+  \item Wizualizację macierzy przejść jako heatmap 48x48
+  \end{itemize}
+\item Administrator wybiera kategorię źródłową z listy rozwijanej (np. „Laptopy")
+\item System wyświetla Top 10 kategorii docelowych z najwyższymi prawdopodobieństwami przejścia:
+  \begin{itemize}
+  \item Akcesoria komputerowe: 0.45 (45\%)
+  \item Peryferia: 0.30 (30\%)
+  \item Torby i plecaki: 0.15 (15\%)
+  \item Oprogramowanie: 0.05 (5\%)
+  \item Inne kategorie: <0.05 (łącznie 5\%)
+  \end{itemize}
+\item Administrator klika „Show Transition Examples"
+\item System pobiera przykładowe rzeczywiste sekwencje zamówień użytkowników, które wygenerowały te przejścia
+\item Administrator weryfikuje sensowność przejść
+\item Administrator przełącza zakładkę na „Naive Bayes Debug"
+\item System wyświetla panel Naive Bayes zawierający:
+  \begin{itemize}
+  \item Wzór twierdzenia Bayesa
+  \item Statystyki: liczba próbek treningowych, accuracy, precision, recall, F1-score
+  \item Tabelę prawdopodobieństw warunkowych $P(feature | class)$ dla każdej z 5 cech
+  \item Prawdopodobieństwa a priori: $P(active)$ = 0.65, $P(inactive)$ = 0.35
+  \end{itemize}
+\item Administrator wprowadza ID użytkownika w pole „User ID for prediction"
+\item System pobiera profil użytkownika i wykonuje predykcję krok po kroku:
+  \begin{itemize}
+  \item Ekstraktuje cechy użytkownika
+  \item Pokazuje obliczenia $P(active | features)$ z rozpisaniem każdego czynnika
+  \item Wyświetla końcowe prawdopodobieństwo oraz klasyfikację (active/inactive)
+  \end{itemize}
+\item Administrator weryfikuje poprawność predykcji
+\end{enumerate}
+
+\noindent
+\textbf{Warunki końcowe:} Administrator zweryfikował poprawność działania modeli probabilistycznych (Markov Chain i Naive Bayes)
