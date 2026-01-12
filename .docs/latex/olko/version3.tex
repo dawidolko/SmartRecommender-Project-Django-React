@@ -557,7 +557,6 @@ Diagram \ref{fig:erd2} pokazuje tabele algorytmów ML:
 \item \textbf{method\_user\_product\_recommendation} - cache rekomendacji użytkownika.
 \end{itemize}
 
-\newpage
 \noindent
 \textbf{Charakterystyka tabel bazy danych}
 
@@ -997,7 +996,7 @@ Diagram \ref{fig:cf_sequence} przedstawia przepływ procesu generowania rekomend
 \subsection*{5.3 Analiza Sentymentu - wieloźródłowa agregacja}
 \addcontentsline{toc}{subsection}{5.2 Analiza Sentymentu - wieloźródłowa agregacja}
 
-Analiza sentymentu pojedynczego tekstu metodą słownikową (Liu 2012) \cite{liu2012} wykorzystuje formułę polarności przedstawioną we wzorze (2) w sekcji 5.1. Proces analizy polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów występujących w słownikach pozytywnym i negatywnym. Słowniki oparte na leksykonach akademickich AFINN-165 (Nielsen 2011) i Opinion Lexicon (Hu \& Liu 2004) zawierają łącznie ~400 słów (~200 słów pozytywnych, ~200 słów negatywnych) obejmujących najczęściej używane określenia jakościowe, emocjonalne i ocenne (np. pozytywne: ,,excellent'', ,,recommend'', ,,quality'', ,,reliable''; negatywne: ,,bad'', ,,poor'', ,,disappointing'', ,,defective''). Wynik wzoru (2) jest ograniczany do przedziału [-1, 1] i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (pozostałe).
+Analiza sentymentu pojedynczego tekstu metodą słownikową \cite{liu2012} wykorzystuje formułę polarności przedstawioną we wzorze (2) w sekcji 5.1. Proces analizy polega na normalizacji tekstu (konwersja na małe litery, usunięcie znaków specjalnych), tokenizacji oraz zliczaniu słów występujących w słownikach pozytywnym i negatywnym. Słowniki oparte na leksykonach akademickich AFINN-165 (Nielsen 2011) i Opinion Lexicon (Hu \& Liu 2004) zawierają łącznie ~400 słów (~200 słów pozytywnych, ~200 słów negatywnych) obejmujących najczęściej używane określenia jakościowe, emocjonalne i ocenne (np. pozytywne: ,,excellent'', ,,recommend'', ,,quality'', ,,reliable''; negatywne: ,,bad'', ,,poor'', ,,disappointing'', ,,defective''). Wynik wzoru (2) jest ograniczany do przedziału [-1, 1] i kategoryzowany: pozytywny (>0.1), negatywny (<-0.1), neutralny (pozostałe).
 
 Wieloźródłowa agregacja sentymentu produktu stanowi kluczową innowację systemu, łącząc wyniki z 5 niezależnych źródeł tekstowych, gdzie każde $S_i$ jest obliczane według wzoru (2). Wagi zostały dobrane empirycznie: opinie klientów 40\% (najbardziej wiarygodne źródło), opis produktu 25\% (profesjonalny opis zawierający kluczowe cechy), nazwa produktu 15\% (często zawiera wskazówki jakościowe jak ,,Premium'', ,,Pro''), specyfikacje techniczne 12\% (obiektywne parametry), kategorie produktu 8\% (ogólny kontekst). Podejście to rozwiązuje fundamentalny problem zimnego startu - produkty bez opinii klientów nadal otrzymują wynik sentymentu na podstawie pozostałych czterech źródeł tekstowych.
 
@@ -1418,23 +1417,17 @@ System używa operacji zbiorczych (bulk operations) dla zapisu wielu rekordów j
 \addcontentsline{toc}{section}{Rozdział 7: Porównanie i ewaluacja metod rekomendacyjnych}
 \section*{Porównanie i ewaluacja metod rekomendacyjnych}
 
-Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zaimplementowanych w aplikacji we współpracy dwuosobowej. Analiza opiera się na wynikach testów przeprowadzonych na rzeczywistych danych: 500 produktów, 20 użytkowników (5 administratorów i 15 klientów) oraz historię transakcji zgromadzoną w bazie PostgreSQL. Ewaluacja koncentruje się na trzech parach metod o komplementarnym charakterze: Collaborative Filtering vs Content-Based Filtering (podejście behawioralne vs atrybutowe), Sentiment Analysis vs Fuzzy Logic (uniwersalne vs spersonalizowane), oraz Apriori vs Markov Chain (współzakupy vs sekwencje czasowe).
-
-\subsection*{Metodyka badania i środowisko testowe}
-
-Testy przeprowadzono w środowisku Docker Compose z trzema kontenerami: frontend (React 18), backend (Django 5.1), oraz baza danych (PostgreSQL 15). Dane testowe zostały wygenerowane komendą \texttt{python manage.py seed}, która wypełniła system produktami z kategorii elektroniki komputerowej (laptopy, peryferia, komponenty, akcesoria) oraz utworzyła 20 kont użytkowników (5 administratorów i 15 klientów) z symulowaną historią zakupów. Każda metoda była testowana w rzeczywistym środowisku aplikacji z włączonym mechanizmem cache Django zgodnie z konfiguracją produkcyjną.
-
-Metryki ewaluacji obejmowały: (1) \textbf{Pokrycie katalogu} - procent produktów, dla których metoda generuje rekomendacje, (2) \textbf{Czas wykonania} - średni czas generowania rekomendacji obserwowany w panelach admina i klienta podczas testów manualnych, (3) \textbf{Trafność} - jakościowa ocena poprawności rekomendacji na podstawie powiązań między produktami (komplementarność, podobieństwo kategorii, wzorce zakupowe).
+Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zaimplementowanych w aplikacji we współpracy dwuosobowej. Ewaluacja koncentruje się na trzech parach metod o komplementarnym charakterze: Collaborative Filtering vs Content-Based Filtering (podejście behawioralne vs atrybutowe), Sentiment Analysis vs Fuzzy Logic (uniwersalne vs spersonalizowane), oraz Apriori vs Markov Chain (współzakupy vs sekwencje czasowe).
 
 \subsection*{Krótka charakterystyka metod współautora projektu}
 
 \textbf{Content-Based Filtering (CBF)} analizuje cechy produktów i znajduje podobieństwa między nimi. System sprawdza kategorie produktu, jego tagi, przedział cenowy oraz słowa kluczowe z opisu. Każda z tych cech ma przypisaną wagę - kategorie są najważniejsze (40\%), następnie tagi (30\%), cena (20\%) i słowa kluczowe (10\%). Dzięki temu laptop jest podobny do innego laptopa przez wspólne cechy, nie przez to że użytkownicy kupowali je razem. Wyniki podobieństw są zapisywane w modelu \texttt{ProductSimilarity} z oznaczeniem typu \texttt{content\_based}. Zaletą tej metody jest natychmiastowe działanie dla nowych produktów - wystarczą same cechy z formularza dodawania produktu. Algorytm ekstraktuje słowa kluczowe z opisów, co pozwala uwzględnić nawet szczegółowe specyfikacje techniczne. W praktyce metoda najlepiej sprawdza się w katalogach z dobrze opisanymi produktami o jasno zdefiniowanych cechach.
 
-\textbf{Fuzzy Logic} personalizuje rekomendacje według profilu cenowego użytkownika. System używa sześciu reguł typu ,,jeśli-to'' (IF-THEN), które oceniają produkty na podstawie trzech kryteriów: cena (tania/średnia/droga), jakość z ocen użytkowników (niska/średnia/wysoka) oraz popularność mierzona liczbą zamówień. Dla każdego użytkownika budowany jest profil na podstawie jego historii zakupów - system oblicza parametr wrażliwości cenowej, który określa czy użytkownik preferuje tanie produkty czy drogie premium. Ten sam produkt może być polecony użytkownikowi premium jako ,,wysoka jakość, warta swojej ceny'' i odrzucony dla użytkownika budżetowego jako ,,zbyt drogi''. Metoda jest dostępna w dedykowanej sekcji panelu klienta. Wnioskowanie rozmyte używa funkcji przynależności trójkątnych, które modelują płynne przejścia między kategoriami cenowymi zamiast ostrych granic. Dzięki temu system unika sytuacji gdzie produkt za 499 PLN jest ,,tani'' a za 501 PLN nagle staje się ,,drogi''.
-
-\textbf{Modele Probabilistyczne} przewidują przyszłe zakupy łącząc dwa algorytmy. Pierwszy analizuje sekwencje zakupów w czasie i przewiduje którą kategorię użytkownik prawdopodobnie kupi następną (np. ,,po laptopie zwykle następują akcesoria komputerowe''). Drugi algorytm ocenia prawdopodobieństwo zakupu na podstawie pięciu cech użytkownika: łączna liczba zamówień, średnia wartość zamówienia, dni od ostatniego zakupu, ulubiona kategoria oraz częstotliwość zakupów. Oba modele działają razem, co pozwala identyfikować użytkowników zagrożonych odejściem oraz planować kampanie retention. Wyniki są widoczne w sekcji analiz probabilistycznych panelu klienta z wizualizacją łańcucha przejść między kategoriami. Model sekwencji wykorzystuje macierz przejść trenowaną na rzeczywistych sekwencjach zamówień, co pozwala modelować zachowania specyficzne dla danego sklepu.
+\textbf{Fuzzy Logic} personalizuje rekomendacje według profilu cenowego użytkownika. System używa sześciu reguł typu ,,jeśli-to'' (IF-THEN), które oceniają produkty na podstawie trzech kryteriów: cena (tania/średnia/droga), jakość z ocen użytkowników (niska/średnia/wysoka) oraz popularność mierzona liczbą zamówień. Dla każdego użytkownika budowany jest profil na podstawie jego historii zakupów -- system oblicza parametr wrażliwości cenowej, który określa czy użytkownik preferuje tanie produkty czy drogie premium. Ten sam produkt może być polecony użytkownikowi premium jako ,,wysoka jakość, warta swojej ceny'' i odrzucony dla użytkownika budżetowego jako ,,zbyt drogi''. Metoda jest dostępna w dedykowanej sekcji panelu klienta. Wnioskowanie rozmyte używa funkcji przynależności trójkątnych, które modelują płynne przejścia między kategoriami cenowymi zamiast ostrych granic. Dzięki temu system unika sytuacji gdzie produkt za 499~PLN jest ,,tani'' a za 501~PLN nagle staje się ,,drogi''.
 
 \newpage
+\textbf{Modele Probabilistyczne} przewidują przyszłe zakupy łącząc dwa algorytmy. Pierwszy analizuje sekwencje zakupów w czasie i przewiduje którą kategorię użytkownik prawdopodobnie kupi następną (np. ,,po laptopie zwykle następują akcesoria komputerowe''). Drugi algorytm ocenia prawdopodobieństwo zakupu na podstawie pięciu cech użytkownika: łączna liczba zamówień, średnia wartość zamówienia, dni od ostatniego zakupu, ulubiona kategoria oraz częstotliwość zakupów. Oba modele działają razem, co pozwala identyfikować użytkowników zagrożonych odejściem oraz planować kampanie retention. Wyniki są widoczne w sekcji analiz probabilistycznych panelu klienta z~wizualizacją łańcucha przejść między kategoriami. Model sekwencji wykorzystuje macierz przejść trenowaną na rzeczywistych sekwencjach zamówień, co pozwala modelować zachowania specyficzne dla danego sklepu.
+
 \subsection*{Porównanie par metod}
 
 \subsubsection*{Collaborative Filtering vs Content-Based Filtering}
@@ -1466,9 +1459,10 @@ Złożoność & Wyższa - macierz wszystkich produktów & Niższa - wektory powi
 \end{tabular}
 \end{table}
 
-\textbf{Różnice w działaniu:} CF wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty fotograficzne często kupują też plecaki turystyczne, CF połączy te produkty mimo różnych kategorii. CBF natomiast zaleci laptopy podobne do laptopów - produkty z tej samej kategorii, w podobnym przedziale cenowym, o podobnych tagach. CF wymaga dużo danych historycznych aby działać dobrze, podczas gdy CBF działa od razu bo każdy produkt ma cechy.
+\newpage
+\textbf{Różnice w działaniu:} CF wykrywa powiązania które nie są oczywiste na podstawie samych cech produktów. Jeśli użytkownicy kupujący aparaty fotograficzne często kupują też plecaki turystyczne, CF połączy te produkty mimo różnych kategorii. CBF natomiast zaleci laptopy podobne do laptopów -- produkty z tej samej kategorii, w podobnym przedziale cenowym, o podobnych tagach. CF wymaga dużo danych historycznych aby działać dobrze, podczas gdy CBF działa od razu bo każdy produkt ma cechy.
 
-\textbf{Zastosowanie praktyczne:} W projekcie obie metody działają równolegle. CF jest używany dla zalogowanych użytkowników z historią zakupów - wyświetla sekcję ,,Produkty podobne'' na stronie produktu. CBF jest używany dla nowych produktów bez historii oraz dla gości bez konta - gwarantuje że każdy produkt może być rekomendowany. Dla sklepów z małą liczbą transakcji CBF jest bezpieczniejszym wyborem. Dla dojrzałych sklepów z bogatą historią CF odkrywa ciekawsze powiązania które zwiększają cross-selling.
+\textbf{Zastosowanie praktyczne:} W projekcie obie metody działają równolegle. CF jest używany dla zalogowanych użytkowników z historią zakupów -- wyświetla sekcję ,,Produkty podobne'' na stronie produktu. CBF jest używany dla nowych produktów bez historii oraz dla gości bez konta -- gwarantuje że każdy produkt może być rekomendowany. Dla sklepów z małą liczbą transakcji CBF jest bezpieczniejszym wyborem. Dla dojrzałych sklepów z bogatą historią CF odkrywa ciekawsze powiązania które zwiększają cross-selling.
 
 \subsubsection*{Sentiment Analysis vs Fuzzy Logic}
 
@@ -1501,7 +1495,7 @@ Użycie & Wyszukiwarka (sortowanie) & Panel klienta (sekcja Fuzzy) \\
 
 \textbf{Różnice w działaniu:} Sentiment ocenia czy produkt jest obiektywnie dobry czy zły analizując tekst opinii, opisów i specyfikacji. Laptop z wieloma pozytywnymi opiniami dostanie wysoki score niezależnie od tego kto go przegląda. Fuzzy Logic natomiast ocenia czy produkt pasuje do konkretnego użytkownika - ten sam laptop może być ,,zbyt drogi'' dla użytkownika budżetowego i ,,świetna wartość'' dla użytkownika premium. Sentiment jest szybszy bo wynik jest obliczany raz i zapisywany w bazie, Fuzzy musi przeliczać 6 reguł dla każdego użytkownika osobno.
 
-\textbf{Zastosowanie praktyczne:} Metody działają komplementarnie. Sentiment jest używany w wyszukiwarce do sortowania produktów według jakości - pokazuje obiektywnie najlepsze produkty na górze listy. Fuzzy Logic jest w panelu klienta jako osobna sekcja rekomendacji - filtruje produkty według profilu cenowego użytkownika. Użytkownik który zawsze kupuje produkty poniżej 300 PLN nie zobaczy laptopów za 5000 PLN nawet jeśli mają doskonałe opinie. System buduje profil automatycznie analizując poprzednie zakupy.
+\textbf{Zastosowanie praktyczne:} Metody działają komplementarnie. Sentiment jest używany w wyszukiwarce do sortowania produktów według jakości -- pokazuje obiektywnie najlepsze produkty na górze listy. Fuzzy Logic jest w panelu klienta jako osobna sekcja rekomendacji -- filtruje produkty według profilu cenowego użytkownika. Użytkownik który zawsze kupuje produkty poniżej 300~PLN nie zobaczy laptopów za 5000~PLN nawet jeśli mają doskonałe opinie. System buduje profil automatycznie analizując poprzednie zakupy.
 
 \subsubsection*{Apriori vs Markov Chain}
 
@@ -1534,11 +1528,9 @@ Wartość & Cross-selling (↑ wartość transakcji) & Retention (identyfikacja 
 \end{tabular}
 \end{table}
 
-\textbf{Różnice w działaniu:} Apriori szuka produktów które ludzie kupują razem w jednym zamówieniu. Jeśli klient dodaje laptop do koszyka, Apriori pokaże mysz i torbę bo poprzedni klienci kupowali to razem. Metryki support, confidence i lift określają jak silne jest powiązanie. Markov natomiast analizuje kolejność zakupów w czasie - jeśli użytkownik kupił laptop w styczniu, Markov przewiduje że w lutym prawdopodobnie wróci po akcesoria komputerowe. Apriori jest szybszy bo używa bitmap pruning (operacje bitowe zamiast pętli), Markov wymaga więcej obliczeń bo musi przeanalizować całą historię użytkownika.
+\textbf{Różnice w działaniu:} Apriori szuka produktów które ludzie kupują razem w jednym zamówieniu. Jeśli klient dodaje laptop do koszyka, Apriori pokaże mysz i torbę bo poprzedni klienci kupowali to razem. Metryki support, confidence i lift określają jak silne jest powiązanie. Markov natomiast analizuje kolejność zakupów w czasie -- jeśli użytkownik kupił laptop w styczniu, Markov przewiduje że w lutym prawdopodobnie wróci po akcesoria komputerowe. Apriori jest szybszy bo używa bitmap pruning (operacje bitowe zamiast pętli), Markov wymaga więcej obliczeń bo musi przeanalizować całą historię użytkownika.
 
-\textbf{Zastosowanie praktyczne:} Apriori maksymalizuje wartość bieżącej transakcji - pokazuje dodatkowe produkty w koszyku które klient może chcieć kupić od razu. Markov służy do planowania kampanii retention - identyfikuje użytkowników którzy prawdopodobnie nie wrócą do sklepu i można im wysłać rabat zachęcający do powrotu. W panelu admina Markov wizualizuje przepływ między kategoriami jako graf, co pomaga zrozumieć ścieżki zakupowe klientów i zaplanować strategię merchandisingową.
-
-\subsection*{Podsumowanie i wnioski}
+\textbf{Zastosowanie praktyczne:} Apriori maksymalizuje wartość bieżącej transakcji -- pokazuje dodatkowe produkty w koszyku które klient może chcieć kupić od razu. Markov służy do planowania kampanii retention -- identyfikuje użytkowników którzy prawdopodobnie nie wrócą do sklepu i można im wysłać rabat zachęcający do powrotu. W panelu admina Markov wizualizuje przepływ między kategoriami jako graf, co pomaga zrozumieć ścieżki zakupowe klientów i zaplanować strategię merchandisingową.
 
 Tabela \ref{tab:summary} zestawia wszystkie sześć metod według kluczowych charakterystyk. Każda metoda ma specyficzne zastosowanie w zależności od kontekstu użycia i dostępnych danych.
 
@@ -1568,13 +1560,13 @@ Markov & Sekwencje & Nie & Predykcja kategorii & Retention \\
 
 \textbf{Wnioski z implementacji:} 
 
-\textbf{(1) Metody uzupełniają się wzajemnie.} Żadna pojedyncza metoda nie rozwiązuje wszystkich problemów rekomendacji. CF doskonale wykrywa nieoczywiste powiązania ale wymaga bogatej historii. CBF gwarantuje pokrycie wszystkich produktów ale generuje oczywiste sugestie. Sentiment ocenia jakość ale nie personalizuje. Fuzzy personalizuje ale wymaga profilu użytkownika. Najlepsze rezultaty daje połączenie wszystkich metod w różnych częściach interfejsu.
+\textbf{(1) Metody uzupełniają się wzajemnie.} Żadna pojedyncza metoda nie rozwiązuje wszystkich problemów rekomendacji. CF doskonale wykrywa nieoczywiste powiązania ale wymaga bogatej historii. CBF gwarantuje pokrycie wszystkich produktów ale generuje oczywiste sugestie. Sentiment ocenia jakość ale nie personalizuje. Fuzzy personalizuje ale wymaga profilu użytkownika. Najlepsze rezultaty daje połączenie wszystkich metod w~różnych częściach interfejsu.
 
-\textbf{(2) Wybór metody zależy od dojrzałości sklepu.} Dla nowego sklepu z małą liczbą produktów i transakcji najlepszy jest start z CBF i Sentiment - działają od razu bez historii. Po zgromadzeniu kilkuset transakcji można dodać Apriori do koszyka dla cross-sellingu. Gdy sklep ma tysiące transakcji i setki aktywnych użytkowników, CF i Markov zaczynają dawać wartość odkrywając wzorce zachowań.
+\textbf{(2) Wybór metody zależy od dojrzałości sklepu.} Dla nowego sklepu z małą liczbą produktów i transakcji najlepszy jest start z CBF i Sentiment -- działają od razu bez historii. Po zgromadzeniu kilkuset transakcji można dodać Apriori do koszyka dla cross-sellingu. Gdy sklep ma tysiące transakcji i setki aktywnych użytkowników, CF i Markov zaczynają dawać wartość odkrywając wzorce zachowań.
 
-\textbf{(3) Optymalizacja jest kluczowa dla wydajności.} Bitmap pruning w Apriori znacząco przyspiesza przetwarzanie - reprezentacja transakcji jako liczb binarnych pozwala na operacje bitowe zamiast iteracji po listach. Cache'owanie wyników Sentiment eliminuje powtarzalne obliczenia. Indeksowanie w bazie danych (model \texttt{ProductSimilarity}) przyspiesza wyszukiwanie podobnych produktów.
+\textbf{(3) Optymalizacja jest kluczowa dla wydajności.} Bitmap pruning w Apriori znacząco przyspiesza przetwarzanie -- reprezentacja transakcji jako liczb binarnych pozwala na operacje bitowe zamiast iteracji po listach. Cache'owanie wyników Sentiment eliminuje powtarzalne obliczenia. Indeksowanie w bazie danych (model \texttt{ProductSimilarity}) przyspiesza wyszukiwanie podobnych produktów.
 
-\textbf{(4) Praktyczne zastosowanie jest różne.} Apriori daje efekt natychmiast - sekcja "Często kupowane razem" w koszyku bezpośrednio zwiększa wartość zamówienia. Markov ma wartość długoterminową - identyfikuje użytkowników którzy przestają być aktywni i pozwala reagować kampaniami. CF i CBF działają w tle stale sugerując produkty. Sentiment pomaga w nawigacji po katalogu.
+\textbf{(4) Praktyczne zastosowanie jest różne.} Apriori daje efekt natychmiast -- sekcja ,,Często kupowane razem'' w koszyku bezpośrednio zwiększa wartość zamówienia. Markov ma wartość długoterminową -- identyfikuje użytkowników którzy przestają być aktywni i pozwala reagować kampaniami. CF i CBF działają w tle stale sugerując produkty. Sentiment pomaga w nawigacji po katalogu.
 
 \textbf{Ograniczenia badania:} System był testowany z danymi z seedera, nie z prawdziwymi użytkownikami. Rzeczywiste wzorce zachowań mogą być inne. Wydajność mierzona była bez równoczesnego obciążenia wieloma użytkownikami. Brak testów A/B uniemożliwia precyzyjne określenie wpływu każdej metody na współczynnik konwersji. Przyszłe wdrożenie produkcyjne wymaga monitorowania rzeczywistych metryk biznesowych.
 
@@ -1667,18 +1659,11 @@ Mohammed J. Zaki,
 \textit{Scalable Algorithms for Association Mining},
 IEEE Transactions on Knowledge and Data Engineering, 2000.
 
-\bibitem{attachment2026}
-Dawid Olko, Piotr Smola,
-\textit{Załącznik A: Szczegółowe scenariusze użycia systemu},
-Materiał pomocniczy do pracy inżynierskiej, 2026.
-Dostępny online: \url{https://github.com/dawidolko/SmartRecommender-Project-Django-React/blob/main/.docs/latex/olko/attachment.pdf}
-
 \end{thebibliography}
 
 \newpage
 % Wykaz rysunków i tabel
 \section*{Wykaz rysunków i tabel}
-\addcontentsline{toc}{section}{Wykaz rysunków i tabel}
 \small
 \listoffigures
 \listoftables
@@ -1718,7 +1703,7 @@ Wartością pracy jest implementacja algorytmów od podstaw, co umożliwiło gł
 
 \newpage
 
-% \input{attachment.tex}
+\input{attachment.tex}
 
 %\begin{figure}[H]
     %\centering
