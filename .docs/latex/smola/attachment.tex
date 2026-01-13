@@ -358,9 +358,9 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \textbf{Przebieg scenariusza głównego:}
 \begin{enumerate}
 \item Użytkownik otwiera stronę szczegółową produktu
-\item System automatycznie wywołuje endpoint \texttt{GET /api/recommendations/\allowbreak content-based/?product\_id=\{id\}}
+\item System automatycznie wywołuje endpoint \texttt{GET /api/\allowbreak recommendations/\allowbreak content-based/\allowbreak ?product\_id=\{id\}}
 \item Backend wywołuje metodę \texttt{ContentBasedAPI} z parametrem \texttt{product\_id}
-\item System wykonuje zapytanie do tabeli \texttt{ProductSimilarity} filtrując po \texttt{product1\_id = \{id\}} oraz \texttt{type='content\_based'}
+\item System wykonuje zapytanie do tabeli \texttt{ProductSimilarity} filtrując po \texttt{product1\_id = \{id\}} oraz \texttt{type=\allowbreak 'content\_based'}
 \item System sortuje wyniki malejąco według \texttt{similarity\_score}
 \item System pobiera Top 10 najbardziej podobnych produktów z bazy danych
 \item Backend zwraca JSON z listą produktów zawierającą: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{similarity\_score}
@@ -390,8 +390,8 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Administrator wybiera zakładkę „Content-Based Filtering"
 \item System wyświetla panel zarządzania CBF z przyciskiem „Generate Similarity Matrix"
 \item Administrator klika „Generate Similarity Matrix"
-\item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak content-based/generate}
-\item Backend uruchamia algorytm \texttt{ContentBased\allowbreak RecommendationEngine.\allowbreak generate\_similarities()}
+\item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak content-based/\allowbreak generate}
+\item Backend uruchamia algorytm \texttt{ContentBased\allowbreak Recommendation\allowbreak Engine.\allowbreak generate\_\allowbreak similarities()}
 \item System pobiera wszystkie produkty z bazy danych
 \item Dla każdego produktu system ekstraktuje cechy:
   \begin{itemize}
@@ -433,7 +433,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \end{itemize}
 \item Administrator wprowadza ID produktu w pole „Product ID for analysis"
 \item Administrator klika „Analyze Product"
-\item System wywołuje endpoint \texttt{GET /api/admin/\allowbreak content-based/debug/?product\_id=\{id\}}
+\item System wywołuje endpoint \texttt{GET /api/admin/\allowbreak content-based/\allowbreak debug/\allowbreak ?product\_id=\{id\}}
 \item System pobiera wybrany produkt oraz jego Top 10 najbardziej podobnych produktów
 \item System wyświetla szczegółową analizę dla wybranego produktu:
   \begin{itemize}
@@ -462,9 +462,9 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Użytkownik loguje się do systemu
 \item Użytkownik otwiera panel klienta
 \item Użytkownik klika zakładkę „Fuzzy Logic Recommendations"
-\item System wywołuje endpoint \texttt{GET /api/fuzzy-logic-\allowbreak recommendations/?limit=10}
+\item System wywołuje endpoint \texttt{GET /api/\allowbreak fuzzy-logic-\allowbreak recommendations/\allowbreak ?limit=10}
 \item Backend wywołuje \texttt{FuzzyLogicAPI} z parametrem \texttt{user\_id} (z tokenu JWT)
-\item System inicjalizuje silnik rozmyty \texttt{FuzzyEngine.\allowbreak initialize\_fuzzy\_system(user\_id)}
+\item System inicjalizuje silnik rozmyty \texttt{FuzzyEngine.\allowbreak initialize\_\allowbreak fuzzy\_system(\allowbreak user\_id)}
 \item System buduje profil użytkownika \texttt{FuzzyUserProfile}:
   \begin{itemize}
   \item Oblicza parametr \texttt{price\_sensitivity} na podstawie średniej ceny zakupionych produktów
@@ -511,7 +511,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Użytkownik wpisuje frazę z literówką: „loptap" (zamiast „laptop")
 \item Użytkownik ustawia próg podobieństwa na 0.3 (30\%)
 \item Użytkownik klika przycisk „Search"
-\item System wywołuje endpoint \texttt{GET /api/search/fuzzy/\allowbreak ?query=loptap\&threshold=0.3}
+\item System wywołuje endpoint \texttt{GET /api/search/\allowbreak fuzzy/\allowbreak ?query=\allowbreak loptap\&\allowbreak threshold=0.3}
 \item Backend iteruje po wszystkich produktach w katalogu
 \item Dla każdego produktu system oblicza odległość Levenshteina między zapytaniem a nazwą produktu:
   \begin{itemize}
@@ -559,7 +559,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \end{itemize}
 \item Administrator wprowadza ID produktu w pole „Product ID for detailed analysis"
 \item Administrator klika „Analyze Product"
-\item System wywołuje endpoint \texttt{GET /api/admin/\allowbreak fuzzy-debug/?product\_id=\{id\}}
+\item System wywołuje endpoint \texttt{GET /api/admin/\allowbreak fuzzy-debug/\allowbreak ?product\_id=\{id\}}
 \item System pobiera wybrany produkt oraz wykonuje szczegółową ewaluację rozmytą
 \item System wyświetla widok szczegółowy dla produktu:
   \begin{itemize}
@@ -603,18 +603,18 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Użytkownik loguje się do systemu
 \item Użytkownik otwiera panel klienta
 \item Użytkownik klika zakładkę „Probabilistic Recommendations"
-\item System wywołuje endpoint \texttt{GET /api/probabilistic-\allowbreak recommendations/?user\_id=\{id\}}
+\item System wywołuje endpoint \texttt{GET /api/\allowbreak probabilistic-\allowbreak recommendations/\allowbreak ?user\_id=\{id\}}
 \item Backend wywołuje \texttt{ProbabilisticAPI} z parametrem \texttt{user\_id}
-\item System pobiera historię zamówień użytkownika z bazy danych wywołując \texttt{get\_user\_orders(\allowbreak user\_id)}
+\item System pobiera historię zamówień użytkownika z bazy danych wywołując \texttt{get\_user\_\allowbreak orders(\allowbreak user\_id)}
 \item System ekstraktuje sekwencję kategorii produktów z zamówień uporządkowanych chronologicznie
-\item System wywołuje \texttt{MarkovChain.\allowbreak predict\_next\_products(order\_sequence)}:
+\item System wywołuje \texttt{MarkovChain.\allowbreak predict\_next\_\allowbreak products(\allowbreak order\_\allowbreak sequence)}:
   \begin{itemize}
   \item Identyfikuje ostatnią zakupioną kategorię (np. „Laptopy")
   \item Odczytuje macierz przejść dla kategorii „Laptopy"
   \item Pobiera Top 3 kategorie z najwyższym prawdopodobieństwem przejścia (np. Akcesoria komputerowe: 0.45, Peryferia: 0.30, Torby: 0.15)
   \item Dla każdej kategorii pobiera Top produkty
   \end{itemize}
-\item System wywołuje \texttt{NaiveBayes.\allowbreak predict\_purchase\_probability(user\_profile)}:
+\item System wywołuje \texttt{NaiveBayes.\allowbreak predict\_\allowbreak purchase\_\allowbreak probability(\allowbreak user\_profile)}:
   \begin{itemize}
   \item Ekstraktuje 5 cech użytkownika: liczba zamówień, średnia wartość, dni od ostatniego zakupu, ulubiona kategoria, częstotliwość
   \item Stosuje twierdzenie Bayesa dla klasyfikacji binarnej (kupi/nie kupi)
@@ -664,8 +664,8 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \item Naive Bayes: ostatni trening 2024-01-15, liczba próbek treningowych: 200 zamówień, accuracy: 78\%
   \end{itemize}
 \item Administrator klika przycisk „Train Markov Chain Model"
-\item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak probabilistic/train-markov}
-\item Backend uruchamia \texttt{MarkovChainEngine.train()}:
+\item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak probabilistic/\allowbreak train-markov}
+\item Backend uruchamia \texttt{MarkovChainEngine.\allowbreak train()}:
   \begin{itemize}
   \item Pobiera wszystkie zamówienia z bazy danych uporządkowane chronologicznie per użytkownik
   \item Ekstraktuje sekwencje kategorii dla każdego użytkownika
@@ -676,8 +676,8 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \end{itemize}
 \item System wyświetla komunikat: „Markov Chain trained successfully. 48 states, 2304 transitions, training time: 3.2s"
 \item Administrator klika przycisk „Train Naive Bayes Model"
-\item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak probabilistic/train-bayes}
-\item Backend uruchamia \texttt{NaiveBayesEngine.train()}:
+\item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak probabilistic/\allowbreak train-bayes}
+\item Backend uruchamia \texttt{NaiveBayesEngine.\allowbreak train()}:
   \begin{itemize}
   \item Pobiera wszystkich użytkowników z zamówieniami
   \item Dla każdego użytkownika ekstraktuje 5 cech: liczba zamówień, średnia wartość, dni od ostatniego, ulubiona kategoria, częstotliwość
