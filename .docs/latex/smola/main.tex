@@ -2242,17 +2242,17 @@ Niniejszy rozdział prezentuje praktyczne aspekty działania zaimplementowanych 
 \subsection*{6.1 Przegląd interfejsu użytkownika}
 \addcontentsline{toc}{subsection}{6.1 Przegląd interfejsu użytkownika}
 
-Niniejszy rozdział przedstawia funkcjonowanie systemu rekomendacji z perspektywy użytkownika końcowego oraz administratora. System oferuje trzy komplementarne metody rekomendacyjne: Content-Based Filtering (rekomendacje oparte na podobieństwie cech produktów), Fuzzy Logic (system rozmytego wnioskowania z interpretowalnymi regułami) oraz modele probabilistyczne (łańcuch Markowa i naiwny klasyfikator Bayesa dla predykcji sekwencji zakupowych).
+Niniejszy podrozdział przedstawia sposób prezentacji rekomendacji w interfejsie użytkownika końcowego oraz w panelach administracyjnych. System SmartRecommender oferuje zaimplementowane trzy metody rekomendacyjne -- Content-Based Filtering, Fuzzy Logic oraz modele probabilistyczne -- które są dostępne dla użytkowników poprzez intuicyjny interfejs webowy. Użytkownik końcowy otrzymuje spersonalizowane sugestie produktowe bez konieczności rozumienia mechanizmów działania algorytmów, natomiast administrator dysponuje zaawansowanymi narzędziami debugowania i monitorowania jakości rekomendacji.
 
 Rekomendacje są wyświetlane użytkownikom w trzech głównych lokalizacjach interfejsu:
 
 \begin{itemize}
 \item \textbf{Strona główna sklepu} - sekcja "Recommended For You" prezentująca spersonalizowane sugestie na podstawie aktywnego algorytmu wybranego przez administratora
 \item \textbf{Strona produktu} - sekcja "Similar Products" z produktami podobnymi do aktualnie przeglądanego
-\item \textbf{Panel klienta} - dedykowane zakładki z rekomendacjami według każdej z trzech metod, umożliwiające użytkownikowi porównanie działania algorytmów
+\item \textbf{Panel klienta} - dedykowane zakładki z rekomendacjami probabilistycznymi (Markov i Naive Bayes) oraz logiką rozmytą, umożliwiające użytkownikowi porównanie działania algorytmów
 \end{itemize}
 
-Administrator systemu dysponuje zaawansowanymi panelami debugowania dla każdej metody, umożliwiającymi monitorowanie działania algorytmów, analizę jakości rekomendacji oraz konfigurację parametrów systemu. Przepływ danych w systemie został szczegółowo opisany w rozdziale 4.4 (Projekt architektury systemu).
+Administrator systemu dysponuje zaawansowanymi panelami debugowania dla każdej metody rekomendacyjnej, umożliwiającymi monitorowanie działania algorytmów, analizę jakości rekomendacji oraz diagnostykę problemów obliczeniowych.
 
 \subsection*{6.2 Rekomendacje Content-Based Filtering}
 \addcontentsline{toc}{subsection}{6.2 Rekomendacje Content-Based Filtering}
@@ -2269,15 +2269,13 @@ Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania
 \end{figure}
 
 
-Rysunek \ref{fig:cbf_recommendations} przedstawia sekcję "Recommended For You (Content-Based)"~wyświetlaną na stronie głównej aplikacji po wyborze algorytmu CBF przez administratora. System prezentuje 4 produkty podobne do wcześniej przeglądanych lub zakupionych artykułów, wybrane na podstawie analizy cech (kategoria, tagi, cena, słowa kluczowe). Każdy produkt zawiera zdjęcie, nazwę, cenę oraz przycisk dodania do koszyka.
-
-Rekomendacje CBF są również dostępne w panelu klienta, gdzie użytkownik może zobaczyć produkty podobne do swoich poprzednich zakupów. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji. Szczegółowy opis przepływu danych w systemie CBF przedstawiono w rozdziale 5.1.
+Rysunek \ref{fig:cbf_recommendations} przedstawia sekcję "Recommended For You (Content-Based)"~wyświetlaną na stronie głównej aplikacji po wyborze algorytmu CBF przez administratora. System prezentuje 4 produkty podobne do wcześniej przeglądanych lub zakupionych artykułów, wybrane na podstawie analizy cech (kategoria, tagi, cena, słowa kluczowe). Każdy produkt zawiera zdjęcie, nazwę, cenę oraz przycisk dodania do koszyka. System automatycznie identyfikuje produkty z wysokim współczynnikiem podobieństwa (powyżej 20\%) i prezentuje je w sekcji spersonalizowanych rekomendacji. Szczegółowy opis przepływu danych w systemie CBF przedstawiono w rozdziale 5.1.
 
 \subsubsection*{6.2.2 Panel administracyjny}
 
 \textbf{Cel i przeznaczenie panelu debugowania}
 
-System Content-Based Filtering udostępnia zaawansowany panel debugowania przeznaczony dla administratorów oraz deweloperów systemu. Panel służy do monitorowania poprawności działania algorytmu, diagnozowania problemów z rekomendacjami oraz optymalizacji parametrów wag cech. Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/content-based-debug/}, który zwraca dane w formacie JSON -- interfejs webowy wizualizuje te dane w czytelny sposób. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w sekcji "Admin Tools" $\rightarrow$ "Content-Based Debug" w panelu administracyjnym aplikacji.
+System Content-Based Filtering udostępnia zaawansowany panel debugowania przeznaczony dla administratorów oraz deweloperów systemu. Panel służy do monitorowania poprawności działania algorytmu, diagnozowania problemów z rekomendacjami oraz optymalizacji parametrów wag cech. Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/content-based-debug/}, który zwraca dane w formacie JSON -- interfejs webowy wizualizuje te dane w czytelny sposób. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w zakładce "Debug"~w panelu administracyjnym aplikacji jako podzakładka "Content-Based Debug".
 
 \newpage
 
@@ -2285,7 +2283,7 @@ System Content-Based Filtering udostępnia zaawansowany panel debugowania przezn
 \begin{itemize}
     \item \textbf{Weryfikacja pokrycia rekomendacji} - sprawdzenie, ile produktów w katalogu ma obliczone podobieństwa (produkty bez podobieństw nie będą rekomendowane użytkownikom)
     \item \textbf{Diagnostyka problemów} - identyfikacja produktów ze słabo opisanymi metadanymi (brak kategorii, tagów), które uzyskują niskie podobieństwa
-    \item \textbf{Optymalizacja wag} - analiza breakdownu podobieństwa pozwala zweryfikować, czy wagi cech (40\% kategoria, 30\% tagi, 20\% cena, 10\% keywords) są odpowiednio dobrane
+    \item \textbf{Optymalizacja wag} - analiza dekompozycji podobieństwa pozwala zweryfikować, czy wagi cech (40\% kategoria, 30\% tagi, 20\% cena, 10\% słowa kluczowe) są odpowiednio dobrane
     \item \textbf{Monitorowanie wydajności} - śledzenie statusu pamięci podręcznej (cache HIT/MISS) oraz czasów generowania macierzy podobieństw
 \end{itemize}
 
@@ -2323,7 +2321,7 @@ Panel oferuje dwa widoki: ogólny (statystyki całego systemu) oraz szczegółow
     \item Top 10 produktów podobnych z szczegółami obliczeń
     \item Wzór matematyczny dla każdej pary: $\frac{dot\_product}{norm_1 \times norm_2}$
     \item Cechy wspólne między produktami
-    \item Breakdown podobieństwa: ile procent z kategorii, ile z tagów, ile z ceny, ile z keywords
+    \item Dekompozycja podobieństwa: ile procent z kategorii, ile z tagów, ile z ceny, ile ze słów kluczowych
 \end{itemize}
 
 \begin{figure}[h!]
@@ -2433,7 +2431,7 @@ Wyszukiwanie tolerujące błędy wykorzystuje algorytm odległości Levensteina 
 
 \newpage
 
-Rysunek \ref{fig:fuzzy_search} przedstawia interfejs wyszukiwarki rozmytej z przykładowym zapytaniem "laptop". Użytkownik kontroluje tolerancję wyszukiwania za pomocą suwaka "Fuzzy Threshold"~(wartość 0.3 oznacza próg 30\% podobieństwa). System zwraca produkty z metryką "Fuzzy Match"~(np. 86\%, 45\%), wskazującą stopień dopasowania nazwy do zapytania. Wyszukiwarka znajduje produkty zawierające słowo "Laptop"~(86\% match) oraz bardziej odległe jak "Desktop Hub"~(45\% match), co demonstruje tolerancję na nieprecyzyjne zapytania.
+Rysunek \ref{fig:fuzzy_search} przedstawia interfejs wyszukiwarki rozmytej z przykładowym zapytaniem "laptop". Użytkownik kontroluje tolerancję wyszukiwania za pomocą suwaka "Fuzzy Threshold"~(wartość 0.3 oznacza próg 30\% podobieństwa). System zwraca produkty z metryką "Fuzzy Match"~(np. 86\%, 45\%), wskazującą stopień dopasowania nazwy do zapytania. Wyszukiwarka znajduje produkty zawierające dokładne słowo "Laptop"~(86\% match) oraz warianty z literówkami lub częściowym dopasowaniem jak "Leptop"~lub "Lapto"~(45\% match), co demonstruje tolerancję na nieprecyzyjne zapytania i błędy ortograficzne.
 
 Algorytm Levensteina oblicza minimalną liczbę operacji edycji (wstawienie, usunięcie, zamiana znaku) potrzebnych do przekształcenia jednego ciągu w drugi:
 
@@ -2456,7 +2454,7 @@ System wyszukiwania zwraca produkty, dla których odległość Levensteina międ
 
 \textbf{Cel i przeznaczenie panelu debugowania}
 
-System Fuzzy Logic udostępnia specjalistyczny panel debugowania przeznaczony dla administratorów i ekspertów systemów rozmytych. Panel służy do weryfikacji poprawności funkcji przynależności, analizy aktywacji reguł IF-THEN oraz debugowania procesu wnioskowania Mamdani. Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/fuzzy-debug/}, który zwraca szczegółowe dane JSON o stanie systemu rozmytego -- interfejs webowy prezentuje te dane w formie tabel i wykresów. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w sekcji "Admin Tools" $\rightarrow$ "Fuzzy Logic Debug" w panelu administracyjnym aplikacji.
+System Fuzzy Logic udostępnia specjalistyczny panel debugowania przeznaczony dla administratorów i ekspertów systemów rozmytych. Panel służy do weryfikacji poprawności funkcji przynależności, analizy aktywacji reguł IF-THEN oraz debugowania procesu wnioskowania Mamdani. Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/fuzzy-debug/}, który zwraca szczegółowe dane JSON o stanie systemu rozmytego -- interfejs webowy prezentuje te dane w formie tabel i wykresów. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w zakładce "Debug"~w panelu administracyjnym aplikacji jako podzakładka "Fuzzy Logic Debug".
 
 \medskip
 
@@ -2474,38 +2472,94 @@ Panel oferuje dwa widoki: ogólny (statystyki systemu i profili użytkowników) 
 
 \medskip
 
-\noindent\textbf{Widok ogólny (bez parametru product\_id)}
+\noindent\textbf{Widok ogólny dla profilu gościa}
+
+Panel wyświetla następujące sekcje (Rysunek \ref{fig:fuzzy_debug1}):
 
 \begin{itemize}
-    \item \textbf{Szczegóły algorytmu}: metoda (Mamdani Fuzzy Inference), liczba reguł (6), T-norma (min), T-conorma (max)
-    \item \textbf{Funkcje przynależności}: definicje dla price, quality, popularity z progami
-    \item \textbf{Statystyki}: średni fuzzy\_score, rozkład wyników, aktywacja reguł
-    \item \textbf{Profil użytkownika}: jeśli podany user\_id — szczegóły profilu rozmytego
+    \item \textbf{Algorithm Information}:
+    \begin{itemize}
+        \item Name: Fuzzy Logic Inference System (Mamdani-Style)
+        \item Description: System rekomendacji oparty na logice rozmytej z uproszczoną defuzzyfikacją
+    \end{itemize}
+    \item \textbf{User Profile} -- profil rozmyty użytkownika gościa:
+    \begin{itemize}
+        \item User: Guest/Default
+        \item Profile Type: session-based
+        \item Price Sensitivity: 0.6-Medium
+        \item Tracked Categories: 3
+        \item Category Interests: Electronics (0.5), Home (0.4), Gaming (0.3)
+    \end{itemize}
 \end{itemize}
+
+\noindent Na zrzucie ekranu jako przykładowy produkt wybrano kamerkę A4Tech HD PK-910P do dalszej analizy.
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug1.png}
-  \caption{Panel debugowania Fuzzy Logic.}
+  \caption{Panel debugowania Fuzzy Logic -- widok ogólny profilu gościa.}
   \label{fig:fuzzy_debug1}
 \end{figure}
 
 \newpage
 
-\noindent\textbf{Widok produktu} (z parametrem product\_id):
+\noindent\textbf{Widok fuzzyfikacji dla wybranego produktu}
+
+Panel przedstawia stopnie przynależności (membership degrees) dla kamerki A4Tech HD PK-910P (Rysunek \ref{fig:fuzzy_debug4}):
 
 \begin{itemize}
-    \item Wartości fuzzyfikacji (wszystkie przynależności)
-    \item Aktywacja każdej z 6 reguł z wyjaśnieniem
-    \item Obliczenie końcowe z breakdownem
-    \item Porównanie z innymi produktami
+    \item \textbf{Fuzzification - Membership Degrees}:
+    \begin{itemize}
+        \item Price: 238.95 PLN -- Cheap ($\varepsilon=1.0$), Medium ($\varepsilon=0$), Expensive ($\varepsilon=0$), Dominant: CHEAP
+        \item Quality: 5.0 -- Low ($\varepsilon=0$), Medium ($\varepsilon=0$), High ($\varepsilon=1.0$), Dominant: HIGH
+        \item Popularity: 3 items -- Low ($\varepsilon=0$), Medium ($\varepsilon=1.0$), High ($\varepsilon=0$), Dominant: LOW
+    \end{itemize}
+    \item \textbf{Category Matching}:
+    \begin{itemize}
+        \item Max Match: 0.44
+        \item Category Details: peripherals/webcams (kategoria "urządzenia peryferyjne/kamery internetowe")
+    \end{itemize}
 \end{itemize}
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug2.png}
-  \caption{Fuzzy Logic - ewaluacja produktu.}
-  \label{fig:fuzzy_debug2}
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug4.png}
+  \caption{Fuzzy Logic -- stopnie przynależności dla wybranego produktu.}
+  \label{fig:fuzzy_debug4}
+\end{figure}
+
+\newpage
+
+\noindent\textbf{Widok wnioskowania rozmytego i defuzzyfikacji}
+
+Panel przedstawia aktywację reguł IF-THEN oraz proces defuzzyfikacji (Rysunek \ref{fig:fuzzy_debug5}):
+
+\begin{itemize}
+    \item \textbf{Fuzzy Inference - Rule Activations} -- aktywacja 6 reguł:
+    \begin{itemize}
+        \item R1: High Quality Bargain (Okazja wysokiej jakości): 1.0
+        \item R2: Popular in Category (Popularny w kategorii): 0
+        \item R3: Price Sensitive Match (Dopasowanie wrażliwości cenowej): 0
+        \item R4: Category Quality Match (Dopasowanie jakości kategorii): 0.44
+        \item R5: Premium Match (Dopasowanie premium): 0
+        \item R6: Quality-Price Balance (Balans jakość-cena): 0.8
+    \end{itemize}
+    \item \textbf{Defuzzification} -- agregacja wyników:
+    \begin{itemize}
+        \item Method: Weighted Average (średnia ważona)
+        \item Final Fuzzy Score: 0.407
+        \item Percentage: 40.7\%
+        \item Defuzzyfikacja: wzór $\frac{weighted\_sum}{weight\_sum}$
+        \item Weighted Sum: 1.874
+        \item Weight Sum: 4.6
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug5.png}
+  \caption{Fuzzy Logic -- wnioskowanie rozmyte i defuzzyfikacja.}
+  \label{fig:fuzzy_debug5}
 \end{figure}
 
 Panel umożliwia administratorowi monitorowanie działania systemu rozmytego, weryfikację poprawności funkcji przynależności oraz analizę aktywacji reguł dla konkretnych produktów. Szczegółowy opis algorytmu Mamdani przedstawiono w rozdziale 5.2.
@@ -2572,7 +2626,7 @@ Zakładka ``Churn Risk Analysis'' (Rysunek \ref{fig:prob_client3}) prezentuje:
 
 \textbf{Cel i przeznaczenie panelu debugowania}
 
-System Probabilistic Models udostępnia kompleksowy panel debugowania przeznaczony dla administratorów oraz data scientists. Panel służy do weryfikacji poprawności treningu modeli probabilistycznych (Markov Chain, Naive Bayes), analizy macierzy przejść między kategoriami produktowymi oraz monitorowania predykcji zakupowych i ryzyka odejścia klientów (churn). Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/probabilistic-debug/}, który zwraca statystyki modeli oraz wyniki predykcji w formacie JSON -- interfejs webowy wizualizuje te dane w formie tabel, macierzy przejść oraz wykresów prawdopodobieństw. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w sekcji "Admin Tools" $\rightarrow$ "Probabilistic Models Debug" w panelu administracyjnym aplikacji.
+System Probabilistic Models udostępnia kompleksowy panel debugowania przeznaczony dla administratorów oraz data scientists. Panel służy do weryfikacji poprawności treningu modeli probabilistycznych (Markov Chain, Naive Bayes), analizy macierzy przejść między kategoriami produktowymi oraz monitorowania predykcji zakupowych i ryzyka odejścia klientów (churn). Dostęp do panelu odbywa się przez endpoint RESTful API \texttt{/api/probabilistic-debug/}, który zwraca statystyki modeli oraz wyniki predykcji w formacie JSON -- interfejs webowy wizualizuje te dane w formie tabel, macierzy przejść oraz wykresów prawdopodobieństw. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w zakładce "Debug"~w panelu administracyjnym aplikacji jako podzakładka "Probabilistic Models Debug".
 
 \medskip
 
@@ -2586,9 +2640,38 @@ System Probabilistic Models udostępnia kompleksowy panel debugowania przeznaczo
 
 \medskip
 
-Panel oferuje dwa główne widoki: panel debugowania (statystyki modeli Markov Chain i Naive Bayes) oraz panele administracyjne (analiza biznesowa predykcji dla konkretnych użytkowników). Poniżej przedstawiono szczegółowy opis obu widoków.
+Panel oferuje dwa główne widoki: panele administracyjne (prognozy sprzedaży, analiza popytu) oraz panel debugowania (statystyki modeli Markov Chain i Naive Bayes). Poniżej przedstawiono szczegółowy opis obu widoków.
 
 \newpage
+
+\noindent\textbf{Panele administracyjne - analiza biznesowa}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin1.png}
+  \caption{Panel administracyjny - Markov Analysis.}
+  \label{fig:prob_admin1}
+\end{figure}
+
+\noindent Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Analysis'' zawierający:
+\begin{itemize}
+    \item \textbf{Markov Chain Analysis}: ogólne statystyki łańcucha Markowa (total predicted units, forecast period, products analyzed, average daily forecast)
+    \item \textbf{Sales Forecast}: wykres prognozy sprzedaży w czasie na podstawie macierzy przejść łańcucha Markowa. Prognoza jest wyznaczana poprzez symulację sekwencji zakupowych: algorytm rozpoczyna od bieżącego rozkładu prawdopodobieństw kategorii produktowych, następnie iteracyjnie mnoży go przez macierz przejść, przewidując prawdopodobieństwo zakupu w każdej kategorii dla kolejnych okresów czasowych (dni/tygodni). Łączna sprzedaż jest sumą predykcji dla wszystkich kategorii z uwzględnieniem średniej wartości produktu w każdej kategorii.
+    \item \textbf{Detailed Forecast}: tabela z szczegółowymi predykcjami dla poszczególnych okresów
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin2.png}
+  \caption{Panel administracyjny - Bayesian Analysis.}
+  \label{fig:prob_admin2}
+\end{figure}
+
+\newpage
+
+Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' zawierający zaawansowane narzędzia analityczne dla administratora. Panel umożliwia analizę oczekiwanego popytu na produkty, identyfikację kategorii produktowych preferowanych przez użytkowników oraz monitorowanie metryk wydajności modelu Naive Bayes. System generuje rekomendacje dotyczące poziomu zapasów oraz identyfikuje produkty wymagające uzupełnienia magazynu na podstawie predykcji probabilistycznych.
+
+\medskip
 
 \noindent\textbf{Panel debugowania - statystyki modeli}
 
@@ -2634,34 +2717,6 @@ Panel oferuje dwa główne widoki: panel debugowania (statystyki modeli Markov C
     \item Class Priors: will\_churn = 0.95, will\_not\_churn = 0.05
 \end{itemize}
 
-\medskip
-\noindent\textbf{Panele administracyjne - analiza biznesowa}
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin1.png}
-  \caption{Panel administracyjny - Markov Analysis.}
-  \label{fig:prob_admin1}
-\end{figure}
-
-\newpage
-
-\noindent Rysunek \ref{fig:prob_admin1} prezentuje panel ``Markov Analysis'' zawierający:
-\begin{itemize}
-    \item \textbf{Markov Chain Analysis}: ogólne statystyki łańcucha Markowa (total predicted units, forecast period, products analyzed, average daily forecast)
-    \item \textbf{Sales Forecast}: wykres prognozy sprzedaży w czasie na podstawie macierzy przejść łańcucha Markowa. Prognoza jest wyznaczana poprzez symulację sekwencji zakupowych: algorytm rozpoczyna od bieżącego rozkładu prawdopodobieństw kategorii produktowych, następnie iteracyjnie mnoży go przez macierz przejść, przewidując prawdopodobieństwo zakupu w każdej kategorii dla kolejnych okresów czasowych (dni/tygodni). Łączna sprzedaż jest sumą predykcji dla wszystkich kategorii z uwzględnieniem średniej wartości produktu w każdej kategorii.
-    \item \textbf{Detailed Forecast}: tabela z szczegółowymi predykcjami dla poszczególnych okresów
-\end{itemize}
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdmin2.png}
-  \caption{Panel administracyjny - Bayesian Analysis.}
-  \label{fig:prob_admin2}
-\end{figure}
-
-Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' zawierający zaawansowane narzędzia analityczne dla administratora. Panel umożliwia analizę oczekiwanego popytu na produkty, identyfikację kategorii produktowych preferowanych przez użytkowników oraz monitorowanie metryk wydajności modelu Naive Bayes. System generuje rekomendacje dotyczące poziomu zapasów oraz identyfikuje produkty wymagające uzupełnienia magazynu na podstawie predykcji probabilistycznych.
-
 \bigskip
 
 System oferuje kompleksowe środowisko do testowania i ewaluacji algorytmów rekomendacyjnych:
@@ -2696,9 +2751,9 @@ Zastosowany zestaw metryk obejmował: (1) \textbf{Zasięg katalogowy} - udział 
 
 \medskip
 
-\textbf{Collaborative Filtering (algorytm współautora)} wykorzystuje zapisy transakcyjne użytkowników do konstrukcji macierzy podobieństw produktowych w oparciu o Adjusted Cosine Similarity z normalizacją względem średnich użytkowników. Algorytm identyfikuje asocjacje niewidoczne w analizie atrybutowej - przykładowo, częste współ występowanie aparatów fotograficznych i plecaków turystycznych w koszykach zakupowych prowadzi do ich połączenia mimo odmiennej klasyfikacji kategorialnej. Metoda charakteryzuje się podatnością na problem zimnego startu (nowe produkty bez historii transakcyjnej) oraz wymaga znacznego wolumenu danych historycznych dla efektywnego działania. Wyniki persystowane są w encji \texttt{ProductSimilarity} z oznaczeniem \texttt{type='collaborative'}. Algorytm wykazuje szczególną efektywność w odkrywaniu rekomendacji międzyka tegorialnych (\textit{cross-category recommendations}), zwiększających wartość średniego koszyka.
+\textbf{Collaborative Filtering (algorytm współautora)} wykorzystuje zapisy transakcyjne użytkowników do konstrukcji macierzy podobieństw produktowych w oparciu o znormalizowane podobieństwo kosinusowe (Adjusted Cosine Similarity) z centralizacją względem średnich użytkowników. Algorytm identyfikuje asocjacje niewidoczne w analizie atrybutowej - przykładowo, częste współ występowanie aparatów fotograficznych i plecaków turystycznych w koszykach zakupowych prowadzi do ich połączenia mimo odmiennej klasyfikacji kategorialnej. Metoda charakteryzuje się podatnością na problem zimnego startu (nowe produkty bez historii transakcyjnej) oraz wymaga znacznego wolumenu danych historycznych dla efektywnego działania. Wyniki zapisywane są w encji \texttt{ProductSimilarity} z oznaczeniem \texttt{type='collaborative'}. Algorytm wykazuje szczególną efektywność w odkrywaniu rekomendacji międzyka tegorialnych (\textit{cross-category recommendations}), zwiększających wartość średniego koszyka.
 
-\textbf{Sentiment Analysis (algorytm współautora)} przeprowadza ekstrakcję tonu emocjonalnego z pięciu strumieni informacyjnych: teksty recenzji użytkowników, oceny w skali 1-5, recenzje zweryfikowane (potwierdzone zakupem), opinie moderatorskie oraz specyfikacje produktowe. Implementacja wykorzystuje dwa słowniki sentymentu: Opinion Lexicon (Hu \& Liu 2004) oraz AFINN-165 (Nielsen 2011) do przypisania wag emocjonalnych terminom. Mechanizm agregacji wieloźródłowej syntetyzuje wszystkie sygnały w unifikowany wskaźnik \texttt{sentiment\_score} o dziedzinie [-1, +1], reprezentujący zagregowany ton wobec produktu. Algorytm charakteryzuje się uniwersalnością (identyczne wyniki niezależnie od użytkownika) i brakiem mechanizmów personalizacyjnych. Kluczowym ograniczeniem jest podatność na konstrukcje negujące, ironiczne oraz sarkastyczne w materiale tekstowym. Rezultaty cachowane są w encji \texttt{method\_product\_sentiment\_summary} i wykorzystywane do rangowania produktów według odbioru społecznego.
+\textbf{Sentiment Analysis (algorytm współautora)} przeprowadza ekstrakcję tonu emocjonalnego z pięciu źródeł informacji: teksty opinii użytkowników (waga 40\%), opis produktu (25\%), nazwa produktu (15\%), specyfikacje techniczne (12\%) oraz nazwy kategorii (8\%). Implementacja wykorzystuje słownik sentymentu Opinion Lexicon (Hu \& Liu 2004) zawierający listy słów pozytywnych i negatywnych. Algorytm oblicza wynik sentymentu według wzoru: (liczba\_słów\_pozytywnych - liczba\_słów\_negatywnych) / liczba\_wszystkich\_słów, generując wskaźnik w dziedzinie [-1, +1]. Mechanizm agregacji wieloźródłowej syntetyzuje wszystkie sygnały w unifikowany wskaźnik \texttt{sentiment\_score}, reprezentujący zagregowany ton wobec produktu. Algorytm charakteryzuje się uniwersalnością (identyczne wyniki niezależnie od użytkownika) i brakiem mechanizmów personalizacyjnych. Kluczowym ograniczeniem jest podatność na konstrukcje negujące, ironiczne oraz sarkastyczne w materiale tekstowym. Rezultaty cachowane są w encji \texttt{method\_product\_sentiment\_summary} i wykorzystywane do rangowania produktów według odbioru społecznego.
 
 \textbf{Apriori (algorytm współautora)} identyfikuje reguły asocjacyjne postaci „konsumenci nabywający pozycję A z dużym prawdopodobieństwem nabywają pozycję B". Mechanizm analizuje kompozycję koszyków transakcyjnych i wykrywa zbiory produktowe występujące wspólnie z częstością przekraczającą losowe oczekiwanie. Ewaluacja opiera się na trzech metrykach: support (wsparcie - częstość występowania zbioru), confidence (ufność - prawdopodobieństwo warunkowe nabycia B przy zakupie A) oraz lift (wzmocnienie - stosunek częstości współwystępowania do niezależnego oczekiwania). Generacja reguł wymaga przekroczenia progów min\_support = 0.01 oraz min\_confidence = 0.1, eliminując asocjacje losowe. Algorytm efektywnie rekomenduje produkty komplementarne (akcesoria, rozszerzenia), lecz wymaga historii transakcyjnej współzakupów i wykazuje problem zimnego startu dla nowych pozycji katalogowych. Rezultaty zapisywane są w tabeli \texttt{method\_productassociation}.
 
@@ -2712,7 +2767,7 @@ Zastosowany zestaw metryk obejmował: (1) \textbf{Zasięg katalogowy} - udział 
 
 \medskip
 
-Tabela \ref{tab:cbf-vs-cf} zestawia charakterystyki porównawczych algorytmów. Filtracja oparta na treści ekstrahuje atrybuty bezpośrednio z danych produktowych (alokacja wag: kategoria 40\%, tagi 30\%, punkt cenowy 20\%, deskryptory 10\%) eliminując zależność od zapisu historycznego. Filtracja kolaboratywna konstruuje macierz podobieństw produktowych w oparciu o analizę zachowań transakcyjnych z wykorzystaniem Adjusted Cosine Similarity z normalizacją per-użytkownik.
+Tabela \ref{tab:cbf-vs-cf} zestawia charakterystyki porównawczych algorytmów. Filtracja oparta na treści ekstrahuje atrybuty bezpośrednio z danych produktowych (alokacja wag: kategoria 40\%, tagi 30\%, punkt cenowy 20\%, deskryptory 10\%) eliminując zależność od zapisu historycznego. Filtracja kolaboratywna konstruuje macierz podobieństw produktowych w oparciu o analizę zachowań transakcyjnych z wykorzystaniem znormalizowanego podobieństwa kosinusowego (Adjusted Cosine Similarity) z centralizacją per-użytkownik.
 
 \begin{table}[H]
 \centering
@@ -2733,7 +2788,7 @@ Problem zimnego startu & Nie występuje dla nowych produktów & Występuje dla n
 \hline
 Typ powiązań & Oczywiste w kategorii (laptop A $\rightarrow$ laptop B) & Nieoczywiste międzykategorialne (aparat $\rightarrow$ plecak) \\
 \hline
-Algorytm & Weighted TF-IDF + Cosine Similarity & Adjusted Cosine + centrowanie średniej \\
+Algorytm & Weighted TF-IDF + Cosine Similarity & Znormalizowane podobieństwo kosinusowe + centrowanie średniej \\
 \hline
 Przechowywanie & \texttt{ProductSimilarity} (type='content\_based') & \texttt{ProductSimilarity} (type='collaborative') \\
 \hline
@@ -2754,7 +2809,7 @@ Interpretowalność & Średnia (wagi cech) & Niska (ukryte wzorce) \\
 
 \medskip
 
-\textbf{Wyniki testów:} Metoda oparta na treści osiągnęła zasięg 80-85\% katalogu (około 400-425 pozycji przekracza próg podobieństwa 20\%). Czas konstrukcji macierzy wyniósł około 1 minuty dla zbioru 500 produktów. Algorytm kolaboratywny, wymagający większego wolumenu danych historycznych, uzyskał zasięg 60-70\% katalogu. Obie metody przy trafień w cache (<100ms) zapewniają natychmiastową odpowiedź, lecz metoda oparta na treści wykazuje przewagę dla produktów bez historii, gdzie podejście kolaboratywne zwraca zbiór pusty.
+\textbf{Wyniki testów:} Metoda oparta na treści osiągnęła wysoki zasięg katalogu - większość produktów posiada obliczone podobieństwa przekraczające próg 20\%. Czas konstrukcji macierzy wyniósł około 1 minuty dla zbioru 500 produktów. Algorytm kolaboratywny, wymagający większego wolumenu danych historycznych, uzyskał niższy zasięg ze względu na ograniczoną historię transakcyjną użytkowników testowych. Metoda oparta na treści wykazuje przewagę dla produktów bez historii zakupowej, gdzie podejście kolaboratywne zwraca zbiór pusty.
 
 \bigskip
 
@@ -2800,7 +2855,7 @@ Typ rekomendacji & „Dopasowane do Twojego budżetu" & „Najlepiej oceniane pr
 
 \medskip
 
-\textbf{Zastosowanie praktyczne:} Wnioskowanie rozmyte udostępnione jest w dedykowanym module panelu klienckiego z trzema widokami (preferowane kategorie, dopasowanie budżetowe, ewaluacja jakość-popularność). Wymaga uwierzytelnienia oraz historii transakcyjnej. Analiza sentymentu dostępna jest dla całej populacji użytkowników (włącznie z gośćmi) i prezentuje globalny ranking „Produkty najlepiej oceniane" w widoku głównym. Logika rozmyta wykazuje wyższą skuteczność dla użytkowników o wyraźnych wzorcach wydatkowych (segment budżetowy lub premium), podczas gdy analiza sentymentu funkcjonuje efektywnie jako uniwersalny filtr jakościowy.
+\textbf{Zastosowanie praktyczne:} Wnioskowanie rozmyte udostępnione jest w dedykowanym module panelu klienckiego z trzema zakładkami (Fuzzy Recommendations -- lista spersonalizowanych rekomendacji, User Profile -- profil rozmyty użytkownika z wrażliwością cenową i preferowanymi kategoriami, Fuzzy Rules -- opis 6 reguł IF-THEN). Metoda wymaga uwierzytelnienia użytkownika dla pełnej personalizacji opartej na historii zakupów. Dla użytkowników niezalogowanych (gości) system wykorzystuje domyślne parametry rozmyte, a administrator może ustawić logikę rozmytą jako algorytm aktywny -- wówczas rekomendacje fuzzy zastępują CBF lub CF w sekcji „Recommended For You" na stronie głównej. Analiza sentymentu dostępna jest dla całej populacji użytkowników (włącznie z gośćmi) i prezentuje globalny ranking „Produkty najlepiej oceniane" w widoku głównym. Logika rozmyta wykazuje wyższą skuteczność dla użytkowników o wyraźnych wzorcach wydatkowych (segment budżetowy lub premium), podczas gdy analiza sentymentu funkcjonuje efektywnie jako uniwersalny filtr jakościowy.
 
 \medskip
 
