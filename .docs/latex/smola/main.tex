@@ -2894,9 +2894,9 @@ Metryki & Prawdopodobieństwo przejścia, prawdopodobieństwo zakupu & Support, 
 \hline
 Problem zimnego startu & Występuje (wymaga historii) & Występuje (wymaga współzakupów) \\
 \hline
-Czas treningu & Kilka sekund (Markov + NB) & Wysoki (dla dużych katalogów) \\
+Czas treningu & Szybki (Markov + NB na zbiorze testowym) & Wysoki (dla dużych katalogów) \\
 \hline
-Czas predykcji & Bardzo szybki (<10ms) & Średni (wyszukiwanie reguł) \\
+Czas predykcji & Bardzo szybki & Średni (wyszukiwanie reguł) \\
 \hline
 Zastosowanie & Przewidywanie następnej kategorii, analiza odejścia klienta & Rekomendacje produktów komplementarnych \\
 \hline
@@ -2907,11 +2907,11 @@ Zastosowanie & Przewidywanie następnej kategorii, analiza odejścia klienta & R
 
 \medskip
 
-\textbf{Zastosowanie praktyczne:} Modele probabilistyczne prezentowane są w module „Analiza probabilistyczna" interfejsu klienckiego z wizualizacją grafu przejść między kategoriami oraz estymacją prawdopodobieństwa churnu. Administrator dysponuje dostępem do paneli „Markov Chain Analysis" oraz „Bayesian Analysis" zawierających prognozy sprzedażowe i identyfikację użytkowników zagrożonych odejściem. Apriori generuje moduł „Często kupowane razem" w widokach produktowych oraz w koszyku zakupowym, sugerując produkty komplementarne. Modele probabilistyczne wykazują wyższą skuteczność dla użytkowników o regularnej historii transakcyjnej (wykrywanie cykli zakupowych), podczas gdy Apriori efektywnie wspiera rekomendację akcesoriów oraz rozszerzeń (sprzedaż krzyżowa).
+\textbf{Zastosowanie praktyczne:} Modele probabilistyczne prezentowane są w module „Smart Recommendations" interfejsu klienckiego (panel użytkownika) z analizą sekwencji zakupowych (tekstowa prezentacja najczęstszych ścieżek pomiędzy kategoriami) oraz estymacją prawdopodobieństwa odejścia klienta (wskaźnik churn risk z wizualizacją poziomu ryzyka). Administrator dysponuje dostępem do paneli „Markov Chain Analysis" oraz „Bayesian Analysis" zawierających prognozy sprzedażowe i identyfikację użytkowników zagrożonych odejściem. Apriori generuje moduł „Często kupowane razem" w widokach produktowych oraz w koszyku zakupowym, sugerując produkty komplementarne. Modele probabilistyczne wykazują wyższą skuteczność dla użytkowników o regularnej historii transakcyjnej (wykrywanie cykli zakupowych), podczas gdy Apriori efektywnie wspiera rekomendację akcesoriów oraz rozszerzeń (sprzedaż krzyżowa).
 
 \medskip
 
-\textbf{Wyniki testów:} Modele probabilistyczne wymagały uczenia na zbiorze 200 zamówień (kilka sekund dla procesu Markowa, 1-2 sekundy dla klasyfikatora Bayesa). Po fazie treningu predykcje realizowane były z wysoką szybkością (<10ms). Macierz przejść Markowa obejmowała 48 stanów (odpowiadających kategoriom produktowym) z wygładzaniem Laplace'a ($\alpha$ = 1.0) eliminującym zerowe prawdopodobieństwa. Apriori generował reguły asocjacyjne przy progach min\_support = 0.01 oraz min\_confidence = 0.1, co eliminowało asocjacje losowe, lecz wymagało wystarczającej liczności transakcji dla każdego zbioru produktowego.
+\textbf{Wyniki testów:} Modele probabilistyczne wymagały uczenia na zbiorze 200 zamówień. Proces treningu obejmował konstrukcję macierzy przejść Markova (48 stanów odpowiadających kategoriom produktowym) oraz trenowanie klasyfikatora Bayesa naiwnego na cechach użytkowników. Po fazie treningu predykcje realizowane były z wysoką szybkością. Macierz przejść Markowa wykorzystywała wygładzanie Laplace'a ($\alpha$ = 1.0) eliminujące zerowe prawdopodobieństwa. Apriori generował reguły asocjacyjne przy progach min\_support = 0.01 oraz min\_confidence = 0.1, co eliminowało asocjacje losowe, lecz wymagało wystarczającej liczności transakcji dla każdego zbioru produktowego.
 
 \medskip
 \noindent\textbf{Podsumowanie ewaluacji}
