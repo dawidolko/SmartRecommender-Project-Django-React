@@ -2726,49 +2726,70 @@ Rysunek \ref{fig:prob_admin2} prezentuje panel ``Bayesian Analysis'' zawierając
 
 \noindent\textbf{Panel debugowania modeli probabilistycznych}
 
+\noindent\textbf{Widok ogólny dla łańcucha Markova}
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug1.png}
-  \caption{Panel debugowania - statystyki Markov Chain.}
+  \caption{Panel debugowania - widok ogólny dla łańcucha Markova.}
   \label{fig:prob_debug1}
 \end{figure}
 
-\noindent\textbf{Statystyki Markov Chain} (Rysunek \ref{fig:prob_debug1}):
+Panel wyświetla następujące sekcje (Rysunek \ref{fig:prob_debug1}):
 \begin{itemize}
-    \item Rząd łańcucha (Order): 1 (first-order Markov Chain)
-    \item Liczba stanów (kategorii): 48
-    \item Liczba przejść (transitions): 48
-    \item Macierz przejść z prawdopodobieństwami przejść między kategoriami
+    \item \textbf{User ID for Analysis} - pole do wyboru analizowanego użytkownika
+    \item \textbf{Product ID for Analysis} - pole do wyboru analizowanego produktu
+    \item \textbf{Algorithm Information}:
+    \begin{itemize}
+        \item Name: Probabilistic Models (Markov Chain + Naive Bayes)
+        \item Description: System rekomendacji oparty na łańcuchach Markova i klasyfikatorze Naive Bayes
+    \end{itemize}
+    \item \textbf{Markov Chain Model}:
+    \begin{itemize}
+        \item Order: 1 (first-order Markov Chain)
+        \item Number of States: 48 (kategorie produktowe)
+        \item Total Transitions: 48
+    \end{itemize}
+    \item \textbf{Macierz Top 10 Transitions} -- tabela z 10 najczęstszymi przejściami między kategoriami produktowymi
 \end{itemize}
+
+\noindent\textbf{Widok szczegółowy dla Naive Bayes}
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.92\textwidth]{images/probabilisticMethodsAdminDebug2.png}
-  \caption{Panel debugowania - statystyki Naive Bayes.}
+  \caption{Panel debugowania - widok szczegółowy dla Naive Bayes.}
   \label{fig:prob_debug2}
 \end{figure}
 
-\newpage
+Panel wyświetla szczegółową analizę w trzech sekcjach (Rysunek \ref{fig:prob_debug2}):
 
-\noindent\textbf{Statystyki Naive Bayes} (Rysunek \ref{fig:prob_debug2}):
-
-\noindent\textit{Purchase Prediction}:
 \begin{itemize}
-    \item Trained: Yes
-    \item Number of Features: 3 (liczba zamówień, średnia wartość koszyka, czas od ostatniego zakupu)
-    \item Classes: will\_not\_purchase
-    \item Class Priors: will\_not\_purchase = 1.0
+    \item \textbf{Naive Bayes Purchase Prediction}:
+    \begin{itemize}
+        \item Trained: Yes
+        \item Number of Features: 3 (liczba zamówień, średnia wartość koszyka, czas od ostatniego zakupu)
+        \item Classes: will\_not\_purchase
+        \item Class Priors: will\_not\_purchase = 1.0
+    \end{itemize}
+    \item \textbf{Naive Bayes - Churn Prediction}:
+    \begin{itemize}
+        \item Trained: Yes
+        \item Number of Features: 3
+        \item Classes: will\_churn
+        \item Class Priors: will\_churn = 1.0
+    \end{itemize}
+    \item \textbf{Product Analysis}:
+    \begin{itemize}
+        \item Product: A4Tech HD PK-910P USB Black
+        \item ID: 295
+        \item Category: peripherals.webcams
+    \end{itemize}
+        \item \textbf{Macierz Next Likely Categories} -- tabela z prawdopodobieństwami przejść do kolejnych kategorii produktowych dla wybranego produktu
+    \end{itemize}
 \end{itemize}
 
-\noindent\textit{Churn Prediction}:
-\begin{itemize}
-    \item Trained: Yes
-    \item Number of Features: 3
-    \item Classes: will\_churn, will\_not\_churn
-    \item Class Priors: will\_churn = 0.95, will\_not\_churn = 0.05
-\end{itemize}
-
-\bigskip
+\medskip
 
 System oferuje kompleksowe środowisko do testowania i ewaluacji algorytmów rekomendacyjnych:
 
@@ -2794,13 +2815,16 @@ Rozdział zawiera empiryczną ewaluację sześciu algorytmów rekomendacyjnych z
 
 \medskip
 
-\textbf{Collaborative Filtering (algorytm współautora)} wykorzystuje zapisy transakcyjne użytkowników do konstrukcji macierzy podobieństw produktowych w oparciu o znormalizowane podobieństwo kosinusowe (Adjusted Cosine Similarity) z centralizacją względem średnich użytkowników. Algorytm identyfikuje asocjacje niewidoczne w analizie atrybutowej - przykładowo, częste współ występowanie aparatów fotograficznych i plecaków turystycznych w koszykach zakupowych prowadzi do ich połączenia mimo odmiennej klasyfikacji kategorialnej. Metoda charakteryzuje się podatnością na problem zimnego startu (nowe produkty bez historii transakcyjnej) oraz wymaga znacznego wolumenu danych historycznych dla efektywnego działania. Wyniki zapisywane są w encji \texttt{ProductSimilarity} z oznaczeniem \texttt{type='collaborative'}. Algorytm wykazuje szczególną efektywność w odkrywaniu rekomendacji międzyka tegorialnych (\textit{cross-category recommendations}), zwiększających wartość średniego koszyka.
+\textbf{Collaborative Filtering} wykorzystuje zapisy transakcyjne użytkowników do konstrukcji macierzy podobieństw produktowych w oparciu o znormalizowane podobieństwo kosinusowe (Adjusted Cosine Similarity) z centralizacją względem średnich użytkowników. Algorytm identyfikuje asocjacje niewidoczne w analizie atrybutowej - przykładowo, częste współ występowanie aparatów fotograficznych i plecaków turystycznych w koszykach zakupowych prowadzi do ich połączenia mimo odmiennej klasyfikacji kategorialnej. Metoda charakteryzuje się podatnością na problem zimnego startu (nowe produkty bez historii transakcyjnej) oraz wymaga znacznego wolumenu danych historycznych dla efektywnego działania. Wyniki zapisywane są w encji \texttt{ProductSimilarity} z oznaczeniem \texttt{type='collaborative'}. Algorytm wykazuje szczególną efektywność w odkrywaniu rekomendacji międzyka tegorialnych (\textit{cross-category recommendations}), zwiększających wartość średniego koszyka.
 
-\textbf{Sentiment Analysis (algorytm współautora)} przeprowadza ekstrakcję tonu emocjonalnego z pięciu źródeł informacji: teksty opinii użytkowników (waga 40\%), opis produktu (25\%), nazwa produktu (15\%), specyfikacje techniczne (12\%) oraz nazwy kategorii (8\%). Implementacja wykorzystuje słownik sentymentu Opinion Lexicon (Hu \& Liu 2004) zawierający listy słów pozytywnych i negatywnych. Algorytm oblicza wynik sentymentu według wzoru: (liczba\_słów\_pozytywnych - liczba\_słów\_negatywnych) / liczba\_wszystkich\_słów, generując wskaźnik w dziedzinie [-1, +1]. Mechanizm agregacji wieloźródłowej syntetyzuje wszystkie sygnały w unifikowany wskaźnik \texttt{sentiment\_score}, reprezentujący zagregowany ton wobec produktu. Algorytm charakteryzuje się uniwersalnością (identyczne wyniki niezależnie od użytkownika) i brakiem mechanizmów personalizacyjnych. Kluczowym ograniczeniem jest podatność na konstrukcje negujące, ironiczne oraz sarkastyczne w materiale tekstowym. Rezultaty cachowane są w encji \texttt{method\_product\_sentiment\_summary} i wykorzystywane do rangowania produktów według odbioru społecznego.
+\medskip
 
-\textbf{Apriori (algorytm współautora)} identyfikuje reguły asocjacyjne postaci „konsumenci nabywający pozycję A z dużym prawdopodobieństwem nabywają pozycję B". Mechanizm analizuje kompozycję koszyków transakcyjnych i wykrywa zbiory produktowe występujące wspólnie z częstością przekraczającą losowe oczekiwanie. Ewaluacja opiera się na trzech metrykach: support (wsparcie - częstość występowania zbioru), confidence (ufność - prawdopodobieństwo warunkowe nabycia B przy zakupie A) oraz lift (wzmocnienie - stosunek częstości współwystępowania do niezależnego oczekiwania). Generacja reguł wymaga przekroczenia progów min\_support = 0.01 oraz min\_confidence = 0.1, eliminując asocjacje losowe. Algorytm efektywnie rekomenduje produkty komplementarne (akcesoria, rozszerzenia), lecz wymaga historii transakcyjnej współzakupów i wykazuje problem zimnego startu dla nowych pozycji katalogowych. Rezultaty zapisywane są w tabeli \texttt{method\_productassociation}.
+\textbf{Sentiment Analysis} przeprowadza ekstrakcję tonu emocjonalnego z pięciu źródeł informacji: teksty opinii użytkowników (waga 40\%), opis produktu (25\%), nazwa produktu (15\%), specyfikacje techniczne (12\%) oraz nazwy kategorii (8\%). Implementacja wykorzystuje słownik sentymentu Opinion Lexicon (Hu \& Liu 2004) zawierający listy słów pozytywnych i negatywnych. Algorytm oblicza wynik sentymentu według wzoru: (liczba\_słów\_pozytywnych - liczba\_słów\_negatywnych) / liczba\_wszystkich\_słów, generując wskaźnik w dziedzinie [-1, +1]. Mechanizm agregacji wieloźródłowej syntetyzuje wszystkie sygnały w unifikowany wskaźnik\\ \texttt{sentiment\_score}, reprezentujący zagregowany ton wobec produktu. Algorytm charakteryzuje się uniwersalnością (identyczne wyniki niezależnie od użytkownika) i brakiem mechanizmów personalizacyjnych. Kluczowym ograniczeniem jest podatność na konstrukcje negujące, ironiczne oraz sarkastyczne w materiale tekstowym. Rezultaty cachowane są w encji \texttt{method\_product\_sentiment\_summary} i wykorzystywane do rangowania produktów według odbioru społecznego.
 
-\newpage
+\medskip
+
+\textbf{Apriori} identyfikuje reguły asocjacyjne postaci „konsumenci nabywający pozycję A z dużym prawdopodobieństwem nabywają pozycję B". Mechanizm analizuje kompozycję koszyków transakcyjnych i wykrywa zbiory produktowe występujące wspólnie z częstością przekraczającą losowe oczekiwanie. Ewaluacja opiera się na trzech metrykach: support (wsparcie - częstość występowania zbioru), confidence (ufność - prawdopodobieństwo warunkowe nabycia B przy zakupie A) oraz lift (wzmocnienie - stosunek częstości współwystępowania do niezależnego oczekiwania). Generacja reguł wymaga przekroczenia progów min\_support = 0.01 oraz min\_confidence = 0.1, eliminując asocjacje losowe. Algorytm efektywnie rekomenduje produkty komplementarne (akcesoria, rozszerzenia), lecz wymaga historii transakcyjnej współzakupów i wykazuje problem zimnego startu dla nowych pozycji katalogowych. Rezultaty zapisywane są w tabeli \texttt{method\_productassociation}.
+
 \medskip
 \noindent\textbf{Porównanie par metod}
 
@@ -2860,7 +2884,7 @@ Interpretowalność & Średnia (wagi cech) & Niska (ukryte wzorce) \\
 
 \medskip
 
-Tabela \ref{tab:fuzzy-vs-sentiment} konfrontuje algorytm spersonalizowany (logika rozmyta) z uniwersalnym (analiza sentymentu). Wnioskowanie rozmyte konstruuje indywidualny \texttt{FuzzyUserProfile} w oparciu o historię transakcyjną użytkownika (wskaźnik wrażliwości cenowej, preferowane klasy produktowe). Analiza sentymentu agreguje materiał tekstowy z pięciu źródeł z wykorzystaniem leksykonów Opinion Lexicon oraz AFINN-165, generując unifikowany wskaźnik dla całej populacji.
+Tabela \ref{tab:fuzzy-vs-sentiment} konfrontuje algorytm spersonalizowany (logika rozmyta) z uniwersalnym (analiza sentymentu). Wnioskowanie rozmyte konstruuje indywidualny\\ \texttt{FuzzyUserProfile} w oparciu o historię transakcyjną użytkownika (wskaźnik wrażliwości cenowej, preferowane klasy produktowe). Analiza sentymentu agreguje materiał tekstowy z pięciu źródeł z wykorzystaniem leksykonów Opinion Lexicon oraz AFINN-165, generując unifikowany wskaźnik dla całej populacji.
 
 \begin{table}[H]
 \centering
@@ -2902,7 +2926,7 @@ Typ rekomendacji & „Dopasowane do Twojego budżetu"~& „Najlepiej oceniane pr
 
 \medskip
 
-\textbf{Wyniki testów:} Wnioskowanie rozmyte osiągnęło najkrótszy czas odpowiedzi (<100ms dla ewaluacji 100 produktów) dzięki eliminacji konieczności przechowywania macierzy - kalkulacje realizowane są dynamicznie. Wyniki odnoszą się do zaimplementowanego systemu Mamdaniego wykorzystującego 6 reguł IF-THEN oraz 3 zmienne wejściowe (punkt cenowy, wskaźnik jakości, popularność). Osiągnięto pełną wyjaśnialność (100\%) - każda sugestia zawiera szczegółowe uzasadnienie aktywacji konkretnych reguł. Analiza sentymentu wymagała wstępnego przetwarzania materiału tekstowego (tokenizacja, eliminacja stop words), lecz działała uniwersalnie bez konstrukcji profili użytkowników. Kluczowym ograniczeniem analizy sentymentu jest podatność na negację oraz ironię w tekście („nie polecam"~może zostać błędnie sklasyfikowane jako pozytywne przy wykryciu terminu „polecam"~przez leksykon).
+\textbf{Wyniki testów:} Wnioskowanie rozmyte osiągnęło najkrótszy czas odpowiedzi dzięki eliminacji konieczności przechowywania macierzy - kalkulacje realizowane są dynamicznie. Wyniki odnoszą się do zaimplementowanego systemu Mamdaniego wykorzystującego 6 reguł IF-THEN oraz 3 zmienne wejściowe (punkt cenowy, wskaźnik jakości, popularność). Osiągnięto pełną wyjaśnialność (100\%) - każda sugestia zawiera szczegółowe uzasadnienie aktywacji konkretnych reguł. Analiza sentymentu wymagała wstępnego przetwarzania materiału tekstowego (tokenizacja, eliminacja stop words), lecz działała uniwersalnie bez konstrukcji profili użytkowników. Kluczowym ograniczeniem analizy sentymentu jest podatność na negację oraz ironię w tekście („nie polecam"~może zostać błędnie sklasyfikowane jako pozytywne przy wykryciu terminu „polecam"~przez leksykon).
 
 \bigskip
 
@@ -2969,7 +2993,7 @@ Ewaluacja sześciu algorytmów rekomendacyjnych wykazała, że każdy z nich adr
 
 \textbf{Algorytmy spersonalizowane vs uniwersalne:} Logika rozmyta (profil wydatkowy użytkownika) dostosowuje sugestie według wrażliwości cenowej, oferując pełną wyjaśnialność (transparentność 100\% - wizualizacja aktywacji 6 reguł IF-THEN). Analiza sentymentu (opinie społeczności) generuje globalny ranking jakościowy dostępny dla całej populacji. Wnioskowanie rozmyte wykazuje wyższą skuteczność dla użytkowników o wyrazistych preferencjach, podczas gdy analiza sentymentu funkcjonuje efektywnie jako uniwersalny filtr jakości.
 
-\medskip
+\newpage
 
 \textbf{Algorytmy sekwencyjne vs asocjacyjne:} Modele probabilistyczne (sekwencje temporalne) prognozują przyszłe transakcje poprzez połączenie łańcuchów Markowa (predykcja kategorii) oraz profilu behawioralnego Bayesa (prawdopodobieństwo transakcji), umożliwiając identyfikację użytkowników zagrożonych churnem. Apriori (współwystępowania) identyfikuje reguły asocjacyjne produktów komplementarnych efektywne w sprzedaży krzyżowej (\textit{cross-selling}). Modele probabilistyczne osiągają lepsze wyniki dla użytkowników o regularnej aktywności (cykle zakupowe), Apriori dla rekomendacji akcesoriów oraz rozszerzeń.
 
@@ -3141,7 +3165,7 @@ Wartością pracy jest implementacja algorytmów od podstaw, co umożliwiło gł
 
 \newpage
 
-% \input{attachment.tex}
+\input{attachment.tex}
 
 %\begin{figure}[H]
     %\centering
