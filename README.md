@@ -164,7 +164,6 @@ Frontend will be available at [http://localhost:3000/](http://localhost:3000/).
 ## 📈 Features
 
 - **Advanced Product Recommendations:**
-
   - Collaborative Filtering (User-Based & Item-Based)
   - Content-Based Filtering
   - Association Rules (Frequently Bought Together)
@@ -173,7 +172,6 @@ Frontend will be available at [http://localhost:3000/](http://localhost:3000/).
   - Probabilistic Methods
 
 - **Comprehensive Admin Dashboard:**
-
   - Sales forecasting
   - Demand prediction
   - Customer churn risk assessment
@@ -306,7 +304,3 @@ See `.database/` directory for complete database documentation and entity relati
 This project is licensed under the [Apache License 2.0](LICENSE).
 
 ---
-
-## 📬 Contact
-
-For any questions or suggestions, feel free to open an issue or contact us directly via GitHub.
