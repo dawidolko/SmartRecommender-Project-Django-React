@@ -130,7 +130,217 @@ Gdzie:
 
 Po normalizacji obaj mają porównywalne wagi przy obliczaniu podobieństwa.
 
-## 2.3 Implementacja w Backend
+## 2.3 PRZYKŁAD KROK PO KROKU - Collaborative Filtering
+
+### Dane wejściowe z bazy danych
+
+Załóżmy, że mamy następujące dane w tabeli `OrderProduct`:
+
+| Order ID | User ID | Product ID    | Quantity |
+| -------- | ------- | ------------- | -------- |
+| 1        | User_1  | Laptop (P1)   | 1        |
+| 1        | User_1  | Mouse (P2)    | 2        |
+| 2        | User_2  | Laptop (P1)   | 1        |
+| 2        | User_2  | Keyboard (P3) | 1        |
+| 3        | User_3  | Mouse (P2)    | 3        |
+| 3        | User_3  | Keyboard (P3) | 1        |
+| 4        | User_4  | Laptop (P1)   | 2        |
+| 4        | User_4  | Mouse (P2)    | 1        |
+| 4        | User_4  | Monitor (P4)  | 1        |
+
+### KROK 1: Budowa macierzy User-Product
+
+```python
+user_product_matrix = defaultdict(dict)
+for order in OrderProduct.objects.all():
+    user_product_matrix[order.order.user_id][order.product_id] = order.quantity
+```
+
+**Wynik - macierz surowa:**
+
+```
+              P1(Laptop)  P2(Mouse)  P3(Keyboard)  P4(Monitor)
+User_1            1           2           0            0
+User_2            1           0           1            0
+User_3            0           3           1            0
+User_4            2           1           0            1
+```
+
+### KROK 2: Mean-Centering (Normalizacja)
+
+Dla każdego użytkownika obliczamy średnią z **zakupionych produktów** (wartości > 0):
+
+**User_1:** Kupił P1=1, P2=2 → średnia = (1+2)/2 = **1.5**
+**User_2:** Kupił P1=1, P3=1 → średnia = (1+1)/2 = **1.0**
+**User_3:** Kupił P2=3, P3=1 → średnia = (3+1)/2 = **2.0**
+**User_4:** Kupił P1=2, P2=1, P4=1 → średnia = (2+1+1)/3 = **1.33**
+
+**Normalizacja:** `normalized[u][p] = original[u][p] - mean[u]` (tylko dla zakupionych)
+
+```python
+for i, user_row in enumerate(matrix):
+    purchased_items = user_row[user_row > 0]
+    user_mean = np.mean(purchased_items)  # Średnia TYLKO z zakupionych
+
+    for j, val in enumerate(user_row):
+        if val > 0:
+            normalized_matrix[i][j] = val - user_mean
+        else:
+            normalized_matrix[i][j] = 0  # Zero zostaje zerem!
+```
+
+**Wynik - macierz znormalizowana:**
+
+```
+              P1(Laptop)  P2(Mouse)  P3(Keyboard)  P4(Monitor)
+User_1         1-1.5       2-1.5        0            0
+             = -0.5       = 0.5         0            0
+
+User_2         1-1.0        0         1-1.0          0
+             = 0.0         0         = 0.0           0
+
+User_3           0        3-2.0      1-2.0          0
+                 0        = 1.0      = -1.0          0
+
+User_4        2-1.33     1-1.33        0          1-1.33
+             = 0.67      = -0.33       0          = -0.33
+```
+
+**Macierz znormalizowana (zaokrąglona):**
+
+```
+              P1      P2      P3      P4
+User_1      -0.50    0.50    0.00    0.00
+User_2       0.00    0.00    0.00    0.00
+User_3       0.00    1.00   -1.00    0.00
+User_4       0.67   -0.33    0.00   -0.33
+```
+
+### KROK 3: Transpozycja macierzy
+
+```python
+product_similarity = cosine_similarity(normalized_matrix.T)
+```
+
+**Po transpozycji (.T)** - wiersze to teraz produkty:
+
+```
+              User_1   User_2   User_3   User_4
+P1(Laptop)    -0.50    0.00     0.00     0.67
+P2(Mouse)      0.50    0.00     1.00    -0.33
+P3(Keyboard)   0.00    0.00    -1.00     0.00
+P4(Monitor)    0.00    0.00     0.00    -0.33
+```
+
+### KROK 4: Obliczenie Cosine Similarity
+
+**Wzór Cosine Similarity:**
+
+$$cos(A, B) = \frac{A \cdot B}{||A|| \times ||B||} = \frac{\sum_{i} A_i \times B_i}{\sqrt{\sum_{i} A_i^2} \times \sqrt{\sum_{i} B_i^2}}$$
+
+**Przykład: Podobieństwo między Laptop (P1) a Mouse (P2)**
+
+```
+Wektor P1: [-0.50, 0.00, 0.00, 0.67]
+Wektor P2: [ 0.50, 0.00, 1.00, -0.33]
+
+1. Iloczyn skalarny (A · B):
+   = (-0.50 × 0.50) + (0.00 × 0.00) + (0.00 × 1.00) + (0.67 × -0.33)
+   = -0.25 + 0 + 0 + (-0.22)
+   = -0.47
+
+2. Norma wektora P1 (||A||):
+   = √((-0.50)² + 0² + 0² + 0.67²)
+   = √(0.25 + 0 + 0 + 0.45)
+   = √0.70 = 0.84
+
+3. Norma wektora P2 (||B||):
+   = √(0.50² + 0² + 1.00² + (-0.33)²)
+   = √(0.25 + 0 + 1.00 + 0.11)
+   = √1.36 = 1.17
+
+4. Cosine Similarity:
+   sim(P1, P2) = -0.47 / (0.84 × 1.17)
+               = -0.47 / 0.98
+               = -0.48
+```
+
+**Wynik:** `sim(Laptop, Mouse) = -0.48` (negatywna korelacja!)
+
+**Przykład: Podobieństwo między Mouse (P2) a Keyboard (P3)**
+
+```
+Wektor P2: [ 0.50, 0.00,  1.00, -0.33]
+Wektor P3: [ 0.00, 0.00, -1.00,  0.00]
+
+1. Iloczyn skalarny:
+   = (0.50 × 0) + (0 × 0) + (1.00 × -1.00) + (-0.33 × 0)
+   = 0 + 0 + (-1.00) + 0
+   = -1.00
+
+2. ||P2|| = 1.17 (obliczone wcześniej)
+
+3. ||P3|| = √(0² + 0² + (-1)² + 0²) = √1 = 1.00
+
+4. sim(P2, P3) = -1.00 / (1.17 × 1.00) = -0.85
+```
+
+**Wynik:** `sim(Mouse, Keyboard) = -0.85` (silna negatywna korelacja)
+
+### KROK 5: Macierz podobieństw i filtrowanie
+
+**Pełna macierz podobieństw (przykładowa):**
+
+```
+              P1(Laptop)  P2(Mouse)  P3(Keyboard)  P4(Monitor)
+P1(Laptop)      1.00       -0.48        0.00         0.72
+P2(Mouse)      -0.48        1.00       -0.85         0.28
+P3(Keyboard)    0.00       -0.85        1.00         0.00
+P4(Monitor)     0.72        0.28        0.00         1.00
+```
+
+**Filtrowanie (threshold = 0.5):**
+
+```python
+similarity_threshold = 0.5
+
+for i, product1_id in enumerate(product_ids):
+    for j, product2_id in enumerate(product_ids):
+        if i != j and product_similarity[i][j] > similarity_threshold:
+            # Zapisz do bazy
+```
+
+**Zapisane do tabeli `ProductSimilarity`:**
+
+| product1_id  | product2_id  | similarity_type | similarity_score |
+| ------------ | ------------ | --------------- | ---------------- |
+| P1 (Laptop)  | P4 (Monitor) | collaborative   | 0.72             |
+| P4 (Monitor) | P1 (Laptop)  | collaborative   | 0.72             |
+
+### KROK 6: Generowanie rekomendacji dla użytkownika
+
+Gdy **User_1** (który kupił Laptop i Mouse) pyta o rekomendacje:
+
+```python
+# Produkty kupione przez User_1
+user_purchases = [P1, P2]  # Laptop, Mouse
+
+# Znajdź podobne produkty
+for product_id in user_purchases:
+    similar = ProductSimilarity.objects.filter(
+        product1_id=product_id,
+        similarity_type="collaborative"
+    ).order_by("-similarity_score")[:5]
+```
+
+**Wynik:**
+
+- Dla Laptop (P1): podobny Monitor (P4) z score=0.72
+- Dla Mouse (P2): brak podobieństw > 0.5
+
+**Rekomendacja dla User_1:** Monitor (score=0.72)
+
+## 2.4 Implementacja w Backend
 
 ### Plik: `backend/home/recommendation_views.py`
 
@@ -230,7 +440,7 @@ def process_collaborative_filtering(self):
 const fetchCFDebug = async () => {
   const res = await axios.get(
     `${config.apiUrl}/api/collaborative-filtering-debug/`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
   setCfDebugData(res.data);
 };
@@ -256,7 +466,7 @@ useEffect(() => {
       // Pobierz aktywny algorytm użytkownika
       const settingsResponse = await axios.get(
         `${config.apiUrl}/api/recommendation-settings/`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       const algorithm =
         settingsResponse.data.active_algorithm || "collaborative";
@@ -264,7 +474,7 @@ useEffect(() => {
       // Pobierz rekomendacje dla algorytmu
       const response = await axios.get(
         `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
     }
   };
@@ -288,7 +498,7 @@ const fetchingAlgorithm = algorithmRequest.then((response) => {
   // Pobierz rekomendacje
   return axios.get(
     `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
 });
 ```
@@ -400,7 +610,273 @@ $$Final\_Score = (Opinion\_Score \times 0.40) + (Description\_Score \times 0.25)
 
 **Dlaczego takie wagi?** Rozwiązują problem **cold start** - produkty bez opinii klientów nadal otrzymują wynik sentymentu na podstawie pozostałych 4 źródeł tekstowych.
 
-## 3.3 Implementacja w Backend
+## 3.3 PRZYKŁAD KROK PO KROKU - Analiza Sentymentu
+
+### Dane wejściowe - Produkt "Premium Gaming Laptop Pro"
+
+**Produkt w bazie danych:**
+
+```python
+product = {
+    "id": 45,
+    "name": "Premium Gaming Laptop Pro",
+    "description": "Powerful gaming laptop with excellent performance and stunning graphics. Fast processor and reliable build quality.",
+    "categories": ["Gaming", "Laptops", "Premium"]
+}
+```
+
+**Opinie klientów (tabela Opinion):**
+
+```python
+opinions = [
+    {"user": "jan@mail.com", "content": "Excellent laptop, very fast and reliable!", "rating": 5},
+    {"user": "anna@mail.com", "content": "Great performance but poor battery life", "rating": 4},
+    {"user": "piotr@mail.com", "content": "Amazing quality, highly recommend!", "rating": 5}
+]
+```
+
+**Specyfikacje (tabela Specification):**
+
+```python
+specifications = [
+    {"parameter_name": "Processor", "specification": "Fast Intel Core i7"},
+    {"parameter_name": "Graphics", "specification": "Powerful NVIDIA RTX"}
+]
+```
+
+### KROK 1: Analiza pojedynczego tekstu
+
+**Wzór z kodu:**
+
+```python
+sentiment_score = (positive_count - negative_count) / total_words
+```
+
+**Przykład dla Opinii 1:** "Excellent laptop, very fast and reliable!"
+
+```
+Tokenizacja: ["excellent", "laptop", "very", "fast", "and", "reliable"]
+
+Sprawdzenie słowników:
+- "excellent" → positive_words ✓ → positive_count = 1
+- "laptop"    → nie w słownikach
+- "very"      → intensifier (w podstawowej wersji pomijany)
+- "fast"      → positive_words ✓ → positive_count = 2
+- "and"       → nie w słownikach
+- "reliable"  → positive_words ✓ → positive_count = 3
+
+Wynik:
+- positive_count = 3
+- negative_count = 0
+- total_words = 6
+
+OBLICZENIE:
+sentiment_score = (3 - 0) / 6 = 0.500
+
+KLASYFIKACJA:
+0.500 > 0.1 → category = "positive"
+```
+
+**Przykład dla Opinii 2:** "Great performance but poor battery life"
+
+```
+Tokenizacja: ["great", "performance", "but", "poor", "battery", "life"]
+
+Sprawdzenie słowników:
+- "great"       → positive_words ✓ → positive_count = 1
+- "performance" → nie w słownikach
+- "but"         → nie w słownikach
+- "poor"        → negative_words ✓ → negative_count = 1
+- "battery"     → nie w słownikach
+- "life"        → nie w słownikach
+
+Wynik:
+- positive_count = 1
+- negative_count = 1
+- total_words = 6
+
+OBLICZENIE:
+sentiment_score = (1 - 1) / 6 = 0.000
+
+KLASYFIKACJA:
+-0.1 ≤ 0.000 ≤ 0.1 → category = "neutral"
+```
+
+**Przykład dla Opinii 3:** "Amazing quality, highly recommend!"
+
+```
+Tokenizacja: ["amazing", "quality", "highly", "recommend"]
+
+Sprawdzenie słowników:
+- "amazing"   → positive_words ✓ → positive_count = 1
+- "quality"   → positive_words ✓ → positive_count = 2
+- "highly"    → nie w słownikach (intensifier)
+- "recommend" → positive_words ✓ → positive_count = 3
+
+Wynik:
+- positive_count = 3
+- negative_count = 0
+- total_words = 4
+
+OBLICZENIE:
+sentiment_score = (3 - 0) / 4 = 0.750
+
+KLASYFIKACJA:
+0.750 > 0.1 → category = "positive"
+```
+
+### KROK 2: Agregacja opinii (waga 40%)
+
+```python
+opinion_scores = [0.500, 0.000, 0.750]
+opinion_sentiment = sum(opinion_scores) / len(opinion_scores)
+                  = (0.500 + 0.000 + 0.750) / 3
+                  = 1.250 / 3
+                  = 0.417
+```
+
+### KROK 3: Analiza opisu produktu (waga 25%)
+
+**Tekst:** "Powerful gaming laptop with excellent performance and stunning graphics. Fast processor and reliable build quality."
+
+```
+Tokenizacja: ["powerful", "gaming", "laptop", "with", "excellent",
+             "performance", "and", "stunning", "graphics", "fast",
+             "processor", "and", "reliable", "build", "quality"]
+
+Sprawdzenie słowników:
+- "powerful"  → positive_words ✓
+- "excellent" → positive_words ✓
+- "stunning"  → positive_words ✓
+- "fast"      → positive_words ✓
+- "reliable"  → positive_words ✓
+- "quality"   → positive_words ✓
+
+Wynik:
+- positive_count = 6
+- negative_count = 0
+- total_words = 15
+
+OBLICZENIE:
+desc_score = (6 - 0) / 15 = 0.400
+```
+
+### KROK 4: Analiza nazwy produktu (waga 15%)
+
+**Tekst:** "Premium Gaming Laptop Pro"
+
+```
+Tokenizacja: ["premium", "gaming", "laptop", "pro"]
+
+Sprawdzenie słowników:
+- "premium" → positive_words ✓ → positive_count = 1
+- "gaming"  → nie w słownikach
+- "laptop"  → nie w słownikach
+- "pro"     → nie w słownikach
+
+Wynik:
+- positive_count = 1
+- negative_count = 0
+- total_words = 4
+
+OBLICZENIE:
+name_score = (1 - 0) / 4 = 0.250
+```
+
+### KROK 5: Analiza specyfikacji (waga 12%)
+
+**Tekst:** "Processor Fast Intel Core i7 Graphics Powerful NVIDIA RTX"
+
+```
+Tokenizacja: ["processor", "fast", "intel", "core", "i7",
+             "graphics", "powerful", "nvidia", "rtx"]
+
+Sprawdzenie słowników:
+- "fast"     → positive_words ✓
+- "powerful" → positive_words ✓
+
+Wynik:
+- positive_count = 2
+- negative_count = 0
+- total_words = 9
+
+OBLICZENIE:
+spec_score = (2 - 0) / 9 = 0.222
+```
+
+### KROK 6: Analiza kategorii (waga 8%)
+
+**Tekst:** "Gaming Laptops Premium"
+
+```
+Tokenizacja: ["gaming", "laptops", "premium"]
+
+Sprawdzenie słowników:
+- "premium" → positive_words ✓
+
+Wynik:
+- positive_count = 1
+- negative_count = 0
+- total_words = 3
+
+OBLICZENIE:
+category_score = (1 - 0) / 3 = 0.333
+```
+
+### KROK 7: Agregacja wieloźródłowa (WZÓR KOŃCOWY)
+
+**Wzór z kodu:**
+
+```python
+final_score = (
+    opinion_sentiment * 0.40 +
+    desc_score * 0.25 +
+    name_score * 0.15 +
+    spec_score * 0.12 +
+    category_score * 0.08
+)
+```
+
+**Podstawienie wartości:**
+
+```
+final_score = (0.417 × 0.40) + (0.400 × 0.25) + (0.250 × 0.15) + (0.222 × 0.12) + (0.333 × 0.08)
+            = 0.167 + 0.100 + 0.038 + 0.027 + 0.027
+            = 0.359
+```
+
+### PODSUMOWANIE dla produktu "Premium Gaming Laptop Pro"
+
+| Źródło          | Score | Waga | Wkład     |
+| --------------- | ----- | ---- | --------- |
+| Opinie klientów | 0.417 | 40%  | 0.167     |
+| Opis produktu   | 0.400 | 25%  | 0.100     |
+| Nazwa produktu  | 0.250 | 15%  | 0.038     |
+| Specyfikacje    | 0.222 | 12%  | 0.027     |
+| Kategorie       | 0.333 | 8%   | 0.027     |
+| **FINAL SCORE** |       |      | **0.359** |
+
+**Klasyfikacja:** 0.359 > 0.1 → **"positive"** ✅
+
+### KROK 8: Sortowanie wyników wyszukiwania
+
+Gdy użytkownik szuka "laptop", system:
+
+1. Znajduje wszystkie produkty pasujące do zapytania
+2. Oblicza `final_score` dla każdego (jak powyżej)
+3. Sortuje malejąco po `final_score`
+
+```python
+products_with_scores.sort(key=lambda x: x["final_score"], reverse=True)
+
+# Wynik:
+# 1. Premium Gaming Laptop Pro - final_score: 0.359 (positive)
+# 2. Budget Office Laptop      - final_score: 0.120 (positive)
+# 3. Basic Laptop              - final_score: -0.050 (neutral)
+# 4. Cheap Refurbished Laptop  - final_score: -0.200 (negative)
+```
+
+## 3.4 Implementacja w Backend
 
 ### Plik: `backend/home/custom_recommendation_engine.py`
 
@@ -596,7 +1072,7 @@ Wyszukiwarka używa endpointu `GET /api/sentiment-search/?q={query}` który zwra
 const fetchSentimentDetailDebug = async (productId) => {
   const res = await axios.get(
     `${config.apiUrl}/api/sentiment-product-debug/?product_id=${productId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
   setSentimentDetailData(res.data);
 };
@@ -718,7 +1194,343 @@ $$Lift(X \rightarrow Y) = \frac{Support(X, Y)}{Support(X) \times Support(Y)} = \
 - **Lift = 1:** Niezależność - brak związku
 - **Lift < 1:** Negatywna korelacja - produkty kupowane razem rzadziej niż losowo
 
-## 4.3 Implementacja w Backend
+## 4.3 PRZYKŁAD KROK PO KROKU - Reguły Asocjacyjne (Apriori)
+
+### 📋 DANE WEJŚCIOWE - Historia zamówień ze sklepu
+
+Wyobraź sobie, że mamy sklep komputerowy i chcemy znaleźć jakie produkty klienci często kupują razem.
+
+**Tabela zamówień z bazy danych:**
+
+```
+╔══════════════╦═══════════════════════════════════════════════╗
+║  Zamówienie  ║           Co kupił klient?                    ║
+╠══════════════╬═══════════════════════════════════════════════╣
+║  Zam. #1     ║  🖥️ Laptop  +  🖱️ Myszka  +  ⌨️ Klawiatura    ║
+║  Zam. #2     ║  🖥️ Laptop  +  🖵 Monitor                     ║
+║  Zam. #3     ║  🖱️ Myszka  +  ⌨️ Klawiatura                  ║
+║  Zam. #4     ║  🖥️ Laptop  +  🖱️ Myszka                      ║
+║  Zam. #5     ║  ⌨️ Klawiatura  +  🖵 Monitor                  ║
+║  Zam. #6     ║  🖥️ Laptop  +  🖱️ Myszka  +  🖵 Monitor       ║
+║  Zam. #7     ║  🖱️ Myszka  +  ⌨️ Klawiatura  +  🎧 Słuchawki ║
+║  Zam. #8     ║  🖥️ Laptop  +  ⌨️ Klawiatura                  ║
+║  Zam. #9     ║  🖵 Monitor  +  🎧 Słuchawki                   ║
+║  Zam. #10    ║  🖥️ Laptop  +  🖱️ Myszka  +  ⌨️ Klaw. + 🖵 Mon║
+╚══════════════╩═══════════════════════════════════════════════╝
+
+RAZEM: 10 zamówień
+```
+
+---
+
+### 🔢 KROK 1: Policz ile razy każdy produkt został kupiony
+
+**Pytanie:** W ilu zamówieniach pojawił się każdy produkt?
+
+```
+🖥️ Laptop:     Zam. #1, #2, #4, #6, #8, #10  →  6 razy
+🖱️ Myszka:     Zam. #1, #3, #4, #6, #7, #10  →  7 razy  ← NAJPOPULARNIEJSZA!
+⌨️ Klawiatura: Zam. #1, #3, #5, #7, #8, #10  →  6 razy
+🖵 Monitor:    Zam. #2, #5, #6, #9, #10      →  5 razy
+🎧 Słuchawki:  Zam. #7, #9                   →  2 razy
+```
+
+**SUPPORT dla pojedynczych produktów:**
+
+$$Support(Produkt) = \frac{\text{ile zamówień zawiera produkt}}{\text{wszystkie zamówienia}}$$
+
+```
+Support(Laptop)     = 6/10 = 0.60 = 60%
+Support(Myszka)     = 7/10 = 0.70 = 70%
+Support(Klawiatura) = 6/10 = 0.60 = 60%
+Support(Monitor)    = 5/10 = 0.50 = 50%
+Support(Słuchawki)  = 2/10 = 0.20 = 20%
+```
+
+---
+
+### 🔢 KROK 2: Policz ile razy PARY produktów były kupowane razem
+
+**Pytanie:** W ilu zamówieniach klient kupił JEDNOCZEŚNIE produkt A i produkt B?
+
+**Przykład szczegółowy: Para (Laptop + Myszka)**
+
+Sprawdzam każde zamówienie - czy zawiera JEDNOCZEŚNIE Laptop i Myszkę?
+
+```
+Zam. #1:  Laptop ✓  Myszka ✓  → TAK, oba są!     ✅
+Zam. #2:  Laptop ✓  Myszka ✗  → NIE, brak myszki ❌
+Zam. #3:  Laptop ✗  Myszka ✓  → NIE, brak laptopa ❌
+Zam. #4:  Laptop ✓  Myszka ✓  → TAK, oba są!     ✅
+Zam. #5:  Laptop ✗  Myszka ✗  → NIE             ❌
+Zam. #6:  Laptop ✓  Myszka ✓  → TAK, oba są!     ✅
+Zam. #7:  Laptop ✗  Myszka ✓  → NIE, brak laptopa ❌
+Zam. #8:  Laptop ✓  Myszka ✗  → NIE, brak myszki ❌
+Zam. #9:  Laptop ✗  Myszka ✗  → NIE             ❌
+Zam. #10: Laptop ✓  Myszka ✓  → TAK, oba są!     ✅
+
+SUMA: 4 zamówienia zawierają JEDNOCZEŚNIE Laptop i Myszkę
+```
+
+**SUPPORT dla pary (Laptop, Myszka):**
+
+$$Support(Laptop, Myszka) = \frac{4}{10} = 0.40 = 40\%$$
+
+**Wszystkie pary produktów:**
+
+| Para produktów       | Które zamówienia? | Ile razem? | Support  |
+| -------------------- | ----------------- | ---------- | -------- |
+| Laptop + Myszka      | #1, #4, #6, #10   | 4          | **0.40** |
+| Laptop + Klawiatura  | #1, #8, #10       | 3          | 0.30     |
+| Laptop + Monitor     | #2, #6, #10       | 3          | 0.30     |
+| Myszka + Klawiatura  | #1, #3, #7, #10   | 4          | **0.40** |
+| Myszka + Monitor     | #6, #10           | 2          | 0.20     |
+| Klawiatura + Monitor | #5, #10           | 2          | 0.20     |
+
+---
+
+### 🔢 KROK 3: Oblicz CONFIDENCE (Pewność reguły)
+
+**Pytanie:** Jeśli klient kupił Laptop, to jak często kupił też Myszkę?
+
+**WZÓR CONFIDENCE:**
+
+$$Confidence(Laptop \rightarrow Myszka) = \frac{Support(Laptop, Myszka)}{Support(Laptop)}$$
+
+**Słownie:** Podziel "ile razy kupiono oba" przez "ile razy kupiono pierwszy produkt"
+
+**OBLICZENIE dla reguły: Laptop → Myszka**
+
+```
+                    Support(Laptop, Myszka)     0.40
+Confidence = ─────────────────────────────── = ────── = 0.667 = 66.7%
+                       Support(Laptop)          0.60
+
+┌─────────────────────────────────────────────────────────────────┐
+│  INTERPRETACJA:                                                 │
+│                                                                 │
+│  Z wszystkich 6 zamówień gdzie klient kupił Laptop:             │
+│  → W 4 zamówieniach kupił też Myszkę                            │
+│  → 4/6 = 66.7%                                                  │
+│                                                                 │
+│  "Jeśli klient kupuje Laptop, to w 67% przypadków               │
+│   kupuje też Myszkę"                                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**OBLICZENIE dla reguły odwrotnej: Myszka → Laptop**
+
+```
+                    Support(Laptop, Myszka)     0.40
+Confidence = ─────────────────────────────── = ────── = 0.571 = 57.1%
+                       Support(Myszka)          0.70
+
+┌─────────────────────────────────────────────────────────────────┐
+│  INTERPRETACJA:                                                 │
+│                                                                 │
+│  Z wszystkich 7 zamówień gdzie klient kupił Myszkę:             │
+│  → W 4 zamówieniach kupił też Laptop                            │
+│  → 4/7 = 57.1%                                                  │
+│                                                                 │
+│  "Jeśli klient kupuje Myszkę, to w 57% przypadków               │
+│   kupuje też Laptop"                                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**⚠️ UWAGA:** Confidence w obie strony jest RÓŻNE!
+
+- Laptop → Myszka: 66.7%
+- Myszka → Laptop: 57.1%
+
+---
+
+### 🔢 KROK 4: Oblicz LIFT (Czy to przypadek czy prawdziwy związek?)
+
+**Problem z samym Confidence:**
+Myszka jest kupowana w 70% zamówień. Więc nawet jeśli Confidence(Laptop→Myszka) = 66.7%, to może być GORZEJ niż losowo!
+
+**LIFT odpowiada na pytanie:** Czy produkty są kupowane razem CZĘŚCIEJ czy RZADZIEJ niż gdyby nie było żadnego związku?
+
+**WZÓR LIFT:**
+
+$$Lift(Laptop \rightarrow Myszka) = \frac{Support(Laptop, Myszka)}{Support(Laptop) \times Support(Myszka)}$$
+
+**Słownie:** Podziel "rzeczywiste współwystępowanie" przez "oczekiwane gdyby były niezależne"
+
+**OBLICZENIE dla reguły: Laptop → Myszka**
+
+```
+             Support(Laptop, Myszka)           0.40
+Lift = ─────────────────────────────── = ─────────────── = 0.952
+       Support(Laptop) × Support(Myszka)   0.60 × 0.70
+
+
+ROZŁÓŻMY TO NA CZYNNIKI PIERWSZE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Co oznacza Support(Laptop) × Support(Myszka)?
+
+   → 0.60 × 0.70 = 0.42 = 42%
+
+   To jest OCZEKIWANY support gdyby Laptop i Myszka były
+   kupowane CAŁKOWICIE NIEZALEŻNIE od siebie.
+
+   Innymi słowy: jeśli 60% klientów kupuje Laptop
+   i 70% kupuje Myszkę, to gdyby nie było żadnego związku,
+   to 60% × 70% = 42% kupiłoby oba.
+
+2. Co oznacza Support(Laptop, Myszka)?
+
+   → 0.40 = 40%
+
+   To jest RZECZYWISTY support - ile faktycznie kupiono razem.
+
+3. PORÓWNANIE:
+
+   Oczekiwane (gdyby niezależne): 42%
+   Rzeczywiste (faktyczne):        40%
+
+   Lift = 40% / 42% = 0.952
+
+┌─────────────────────────────────────────────────────────────────┐
+│  INTERPRETACJA LIFT = 0.95:                                     │
+│                                                                 │
+│  Lift < 1 oznacza NEGATYWNĄ korelację!                          │
+│                                                                 │
+│  Laptop i Myszka są kupowane razem RZADZIEJ (40%)               │
+│  niż gdyby były niezależne (42%).                               │
+│                                                                 │
+│  Różnica jest mała (0.95 ≈ 1), więc związek jest słaby.         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**INTERPRETACJA WARTOŚCI LIFT:**
+
+```
+┌────────────────┬────────────────────────────────────────────────┐
+│  Lift > 1.0    │  POZYTYWNA korelacja - kupowane CZĘŚCIEJ razem │
+│                │  Im wyższy, tym silniejszy związek             │
+├────────────────┼────────────────────────────────────────────────┤
+│  Lift = 1.0    │  BRAK związku - produkty są NIEZALEŻNE         │
+│                │  Kupowanie jednego nie wpływa na drugie        │
+├────────────────┼────────────────────────────────────────────────┤
+│  Lift < 1.0    │  NEGATYWNA korelacja - kupowane RZADZIEJ razem │
+│                │  Klienci UNIKAJĄ kupowania obu                 │
+└────────────────┴────────────────────────────────────────────────┘
+```
+
+---
+
+### 🔢 KROK 5: Oblicz wszystkie reguły
+
+**Pełna tabela obliczeń:**
+
+| Reguła              | Support(A) | Support(B) | Support(A,B) | Confidence            | Lift                        |
+| ------------------- | ---------- | ---------- | ------------ | --------------------- | --------------------------- |
+| Laptop → Myszka     | 0.60       | 0.70       | 0.40         | 0.40/0.60 = **66.7%** | 0.40/(0.60×0.70) = **0.95** |
+| Myszka → Laptop     | 0.70       | 0.60       | 0.40         | 0.40/0.70 = **57.1%** | 0.40/(0.70×0.60) = **0.95** |
+| Laptop → Klawiatura | 0.60       | 0.60       | 0.30         | 0.30/0.60 = **50.0%** | 0.30/(0.60×0.60) = **0.83** |
+| Klawiatura → Laptop | 0.60       | 0.60       | 0.30         | 0.30/0.60 = **50.0%** | 0.30/(0.60×0.60) = **0.83** |
+| Myszka → Klawiatura | 0.70       | 0.60       | 0.40         | 0.40/0.70 = **57.1%** | 0.40/(0.70×0.60) = **0.95** |
+| Klawiatura → Myszka | 0.60       | 0.70       | 0.40         | 0.40/0.60 = **66.7%** | 0.40/(0.60×0.70) = **0.95** |
+| Laptop → Monitor    | 0.60       | 0.50       | 0.30         | 0.30/0.60 = **50.0%** | 0.30/(0.60×0.50) = **1.00** |
+| Monitor → Laptop    | 0.50       | 0.60       | 0.30         | 0.30/0.50 = **60.0%** | 0.30/(0.50×0.60) = **1.00** |
+
+**Najciekawsza reguła: Laptop ↔ Monitor z Lift = 1.00**
+
+To oznacza, że te produkty są kupowane razem DOKŁADNIE tak często jak wynikałoby z losowości - nie ma ani pozytywnego ani negatywnego związku.
+
+---
+
+### 🔢 KROK 6: Filtrowanie i wybór najlepszych reguł
+
+**Parametry w systemie:**
+
+- `min_support = 0.20` (para musi występować w min. 20% zamówień)
+- `min_confidence = 0.30` (pewność reguły min. 30%)
+- `min_lift = 0.50` (lift min. 0.5)
+
+```python
+# Kod z custom_recommendation_engine.py
+for rule in all_rules:
+    if (rule.support >= 0.20 and
+        rule.confidence >= 0.30 and
+        rule.lift >= 0.50):
+        approved_rules.append(rule)
+```
+
+---
+
+### 🎯 KROK 7: Użycie w sklepie - "Frequently Bought Together"
+
+**Scenariusz:** Klient dodał **Laptop** do koszyka.
+
+**Zapytanie do bazy:**
+
+```python
+associations = ProductAssociation.objects.filter(
+    product_1_id="Laptop"
+).order_by("-confidence")[:3]
+```
+
+**Wynik sortowany po Confidence:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🛒 KLIENCI KTÓRZY KUPILI LAPTOP, KUPILI RÓWNIEŻ:               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. 🖱️ MYSZKA                                                   │
+│     ├─ Confidence: 66.7%  ("67% klientów kupiło też myszkę")    │
+│     ├─ Support: 40%       ("w 40% wszystkich zamówień")         │
+│     └─ Lift: 0.95         ("lekka negatywna korelacja")         │
+│                                                                 │
+│  2. ⌨️ KLAWIATURA                                               │
+│     ├─ Confidence: 50.0%  ("50% klientów kupiło klawiaturę")    │
+│     ├─ Support: 30%       ("w 30% wszystkich zamówień")         │
+│     └─ Lift: 0.83         ("negatywna korelacja")               │
+│                                                                 │
+│  3. 🖵 MONITOR                                                  │
+│     ├─ Confidence: 50.0%  ("50% klientów kupiło monitor")       │
+│     ├─ Support: 30%       ("w 30% wszystkich zamówień")         │
+│     └─ Lift: 1.00         ("brak korelacji - niezależne")       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 📊 PODSUMOWANIE - Co znaczą metryki?
+
+```
+┌──────────────┬────────────────────────────────────────────────────────┐
+│   METRYKA    │                    CO OZNACZA?                         │
+├──────────────┼────────────────────────────────────────────────────────┤
+│              │ "Jak popularna jest ta para?"                          │
+│   SUPPORT    │                                                        │
+│              │ Support(A,B) = 0.40 → "40% wszystkich zamówień         │
+│              │                        zawiera oba produkty"           │
+├──────────────┼────────────────────────────────────────────────────────┤
+│              │ "Jeśli kupisz A, jak pewne jest że kupisz B?"          │
+│  CONFIDENCE  │                                                        │
+│              │ Confidence(A→B) = 67% → "67% klientów którzy kupili A, │
+│              │                          kupiło też B"                 │
+├──────────────┼────────────────────────────────────────────────────────┤
+│              │ "Czy to prawdziwy związek czy przypadek?"              │
+│     LIFT     │                                                        │
+│              │ Lift > 1: "Kupowane CZĘŚCIEJ razem niż losowo"         │
+│              │ Lift = 1: "Brak związku, niezależne"                   │
+│              │ Lift < 1: "Kupowane RZADZIEJ razem niż losowo"         │
+└──────────────┴────────────────────────────────────────────────────────┘
+```
+
+**Praktyczna rada:**
+
+- **Wysokie Confidence + Wysokie Lift** = Najlepsza rekomendacja!
+- **Wysokie Confidence + Niskie Lift** = Produkt i tak jest popularny, niekoniecznie związek
+- **Niskie Confidence + Wysokie Lift** = Rzadko kupowane razem, ale jak już to zawsze
+
+## 4.4 Implementacja w Backend
 
 ### Plik: `backend/home/custom_recommendation_engine.py`
 
@@ -1022,7 +1834,7 @@ const fetchRecommendations = async () => {
 
     // Pobierz rekomendacje Apriori
     const response = await axios.get(
-      `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`
+      `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`,
     );
 
     setRecommendations(response.data);
@@ -1077,7 +1889,7 @@ useEffect(() => {
 const fetchAssociationDebug = async (productId) => {
   const res = await axios.get(
     `${config.apiUrl}/api/product-association-debug/?product_id=${productId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
   setAssociationDebugData(res.data);
 };
@@ -1184,13 +1996,13 @@ const fetchAssociationDebug = async (productId) => {
 ```jsx
 // Pobierz aktywny algorytm
 const settingsResponse = await axios.get(
-  `${config.apiUrl}/api/recommendation-settings/`
+  `${config.apiUrl}/api/recommendation-settings/`,
 );
 const algorithm = settingsResponse.data.active_algorithm || "collaborative";
 
 // Pobierz rekomendacje
 const response = await axios.get(
-  `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`
+  `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
 );
 ```
 
