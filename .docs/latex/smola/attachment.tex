@@ -363,7 +363,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System wykonuje zapytanie do tabeli \texttt{ProductSimilarity} filtrując po \texttt{product1\_id = \{id\}} oraz \texttt{type=\allowbreak 'content\_based'}
 \item System sortuje wyniki malejąco według \texttt{similarity\_score}
 \item System pobiera Top 10 najbardziej podobnych produktów z bazy danych
-\item Backend zwraca JSON z listą produktów zawierającą: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{similarity\_score}
+\item Backend zwraca JSON z listą produktów zawierającą: \texttt{product\_id}, \texttt{name}, \texttt{price}, \\\texttt{similarity\_score}
 \item Frontend wyświetla sekcję „Podobne produkty" z kafelkami produktów
 \item Każdy kafelek zawiera zdjęcie, nazwę, cenę oraz wskaźnik podobieństwa (np. „85\% podobny")
 \item Użytkownik przegląda rekomendacje
@@ -391,7 +391,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item System wyświetla panel zarządzania CBF z przyciskiem „Generate Similarity Matrix"
 \item Administrator klika „Generate Similarity Matrix"
 \item System wywołuje endpoint \texttt{POST /api/admin/\allowbreak content-based/\allowbreak generate}
-\item Backend uruchamia algorytm \texttt{ContentBased\allowbreak Recommendation\allowbreak Engine.\allowbreak generate\_\allowbreak similarities()}
+\item Backend uruchamia algorytm \texttt{ContentBased\allowbreak Recommendation\allowbreak Engine.\allowbreak generate\_\allowbreak \\similarities()}
 \item System pobiera wszystkie produkty z bazy danych
 \item Dla każdego produktu system ekstraktuje cechy:
   \begin{itemize}
@@ -479,7 +479,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \item Defuzzyfikacja - oblicza końcowy \texttt{fuzzy\_score} metodą średniej ważonej
   \end{itemize}
 \item System sortuje produkty malejąco według \texttt{fuzzy\_score}
-\item System zwraca JSON z Top 10 rekomendacji zawierający: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{fuzzy\_score}, \texttt{activated\_rules}
+\item System zwraca JSON z Top 10 rekomendacji zawierający: \texttt{product\_id}, \texttt{name}, \texttt{price}, \\\texttt{fuzzy\_score}, \texttt{activated\_rules}
 \item Frontend wyświetla trzy zakładki:
   \begin{itemize}
   \item „Fuzzy Recommendations" - lista Top 10 produktów z fuzzy\_score i aktywowanymi regułami
@@ -603,9 +603,9 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
 \item Użytkownik loguje się do systemu
 \item Użytkownik otwiera panel klienta
 \item Użytkownik klika zakładkę „Probabilistic Recommendations"
-\item System wywołuje endpoint \texttt{GET /api/\allowbreak probabilistic-\allowbreak recommendations/\allowbreak ?user\_id=\{id\}}
+\item System wywołuje endpoint \texttt{GET /api/\allowbreak probabilistic-\allowbreak recommendations/\allowbreak \\?user\_id=\{id\}}
 \item Backend wywołuje \texttt{ProbabilisticAPI} z parametrem \texttt{user\_id}
-\item System pobiera historię zamówień użytkownika z bazy danych wywołując \texttt{get\_user\_\allowbreak orders(\allowbreak user\_id)}
+\item System pobiera historię zamówień użytkownika z bazy danych wywołując \texttt{get\_user\_\allowbreak \\orders(\allowbreak user\_id)}
 \item System ekstraktuje sekwencję kategorii produktów z zamówień uporządkowanych chronologicznie
 \item System wywołuje \texttt{MarkovChain.\allowbreak predict\_next\_\allowbreak products(\allowbreak order\_\allowbreak sequence)}:
   \begin{itemize}
@@ -621,7 +621,7 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \item Oblicza prawdopodobieństwo zakupu w najbliższym okresie
   \end{itemize}
 \item System agreguje wyniki: 60\% waga dla Markov, 40\% waga dla Naive Bayes
-\item Backend zwraca JSON z Top 10 rekomendacji zawierający: \texttt{product\_id}, \texttt{name}, \texttt{price}, \texttt{markov\_probability}, \texttt{bayes\_probability}, \texttt{combined\_score}
+\item Backend zwraca JSON z Top 10 rekomendacji zawierający: \texttt{product\_id}, \texttt{name}, \texttt{price}, \\\texttt{markov\_probability}, \texttt{bayes\_probability}, \texttt{combined\_score}
 \item Frontend wyświetla trzy zakładki:
   \begin{itemize}
   \item „Probabilistic Recommendations" - lista Top 10 produktów z prawdopodobieństwami
