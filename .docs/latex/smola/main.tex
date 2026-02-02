@@ -4,6 +4,8 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[lf]{carlito}
+\renewcommand{\familydefault}{\sfdefault}
 \usepackage[polish]{babel}
 \usepackage{amsmath, amssymb}
 \usepackage{amsthm}
@@ -715,17 +717,6 @@ Implementacja własna pozwala na zastosowanie strategii niedostępnych w rozwią
 \item \textbf{Proces Markowa pierwszego rzędu} - estymacja przyszłych kategorii transakcyjnych na bazie macierzy prawdopodobieństw przejścia.
 \end{itemize}
 
-\item \textbf{Niezależność infrastrukturalna i przenośność}:
-
-Stos Django + React + PostgreSQL zapewnia możliwość uruchomienia na dowolnym środowisku: chmury publiczne (AWS, GCP, Azure), infrastruktura on-premise, środowisko deweloperskie lokalne. Przeniesienie między platformami ogranicza się do rekonfiguracji parametrów połączeniowych - warstwa algorytmiczna pozostaje niemodyfikowana.
-
-Kontrast: przejście pomiędzy usługami Amazon Personalize a Google Recommendations AI wymusza reimplementację całego interfejsu (strumienie zdarzeń, zbiory uczące, wywołania API), ponowne wytrenowanie modeli oraz okres degradacji jakości sugestii podczas migracji.
-
-\item \textbf{Wymiar dydaktyczny i przejrzystość decyzyjna}:
-
-Charakter pracy inżynierskiej zakłada eksplorację badawczą oraz cel edukacyjny. Budowa algorytmów od podstaw (bez gotowych bibliotek uczenia maszynowego) umożliwia dogłębną analizę mechanizmów każdej metody, czego nie oferują usługi zarządzane działające w modelu black-box.
-
-Wnioskowanie rozmyte oparte o reguły IF-THEN gwarantuje transparentność procesu decyzyjnego (koncepcja \textit{explainable AI} - interpretowalnej sztucznej inteligencji), podczas gdy modele głębokiego uczenia stosowane przez Amazon i Google charakteryzują się nieinterpretowalnością.
 \end{itemize}
 
 Autorska architektura silnika rekomendacyjnego stanowi racjonalny wybór dla platform e-commerce o średniej skali operacyjnej, oferując następujące cechy charakterystyczne:
@@ -1737,21 +1728,21 @@ Poniższe wykresy przedstawiają graficzną reprezentację zaimplementowanych fu
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{images/fuzzy_price_membership.png}
+  \includegraphics[width=0.70\textwidth]{images/fuzzy_price_membership.png}
   \caption{Funkcje przynależności dla ceny produktu (cheap, medium, expensive).}
   \label{fig:fuzzy_price}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{images/fuzzy_quality_membership.png}
+  \includegraphics[width=0.70\textwidth]{images/fuzzy_quality_membership.png}
   \caption{Funkcje przynależności dla jakości produktu (low, medium, high).}
   \label{fig:fuzzy_quality}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{images/fuzzy_popularity_membership.png}
+  \includegraphics[width=0.70\textwidth]{images/fuzzy_popularity_membership.png}
   \caption{Funkcje przynależności dla popularności produktu (low, medium, high).}
   \label{fig:fuzzy_popularity}
 \end{figure}
@@ -2280,7 +2271,7 @@ Metoda Content-Based Filtering jest wykorzystywana jako jedna z opcji sortowania
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/recomendationSystem.png}
+  \includegraphics[width=0.85\textwidth]{images/recomendationSystem.png}
   \caption{Rekomendacje Content-Based Filtering wyświetlane użytkownikowi na stronie głównej.}
   \label{fig:cbf_recommendations}
 \end{figure}
@@ -3162,8 +3153,6 @@ Wartością pracy jest implementacja algorytmów od podstaw, co umożliwiło gł
 \clearpage
 
 \newpage
-
-\input{attachment.tex}
 
 % \newpage
 % \newgeometry{left=3cm, right=3cm, top=2.5cm, bottom=2.5cm}
