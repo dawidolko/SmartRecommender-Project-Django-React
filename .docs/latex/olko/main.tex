@@ -6,8 +6,8 @@
 % Zaimportowane zależności
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[lf]{carlito} % Czcionka podobna do Calibri, lf = lining figures (cyfry wyrównane)
-\renewcommand{\familydefault}{\sfdefault} % Ustawienie Carlito jako domyślnej czcionki
+\usepackage[lf]{carlito}
+\renewcommand{\familydefault}{\sfdefault}
 \usepackage[polish]{babel}
 \usepackage{amsmath, amssymb}
 \usepackage{amsthm}
@@ -172,7 +172,7 @@ Systemy rekomendacyjne stanowią rozwiązanie tego problemu poprzez automatyczn�
 \subsection*{Cel pracy}
 
 Celem niniejszej pracy jest zaprojektowanie, implementacja oraz analiza kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. Aplikacja została opracowana od podstaw we współpracy dwuosobowej, w ramach której części frontendu, backendu oraz bazy danych zostały zrealizowane wspólnie, natomiast metody rekomendacyjne były implementowane przez każdego z osobna. Zaimplementowano łącznie
-sześć różnych metod rekomendacyjnych, niniejsza praca koncentruje się na trzech spośród nich: Collaborative Filtering, analizie sentymentu oraz regułach asocjacyjnych. Mechanizmy rekomendacyjne zostały zaprojektowane i zaimplementowane samodzielnie na podstawie literatury naukowej, bez wykorzystania gotowych bibliotek rekomendacyjnych, co umożliwiło pełną kontrolę nad logiką algorytmów oraz ich świadome dostosowanie do specyfiki branży handlu elektronicznego.
+sześć różnych metod rekomendacyjnych, jednak praca koncentruje się na trzech spośród nich: Collaborative Filtering, analizie sentymentu oraz regułach asocjacyjnych. Mechanizmy rekomendacyjne zostały zaprojektowane i zaimplementowane samodzielnie na podstawie literatury naukowej, bez wykorzystania gotowych bibliotek rekomendacyjnych, co umożliwiło pełną kontrolę nad logiką algorytmów oraz ich świadome dostosowanie do specyfiki branży handlu elektronicznego.
 
 \subsection*{Zakres pracy}
 
@@ -254,7 +254,7 @@ Dla porównania, własna implementacja eliminuje te koszty przy zachowaniu kontr
 
 \subsection*{Google Recommendations AI (Vertex AI)}
 
-Google Recommendations AI to platforma GCP wykorzystująca deep learning oraz algorytmy wieloramiennych bandytów kontekstowych (ang. multi-armed contextual bandits). Algorytmy te dynamicznie balansują eksplorację (testowanie nowych produktów \\w celu poznania ich wartości) z eksploatacją (rekomendowanie produktów o udowodnionej skuteczności), co pozwala systemowi optymalizować rekomendacje w czasie rzeczywistym na podstawie feedbacku użytkowników. System oferuje zaawansowane rekomendacje dla e-commerce, VOD (Video on Demand - wideo na żądanie) oraz platform newsowych, z automatycznym wykrywaniem trendów i sezonowości.
+Google Recommendations AI to platforma Google Cloud Platform wykorzystująca deep learning oraz algorytmy wieloramiennych bandytów kontekstowych (ang. multi-armed contextual bandits). Algorytmy te dynamicznie balansują eksplorację (testowanie nowych produktów \\w celu poznania ich wartości) z eksploatacją (rekomendowanie produktów o udowodnionej skuteczności), co pozwala systemowi optymalizować rekomendacje w czasie rzeczywistym na podstawie feedbacku użytkowników. System oferuje zaawansowane rekomendacje dla e-commerce, VOD oraz platform newsowych, z automatycznym wykrywaniem trendów i sezonowości.
 
 \textbf{Możliwości systemu:} Platforma zapewnia automatyczne wykrywanie trendów sezonowych oraz reagowanie na zmiany w zachowaniach użytkowników bez konieczności ręcznej rekonfiguracji. System oferuje funkcję ,,Frequently Bought Together'' (często kupowane razem), która analizuje koszyki zakupowe w sposób podobny do algorytmu Apriori. Google Recommendations AI automatycznie optymalizuje parametry modeli poprzez mechanizmy AutoML, co eliminuje potrzebę ręcznego dostrajania hiperparametrów. Platforma oferuje zaawansowane możliwości personalizacji rekomendacji z uwzględnieniem kontekstu sesji użytkownika (urządzenie, lokalizacja, pora dnia), co może zwiększać współczynnik konwersji.
 
@@ -278,10 +278,9 @@ Apache Mahout to otwartoźródłowy framework (ang. open-source framework) imple
 \textbf{Kluczowe ograniczenia w kontekście planowanego rozwiązania:}
 
 \begin{itemize}
-\item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów), oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie \\z Apache Spark,
+\item \textbf{Wymóg zaawansowanej wiedzy technicznej} - konieczność konfiguracji klastra Apache Spark (środowisko przetwarzania rozproszonego), YARN resource manager (zarządca zasobów), oraz monitoringu. Według Stack Overflow Developer Survey 2023, bardzo mała część programistów ma doświadczenie z Apache Spark,
 \item \textbf{Koszty infrastruktury} - utrzymanie klastra Spark wymaga dedykowanych zasobów serwerowych oraz czasu na implementację integracji (REST API, baza danych, cache, frontend), co generuje znaczące koszty operacyjne,
-\item \textbf{Brak analizy sentymentu} - Apache Mahout nie oferuje sentiment analysis. Wymagana jest integracja z zewnętrznymi bibliotekami (np. Stanford CoreNLP) lub samodzielna implementacja słownikowej analizy sentymentu,
-\item \textbf{Wolniejszy rozwój projektu} - według danych z lat 2023-2024, aktywność projektu spadła (2-3 commity miesięcznie vs 20-30 commitów w latach 2012-2014), co skutkuje ograniczoną dokumentacją dla nowszych wersji.
+\item \textbf{Brak analizy sentymentu} - Apache Mahout nie oferuje sentiment analysis. Wymagana jest integracja z zewnętrznymi bibliotekami (np. Stanford CoreNLP) lub samodzielna implementacja słownikowej analizy sentymentu.
 \end{itemize}
 
 \subsection*{Analiza i uzasadnienie własnego rozwiązania}
@@ -307,7 +306,6 @@ Własna implementacja pozwala na spójną integrację wszystkich trzech metod \\
 
 Własna implementacja (Django + PostgreSQL) eliminuje koszty licencyjne rozwiązań chmurowych przy zachowaniu wysokiej jakości rekomendacji. System jest szczególnie atrakcyjny dla małych i średnich platform e-commerce (do 10000 produktów, do 10000 użytkowników), które potrzebują zaawansowanych funkcjonalności rekomendacji przy ograniczonym budżecie.
 
-\newpage
 \item \textbf{Kontrola nad logiką biznesową i możliwość dostosowania}:
 
 Własna implementacja umożliwia unikalne podejścia niedostępne w gotowych rozwiązaniach:
@@ -321,7 +319,7 @@ Własna implementacja umożliwia unikalne podejścia niedostępne w gotowych roz
 
 Aplikacja oparta na Django + React + PostgreSQL może być wdrożona na dowolnej platformie: AWS, GCP, Azure, własne serwery lub localhost. Migracja między platformami wymaga jedynie zmiany parametrów połączenia - logika rekomendacji pozostaje niezmieniona.
 
-Dla porównania: migracja z Amazon Personalize do Google Recommendations AI wymaga przepisania całej integracji (śledzenie zdarzeń, dane treningowe, wywołania API) oraz ponownego trenowania modeli, co może trwać tygodnie i powodować degradację jakości rekomendacji.
+Dla porównania: migracja z Amazon Personalize do Google Recommendations AI wymaga przepisania całej integracji (śledzenie zdarzeń, dane treningowe, wywołania API) oraz ponownego trenowania modeli, co może trwać dłuższą chwilę i powodować degradację jakości rekomendacji.
 \end{itemize}
 
 \noindent
@@ -387,7 +385,6 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Dodawanie produktów do koszyka,
 \item Wyświetlanie zawartości koszyka z sumą całkowitą,
 \item Modyfikacja ilości produktów w koszyku,
-\item Usuwanie produktów z koszyka,
 \item Wyświetlanie rekomendacji Apriori (,,Często kupowane razem'').
 \end{itemize}
 
@@ -397,15 +394,6 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \item Składanie zamówień z danymi dostawy i płatności,
 \item Wyświetlanie historii zamówień użytkownika,
 \item Śledzenie statusu zamówienia (oczekujące, w realizacji, zakończone, anulowane),
-\item Wyświetlanie szczegółów zamkniętych zamówień.
-\end{itemize}
-
-\noindent
-\textbf{Zarządzanie kontem użytkownika:}
-\begin{itemize}
-\item Wyświetlanie profilu użytkownika,
-\item Edycja danych osobowych (imię, nazwisko, adres e-mail),
-\item Zmiana hasła.
 \end{itemize}
 
 \noindent
@@ -430,8 +418,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \begin{itemize}
 \item Dodawanie nowych produktów do katalogu,
 \item Edycja istniejących produktów (nazwa, opis, cena, kategorie, specyfikacje),
-\item Usuwanie produktów z potwierdzeniem,
-\item Zarządzanie kategoriami produktów.
+\item Usuwanie produktów z potwierdzeniem.
 \end{itemize}
 
 \noindent
@@ -455,8 +442,7 @@ System został zaprojektowany z uwzględnieniem następujących wymagań funkcjo
 \begin{itemize}
 \item Panel analityczny (dashboard) z kluczowymi wskaźnikami,
 \item Wykresy sprzedaży (miesięczny obrót, najpopularniejsze kategorie),
-\item Statystyki użytkowników (nowe rejestracje, aktywni użytkownicy),
-\item Statystyki produktów (najczęściej kupowane, najlepsze opinie).
+\item Statystyki produktów (najczęściej kupowane).
 \end{itemize}
 
 \noindent
@@ -701,7 +687,6 @@ Do operacji numerycznych i obliczania podobieństw wykorzystano:
 
 \begin{itemize}
 \item \textbf{Zaawansowane indeksy} - wsparcie dla B-tree (domyślne), GIN (wyszukiwanie pełnotekstowe), BRIN (optymalizacja dla dużych tabel),
-\item \textbf{Typ danych JSONB} - natywne przechowywanie i indeksowanie struktur JSON (wykorzystane w tabeli \texttt{method\_user\_purchase\_pattern} dla sezonowości zakupów),
 \item \textbf{Transakcje ACID} - gwarancja atomowości, spójności, izolacji i trwałości operacji krytycznych (zamówienia, płatności),
 \item \textbf{Klucze obce i constrainty} - automatyczne wymuszanie integralności referencyjnej oraz walidacji danych (np. rating 1-5 w opiniach),
 \item \textbf{Optymalizacja JOIN} - wydajne łączenie tabel w złożonych zapytaniach rekomendacyjnych,
@@ -763,6 +748,7 @@ Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
 \item Zależności (Dependencies): package.json (React, Axios, React Router, Framer Motion).
 \end{itemize}
 
+\newpage
 \noindent
 \textbf{2. Kontener backendu (Django 5.1.4)}
 \begin{itemize}
@@ -1227,6 +1213,8 @@ Rozdział przedstawia funkcjonowanie zaimplementowanych metod rekomendacyjnych w
 
 Rysunki \ref{fig:main_cf_1}, \ref{fig:main_cf_3} i \ref{fig:main_cf_2} przedstawiają trzy sekcje rekomendacji na stronie głównej aplikacji. Sekcje te są identyczne pod względem funkcjonalności i prezentują produkty w formie interaktywnych sliderów umożliwiających przewijanie oferty. Różnica między sekcjami polega wyłącznie na kolejności wyświetlania produktów - każda sekcja losuje inny podzbiór z pełnej listy rekomendacji, co zwiększa różnorodność prezentowanych ofert i minimalizuje efekt monotonii. Wszystkie trzy sekcje dynamicznie dostosowują wyświetlane produkty w zależności od metody rekomendacyjnej wybranej przez administratora w panelu zarządzania (rys. \ref{fig:admin_recommendation_settings}). Gdy aktywny jest algorytm Collaborative Filtering, wszystkie sekcje prezentują produkty dobrane na podstawie podobieństwa obliczonego metryką Adjusted Cosine Similarity zgodnie ze wzorem (1) z sekcji 5.1.
 
+\vspace{0.5cm}
+\noindent
 \textbf{Panel debugowania Collaborative Filtering}
 
 Panel debugowania Collaborative Filtering znajduje się w sekcji administracyjnej systemu i służy do weryfikacji poprawności działania algorytmu oraz analizy wygenerowanych rekomendacji. Narzędzie to jest przeznaczone dla administratorów systemu oraz programistów przeprowadzających testy działania algorytmu. Panel umożliwia podgląd macierzy podobieństw produktów, sprawdzenie statusu wykonania obliczeń, analizę przykładowych rekomendacji oraz weryfikację zgodności wyników z oczekiwaniami biznesowymi. Dzięki temu administratorzy mogą szybko zdiagnozować ewentualne problemy w działaniu algorytmu, takie jak brak rekomendacji dla niektórych produktów, nieprawidłowe wartości podobieństwa czy błędy w strukturze danych.
@@ -1251,6 +1239,7 @@ Rysunek \ref{fig:cf_debug_1} przedstawia sekcję debugowania algorytmu Collabora
 
 Rysunek \ref{fig:cf_debug_2} pokazuje drugą część panelu debugowania Collaborative Filtering. System wyświetla podsumowanie macierzy, statystyki cache oraz przykład rekomendacji dla pierwszego użytkownika z bazy danych.
 
+\vspace{0.5cm}
 \textbf{Rekomendacje w panelu klienta}
 
 \begin{figure}[H]
@@ -1273,7 +1262,7 @@ System opinii jest zintegrowany w dwóch kluczowych miejscach interfejsu użytko
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{images/opinionView.jpg}
-  \caption{Formularz dodawania opinii na stronie produktu z oceną gwiazdkową \\i recenzją tekstową.}
+  \caption{Formularz dodawania opinii na stronie produktu.}
   \label{fig:opinion_view1}
 \end{figure}
 
@@ -1289,6 +1278,7 @@ Rysunek \ref{fig:opinion_view1} przedstawia sekcję dodawania opinii na karcie p
 
 Rysunek \ref{fig:opinion_view2} pokazuje listę wszystkich opinii dla danego produktu. Każda opinia wyświetla email użytkownika, ocenę gwiazdkową oraz pełną treść recenzji tekstowej. System opinii pełni kluczową rolę w dwóch aspektach aplikacji. Po pierwsze, realizuje mechanizm social proof budujący zaufanie do produktów poprzez autentyczne recenzje od rzeczywistych klientów - potencjalni kupujący mogą zapoznać się z doświadczeniami innych użytkowników przed podjęciem decyzji zakupowej. Po drugie, opinie są automatycznie przetwarzane przez algorytm analizy sentymentu jako jedno z pięciu źródeł tekstowych (z wagą 40\% w wieloźródłowej agregacji opisanej w sekcji 5.3), co czyni je najważniejszym elementem systemu oceny jakości produktów.
 
+\vspace{0.5cm}
 \textbf{Wyszukiwarka z sortowaniem według sentymentu}
 
 \begin{figure}[H]
@@ -1329,11 +1319,12 @@ Rysunek \ref{fig:sentiment_debug} pokazuje panel debugowania analizy sentymentu.
 
 Rysunek \ref{fig:association_view} przedstawia sekcję ,,Frequently Bought Together'' na stronie produktu. Pod numerem (1) widoczne są produkty dodane przez użytkownika do koszyka. Pod numerem (2) system wyświetla produkty proponowane na podstawie reguł asocjacyjnych wraz z metrykami lift, support i confidence.
 
+\vspace{0.5cm}
 \textbf{Panel zarządzania regułami asocjacyjnymi}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=1\textwidth]{images/associationAdmin.png}
+  \includegraphics[width=0.9\textwidth]{images/associationAdmin.png}
   \caption{Panel administracyjny zarządzania regułami Apriori.}
   \label{fig:association_admin}
 \end{figure}
@@ -1351,7 +1342,7 @@ Panel debugowania reguł asocjacyjnych znajduje się w sekcji administracyjnej s
   \label{fig:association_debug_1}
 \end{figure}
 
-Rysunek \ref{fig:association_debug_1} przedstawia pierwszy ekran panelu debugowania algorytmu Apriori. Pod numerem (1) administrator wybiera produkt z listy rozwijanej. Poniżej system wyświetla dane produktu z bazy danych, obliczenia transakcji oraz wszystkie reguły asocjacyjne dla wybranego produktu.
+Rysunek \ref{fig:association_debug_1} przedstawia pierwszy ekran panelu debugowania algorytmu Apriori. Pod numerem (1) administrator wybiera produkt z listy rozwijanej. Poniżej pod numerem (2) system wyświetla dane produktu z bazy danych, obliczenia transakcji oraz wszystkie reguły asocjacyjne dla wybranego produktu.
 
 \begin{figure}[H]
   \centering
@@ -1375,7 +1366,7 @@ Panel administracyjny umożliwia dynamiczne przełączanie między trzema metoda
   \label{fig:admin_recommendation_settings}
 \end{figure}
 
-Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z opcjami metod rekomendacyjnych. Administrator może wybrać aktywny algorytm, który będzie wykorzystywany we wszystkich sekcjach rekomendacji na stronie głównej. System zawiera łącznie sześć metod rekomendacyjnych zaimplementowanych w ramach dwóch prac inżynierskich. W ramach niniejszej pracy zaimplementowano:
+Rysunek \ref{fig:admin_recommendation_settings} przedstawia panel konfiguracji z opcjami metod rekomendacyjnych. Administrator może wybrać aktywny algorytm, który będzie wykorzystywany we wszystkich sekcjach rekomendacji na stronie głównej. System zawiera łącznie trzy metody rekomendacyjne zaimplementowane w ramach dwóch prac inżynierskich dla tej sekcji. W ramach niniejszej pracy zaimplementowano:
 
 \begin{itemize}
 \item \textbf{Collaborative Filtering} - rekomendacje oparte na historii zakupów użytkowników (opisane w niniejszej pracy).
@@ -1433,7 +1424,7 @@ Rozdział przedstawia praktyczne porównanie sześciu metod rekomendacyjnych zai
 
 \subsubsection*{Collaborative Filtering vs Content-Based Filtering}
 
-Tabela \ref{tab:cf-vs-cbf} przedstawia kluczowe różnice między metodami CF i CBF. Item-Based CF analizuje historię zakupów i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika. CBF ekstraktuje cechy bezpośrednio z atrybutów produktów (kategoria, tagi, cena) bez potrzeby historii zakupów.
+Tabela \ref{tab:cf-vs-cbf} przedstawia kluczowe różnice między metodami CF i CBF. Item-Based CF analizuje historię zakupów i buduje macierz podobieństw produktów używając algorytmu Adjusted Cosine Similarity z centrowaniem średniej użytkownika. CBF ekstraktuje cechy bezpośrednio z atrybutów produktów (kategoria, tagi, cena) bez potrzeby historii.
 
 \begin{table}[H]
 \centering
@@ -1564,7 +1555,7 @@ Markov & Sekwencje & Nie & Predykcja kategorii & Retention \\
 
 \textbf{(2) Wybór metody zależy od dojrzałości sklepu.} Dla nowego sklepu z małą liczbą produktów i transakcji najlepszy jest start z CBF i Sentiment -- działają od razu bez historii. Po zgromadzeniu kilkuset transakcji można dodać Apriori do koszyka dla cross-sellingu. Gdy sklep ma tysiące transakcji i setki aktywnych użytkowników, CF i Markov zaczynają dawać wartość odkrywając wzorce zachowań.
 
-\textbf{(3) Optymalizacja jest kluczowa dla wydajności.} Bitmap pruning w Apriori znacząco przyspiesza przetwarzanie -- reprezentacja transakcji jako liczb binarnych pozwala na operacje bitowe zamiast iteracji po listach. Cache'owanie wyników Sentiment eliminuje powtarzalne obliczenia. Indeksowanie w bazie danych (model \texttt{ProductSimilarity}) przyspiesza wyszukiwanie podobnych produktów.
+\textbf{(3) Optymalizacja jest kluczowa dla wydajności.} Bitmap pruning w Apriori znacząco przyspiesza przetwarzanie -- reprezentacja transakcji jako liczb binarnych. Cache'owanie wyników Sentiment eliminuje powtarzalne obliczenia. Indeksowanie w bazie danych (model \texttt{ProductSimilarity}) przyspiesza wyszukiwanie podobnych produktów.
 
 \textbf{(4) Praktyczne zastosowanie jest różne.} Apriori daje efekt natychmiast -- sekcja ,,Często kupowane razem'' w koszyku bezpośrednio zwiększa wartość zamówienia. Markov ma wartość długoterminową -- identyfikuje użytkowników którzy przestają być aktywni i pozwala reagować kampaniami. CF i CBF działają w tle stale sugerując produkty. Sentiment pomaga w nawigacji po katalogu.
 
@@ -1576,7 +1567,7 @@ Markov & Sekwencje & Nie & Predykcja kategorii & Retention \\
 \addcontentsline{toc}{section}{Rozdział 8: Podsumowanie i wnioski końcowe}
 \section*{Podsumowanie i wnioski końcowe}
 
-Niniejsza praca przedstawiła proces implementacji oraz analizy kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. System został opracowany od podstaw we współpracy dwuosobowej, przy czym w ramach niniejszej pracy zaimplementowano trzy metody rekomendacyjne: Collaborative Filtering z metryką Adjusted Cosine Similarity, analizę sentymentu opartą na podejściu słownikowym oraz reguły asocjacyjne wykorzystujące algorytm Apriori.
+Niniejsza praca przedstawiła proces implementacji oraz analizy kompletnego systemu e-commerce wyposażonego w mechanizmy rekomendacji produktów. System został opracowany od podstaw we współpracy dwuosobowej, przy czym w ramach pracy zaimplementowano trzy metody rekomendacyjne: Collaborative Filtering z metryką Adjusted Cosine Similarity, analizę sentymentu opartą na podejściu słownikowym oraz reguły asocjacyjne wykorzystujące algorytm Apriori.
 
 \subsection*{Ograniczenia systemu}
 
@@ -1689,13 +1680,15 @@ Product Recommendation System Based on Collaborative Filtering, Sentiment Analys
 
 \vspace{0.3cm}
 
-Niniejsza praca inżynierska przedstawia projekt oraz implementację systemu rekomendacji produktów dla platformy e-commerce, łączącego trzy komplementarne metody rekomendacyjne: collaborative filtering, analizę sentymentu oraz reguły asocjacyjne. Celem było zaprojektowanie rozwiązania eliminującego problem przeładowania informacyjnego \\w sklepach internetowych poprzez dostarczanie użytkownikom spersonalizowanych rekomendacji.
+Niniejsza praca inżynierska przedstawia projekt oraz implementację systemu rekomendacji produktów dla platformy e-commerce, łączącego trzy komplementarne metody rekomendacyjne: collaborative filtering, analizę sentymentu oraz reguły asocjacyjne. Celem było zaprojektowanie rozwiązania eliminującego problem przeładowania informacyjnego w sklepach internetowych poprzez dostarczanie użytkownikom spersonalizowanych rekomendacji.
 
-Część teoretyczna obejmuje przegląd systemów rekomendacyjnych oraz analizę rozwiązań alternatywnych (Amazon Personalize, Google Recommendations AI, Apache Mahout) wraz \\z uzasadnieniem implementacji dedykowanego systemu. Przedstawiono fundament matematyczny wykorzystanych algorytmów: metrykę Adjusted Cosine Similarity dla Item-Based Collaborative Filtering, słownikowe podejście do analizy sentymentu z agregacją wieloźródłową oraz metryki support, confidence i lift dla reguł asocjacyjnych algorytmu Apriori.
+Część teoretyczna obejmuje przegląd systemów rekomendacyjnych oraz analizę rozwiązań alternatywnych (Amazon Personalize, Google Recommendations AI, Apache Mahout) wraz z uzasadnieniem implementacji dedykowanego systemu. Przedstawiono fundament matematyczny wykorzystanych algorytmów: metrykę Adjusted Cosine Similarity dla Item-Based Collaborative Filtering, słownikowe podejście do analizy sentymentu z agregacją wieloźródłową oraz metryki support, confidence i lift dla reguł asocjacyjnych algorytmu Apriori.
 
 Część projektowa obejmuje szczegółowy projekt architektury systemu w modelu trójwarstwowym (warstwa prezentacji React, warstwa logiki biznesowej Django, warstwa danych PostgreSQL), projekt struktury bazy danych z tabelami dla prekalkulowanych wyników algorytmów, projekt interfejsów użytkownika (widoki użytkownika końcowego i panele administracyjne) oraz projekt mechanizmów optymalizacyjnych (cache'owanie, indeksowanie, operacje zbiorcze).
 
 Część implementacyjna przedstawia realizację aplikacji webowej w architekturze Django REST Framework (backend) oraz React 18 (frontend). System integruje trzy metody działające komplementarnie w różnych kontekstach: Collaborative Filtering dla personalizacji na stronie głównej, analizę sentymentu dla oceny jakości w wyszukiwarce oraz algorytm Apriori dla cross-sellingu \\w koszyku zakupowym. Zaimplementowano kompletny interfejs z narzędziami debugowania oraz panel administracyjny umożliwiający dynamiczne przełączanie metod rekomendacyjnych.
+
+Przeprowadzona analiza porównawcza sześciu metod rekomendacyjnych wykazała, że każda z nich charakteryzuje się specyficznymi zaletami i ograniczeniami. Collaborative Filtering skutecznie wykrywa nieoczywiste powiązania międzykategorialne, lecz wymaga bogatej historii transakcyjnej. Analiza sentymentu rozwiązuje problem zimnego startu poprzez wieloźródłową agregację tekstu, natomiast algorytm Apriori z optymalizacją bitmap pruning efektywnie generuje reguły współzakupowe dla strategii cross-sellingu.
 
 Wartością pracy jest implementacja algorytmów od podstaw, co umożliwiło głębokie zrozumienie mechanizmów oraz świadome dostosowanie do specyfiki e-commerce.
 

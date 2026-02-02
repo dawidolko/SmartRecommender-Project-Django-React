@@ -1,9 +1,9 @@
-% filepath: /SmartRecommender-Project-Django-React/.docs/latex/smola/attachment.tex
+% filepath: /SmartRecommender-Project-Django-React/.docs/latex/olko/attachment.tex
 
 \newpage
 \section*{Załącznik A}
-\addcontentsline{toc}{section}{Załącznik A: Szczegółowe scenariusze użycia}
-\section*{Szczegółowe scenariusze użycia}
+\addcontentsline{toc}{section}{Załącznik A: Szczegółowe scenariusze przypadków użycia}
+\section*{Szczegółowe scenariusze przypadków użycia}
 
 Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiadających przypadkom użycia zaprezentowanym na diagramie w rozdziale 3.3. Scenariusze zostały opisane zgodnie z notacją: Aktor, Warunki początkowe, Przebieg scenariusza głównego, Warunki końcowe.
 
@@ -689,59 +689,6 @@ Poniżej przedstawiono szczegółowe opisy scenariuszy użycia systemu odpowiada
   \end{itemize}
 \item System wyświetla komunikat: „Naive Bayes trained successfully. Training samples: 200, Test accuracy: 78\%, training time: 1.8s"
 \item Administrator widzi zaktualizowane timestampy i metryki
-\end{enumerate}
-
-\noindent
-\textbf{Warunki końcowe:} Modele probabilistyczne (Markov Chain i Naive Bayes) zostały wytrenowane na aktualnych danych, rekomendacje są aktualne
-
-\subsection*{Scenariusz 22: Debugowanie modeli probabilistycznych}
-
-\noindent
-\textbf{Aktor:} Administrator
-
-\noindent
-\textbf{Warunki początkowe:} Administrator jest zalogowany, modele zostały wytrenowane
-
-\noindent
-\textbf{Przebieg scenariusza głównego - Markov Chain:}
-\begin{enumerate}
-\item Administrator otwiera panel administracyjny
-\item Administrator klika sekcję „Debug"
-\item Administrator wybiera zakładkę „Markov Chain Debug"
-\item System wyświetla panel debugowania zawierający:
-  \begin{itemize}
-  \item Wzór matematyczny macierzy przejść z wygładzaniem Laplace'a
-  \item Statystyki: liczba stanów (48 kategorii), łączna liczba przejść, wygładzanie $\alpha$ = 1.0, timestamp ostatniego treningu
-  \item Wizualizację macierzy przejść jako heatmap 48x48
-  \end{itemize}
-\item Administrator wybiera kategorię źródłową z listy rozwijanej (np. „Laptopy")
-\item System wyświetla Top 10 kategorii docelowych z najwyższymi prawdopodobieństwami przejścia:
-  \begin{itemize}
-  \item Akcesoria komputerowe: 0.45 (45\%)
-  \item Peryferia: 0.30 (30\%)
-  \item Torby i plecaki: 0.15 (15\%)
-  \item Oprogramowanie: 0.05 (5\%)
-  \item Inne kategorie: <0.05 (łącznie 5\%)
-  \end{itemize}
-\item Administrator klika „Show Transition Examples"
-\item System pobiera przykładowe rzeczywiste sekwencje zamówień użytkowników, które wygenerowały te przejścia
-\item Administrator weryfikuje sensowność przejść
-\item Administrator przełącza zakładkę na „Naive Bayes Debug"
-\item System wyświetla panel Naive Bayes zawierający:
-  \begin{itemize}
-  \item Wzór twierdzenia Bayesa
-  \item Statystyki: liczba próbek treningowych, accuracy, precision, recall, F1-score
-  \item Tabelę prawdopodobieństw warunkowych $P(feature | class)$ dla każdej z 5 cech
-  \item Prawdopodobieństwa a priori: $P(active)$ = 0.65, $P(inactive)$ = 0.35
-  \end{itemize}
-\item Administrator wprowadza ID użytkownika w pole „User ID for prediction"
-\item System pobiera profil użytkownika i wykonuje predykcję krok po kroku:
-  \begin{itemize}
-  \item Ekstraktuje cechy użytkownika
-  \item Pokazuje obliczenia $P(active | features)$ z rozpisaniem każdego czynnika
-  \item Wyświetla końcowe prawdopodobieństwo oraz klasyfikację (active/inactive)
-  \end{itemize}
-\item Administrator weryfikuje poprawność predykcji
 \end{enumerate}
 
 \noindent
