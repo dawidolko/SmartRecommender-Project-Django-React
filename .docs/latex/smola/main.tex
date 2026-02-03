@@ -820,7 +820,7 @@ System został zaprojektowany z uwzględnieniem następujących grup wymagań fu
 \subsection*{3.4 Diagram przypadków użycia}
 \addcontentsline{toc}{subsection}{3.4 Diagram przypadków użycia}
 
-Diagram przypadków użycia (rys. \ref{fig:use_case_project}) przedstawia kompletny widok funkcjonalności systemu oraz relacji między aktorami a przypadkami użycia. System obsługuje trzy główne typy aktorów: Gościa (użytkownik niezalogowany), Klienta (użytkownik zalogowany) oraz Administratora (zarządzający systemem). Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
+Diagram przypadków użycia (rysunek \ref{fig:use_case_project}) przedstawia kompletny widok funkcjonalności systemu oraz relacji między aktorami a przypadkami użycia. System obsługuje trzy główne typy aktorów: Gościa (użytkownik niezalogowany), Klienta (użytkownik zalogowany) oraz Administratora (zarządzający systemem). Relacje dziedziczenia między aktorami (Gość $\rightarrow$ Klient $\rightarrow$ Administrator) odzwierciedlają hierarchię uprawnień - każdy następny poziom dziedziczy wszystkie funkcjonalności poprzedniego i dodaje nowe, specyficzne dla swojej roli.
 
 \begin{figure}[H]
   \centering
@@ -1209,7 +1209,7 @@ Aplikacja została skonteneryzowana przy użyciu Docker Compose, zapewniając sp
 
 \newpage
 
-\noindent Architektura składa się z trzech kontenerów (rys. \ref{fig:docker_view}):
+\noindent Architektura składa się z trzech kontenerów (rysunek \ref{fig:docker_view}):
 
 \medskip
 
@@ -2226,7 +2226,7 @@ Wszystkie trzy metody zostały zintegrowane z systemem Django/React, oferują AP
 
 Rozdział prezentuje praktyczne aspekty działania zaimplementowanych algorytmów rekomendacyjnych, obejmując interfejsy użytkownika, panele administracyjne oraz narzędzia debugowania.
 
-\subsection*{6.1 Przegląd interfejsu użytkownika}
+\addcontentsline{toc}{subsection}{6.1 Przegląd interfejsu użytkownika}
 
 Trzy zaimplementowane metody rekomendacyjne – Content-Based Filtering, Fuzzy Logic oraz modele probabilistyczne – są dostępne poprzez intuicyjny interfejs webowy. Użytkownik końcowy otrzymuje spersonalizowane sugestie produktowe bez konieczności rozumienia mechanizmów działania algorytmów, natomiast administrator dysponuje narzędziami debugowania i monitorowania jakości rekomendacji.
 
@@ -2279,7 +2279,7 @@ System Content-Based Filtering udostępnia zaawansowany panel debugowania przezn
 
 \noindent\textbf{Widok ogólny}
 
-Panel (rys. \ref{fig:cbf_debug1}) zawiera pole wyboru produktu (Select Product To Analyze), informacje o algorytmie (Content-Based Filtering z wzorem podobieństwa kosinusowego ważonego), statystyki bazy danych (500 produktów, 16038 zapisanych podobieństw przy progu 20\%, pokrycie 6.43\%) oraz wagi cech (kategoria 40\%, tag 30\%, cena 20\%, słowa kluczowe 10\%).
+Panel (rysunek \ref{fig:cbf_debug1}) zawiera pole wyboru produktu (Select Product To Analyze), informacje o algorytmie (Content-Based Filtering z wzorem podobieństwa kosinusowego ważonego), statystyki bazy danych (500 produktów, 16038 zapisanych podobieństw przy progu 20\%, pokrycie 6.43\%) oraz wagi cech (kategoria 40\%, tag 30\%, cena 20\%, słowa kluczowe 10\%).
 
 \begin{figure}[h!]
   \centering
@@ -2291,7 +2291,7 @@ Panel (rys. \ref{fig:cbf_debug1}) zawiera pole wyboru produktu (Select Product T
 \noindent\textbf{Widok szczegółowy dla wybranego produktu}
 
 
-Widok szczegółowy (rys. \ref{fig:cbf_debug2}) prezentuje dane wybranego produktu (np. A4 Tech HD PK-910P, ID 295, cena 29.99 PLN, kategoria peripherals.webcams, tag Budget), jego wektor cech (8 elementów z wagami: category 0.400, tag 0.300, price 0.200, keywords 5×0.020) oraz tabelę 10 najbardziej podobnych produktów (kolumny: nazwa, similarity score, cena, kategoria).
+Widok szczegółowy (rysunek \ref{fig:cbf_debug2}) prezentuje dane wybranego produktu (np. A4 Tech HD PK-910P, ID 295, cena 29.99 PLN, kategoria peripherals.webcams, tag Budget), jego wektor cech (8 elementów z wagami: category 0.400, tag 0.300, price 0.200, keywords 5×0.020) oraz tabelę 10 najbardziej podobnych produktów (kolumny: nazwa, similarity score, cena, kategoria).
 
 \begin{figure}[h!]
   \centering
@@ -2322,7 +2322,8 @@ Rysunek \ref{fig:fuzzy_client} przedstawia główny widok rekomendacji Fuzzy Log
     \item \textbf{View Rule Activations}: niebieski przycisk umożliwiający podgląd szczegółowej aktywacji wszystkich 6 reguł IF-THEN dla danego produktu wraz z wyjaśnieniem, dlaczego produkt został polecony
 \end{itemize}
 
-Produkty osiągają podobny Fuzzy Score (53-54\%) i wysokie dopasowanie kategorii (62-63\%), co wskazuje na spójność z profilem użytkownika. Przycisk "View Rule Activations"~umożliwia podgląd aktywacji wszystkich 6 reguł.
+Wszystkie pokazane produkty mają podobny Fuzzy Score (53-54\%), co oznacza, że system wnioskowania Mamdani ocenił je jako równie dopasowane do profilu użytkownika. Category Match (62-63\%) wskazuje na wysoki stopień dopasowania kategorii produktów do historycznych preferencji zakupowych użytkownika. W kontekście danych testowych (użytkownik z historią zakupów z kategorii "Laptopy"~oraz "Akcesoria komputerowe", średnia cena zakupów ok. 1200 PLN) wyniki są sensowne: Fuzzy Score 53-54\% odpowiada produktom częściowo dopasowanym do profilu (produkty z kategorii preferowanych, ale w różnych przedziałach cenowych - część droższa, część tańsza od średniej użytkownika), Category Match 62-63\% oznacza silne powiązanie z ulubionymi kategoriami użytkownika (produkt należy do kategorii, w której użytkownik ma >60\% historii zakupów).
+
 
 \begin{figure}[h!]
   \centering
@@ -2331,7 +2332,7 @@ Produkty osiągają podobny Fuzzy Score (53-54\%) i wysokie dopasowanie kategori
   \label{fig:fuzzy_client}
 \end{figure}
 
-\medskip
+\newpage
 
 \noindent\textbf{Zakładka "User Profile"}
 
@@ -2406,7 +2407,7 @@ System wyszukiwania zwraca produkty, dla których odległość Levensteina międ
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.65\textwidth]{images/fuzzySearch1.jpg}
+  \includegraphics[width=0.75\textwidth]{images/fuzzySearch1.jpg}
   \caption{Wyszukiwarka rozmyta (Fuzzy Search).}
   \label{fig:fuzzy_search}
 \end{figure}
@@ -2429,7 +2430,7 @@ System Fuzzy Logic udostępnia specjalistyczny panel debugowania przeznaczony dl
 
 \noindent\textbf{Widok ogólny dla profilu gościa}
 
-Panel (rys. \ref{fig:fuzzy_debug1}) zawiera informacje o algorytmie (Fuzzy Logic Inference System w stylu Mamdani) oraz profil rozmyty użytkownika gościa (Price Sensitivity: 0.6-Medium, zainteresowania kategoriami: Electronics 0.5, Home 0.4, Gaming 0.3). Na zrzucie ekranu wybrano kamerkę A4Tech HD PK-910P do dalszej analizy.
+Panel (rysunek \ref{fig:fuzzy_debug1}) zawiera informacje o algorytmie (Fuzzy Logic Inference System w stylu Mamdani) oraz profil rozmyty użytkownika gościa (Price Sensitivity: 0.6-Medium, zainteresowania kategoriami: Electronics 0.5, Home 0.4, Gaming 0.3). Na zrzucie ekranu wybrano kamerkę A4Tech HD PK-910P do dalszej analizy.
 
 \begin{figure}[h!]
   \centering
@@ -2438,27 +2439,29 @@ Panel (rys. \ref{fig:fuzzy_debug1}) zawiera informacje o algorytmie (Fuzzy Logic
   \label{fig:fuzzy_debug1}
 \end{figure}
 
-\medskip
+\newpage
 
 \noindent\textbf{Widok fuzzyfikacji dla wybranego produktu}
 
 
-Panel (rys. \ref{fig:fuzzy_debug4}) przedstawia stopnie przynależności dla kamerki A4Tech HD PK-910P: cena 238.95 PLN (Cheap $\varepsilon=1.0$, dominujący), jakość 5.0 (High $\varepsilon=1.0$, dominujący), popularność 3 zamówienia (Medium $\varepsilon=1.0$, dominujący) oraz dopasowanie kategorii (Max Match: 0.44, peripherals/webcams).
+Panel (rysunek \ref{fig:fuzzy_debug4}) przedstawia stopnie przynależności dla kamerki A4Tech HD PK-910P: cena 238.95 PLN (Cheap $\varepsilon=1.0$, dominujący), jakość 5.0 (High $\varepsilon=1.0$, dominujący), popularność 3 zamówienia (Medium $\varepsilon=1.0$, dominujący) oraz dopasowanie kategorii (Max Match: 0.44, peripherals/webcams).
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug4.png}
+  \includegraphics[width=1\textwidth]{images/fuzzyLogicAdminDebug4.png}
   \caption{Fuzzy Logic -- stopnie przynależności dla wybranego produktu.}
   \label{fig:fuzzy_debug4}
 \end{figure}
 
+\newpage
+
 \noindent\textbf{Widok wnioskowania rozmytego i defuzzyfikacji}
 
-Panel (rys. \ref{fig:fuzzy_debug5}) przedstawia aktywację 6 reguł (R1: 1.0, R2: 0, R3: 0, R4: 0.44, R5: 0, R6: 0.8) oraz proces defuzzyfikacji metodą średniej ważonej (Final Fuzzy Score: 0.407 = 40.7\%, weighted\_sum/weight\_sum = 1.874/4.6).
+Panel (rysunek \ref{fig:fuzzy_debug5}) przedstawia aktywację 6 reguł (R1: 1.0, R2: 0, R3: 0, R4: 0.44, R5: 0, R6: 0.8) oraz proces defuzzyfikacji metodą średniej ważonej (Final Fuzzy Score: 0.407 = 40.7\%, weighted\_sum/weight\_sum = 1.874/4.6).
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.92\textwidth]{images/fuzzyLogicAdminDebug5.png}
+  \includegraphics[width=1\textwidth]{images/fuzzyLogicAdminDebug5.png}
   \caption{Fuzzy Logic -- wnioskowanie rozmyte i defuzzyfikacja.}
   \label{fig:fuzzy_debug5}
 \end{figure}
@@ -2499,7 +2502,7 @@ Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkowniko
 \noindent Zakładka "Behavior Insights (Bayesian)"~(rysunek \ref{fig:prob_client2}) wykorzystuje model Naive Bayes do analizy preferencji zakupowych:
 \begin{itemize}
     \item \textbf{Purchase Likelihood}: wykres słupkowy prawdopodobieństwa zakupu dla każdej kategorii
-    \item Kategorie z najwyższym prawdopodobieństwem: laptop.hubs (8\%), components.cooling (7\%), peripherals.keyboards (6\%)
+    \item Kategorie z najwyższym prawdopodobieństwem: laptop.hubs (8\%), \\components.cooling (7\%), peripherals.keyboards (6\%)
     \item Model uczy się na podstawie historii zakupów wszystkich użytkowników i tworzy profil behawioralny
 \end{itemize}
 
@@ -2531,6 +2534,8 @@ Rekomendacje oparte na modelach probabilistycznych są prezentowane użytkowniko
 \textbf{Cel i przeznaczenie panelu debugowania}
 
 System Probabilistic Models udostępnia kompleksowy panel debugowania przeznaczony dla administratorów oraz data scientists. Panel służy do weryfikacji poprawności treningu modeli probabilistycznych (Markov Chain, Naive Bayes), analizy macierzy przejść między kategoriami produktowymi oraz monitorowania predykcji zakupowych i ryzyka odejścia klientów (churn). Dostęp do panelu odbywa się przez endpoint \\\texttt{/api/probabilistic-debug/}, który zwraca statystyki modeli oraz wyniki predykcji w formacie JSON -- interfejs webowy wizualizuje te dane w formie tabel, macierzy przejść oraz wykresów prawdopodobieństw. Panel jest dostępny wyłącznie dla użytkowników z uprawnieniami administratora i znajduje się w zakładce "Debug"~w panelu administracyjnym aplikacji jako podzakładka "Probabilistic Models Debug".
+
+\medskip
 
 \noindent Główne zastosowania panelu:
 \begin{itemize}
@@ -2581,7 +2586,7 @@ Panel (rysunek \ref{fig:prob_debug1}) zawiera pola wyboru użytkownika i produkt
 
 \noindent\textbf{Widok szczegółowy dla Naive Bayes}
 
-Widok szczegółowy (rys. \ref{fig:prob_debug2}) prezentuje dwie sekcje predykcji Naive Bayes (Purchase: 3 cechy, Classes: will\_not\_purchase; Churn: 3 cechy, Classes: will\_churn) oraz analizę produktu (A4Tech HD PK-910P, ID 295, kategoria peripherals.webcams) z tabelą Next Likely Categories zawierającą prawdopodobieństwa przejść do kolejnych kategorii.
+Widok szczegółowy (rysunek \ref{fig:prob_debug2}) prezentuje dwie sekcje predykcji Naive Bayes (Purchase: 3 cechy, Classes: will\_not\_purchase; Churn: 3 cechy, Classes: will\_churn) oraz analizę produktu (A4Tech HD PK-910P, ID 295, kategoria peripherals.webcams) z tabelą Next Likely Categories zawierającą prawdopodobieństwa przejść do kolejnych kategorii.
 
 \begin{figure}[h!]
   \centering
