@@ -1,4 +1,3 @@
-// ShopContent Component - Main shop page with filtering and pagination
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
@@ -298,18 +297,6 @@ const ShopContent = () => {
     return matchesCategory && matchesPrice && matchesBrand && matchesSearch;
   });
 
-  console.log("ShopContent - Debug:", {
-    totalProducts: products.length,
-    filteredCount: filteredProducts.length,
-    currentProductsCount: filteredProducts.slice(
-      indexOfFirstProduct,
-      indexOfLastProduct,
-    ).length,
-    selectedMainCategory,
-    isLoadingProducts,
-    config: config.useMockData,
-  });
-
   const totalProducts = filteredProducts.length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -318,6 +305,15 @@ const ShopContent = () => {
     indexOfFirstProduct,
     indexOfLastProduct,
   );
+
+  console.log("ShopContent - Debug:", {
+    totalProducts: products.length,
+    filteredCount: filteredProducts.length,
+    currentProductsCount: currentProducts.length,
+    selectedMainCategory,
+    isLoadingProducts,
+    config: config.useMockData,
+  });
 
   const getCategoryIcon = (categoryName) => {
     const name = categoryName.toLowerCase();
