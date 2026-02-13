@@ -26,7 +26,6 @@ const ClientFuzzyLogic = () => {
   const [activeTab, setActiveTab] = useState("recommendations");
   const [recommendationsData, setRecommendationsData] = useState([]);
   const [userProfile, setUserProfile] = useState({});
-  const [fuzzySystem, setFuzzySystem] = useState({});
   const [ruleExplanations, setRuleExplanations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,7 +50,7 @@ const ClientFuzzyLogic = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -76,12 +75,11 @@ const ClientFuzzyLogic = () => {
             rule_activations: rec.rule_activations,
             image_url: imageUrl,
           };
-        }
+        },
       );
 
       setRecommendationsData(enhancedRecommendations);
       setUserProfile(data.user_profile || {});
-      setFuzzySystem(data.fuzzy_system || {});
       setRuleExplanations(data.rule_explanations || []);
       setLoading(false);
     } catch (error) {
@@ -135,15 +133,15 @@ const ClientFuzzyLogic = () => {
                         activation > 0.7
                           ? "#28a745"
                           : activation > 0.3
-                          ? "#ffc107"
-                          : "#dc3545",
+                            ? "#ffc107"
+                            : "#dc3545",
                     }}></div>
                   <span className="rule-activation-value">
                     {activation.toFixed(3)}
                   </span>
                 </div>
               </div>
-            )
+            ),
           )}
         </div>
 
@@ -316,7 +314,7 @@ const ClientFuzzyLogic = () => {
                     </div>
                     <span className="sensitivity-value">
                       {((userProfile.price_sensitivity || 0.5) * 100).toFixed(
-                        0
+                        0,
                       )}
                       %
                     </span>
@@ -325,8 +323,8 @@ const ClientFuzzyLogic = () => {
                     {userProfile.price_sensitivity > 0.7
                       ? "Highly price-sensitive (prefers budget options)"
                       : userProfile.price_sensitivity < 0.3
-                      ? "Low price sensitivity (prefers premium products)"
-                      : "Moderate price sensitivity"}
+                        ? "Low price sensitivity (prefers premium products)"
+                        : "Moderate price sensitivity"}
                   </p>
                 </div>
               </div>
@@ -355,7 +353,7 @@ const ClientFuzzyLogic = () => {
                           style={{ width: `${degree * 100}%` }}></div>
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>

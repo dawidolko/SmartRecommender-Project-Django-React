@@ -2,14 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Pie } from "react-chartjs-2";
 import { Link } from "react-router-dom";
 import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from "chart.js";
-import {
-  TrendingUp,
-  ShoppingBag,
-  Clock,
-  Heart,
-  Calendar,
-  X,
-} from "react-feather";
+import { TrendingUp, ShoppingBag, Clock, Heart } from "react-feather";
 import config from "../../config/config";
 import "./ClientProbabilistic.scss";
 
@@ -229,7 +222,7 @@ const ClientProbabilistic = () => {
           .catch((error) => {
             showModal(
               "Error",
-              <p>Failed to load profile details: {error.message}</p>
+              <p>Failed to load profile details: {error.message}</p>,
             );
           });
         break;
@@ -429,7 +422,7 @@ const ClientProbabilistic = () => {
                       <div className="probability-display">
                         <span className="probability-value">
                           {Math.round(
-                            markovData.next_purchase_probability * 100
+                            markovData.next_purchase_probability * 100,
                           )}
                           %
                         </span>
@@ -576,7 +569,7 @@ const ClientProbabilistic = () => {
                                   </span>
                                 </div>
                               </div>
-                            )
+                            ),
                           )}
                       </div>
                     </div>
@@ -593,8 +586,8 @@ const ClientProbabilistic = () => {
                             bayesianData.churn_risk < 0.3
                               ? "low"
                               : bayesianData.churn_risk < 0.7
-                              ? "medium"
-                              : "high"
+                                ? "medium"
+                                : "high"
                           }`}>
                           <span className="churn-percentage">
                             {Math.round(bayesianData.churn_risk * 100)}%
@@ -603,16 +596,16 @@ const ClientProbabilistic = () => {
                             {bayesianData.churn_risk < 0.3
                               ? "Low Risk"
                               : bayesianData.churn_risk < 0.7
-                              ? "Medium Risk"
-                              : "High Risk"}
+                                ? "Medium Risk"
+                                : "High Risk"}
                           </span>
                         </div>
                         <p className="churn-explanation">
                           {bayesianData.churn_risk < 0.3
                             ? "You are a loyal customer with consistent shopping patterns."
                             : bayesianData.churn_risk < 0.7
-                            ? "Your shopping frequency has decreased slightly. Consider exploring new products!"
-                            : "We miss you! Check out our latest offers to rediscover great products."}
+                              ? "Your shopping frequency has decreased slightly. Consider exploring new products!"
+                              : "We miss you! Check out our latest offers to rediscover great products."}
                         </p>
                       </div>
                     </div>
