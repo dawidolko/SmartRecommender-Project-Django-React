@@ -2261,17 +2261,17 @@ export const mockProducts = shopData;
 
 // Mock categories
 export const mockCategories = [
-  { id: 1, name: "Computer", slug: "computer" },
-  { id: 2, name: "Laptop", slug: "laptop" },
-  { id: 3, name: "Case", slug: "case" },
-  { id: 4, name: "Cooler", slug: "cooler" },
-  { id: 5, name: "Disk", slug: "disk" },
-  { id: 6, name: "Fan", slug: "fan" },
-  { id: 7, name: "GPU", slug: "gpu" },
-  { id: 8, name: "Motherboard", slug: "motherboard" },
-  { id: 9, name: "Power Supply", slug: "powersupply" },
-  { id: 10, name: "Processor", slug: "processor" },
-  { id: 11, name: "RAM", slug: "ram" },
+  { id: 1, name: "computer", slug: "computer" },
+  { id: 2, name: "laptop", slug: "laptop" },
+  { id: 3, name: "case", slug: "case" },
+  { id: 4, name: "cooler", slug: "cooler" },
+  { id: 5, name: "disk", slug: "disk" },
+  { id: 6, name: "fan", slug: "fan" },
+  { id: 7, name: "gpu", slug: "gpu" },
+  { id: 8, name: "motherboard", slug: "motherboard" },
+  { id: 9, name: "powersupply", slug: "powersupply" },
+  { id: 10, name: "processor", slug: "processor" },
+  { id: 11, name: "ram", slug: "ram" },
 ];
 
 // Placeholder image for products without photos
@@ -2280,23 +2280,39 @@ export const PLACEHOLDER_IMAGE =
 
 // Mock API functions
 export const mockAPI = {
-  getProducts: () => Promise.resolve(shopData),
+  getProducts: () => {
+    // Transform products to match API format with categories array
+    const transformedProducts = shopData.map((product) => ({
+      ...product,
+      categories: [product.category], // Convert category string to array
+    }));
+    return Promise.resolve(transformedProducts);
+  },
 
   getProductById: (id) => {
     const product = shopData.find((p) => p.id === parseInt(id));
-    return Promise.resolve(product || null);
+    if (!product) return Promise.resolve(null);
+    // Transform to match API format
+    return Promise.resolve({
+      ...product,
+      categories: [product.category],
+    });
   },
 
   getCategories: () => Promise.resolve(mockCategories),
 
   getProductsByCategory: (category) => {
     if (!category || category === "all") {
-      return Promise.resolve(shopData);
+      return mockAPI.getProducts();
     }
     const filtered = shopData.filter(
       (product) => product.category.toLowerCase() === category.toLowerCase(),
     );
-    return Promise.resolve(filtered);
+    const transformedFiltered = filtered.map((product) => ({
+      ...product,
+      categories: [product.category],
+    }));
+    return Promise.resolve(transformedFiltered);
   },
 
   getRandomProducts: (count = 8) => {
@@ -2311,7 +2327,11 @@ export const mockAPI = {
         (product.description &&
           product.description.toLowerCase().includes(query.toLowerCase())),
     );
-    return Promise.resolve(filtered);
+    const transformedFiltered = filtered.map((product) => ({
+      ...product,
+      categories: [product.category],
+    }));
+    return Promise.resolve(transformedFiltered);
   },
 
   getRecommendationSettings: () =>
