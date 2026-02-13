@@ -562,7 +562,7 @@ const ShopContent = () => {
                   old_price={product.old_price}
                   imgs={
                     config.useMockData
-                      ? [PLACEHOLDER_IMAGE]
+                      ? product.imgs || [PLACEHOLDER_IMAGE]
                       : product.photos &&
                           Array.isArray(product.photos) &&
                           product.photos.length > 0

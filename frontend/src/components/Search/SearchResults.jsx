@@ -85,9 +85,13 @@ const SearchResults = () => {
               name={product.name}
               price={product.price}
               old_price={product.old_price}
-              imgs={product.photos.map(
-                (photo) => `${config.apiUrl}/media/${photo.path}`,
-              )}
+              imgs={
+                config.useMockData
+                  ? product.imgs || ["/placeholder.jpg"]
+                  : product.photos?.map(
+                      (photo) => `${config.apiUrl}/media/${photo.path}`,
+                    ) || ["/placeholder.jpg"]
+              }
               category={product.categories[0] || "N/A"}
             />
           ))

@@ -8,6 +8,7 @@ import config from "../../config/config";
 const TestimonialsItem = ({
   id,
   photos,
+  imgs,
   name,
   price,
   old_price,
@@ -48,9 +49,11 @@ const TestimonialsItem = ({
       <div className="testimonials__image-container">
         <img
           src={
-            photos?.[0]?.path
-              ? `${config.apiUrl}/media/${photos[0].path}`
-              : "/placeholder.jpg"
+            config.useMockData && imgs && imgs[0]
+              ? imgs[0]
+              : photos?.[0]?.path
+                ? `${config.apiUrl}/media/${photos[0].path}`
+                : "/placeholder.jpg"
           }
           alt={name}
           className="testimonials__img"

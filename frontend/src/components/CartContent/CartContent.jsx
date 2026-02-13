@@ -189,7 +189,14 @@ const CartContent = () => {
               ) : (
                 <div className="cart__recommendations-grid">
                   {recommendations.map((rec, index) => {
-                    const imageUrl = `${config.apiUrl}/media/${rec.product.photos[0]?.path}`;
+                    const imageUrl =
+                      config.useMockData &&
+                      rec.product.imgs &&
+                      rec.product.imgs[0]
+                        ? rec.product.imgs[0]
+                        : rec.product.photos && rec.product.photos[0]?.path
+                          ? `${config.apiUrl}/media/${rec.product.photos[0].path}`
+                          : "/placeholder.jpg";
                     return (
                       <div key={index} className="cart__recommendation-item">
                         <img

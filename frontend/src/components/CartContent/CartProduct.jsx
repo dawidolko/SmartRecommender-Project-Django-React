@@ -3,16 +3,16 @@ import { CartContext } from "../ShopContext/ShopContext";
 import { AiOutlinePlus, AiOutlineMinus, AiOutlineClose } from "react-icons/ai";
 import config from "../../config/config";
 import { Link } from "react-router-dom";
-import { PLACEHOLDER_IMAGE } from "../../utils/mockData";
 
-const CartProduct = ({ id, name, price, photos, removeItemFromCart }) => {
+const CartProduct = ({ id, name, price, photos, imgs, removeItemFromCart }) => {
   const { items, addToCart, removeFromCart } = useContext(CartContext);
 
-  const img = config.useMockData
-    ? PLACEHOLDER_IMAGE
-    : photos?.[0]?.path
-      ? `${config.apiUrl}/media/${photos[0].path}`
-      : "https://via.placeholder.com/150";
+  const img =
+    config.useMockData && imgs && imgs[0]
+      ? imgs[0]
+      : photos?.[0]?.path
+        ? `${config.apiUrl}/media/${photos[0].path}`
+        : "https://via.placeholder.com/150";
 
   const itemQuantity = items[id];
   const totalProductAmount = price * itemQuantity;

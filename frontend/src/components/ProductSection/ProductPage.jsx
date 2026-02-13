@@ -457,28 +457,34 @@ const ProductPage = () => {
               </button>
             </div>
             <div className="productPage__thumbnails">
-              {product.photos && product.photos.length > 0 && (
-                <Slider {...thumbnailSliderSettings}>
-                  {product.photos.map((photo, idx) => (
-                    <div key={`thumb-${photo?.id ?? photo?.path ?? idx}`}>
-                      <img
-                        src={
-                          photo?.path
-                            ? `${config.apiUrl}/media/${photo.path}`
-                            : "/placeholder.jpg"
-                        }
-                        alt={`Thumbnail ${idx + 1}`}
-                        className={`productPage__thumbnail ${
-                          idx === currentIndex
-                            ? "productPage__thumbnail--active"
-                            : ""
-                        }`}
-                        onClick={() => setCurrentIndex(idx)}
-                      />
-                    </div>
-                  ))}
-                </Slider>
-              )}
+              {((config.useMockData && product.imgs) ||
+                (!config.useMockData && product.photos)) &&
+                ((config.useMockData && product.imgs) || product.photos || [])
+                  .length > 0 && (
+                  <Slider {...thumbnailSliderSettings}>
+                    {(config.useMockData
+                      ? product.imgs || []
+                      : product.photos || []
+                    ).map((photo, idx) => (
+                      <div key={`thumb-${photo?.id ?? photo?.path ?? idx}`}>
+                        <img
+                          src={
+                            photo?.path
+                              ? `${config.apiUrl}/media/${photo.path}`
+                              : "/placeholder.jpg"
+                          }
+                          alt={`Thumbnail ${idx + 1}`}
+                          className={`productPage__thumbnail ${
+                            idx === currentIndex
+                              ? "productPage__thumbnail--active"
+                              : ""
+                          }`}
+                          onClick={() => setCurrentIndex(idx)}
+                        />
+                      </div>
+                    ))}
+                  </Slider>
+                )}
             </div>
           </div>
 
