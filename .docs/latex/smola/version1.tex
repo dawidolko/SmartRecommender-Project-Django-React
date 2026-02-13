@@ -2305,15 +2305,13 @@ Cache znacząco redukuje obciążenie bazy danych i przyspiesza odpowiedzi API. 
 Zamiast pojedynczych zapytań INSERT dla każdego podobieństwa, system wykorzystuje metodę \texttt{bulk\_create()} Django ORM do wstawiania rekordów wsadowo:
 
 \begin{lstlisting}[style=pseudocode]
-// Zamiast:
 FOR kazda para (product1, product2):
-    ProductSimilarity.objects.create(...)  // N zapytan SQL
+    ProductSimilarity.objects.create(...) 
 
-// System uzywa:
 similarities = []
 FOR kazda para (product1, product2):
     similarities.append(ProductSimilarity(...))
-ProductSimilarity.objects.bulk_create(similarities)  // 1 zapytanie SQL
+ProductSimilarity.objects.bulk_create(similarities) 
 \end{lstlisting}
 
 Dla 4000 par produktów bulk insert jest \textbf{80x szybszy} niż pojedyncze inserty (5 sekund vs 400 sekund).

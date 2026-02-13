@@ -43,7 +43,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
 import config from "../../config/config";
-import { mockAPI } from "../../utils/mockData";
+import { mockAPI, PLACEHOLDER_IMAGE } from "../../utils/mockData";
 import DemoFallback from "../DemoFallback/DemoFallback";
 import { IoHomeOutline } from "react-icons/io5";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
@@ -83,6 +83,12 @@ const ShopContent = () => {
   const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Additional filter states
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [productsPerPage] = useState(30);
 
   useEffect(() => {
@@ -92,6 +98,96 @@ const ShopContent = () => {
       setSelectedSubCategory(parts[1] || "all");
     }
   }, [category]);
+
+  // Helper functions for filtering
+  const getAvailableBrands = () => {
+    if (!products || !Array.isArray(products)) return [];
+
+    const brands = new Set();
+    products.forEach((product) => {
+      if (product?.tags && Array.isArray(product.tags)) {
+        product.tags.forEach((tag) => {
+          // Extract brands from tags that might contain brand information
+          if (tag && typeof tag === "string") {
+            brands.add(tag);
+          }
+        });
+      }
+      // Also check if there's a brand field directly
+      if (product?.brand) {
+        brands.add(product.brand);
+      }
+      // Extract from name patterns (common brand prefixes)
+      if (product?.name) {
+        const nameParts = product.name.split(" ");
+        if (nameParts.length > 0 && nameParts[0] && nameParts[0].trim()) {
+          brands.add(nameParts[0]); // First word often is brand
+        }
+      }
+    });
+    return Array.from(brands).sort();
+  };
+
+  const resetAllFilters = () => {
+    setPriceRange({ min: 0, max: 1000 });
+    setSelectedBrands([]);
+    setSearchTerm("");
+    setSelectedMainCategory("all");
+    setSelectedSubCategory("all");
+    setCurrentPage(1);
+    navigate("/category/all");
+  };
+
+  const clearPriceFilter = () => {
+    setPriceRange({ min: 0, max: 1000 });
+    setCurrentPage(1);
+  };
+
+  const handlePriceChange = (type, value) => {
+    // Handle empty string as 0 for min or 1000 for max
+    let numValue;
+    if (value === "" || value === null || value === undefined) {
+      numValue = type === "min" ? 0 : 1000;
+    } else {
+      numValue = Math.max(0, Number(value) || 0);
+    }
+
+    setPriceRange((prev) => {
+      const newRange = { ...prev, [type]: numValue };
+
+      // Ensure min is not greater than max
+      if (type === "min" && newRange.min > newRange.max) {
+        newRange.max = newRange.min;
+      } else if (type === "max" && newRange.max < newRange.min) {
+        newRange.min = newRange.max;
+      }
+
+      return newRange;
+    });
+    setCurrentPage(1);
+  };
+
+  const removeBrandFilter = (brand) => {
+    setSelectedBrands((prev) => prev.filter((b) => b !== brand));
+    setCurrentPage(1);
+  };
+
+  const clearSearchFilter = () => {
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && showFilterModal) {
+        setShowFilterModal(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showFilterModal]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -172,7 +268,13 @@ const ShopContent = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedMainCategory, selectedSubCategory]);
+  }, [
+    selectedMainCategory,
+    selectedSubCategory,
+    priceRange,
+    selectedBrands,
+    searchTerm,
+  ]);
 
   const mainCategories = Array.from(
     new Set(
@@ -190,8 +292,10 @@ const ShopContent = () => {
       : [];
 
   const filteredProducts = (products || []).filter((product) => {
-    if (!product || !product.categories) return false;
+    if (!product || !product.categories || !Array.isArray(product.categories))
+      return false;
 
+    // Category filtering
     const matchesCategory =
       selectedMainCategory === "all" ||
       product.categories.some((prodCat) => {
@@ -203,7 +307,50 @@ const ShopContent = () => {
               prodSub === selectedSubCategory;
       });
 
-    return matchesCategory;
+    // Price filtering
+    const productPrice = parseFloat(product.price || 0);
+    const matchesPrice =
+      productPrice >= priceRange.min && productPrice <= priceRange.max;
+
+    // Brand filtering
+    const matchesBrand =
+      selectedBrands.length === 0 ||
+      selectedBrands.some((brand) => {
+        // Check in tags
+        if (
+          product.tags &&
+          Array.isArray(product.tags) &&
+          product.tags.includes(brand)
+        )
+          return true;
+        // Check in brand field
+        if (product.brand === brand) return true;
+        // Check in name (first word)
+        if (
+          product.name &&
+          product.name.toLowerCase().startsWith(brand.toLowerCase())
+        )
+          return true;
+        return false;
+      });
+
+    // Search filtering
+    const matchesSearch =
+      !searchTerm ||
+      (product.name &&
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (product.description &&
+        product.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (product.tags &&
+        Array.isArray(product.tags) &&
+        product.tags.some(
+          (tag) =>
+            tag &&
+            typeof tag === "string" &&
+            tag.toLowerCase().includes(searchTerm.toLowerCase()),
+        ));
+
+    return matchesCategory && matchesPrice && matchesBrand && matchesSearch;
   });
 
   const totalProducts = filteredProducts.length;
@@ -392,7 +539,41 @@ const ShopContent = () => {
         <div className="shop__products-container">
           <div className="shop__products-header">
             <h3 className="shop__products-title">Filtry:</h3>
+
+            {/* Filter Toggle Button */}
+            <button
+              className="shop__filter-toggle"
+              onClick={() => setShowFilterModal(true)}>
+              Filtry i wyszukiwanie
+            </button>
+
             <div className="shop__filter-tags">
+              {/* Search filter tag */}
+              {searchTerm && (
+                <div className="shop__filter-tag">
+                  <span>Szukaj: "{searchTerm}"</span>
+                  <button onClick={clearSearchFilter}>×</button>
+                </div>
+              )}
+
+              {/* Price filter tag */}
+              {(priceRange.min > 0 || priceRange.max < 1000) && (
+                <div className="shop__filter-tag">
+                  <span>
+                    Cena: ${priceRange.min}-${priceRange.max}
+                  </span>
+                  <button onClick={clearPriceFilter}>×</button>
+                </div>
+              )}
+
+              {/* Brand filter tags */}
+              {selectedBrands.map((brand) => (
+                <div key={brand} className="shop__filter-tag">
+                  <span>Marka: {brand}</span>
+                  <button onClick={() => removeBrandFilter(brand)}>×</button>
+                </div>
+              ))}
+
               {selectedMainCategory !== "all" && (
                 <div className="shop__filter-tag">
                   <span>{selectedMainCategory.toUpperCase()}</span>
@@ -429,13 +610,27 @@ const ShopContent = () => {
                 <ShopProduct
                   key={product.id}
                   id={product.id}
-                  name={product.name}
-                  price={product.price}
+                  name={product.name || "Product name unavailable"}
+                  price={product.price || 0}
                   old_price={product.old_price}
-                  imgs={product.photos.map(
-                    (photo) => `${config.apiUrl}/media/${photo.path}`,
-                  )}
-                  category={product.categories[0] || "N/A"}
+                  imgs={
+                    config.useMockData
+                      ? [PLACEHOLDER_IMAGE]
+                      : product.photos &&
+                          Array.isArray(product.photos) &&
+                          product.photos.length > 0
+                        ? product.photos.map(
+                            (photo) => `${config.apiUrl}/media/${photo.path}`,
+                          )
+                        : [PLACEHOLDER_IMAGE]
+                  }
+                  category={
+                    product.categories &&
+                    Array.isArray(product.categories) &&
+                    product.categories.length > 0
+                      ? product.categories[0]
+                      : "N/A"
+                  }
                 />
               ))
             ) : (
@@ -502,6 +697,108 @@ const ShopContent = () => {
           )}
         </div>
       </div>
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <div
+          className="shop__modal-overlay"
+          onClick={() => setShowFilterModal(false)}>
+          <div className="shop__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="shop__modal-header">
+              <h3>Filtry produktów</h3>
+              <button
+                className="common-modal-close search-modal-close"
+                onClick={() => setShowFilterModal(false)}
+                aria-label="Close Filter Modal">
+                ×
+              </button>
+            </div>
+            <div className="shop__modal-content">
+              {/* Search Filter */}
+              <div className="shop__filter-section">
+                <label htmlFor="modal-search-input">Szukaj produkty:</label>
+                <input
+                  id="modal-search-input"
+                  type="text"
+                  placeholder="Wpisz nazwę produktu lub tag..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="shop__filter-input"
+                />
+              </div>
+
+              {/* Price Range Filter */}
+              <div className="shop__filter-section">
+                <label>Zakres cen ($):</label>
+                <div className="shop__price-filter">
+                  <input
+                    type="number"
+                    placeholder="Od"
+                    min="0"
+                    max="10000"
+                    step="1"
+                    value={priceRange.min === 0 ? "" : priceRange.min}
+                    onChange={(e) => handlePriceChange("min", e.target.value)}
+                    className="shop__filter-input shop__price-input"
+                  />
+                  <span className="shop__price-separator">-</span>
+                  <input
+                    type="number"
+                    placeholder="Do"
+                    min="0"
+                    max="10000"
+                    step="1"
+                    value={priceRange.max === 1000 ? "" : priceRange.max}
+                    onChange={(e) => handlePriceChange("max", e.target.value)}
+                    className="shop__filter-input shop__price-input"
+                  />
+                </div>
+              </div>
+
+              {/* Brand Filter */}
+              {getAvailableBrands().length > 0 && (
+                <div className="shop__filter-section">
+                  <label>Marki i tagi:</label>
+                  <div className="shop__brand-filter">
+                    {getAvailableBrands()
+                      .slice(0, 15)
+                      .map((brand) => (
+                        <label key={brand} className="shop__brand-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={selectedBrands.includes(brand)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedBrands((prev) => [...prev, brand]);
+                              } else {
+                                setSelectedBrands((prev) =>
+                                  prev.filter((b) => b !== brand),
+                                );
+                              }
+                            }}
+                          />
+                          <span>{brand}</span>
+                        </label>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="shop__modal-footer">
+              <button
+                className="shop__reset-filters-btn"
+                onClick={resetAllFilters}>
+                Resetuj filtry
+              </button>
+              <button
+                className="shop__apply-filters-btn"
+                onClick={() => setShowFilterModal(false)}>
+                Zastosuj filtry
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

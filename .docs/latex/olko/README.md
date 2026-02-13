@@ -463,7 +463,6 @@ useEffect(() => {
   const fetchData = async () => {
     const token = localStorage.getItem("access");
     if (token) {
-      // Pobierz aktywny algorytm użytkownika
       const settingsResponse = await axios.get(
         `${config.apiUrl}/api/recommendation-settings/`,
         { headers: { Authorization: `Bearer ${token}` } },
@@ -471,7 +470,6 @@ useEffect(() => {
       const algorithm =
         settingsResponse.data.active_algorithm || "collaborative";
 
-      // Pobierz rekomendacje dla algorytmu
       const response = await axios.get(
         `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
         { headers: { Authorization: `Bearer ${token}` } },
@@ -490,12 +488,10 @@ useEffect(() => {
 const fetchingAlgorithm = algorithmRequest.then((response) => {
   const algorithm = response.data.active_algorithm || "collaborative";
 
-  // Ustaw tytuł sekcji rekomendacji
   if (algorithm === "collaborative") {
     setRecommendationTitle("Recommended For You (Collaborative Filtering)");
   }
 
-  // Pobierz rekomendacje
   return axios.get(
     `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
     { headers: { Authorization: `Bearer ${token}` } },
@@ -1825,14 +1821,11 @@ def get(self, request):
 const fetchRecommendations = async () => {
   setRecommendationsLoading(true);
   try {
-    // Zbierz ID produktów z koszyka
     const productIds = Object.keys(items).filter((id) => items[id] > 0);
 
-    // Zbuduj query params
     const params = new URLSearchParams();
     productIds.forEach((id) => params.append("product_ids[]", id));
 
-    // Pobierz rekomendacje Apriori
     const response = await axios.get(
       `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`,
     );
@@ -1845,7 +1838,6 @@ const fetchRecommendations = async () => {
   }
 };
 
-// Wywoływane przy każdej zmianie koszyka
 useEffect(() => {
   if (Object.keys(items).length > 0) {
     fetchRecommendations();
@@ -1994,13 +1986,11 @@ const fetchAssociationDebug = async (productId) => {
 **Endpoint:** `GET /api/recommendation-preview/?algorithm={algorithm}`
 
 ```jsx
-// Pobierz aktywny algorytm
 const settingsResponse = await axios.get(
   `${config.apiUrl}/api/recommendation-settings/`,
 );
 const algorithm = settingsResponse.data.active_algorithm || "collaborative";
 
-// Pobierz rekomendacje
 const response = await axios.get(
   `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
 );
@@ -2015,7 +2005,6 @@ const response = await axios.get(
 **Sekcja:** "Recommended For You"
 
 ```jsx
-// Tytuł zmienia się zależnie od algorytmu
 if (algorithm === "collaborative") {
   setRecommendationTitle("Recommended For You (Collaborative Filtering)");
 } else if (algorithm === "content_based") {
@@ -2036,7 +2025,6 @@ if (algorithm === "collaborative") {
 **Endpoint:** `GET /api/frequently-bought-together/?product_ids[]={ids}`
 
 ```jsx
-// Wyświetlanie metryk
 <span className="stat-confidence">
     Confidence: {(rec.confidence * 100).toFixed(0)}%
 </span>
