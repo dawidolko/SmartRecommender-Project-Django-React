@@ -55,6 +55,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import config from "../../config/config";
 import DemoFallback from "../DemoFallback/DemoFallback";
+import { mockAPI } from "../../utils/mockData";
 
 const CartContent = () => {
   const { items, totalAmount, removeFromCart, addToCart } =
