@@ -1,4 +1,3 @@
-// Automatycznie wykrywaj czy jesteśmy na produkcji (nie localhost)
 const isProduction =
   typeof window !== "undefined" &&
   (window.location.hostname.includes("github.io") ||
@@ -14,7 +13,6 @@ const config = {
   useMockData: isProduction || process.env.REACT_APP_USE_MOCK_DATA === "true",
 };
 
-// Debug info
 if (typeof window !== "undefined") {
   console.log("Config Debug:", {
     hostname: window.location.hostname,

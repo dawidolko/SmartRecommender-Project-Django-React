@@ -1,43 +1,4 @@
-/**
- * ShopContent Component
- *
- * Authors: Dawid Olko & Piotr Smoła
- * Date: 2025-11-02
- * Version: 2.0
- *
- * Main shop page component that displays product catalog with category filtering,
- * pagination, and responsive sidebar navigation.
- *
- * Features:
- *   - Hierarchical category filtering (main categories + subcategories)
- *   - Product grid with pagination (30 products per page)
- *   - Responsive sidebar (collapsible on mobile)
- *   - Dynamic icon mapping for categories
- *   - URL-based category selection (deep linking)
- *   - Loading states for better UX
- *   - Expandable category groups
- *
- * Category Structure:
- *   - Main categories (e.g., "Electronics")
- *   - Subcategories (e.g., "Electronics.Laptops")
- *   - URL format: /shop/:category (e.g., /shop/Electronics.Laptops)
- *
- * State Management:
- *   - selectedMainCategory: Current main category filter
- *   - selectedSubCategory: Current subcategory filter
- *   - products: Array of all products from API
- *   - categories: Array of available category names
- *   - currentPage: Active pagination page number
- *   - isSidebarOpen: Sidebar visibility toggle (responsive)
- *   - expandedCategories: List of expanded category groups
- *
- * API Endpoints:
- *   - GET /api/categories/ - Fetch all categories
- *   - GET /api/products/ - Fetch all products
- *
- * @component
- * @returns {React.ReactElement} Shop page with category sidebar and product grid
- */
+// ShopContent Component - Main shop page with filtering and pagination
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
@@ -83,8 +44,6 @@ const ShopContent = () => {
   const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Additional filter states
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,7 +58,6 @@ const ShopContent = () => {
     }
   }, [category]);
 
-  // Helper functions for filtering
   const getAvailableBrands = () => {
     if (!products || !Array.isArray(products)) return [];
 
@@ -107,21 +65,18 @@ const ShopContent = () => {
     products.forEach((product) => {
       if (product?.tags && Array.isArray(product.tags)) {
         product.tags.forEach((tag) => {
-          // Extract brands from tags that might contain brand information
           if (tag && typeof tag === "string") {
             brands.add(tag);
           }
         });
       }
-      // Also check if there's a brand field directly
       if (product?.brand) {
         brands.add(product.brand);
       }
-      // Extract from name patterns (common brand prefixes)
       if (product?.name) {
         const nameParts = product.name.split(" ");
         if (nameParts.length > 0 && nameParts[0] && nameParts[0].trim()) {
-          brands.add(nameParts[0]); // First word often is brand
+          brands.add(nameParts[0]);
         }
       }
     });
@@ -144,7 +99,6 @@ const ShopContent = () => {
   };
 
   const handlePriceChange = (type, value) => {
-    // Handle empty string as 0 for min or 1000 for max
     let numValue;
     if (value === "" || value === null || value === undefined) {
       numValue = type === "min" ? 0 : 1000;
@@ -155,7 +109,6 @@ const ShopContent = () => {
     setPriceRange((prev) => {
       const newRange = { ...prev, [type]: numValue };
 
-      // Ensure min is not greater than max
       if (type === "min" && newRange.min > newRange.max) {
         newRange.max = newRange.min;
       } else if (type === "max" && newRange.max < newRange.min) {
@@ -177,7 +130,6 @@ const ShopContent = () => {
     setCurrentPage(1);
   };
 
-  // Handle ESC key to close modal
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && showFilterModal) {
@@ -207,7 +159,7 @@ const ShopContent = () => {
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
-        setCategories([]); // Set empty array on error
+        setCategories([]);
       } finally {
         setIsLoadingCategories(false);
       }
@@ -219,6 +171,7 @@ const ShopContent = () => {
           console.log("ShopContent: Using mock data for products");
           const data = await mockAPI.getProducts();
           console.log("ShopContent: Mock products loaded:", data?.length);
+          console.log("ShopContent: First product:", data?.[0]);
           setProducts(data || []);
         } else {
           const response = await fetch(`${config.apiUrl}/api/products/`);
@@ -230,7 +183,7 @@ const ShopContent = () => {
         }
       } catch (error) {
         console.error("Error fetching products:", error);
-        setProducts([]); // Set empty array on error
+        setProducts([]);
       } finally {
         setIsLoadingProducts(false);
       }
@@ -239,7 +192,6 @@ const ShopContent = () => {
     fetchCategories();
     fetchProducts();
 
-    // Timeout fallback - if loading takes too long, show demo fallback
     const timeoutId = setTimeout(() => {
       if (isLoadingProducts || isLoadingCategories) {
         console.log("ShopContent: Loading timeout - showing demo fallback");
@@ -295,7 +247,6 @@ const ShopContent = () => {
     if (!product || !product.categories || !Array.isArray(product.categories))
       return false;
 
-    // Category filtering
     const matchesCategory =
       selectedMainCategory === "all" ||
       product.categories.some((prodCat) => {
@@ -307,25 +258,20 @@ const ShopContent = () => {
               prodSub === selectedSubCategory;
       });
 
-    // Price filtering
     const productPrice = parseFloat(product.price || 0);
     const matchesPrice =
       productPrice >= priceRange.min && productPrice <= priceRange.max;
 
-    // Brand filtering
     const matchesBrand =
       selectedBrands.length === 0 ||
       selectedBrands.some((brand) => {
-        // Check in tags
         if (
           product.tags &&
           Array.isArray(product.tags) &&
           product.tags.includes(brand)
         )
           return true;
-        // Check in brand field
         if (product.brand === brand) return true;
-        // Check in name (first word)
         if (
           product.name &&
           product.name.toLowerCase().startsWith(brand.toLowerCase())
@@ -334,7 +280,6 @@ const ShopContent = () => {
         return false;
       });
 
-    // Search filtering
     const matchesSearch =
       !searchTerm ||
       (product.name &&
@@ -351,6 +296,18 @@ const ShopContent = () => {
         ));
 
     return matchesCategory && matchesPrice && matchesBrand && matchesSearch;
+  });
+
+  console.log("ShopContent - Debug:", {
+    totalProducts: products.length,
+    filteredCount: filteredProducts.length,
+    currentProductsCount: filteredProducts.slice(
+      indexOfFirstProduct,
+      indexOfLastProduct,
+    ).length,
+    selectedMainCategory,
+    isLoadingProducts,
+    config: config.useMockData,
   });
 
   const totalProducts = filteredProducts.length;
@@ -540,7 +497,6 @@ const ShopContent = () => {
           <div className="shop__products-header">
             <h3 className="shop__products-title">Filtry:</h3>
 
-            {/* Filter Toggle Button */}
             <button
               className="shop__filter-toggle"
               onClick={() => setShowFilterModal(true)}>
@@ -548,15 +504,12 @@ const ShopContent = () => {
             </button>
 
             <div className="shop__filter-tags">
-              {/* Search filter tag */}
               {searchTerm && (
                 <div className="shop__filter-tag">
                   <span>Szukaj: "{searchTerm}"</span>
                   <button onClick={clearSearchFilter}>×</button>
                 </div>
               )}
-
-              {/* Price filter tag */}
               {(priceRange.min > 0 || priceRange.max < 1000) && (
                 <div className="shop__filter-tag">
                   <span>
@@ -565,8 +518,6 @@ const ShopContent = () => {
                   <button onClick={clearPriceFilter}>×</button>
                 </div>
               )}
-
-              {/* Brand filter tags */}
               {selectedBrands.map((brand) => (
                 <div key={brand} className="shop__filter-tag">
                   <span>Marka: {brand}</span>
@@ -635,22 +586,28 @@ const ShopContent = () => {
               ))
             ) : (
               (() => {
-                // Check if on GitHub Pages and no products
-                const isGitHubPages =
-                  typeof window !== "undefined" &&
-                  (window.location.hostname.includes("github.io") ||
-                    window.location.hostname.includes("project.dawidolko.pl") ||
-                    (!window.location.hostname.includes("localhost") &&
-                      !window.location.hostname.includes("127.0.0.1")));
+                if (
+                  (!isLoadingProducts && products.length === 0) ||
+                  loadingTimeout
+                ) {
+                  const isGitHubPages =
+                    typeof window !== "undefined" &&
+                    (window.location.hostname.includes("github.io") ||
+                      window.location.hostname.includes(
+                        "project.dawidolko.pl",
+                      ) ||
+                      (!window.location.hostname.includes("localhost") &&
+                        !window.location.hostname.includes("127.0.0.1")));
 
-                if ((isGitHubPages && !isLoadingProducts) || loadingTimeout) {
-                  return (
-                    <DemoFallback
-                      title="Shop - Demo Mode"
-                      message="The product catalog requires database connectivity to display items, categories, and filtering. This feature is not available in the static demo version."
-                      showBackButton={false}
-                    />
-                  );
+                  if (isGitHubPages) {
+                    return (
+                      <DemoFallback
+                        title="Shop - Demo Mode"
+                        message="The product catalog requires database connectivity to display items, categories, and filtering. This feature is not available in the static demo version."
+                        showBackButton={false}
+                      />
+                    );
+                  }
                 }
                 return (
                   <p className="shop__no-products">
@@ -698,7 +655,6 @@ const ShopContent = () => {
         </div>
       </div>
 
-      {/* Filter Modal */}
       {showFilterModal && (
         <div
           className="shop__modal-overlay"
@@ -714,7 +670,6 @@ const ShopContent = () => {
               </button>
             </div>
             <div className="shop__modal-content">
-              {/* Search Filter */}
               <div className="shop__filter-section">
                 <label htmlFor="modal-search-input">Szukaj produkty:</label>
                 <input
@@ -726,8 +681,6 @@ const ShopContent = () => {
                   className="shop__filter-input"
                 />
               </div>
-
-              {/* Price Range Filter */}
               <div className="shop__filter-section">
                 <label>Zakres cen ($):</label>
                 <div className="shop__price-filter">
@@ -754,8 +707,6 @@ const ShopContent = () => {
                   />
                 </div>
               </div>
-
-              {/* Brand Filter */}
               {getAvailableBrands().length > 0 && (
                 <div className="shop__filter-section">
                   <label>Marki i tagi:</label>

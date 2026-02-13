@@ -417,7 +417,6 @@
     }
   }
 
-  // Advanced Filters Styles
   &__filter-toggle {
     background-color: $blue;
     color: white;
@@ -519,14 +518,12 @@
       margin-bottom: 5px;
     }
 
-    // Remove spinner arrows in Webkit browsers
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
 
-    // Remove spinner arrows in Firefox
     &[type="number"] {
       appearance: textfield;
       -moz-appearance: textfield;
@@ -608,7 +605,6 @@
     }
   }
 
-  // Responsive improvements for filter tags
   &__filter-tags {
     @media (max-width: 668px) {
       gap: 6px;
@@ -1143,7 +1139,6 @@
   flex-shrink: 0;
 }
 
-// Additional responsive improvements for filter tags
 .shop {
   &__filter-tags {
     @media (max-width: 668px) {

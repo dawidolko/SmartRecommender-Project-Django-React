@@ -2256,10 +2256,8 @@ const shopData = [
 
 export default shopData;
 
-// Export for compatibility with mock data usage
 export const mockProducts = shopData;
 
-// Mock categories
 export const mockCategories = [
   { id: 1, name: "computer", slug: "computer" },
   { id: 2, name: "laptop", slug: "laptop" },
@@ -2274,17 +2272,14 @@ export const mockCategories = [
   { id: 11, name: "ram", slug: "ram" },
 ];
 
-// Placeholder image for products without photos
 export const PLACEHOLDER_IMAGE =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E";
 
-// Mock API functions
 export const mockAPI = {
   getProducts: () => {
-    // Transform products to match API format with categories array
     const transformedProducts = shopData.map((product) => ({
       ...product,
-      categories: [product.category], // Convert category string to array
+      categories: [product.category],
     }));
     return Promise.resolve(transformedProducts);
   },
@@ -2292,7 +2287,6 @@ export const mockAPI = {
   getProductById: (id) => {
     const product = shopData.find((p) => p.id === parseInt(id));
     if (!product) return Promise.resolve(null);
-    // Transform to match API format
     return Promise.resolve({
       ...product,
       categories: [product.category],
@@ -2345,7 +2339,6 @@ export const mockAPI = {
   },
 
   getRelatedProducts: (productId, count = 4) => {
-    // Get random products excluding the current one
     const filtered = shopData.filter((p) => p.id !== parseInt(productId));
     const shuffled = [...filtered].sort(() => 0.5 - Math.random());
     return Promise.resolve(shuffled.slice(0, count));
