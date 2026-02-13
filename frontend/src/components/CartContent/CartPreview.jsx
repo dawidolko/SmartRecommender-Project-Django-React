@@ -5,6 +5,7 @@ import { AiOutlineClose, AiOutlineShopping } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import config from "../../config/config";
 import { CartContext } from "../ShopContext/ShopContext";
+import { mockAPI, PLACEHOLDER_IMAGE } from "../../utils/mockData";
 
 const BASE_URL = `${config.apiUrl}`;
 
@@ -30,20 +31,35 @@ const CartPreview = () => {
 
     const fetchProducts = async () => {
       try {
-        const productIds = Object.keys(items).join(",");
-        const response = await axios.get(
-          `${BASE_URL}/api/products/?ids=${productIds}`
-        );
-        const productMap = {};
-        response.data.forEach((product) => {
-          productMap[product.id] = {
-            ...product,
-            image: product.photos?.[0]?.path
-              ? `${BASE_URL}/media/${product.photos[0].path}`
-              : "https://via.placeholder.com/150",
-          };
-        });
-        setProducts(productMap);
+        if (config.useMockData) {
+          const allProducts = await mockAPI.getProducts();
+          const productMap = {};
+          Object.keys(items).forEach((itemId) => {
+            const product = allProducts.find((p) => p.id === parseInt(itemId));
+            if (product) {
+              productMap[itemId] = {
+                ...product,
+                image: product.imgs?.[0] || PLACEHOLDER_IMAGE,
+              };
+            }
+          });
+          setProducts(productMap);
+        } else {
+          const productIds = Object.keys(items).join(",");
+          const response = await axios.get(
+            `${BASE_URL}/api/products/?ids=${productIds}`,
+          );
+          const productMap = {};
+          response.data.forEach((product) => {
+            productMap[product.id] = {
+              ...product,
+              image: product.photos?.[0]?.path
+                ? `${BASE_URL}/media/${product.photos[0].path}`
+                : PLACEHOLDER_IMAGE,
+            };
+          });
+          setProducts(productMap);
+        }
       } catch (error) {
         console.error("Error with loading products:", error);
       }

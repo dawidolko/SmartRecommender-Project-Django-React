@@ -68,8 +68,13 @@ const CartContent = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/api/products/`);
-        setShopData(response.data);
+        if (config.useMockData) {
+          const data = await mockAPI.getProducts();
+          setShopData(data);
+        } else {
+          const response = await axios.get(`${config.apiUrl}/api/products/`);
+          setShopData(response.data);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -92,6 +97,12 @@ const CartContent = () => {
   const fetchRecommendations = async () => {
     setRecommendationsLoading(true);
     try {
+      if (config.useMockData) {
+        // Na produkcji nie ma rekomendacji
+        setRecommendations([]);
+        return;
+      }
+
       const productIds = Object.keys(items).filter((id) => items[id] > 0);
       if (productIds.length === 0) return;
 

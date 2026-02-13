@@ -132,7 +132,7 @@ const NewProducts = () => {
               old_price: product.old_price
                 ? parseFloat(product.old_price)
                 : null,
-              imgs: product.photos.map(
+              imgs: (product.photos || []).map(
                 (photo) => `${config.apiUrl}/media/${photo.path}`,
               ),
               category: product.categories?.[0] || "N/A",
@@ -151,7 +151,7 @@ const NewProducts = () => {
         name: product.name,
         price: parseFloat(product.price),
         old_price: product.old_price ? parseFloat(product.old_price) : null,
-        imgs: product.photos.map(
+        imgs: (product.photos || []).map(
           (photo) => `${config.apiUrl}/media/${photo.path}`,
         ),
         category: product.categories?.[0] || "N/A",

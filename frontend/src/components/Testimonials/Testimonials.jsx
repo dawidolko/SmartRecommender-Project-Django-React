@@ -61,6 +61,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "./Testimonials.scss";
 import TestimonialsItem from "./TestimonialsItem";
 import config from "../../config/config";
+import { mockAPI } from "../../utils/mockData";
 
 const Testimonials = () => {
   const [productsState, setProductsState] = useState({
@@ -73,22 +74,27 @@ const Testimonials = () => {
     const fetchData = async () => {
       setProductsState((prev) => ({ ...prev, isLoading: true }));
       try {
-        const token = localStorage.getItem("access");
-        if (token) {
-          const settingsResponse = await axios.get(
-            `${config.apiUrl}/api/recommendation-settings/`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          const algorithm =
-            settingsResponse.data.active_algorithm || "collaborative";
-          setProductsState((prev) => ({
-            ...prev,
-            currentAlgorithm: algorithm,
-          }));
-
-          await fetchProducts(algorithm, token);
-        } else {
+        if (config.useMockData) {
+          // Use mock data for GitHub Pages
           await fetchProducts(null, null);
+        } else {
+          const token = localStorage.getItem("access");
+          if (token) {
+            const settingsResponse = await axios.get(
+              `${config.apiUrl}/api/recommendation-settings/`,
+              { headers: { Authorization: `Bearer ${token}` } },
+            );
+            const algorithm =
+              settingsResponse.data.active_algorithm || "collaborative";
+            setProductsState((prev) => ({
+              ...prev,
+              currentAlgorithm: algorithm,
+            }));
+
+            await fetchProducts(algorithm, token);
+          } else {
+            await fetchProducts(null, null);
+          }
         }
       } catch (error) {
         console.error("Error in initial fetch:", error);
@@ -135,11 +141,20 @@ const Testimonials = () => {
 
   const fetchProducts = async (algorithm, token) => {
     try {
+      if (config.useMockData) {
+        const data = await mockAPI.getRandomProducts(8);
+        setProductsState((prev) => ({
+          ...prev,
+          products: data,
+        }));
+        return;
+      }
+
       if (token && algorithm) {
         try {
           const previewResponse = await axios.get(
             `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
 
           if (previewResponse.data && previewResponse.data.length > 0) {
@@ -190,10 +205,10 @@ const Testimonials = () => {
       return productsState.currentAlgorithm === "collaborative"
         ? "Personalized Recommendations (Collaborative Filtering)"
         : productsState.currentAlgorithm === "content_based"
-        ? "Personalized Recommendations (Content-Based)"
-        : productsState.currentAlgorithm === "fuzzy_logic"
-        ? "Personalized Recommendations (Fuzzy Logic)"
-        : "Personalized Recommendations";
+          ? "Personalized Recommendations (Content-Based)"
+          : productsState.currentAlgorithm === "fuzzy_logic"
+            ? "Personalized Recommendations (Fuzzy Logic)"
+            : "Personalized Recommendations";
     }
     return "Discover Our Products";
   };
@@ -203,10 +218,10 @@ const Testimonials = () => {
       return productsState.currentAlgorithm === "collaborative"
         ? "Based on what users like you are buying"
         : productsState.currentAlgorithm === "content_based"
-        ? "Based on products similar to your preferences"
-        : productsState.currentAlgorithm === "fuzzy_logic"
-        ? "Based on fuzzy logic matching your preferences with uncertainty modeling"
-        : "Based on your shopping patterns";
+          ? "Based on products similar to your preferences"
+          : productsState.currentAlgorithm === "fuzzy_logic"
+            ? "Based on fuzzy logic matching your preferences with uncertainty modeling"
+            : "Based on your shopping patterns";
     }
     return "Check out selected proposals from our product database – scroll to see more and test our recommendation system in action!";
   };
