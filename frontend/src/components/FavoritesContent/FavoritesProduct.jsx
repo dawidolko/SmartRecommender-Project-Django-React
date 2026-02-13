@@ -1,12 +1,15 @@
 import config from "../../config/config";
 import { Link } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
+import { PLACEHOLDER_IMAGE } from "../../utils/mockData";
 
 const FavoritesProduct = ({ product, onMoveToCart, onRemoveFromFavorites }) => {
   const { id, photos, name } = product;
-  const imageUrl = photos?.[0]?.path
-    ? `${config.apiUrl}/media/${photos[0].path}`
-    : "https://via.placeholder.com/150";
+  const imageUrl = config.useMockData
+    ? PLACEHOLDER_IMAGE
+    : photos?.[0]?.path
+      ? `${config.apiUrl}/media/${photos[0].path}`
+      : "https://via.placeholder.com/150";
 
   return (
     <tr className="favorites__tr" key={id}>

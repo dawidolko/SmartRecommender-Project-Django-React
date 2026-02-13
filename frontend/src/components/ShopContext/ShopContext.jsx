@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import config from "../../config/config";
+import { mockAPI } from "../../utils/mockData";
 
 export const CartContext = createContext(null);
 
@@ -16,8 +17,13 @@ const ShopContext = (props) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/api/products/`);
-        setProducts(response.data);
+        if (config.useMockData) {
+          const data = await mockAPI.getProducts();
+          setProducts(data);
+        } else {
+          const response = await axios.get(`${config.apiUrl}/api/products/`);
+          setProducts(response.data);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
       }

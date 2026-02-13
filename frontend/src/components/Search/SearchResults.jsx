@@ -39,6 +39,7 @@ import { useParams } from "react-router-dom";
 import "../ShopContent/ShopContent.scss";
 import ShopProduct from "../ShopContent/ShopProduct";
 import config from "../../config/config";
+import { mockAPI } from "../../utils/mockData";
 
 const SearchResults = () => {
   const { query } = useParams();
@@ -48,11 +49,16 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(
-          `${config.apiUrl}/api/products/search/?q=${query}`
-        );
-        const data = await response.json();
-        setProducts(data);
+        if (config.useMockData) {
+          const data = await mockAPI.searchProducts(query);
+          setProducts(data);
+        } else {
+          const response = await fetch(
+            `${config.apiUrl}/api/products/search/?q=${query}`,
+          );
+          const data = await response.json();
+          setProducts(data);
+        }
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -79,7 +85,7 @@ const SearchResults = () => {
               price={product.price}
               old_price={product.old_price}
               imgs={product.photos.map(
-                (photo) => `${config.apiUrl}/media/${photo.path}`
+                (photo) => `${config.apiUrl}/media/${photo.path}`,
               )}
               category={product.categories[0] || "N/A"}
             />

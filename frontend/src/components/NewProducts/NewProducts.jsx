@@ -57,6 +57,7 @@ import { motion, useInView } from "framer-motion";
 import AnimationVariants from "../AnimationVariants/AnimationVariants";
 import axios from "axios";
 import config from "../../config/config";
+import { mockAPI, PLACEHOLDER_IMAGE } from "../../utils/mockData";
 
 const NewProducts = () => {
   const [randomProducts, setRandomProducts] = useState([]);
@@ -70,19 +71,24 @@ const NewProducts = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const token = localStorage.getItem("access");
-        if (token) {
-          const settingsResponse = await axios.get(
-            `${config.apiUrl}/api/recommendation-settings/`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          const algorithm =
-            settingsResponse.data.active_algorithm || "collaborative";
-          setCurrentAlgorithm(algorithm);
-
-          await fetchProducts(algorithm, token);
-        } else {
+        if (config.useMockData) {
+          // Use mock data for GitHub Pages
           await fetchProducts(null, null);
+        } else {
+          const token = localStorage.getItem("access");
+          if (token) {
+            const settingsResponse = await axios.get(
+              `${config.apiUrl}/api/recommendation-settings/`,
+              { headers: { Authorization: `Bearer ${token}` } },
+            );
+            const algorithm =
+              settingsResponse.data.active_algorithm || "collaborative";
+            setCurrentAlgorithm(algorithm);
+
+            await fetchProducts(algorithm, token);
+          } else {
+            await fetchProducts(null, null);
+          }
         }
       } catch (error) {
         console.error("Error in initial fetch:", error);
@@ -96,11 +102,26 @@ const NewProducts = () => {
 
   const fetchProducts = async (algorithm, token) => {
     try {
+      if (config.useMockData) {
+        // Use mock data for GitHub Pages
+        const data = await mockAPI.getRandomProducts(9);
+        const formattedProducts = data.map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: parseFloat(product.price),
+          old_price: product.old_price ? parseFloat(product.old_price) : null,
+          imgs: [PLACEHOLDER_IMAGE],
+          category: product.categories?.[0]?.name || "N/A",
+        }));
+        setRandomProducts(formattedProducts);
+        return;
+      }
+
       if (token && algorithm) {
         try {
           const previewResponse = await axios.get(
             `${config.apiUrl}/api/recommendation-preview/?algorithm=${algorithm}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
 
           if (previewResponse.data && previewResponse.data.length > 0) {
@@ -112,7 +133,7 @@ const NewProducts = () => {
                 ? parseFloat(product.old_price)
                 : null,
               imgs: product.photos.map(
-                (photo) => `${config.apiUrl}/media/${photo.path}`
+                (photo) => `${config.apiUrl}/media/${photo.path}`,
               ),
               category: product.categories?.[0] || "N/A",
             }));
@@ -131,7 +152,7 @@ const NewProducts = () => {
         price: parseFloat(product.price),
         old_price: product.old_price ? parseFloat(product.old_price) : null,
         imgs: product.photos.map(
-          (photo) => `${config.apiUrl}/media/${photo.path}`
+          (photo) => `${config.apiUrl}/media/${photo.path}`,
         ),
         category: product.categories?.[0] || "N/A",
       }));
@@ -146,10 +167,10 @@ const NewProducts = () => {
       return currentAlgorithm === "collaborative"
         ? "Recommended for You (Collaborative Filtering)"
         : currentAlgorithm === "content_based"
-        ? "Recommended for You (Content-Based)"
-        : currentAlgorithm === "fuzzy_logic"
-        ? "Recommended for You (Fuzzy Logic)"
-        : "Recommended for You";
+          ? "Recommended for You (Content-Based)"
+          : currentAlgorithm === "fuzzy_logic"
+            ? "Recommended for You (Fuzzy Logic)"
+            : "Recommended for You";
     }
     return "Our Latest Products";
   };

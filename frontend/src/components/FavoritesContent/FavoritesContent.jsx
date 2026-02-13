@@ -7,6 +7,7 @@ import FavoritesProduct from "./FavoritesProduct";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import config from "../../config/config";
+import { mockAPI } from "../../utils/mockData";
 
 const FavoritesContent = () => {
   const { favorites, removeFromFavorites } = useFavorites();
@@ -17,8 +18,13 @@ const FavoritesContent = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/api/products/`);
-        setProducts(response.data);
+        if (config.useMockData) {
+          const data = await mockAPI.getProducts();
+          setProducts(data);
+        } else {
+          const response = await axios.get(`${config.apiUrl}/api/products/`);
+          setProducts(response.data);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
       }

@@ -1,5 +1,6 @@
 const config = {
   apiUrl: process.env.REACT_APP_API_URL || "http://localhost:8000",
+  useMockData: process.env.REACT_APP_USE_MOCK_DATA === "true",
 };
 
 export default config;
