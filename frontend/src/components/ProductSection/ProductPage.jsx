@@ -137,7 +137,9 @@ const ProductPage = () => {
           );
           setProduct(response.data);
           setFavorite(isFavorite(response.data.id));
-          sendInteraction("view");
+          if (!config.useMockData) {
+            sendInteraction("view");
+          }
         }
       } catch (error) {
         console.error(error);
@@ -253,12 +255,14 @@ const ProductPage = () => {
   };
 
   const handlePrevImage = () => {
+    if (!product.photos || product.photos.length === 0) return;
     setCurrentIndex((prev) =>
       prev === 0 ? product.photos.length - 1 : prev - 1,
     );
   };
 
   const handleNextImage = () => {
+    if (!product.photos || product.photos.length === 0) return;
     setCurrentIndex((prev) =>
       prev === product.photos.length - 1 ? 0 : prev + 1,
     );
@@ -353,7 +357,7 @@ const ProductPage = () => {
       case "specifications":
         return (
           <div className="productPage__tab-content">
-            {product.specifications.length > 0 ? (
+            {product.specifications && product.specifications.length > 0 ? (
               <table className="productPage__specs-table">
                 <tbody>
                   {product.specifications.map((spec, index) => (
@@ -379,7 +383,7 @@ const ProductPage = () => {
       case "reviews":
         return (
           <div className="productPage__tab-content">
-            {product.opinions.length > 0 ? (
+            {product.opinions && product.opinions.length > 0 ? (
               product.opinions.map((review) => (
                 <div key={review.id} className="productPage__review">
                   <div className="productPage__review-header">
@@ -436,7 +440,11 @@ const ProductPage = () => {
                 <AiOutlineLeft />
               </button>
               <img
-                src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                src={
+                  product.photos && product.photos[currentIndex]
+                    ? `${config.apiUrl}/media/${product.photos[currentIndex].path}`
+                    : "/placeholder.jpg"
+                }
                 alt={product.name}
                 className="productPage__main-img productPage__main-img--clickable"
                 onClick={handleImageEnlarge}
@@ -449,22 +457,28 @@ const ProductPage = () => {
               </button>
             </div>
             <div className="productPage__thumbnails">
-              <Slider {...thumbnailSliderSettings}>
-                {product.photos.map((photo, idx) => (
-                  <div key={`thumb-${photo?.id ?? photo?.path ?? idx}`}>
-                    <img
-                      src={`${config.apiUrl}/media/${photo.path}`}
-                      alt={`Thumbnail ${idx + 1}`}
-                      className={`productPage__thumbnail ${
-                        idx === currentIndex
-                          ? "productPage__thumbnail--active"
-                          : ""
-                      }`}
-                      onClick={() => setCurrentIndex(idx)}
-                    />
-                  </div>
-                ))}
-              </Slider>
+              {product.photos && product.photos.length > 0 && (
+                <Slider {...thumbnailSliderSettings}>
+                  {product.photos.map((photo, idx) => (
+                    <div key={`thumb-${photo?.id ?? photo?.path ?? idx}`}>
+                      <img
+                        src={
+                          photo?.path
+                            ? `${config.apiUrl}/media/${photo.path}`
+                            : "/placeholder.jpg"
+                        }
+                        alt={`Thumbnail ${idx + 1}`}
+                        className={`productPage__thumbnail ${
+                          idx === currentIndex
+                            ? "productPage__thumbnail--active"
+                            : ""
+                        }`}
+                        onClick={() => setCurrentIndex(idx)}
+                      />
+                    </div>
+                  ))}
+                </Slider>
+              )}
             </div>
           </div>
 
@@ -479,7 +493,11 @@ const ProductPage = () => {
                 </button>
                 <img
                   className="common-image-overlay__image"
-                  src={`${config.apiUrl}/media/${product.photos[currentIndex]?.path}`}
+                  src={
+                    product.photos && product.photos[currentIndex]
+                      ? `${config.apiUrl}/media/${product.photos[currentIndex].path}`
+                      : "/placeholder.jpg"
+                  }
                   alt={product.name}
                 />
               </div>
@@ -488,13 +506,15 @@ const ProductPage = () => {
 
           <div className="productPage__info">
             <div className="productPage__category">
-              {product.categories
-                .map((category) => category.replace(/\./g, " › "))
-                .join(", ")}
+              {product.categories && product.categories.length > 0
+                ? product.categories
+                    .map((category) => category.replace(/\./g, " › "))
+                    .join(", ")
+                : "Uncategorized"}
             </div>
             <h1 className="productPage__title">{product.name}</h1>
 
-            {product.tags.length > 0 && (
+            {product.tags && product.tags.length > 0 && (
               <div className="productPage__tags">
                 {product.tags.map((tag, index) => (
                   <span
@@ -533,7 +553,11 @@ const ProductPage = () => {
                       className="productPage__quick-rec-card"
                       onClick={() => navigate(`/product/${recProduct.id}`)}>
                       <img
-                        src={`${config.apiUrl}/media/${recProduct.photos[0]?.path}`}
+                        src={
+                          recProduct.photos && recProduct.photos[0]
+                            ? `${config.apiUrl}/media/${recProduct.photos[0].path}`
+                            : "/placeholder.jpg"
+                        }
                         alt={recProduct.name}
                         className="productPage__quick-rec-img"
                       />
@@ -574,7 +598,7 @@ const ProductPage = () => {
                 activeTab === "reviews" ? "productPage__tab--active" : ""
               }`}
               onClick={() => setActiveTab("reviews")}>
-              Reviews ({product.opinions.length})
+              Reviews ({product.opinions ? product.opinions.length : 0})
             </button>
           </div>
           {renderTabContent()}
@@ -598,7 +622,11 @@ const ProductPage = () => {
                       className="productPage__similar-product-inner"
                       onClick={() => navigate(`/product/${similarProduct.id}`)}>
                       <img
-                        src={`${config.apiUrl}/media/${similarProduct.photos[0]?.path}`}
+                        src={
+                          similarProduct.photos && similarProduct.photos[0]
+                            ? `${config.apiUrl}/media/${similarProduct.photos[0].path}`
+                            : "/placeholder.jpg"
+                        }
                         alt={similarProduct.name}
                         className="productPage__similar-product-img"
                       />
