@@ -1,0 +1,124 @@
+/**
+ * DemoNotice Styles
+ * 
+ * Styling for the GitHub Pages demo version notice banner
+ */
+
+.demo-notice {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease-out;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+  }
+
+  &__icon {
+    font-size: 18px;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
+  }
+
+  &__content {
+    flex: 1;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+
+  &__link {
+    color: #fbbf24;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #f59e0b;
+      text-decoration: none;
+    }
+
+    &:focus {
+      outline: 2px solid #fbbf24;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .demo-notice {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+
+    &__link {
+      color: #fcd34d;
+
+      &:hover {
+        color: #fbbf24;
+      }
+
+      &:focus {
+        outline-color: #fcd34d;
+      }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .demo-notice {
+    background: #000080;
+    border-bottom: 2px solid #ffffff;
+
+    &__link {
+      color: #ffff00;
+      text-decoration: underline;
+
+      &:hover {
+        color: #ffffff;
+        background: #ffff00;
+      }
+    }
+  }
+}
+
+// Reduce motion for accessibility
+@media (prefers-reduced-motion: reduce) {
+  .demo-notice {
+    animation: none;
+  }
+}

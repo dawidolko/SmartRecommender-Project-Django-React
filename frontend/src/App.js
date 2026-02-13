@@ -102,6 +102,7 @@ import ClientProbabilistic from "./components/ClientPanel/ClientProbabilistic";
 
 import ScrollToTop from "./utils/ScrollToTop";
 import AccessibilityToolbar from "./components/AccessibilityToolbar/AccessibilityToolbar";
+import DemoNotice from "./components/DemoNotice/DemoNotice";
 
 function PrivateRoute({ children, roles }) {
   const { user } = useContext(AuthContext);
@@ -121,6 +122,7 @@ function App() {
       <ScrollToTop />
       {!location.pathname.startsWith("/admin") &&
         !location.pathname.startsWith("/client") && <AccessibilityToolbar />}
+      <DemoNotice />
       <FavoritesProvider>
         <ShopContext>
           {location.pathname.startsWith("/admin") ||

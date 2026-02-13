@@ -6,6 +6,16 @@
 
 ---
 
+## 🌍 Live Demo
+
+🔗 **Preview Version:** [project.dawidolko.pl](https://project.dawidolko.pl)
+
+> **⚠️ Note:** This is a static preview version hosted on GitHub Pages. Only the homepage and basic navigation work. Features requiring database connectivity (like shopping cart, user accounts, recommendations) are not functional in this demo version.
+
+> **💡 For Full Experience:** Follow the installation guide below to run the complete application with all features enabled.
+
+---
+
 ## 🚀 Usage
 
 ### Option 1: Docker Setup (Recommended)
