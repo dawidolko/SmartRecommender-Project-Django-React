@@ -110,8 +110,8 @@ const NewProducts = () => {
           name: product.name,
           price: parseFloat(product.price),
           old_price: product.old_price ? parseFloat(product.old_price) : null,
-          imgs: [PLACEHOLDER_IMAGE],
-          category: product.categories?.[0]?.name || "N/A",
+          imgs: product.imgs || [PLACEHOLDER_IMAGE],
+          category: product.category || "N/A",
         }));
         setRandomProducts(formattedProducts);
         return;
