@@ -221,7 +221,7 @@ const AdminDebug = () => {
         `${config.apiUrl}/api/collaborative-filtering-debug/`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setCfDebugData(res.data);
     } catch (err) {
@@ -258,7 +258,7 @@ const AdminDebug = () => {
         `${config.apiUrl}/api/all-collaborative-similarities/?limit=10000`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       // Format data for modal table structure
@@ -321,7 +321,7 @@ const AdminDebug = () => {
         `${config.apiUrl}/api/sentiment-analysis-debug/`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setSentimentDebugData(res.data);
     } catch (err) {
@@ -341,7 +341,7 @@ const AdminDebug = () => {
         `${config.apiUrl}/api/sentiment-product-debug/?product_id=${productId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setSentimentDetailData(res.data);
     } catch (err) {
@@ -361,7 +361,7 @@ const AdminDebug = () => {
         `${config.apiUrl}/api/product-association-debug/?product_id=${productId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setAssociationDebugData(res.data);
     } catch (err) {
@@ -740,7 +740,7 @@ const AdminDebug = () => {
                                         {sim.score.toFixed(4)}
                                       </td>
                                     </tr>
-                                  )
+                                  ),
                                 )}
                               </tbody>
                             </table>
@@ -853,7 +853,7 @@ const AdminDebug = () => {
                                       </td>
                                       <td>{item.review_count}</td>
                                     </tr>
-                                  )
+                                  ),
                                 )}
                               </tbody>
                             </table>
@@ -886,7 +886,7 @@ const AdminDebug = () => {
                                       </td>
                                       <td>{item.review_count}</td>
                                     </tr>
-                                  )
+                                  ),
                                 )}
                               </tbody>
                             </table>
@@ -932,9 +932,9 @@ const AdminDebug = () => {
                                     .final_score > 0.1
                                     ? "success"
                                     : sentimentDetailData.final_calculation
-                                        .final_score < -0.1
-                                    ? "error"
-                                    : ""
+                                          .final_score < -0.1
+                                      ? "error"
+                                      : ""
                                 }`}>
                                 {
                                   sentimentDetailData.final_calculation
@@ -950,9 +950,9 @@ const AdminDebug = () => {
                                     .final_category === "Positive"
                                     ? "success"
                                     : sentimentDetailData.final_calculation
-                                        .final_category === "Negative"
-                                    ? "error"
-                                    : ""
+                                          .final_category === "Negative"
+                                      ? "error"
+                                      : ""
                                 }`}>
                                 {
                                   sentimentDetailData.final_calculation
@@ -1316,7 +1316,7 @@ const AdminDebug = () => {
                                       </div>
                                     </div>
                                   </div>
-                                )
+                                ),
                               )}
                             </div>
                           )}
@@ -1353,7 +1353,7 @@ const AdminDebug = () => {
                                 </span>
                                 <span className="value">
                                   {sentimentDetailData.lexicon_info.examples_positive.join(
-                                    ", "
+                                    ", ",
                                   )}
                                 </span>
                               </div>
@@ -1363,7 +1363,7 @@ const AdminDebug = () => {
                                 </span>
                                 <span className="value">
                                   {sentimentDetailData.lexicon_info.examples_negative.join(
-                                    ", "
+                                    ", ",
                                   )}
                                 </span>
                               </div>
@@ -1565,7 +1565,7 @@ const AdminDebug = () => {
                                       <td>{assoc.product_2.name}</td>
                                       <td className="metric-value">
                                         {(assoc.metrics.support * 100).toFixed(
-                                          2
+                                          2,
                                         )}
                                         %
                                       </td>
@@ -1579,7 +1579,7 @@ const AdminDebug = () => {
                                         {assoc.metrics.lift.toFixed(2)}x
                                       </td>
                                     </tr>
-                                  )
+                                  ),
                                 )}
                               </tbody>
                             </table>
@@ -1884,7 +1884,7 @@ const AdminDebug = () => {
                               <span className="label">Categories:</span>
                               <span className="value">
                                 {contentBasedDebugData.selected_product.categories.join(
-                                  ", "
+                                  ", ",
                                 )}
                               </span>
                             </div>
@@ -1892,7 +1892,7 @@ const AdminDebug = () => {
                               <span className="label">Tags:</span>
                               <span className="value">
                                 {contentBasedDebugData.selected_product.tags.join(
-                                  ", "
+                                  ", ",
                                 )}
                               </span>
                             </div>
@@ -1900,7 +1900,7 @@ const AdminDebug = () => {
                               <span className="label">Keywords:</span>
                               <span className="value">
                                 {contentBasedDebugData.selected_product.keywords.join(
-                                  ", "
+                                  ", ",
                                 )}
                               </span>
                             </div>
@@ -1915,7 +1915,7 @@ const AdminDebug = () => {
                           </h3>
                           <div className="debug-info">
                             {Object.entries(
-                              contentBasedDebugData.feature_vector.features
+                              contentBasedDebugData.feature_vector.features,
                             ).map(([key, value]) => (
                               <div key={key} className="info-row">
                                 <span className="label">{key}:</span>
@@ -1963,11 +1963,11 @@ const AdminDebug = () => {
                                           <td>{sim.product_2.price} PLN</td>
                                           <td>
                                             {sim.product_2.categories.join(
-                                              ", "
+                                              ", ",
                                             )}
                                           </td>
                                         </tr>
-                                      )
+                                      ),
                                     )}
                                   </tbody>
                                 </table>
@@ -2072,7 +2072,7 @@ const AdminDebug = () => {
                                             </thead>
                                             <tbody>
                                               {Object.entries(
-                                                sim.common_features
+                                                sim.common_features,
                                               ).map(([feat, vals]) => (
                                                 <tr key={feat}>
                                                   <td>
@@ -2131,7 +2131,7 @@ const AdminDebug = () => {
                                         </strong>
                                       </td>
                                     </tr>
-                                  )
+                                  ),
                                 )}
                               </tbody>
                             </table>
@@ -2168,7 +2168,7 @@ const AdminDebug = () => {
                               }>
                               {issue}
                             </p>
-                          )
+                          ),
                         )}
                       </div>
                     </div>
@@ -2289,7 +2289,7 @@ const AdminDebug = () => {
                     <div className="debug-info">
                       {Object.entries(
                         fuzzyLogicDebugData.user_profile.category_interests ||
-                          {}
+                          {},
                       ).map(([cat, interest]) => (
                         <div className="info-row" key={cat}>
                           <span className="label">{cat}:</span>
@@ -2307,7 +2307,7 @@ const AdminDebug = () => {
                     <h4>Price Functions</h4>
                     <div className="debug-info">
                       {Object.entries(
-                        fuzzyLogicDebugData.membership_functions.price
+                        fuzzyLogicDebugData.membership_functions.price,
                       ).map(([key, func]) => (
                         <div key={key} style={{ marginBottom: "0.8rem" }}>
                           <div className="info-row">
@@ -2322,7 +2322,7 @@ const AdminDebug = () => {
                     <h4 style={{ marginTop: "1rem" }}>Quality Functions</h4>
                     <div className="debug-info">
                       {Object.entries(
-                        fuzzyLogicDebugData.membership_functions.quality
+                        fuzzyLogicDebugData.membership_functions.quality,
                       ).map(([key, func]) => (
                         <div key={key} style={{ marginBottom: "0.8rem" }}>
                           <div className="info-row">
@@ -2337,7 +2337,7 @@ const AdminDebug = () => {
                     <h4 style={{ marginTop: "1rem" }}>Popularity Functions</h4>
                     <div className="debug-info">
                       {Object.entries(
-                        fuzzyLogicDebugData.membership_functions.popularity
+                        fuzzyLogicDebugData.membership_functions.popularity,
                       ).map(([key, func]) => (
                         <div key={key} style={{ marginBottom: "0.8rem" }}>
                           <div className="info-row">
@@ -2418,7 +2418,7 @@ const AdminDebug = () => {
                           <span className="label">Categories:</span>
                           <span className="value">
                             {fuzzyLogicDebugData.selected_product.categories.join(
-                              ", "
+                              ", ",
                             )}
                           </span>
                         </div>
@@ -2573,7 +2573,7 @@ const AdminDebug = () => {
                         <div className="debug-info">
                           {Object.entries(
                             fuzzyLogicDebugData.category_matching
-                              .category_details || {}
+                              .category_details || {},
                           ).map(([cat, match]) => (
                             <div className="info-row" key={cat}>
                               <span className="label">{cat}:</span>
@@ -2589,7 +2589,8 @@ const AdminDebug = () => {
                         <h3>Fuzzy Inference - Rule Activations</h3>
                         <div className="debug-info">
                           {Object.entries(
-                            fuzzyLogicDebugData.inference.rule_activations || {}
+                            fuzzyLogicDebugData.inference.rule_activations ||
+                              {},
                           ).map(([rule, activation]) => (
                             <div className="info-row" key={rule}>
                               <span className="label">{rule}:</span>
@@ -2707,7 +2708,7 @@ const AdminDebug = () => {
                                 <td>{prod.category_match}</td>
                                 <td>{prod.categories.join(", ")}</td>
                               </tr>
-                            )
+                            ),
                           )}
                         </tbody>
                       </table>
@@ -2878,7 +2879,7 @@ const AdminDebug = () => {
                                 </td>
                                 <td>{trans.count}</td>
                               </tr>
-                            )
+                            ),
                           )}
                         </tbody>
                       </table>
@@ -2916,7 +2917,7 @@ const AdminDebug = () => {
                         <span className="label">Classes:</span>
                         <span className="value">
                           {probabilisticDebugData.naive_bayes_purchase.classes.join(
-                            ", "
+                            ", ",
                           )}
                         </span>
                       </div>
@@ -2925,7 +2926,8 @@ const AdminDebug = () => {
                     <h4 style={{ marginTop: "1rem" }}>Class Priors</h4>
                     <div className="debug-info">
                       {Object.entries(
-                        probabilisticDebugData.naive_bayes_purchase.class_priors
+                        probabilisticDebugData.naive_bayes_purchase
+                          .class_priors,
                       ).map(([cls, prob]) => (
                         <div className="info-row" key={cls}>
                           <span className="label">Class {cls}:</span>
@@ -2966,7 +2968,7 @@ const AdminDebug = () => {
                         <span className="label">Classes:</span>
                         <span className="value">
                           {probabilisticDebugData.naive_bayes_churn.classes.join(
-                            ", "
+                            ", ",
                           )}
                         </span>
                       </div>
@@ -2975,7 +2977,7 @@ const AdminDebug = () => {
                     <h4 style={{ marginTop: "1rem" }}>Class Priors</h4>
                     <div className="debug-info">
                       {Object.entries(
-                        probabilisticDebugData.naive_bayes_churn.class_priors
+                        probabilisticDebugData.naive_bayes_churn.class_priors,
                       ).map(([cls, prob]) => (
                         <div className="info-row" key={cls}>
                           <span className="label">Class {cls}:</span>
@@ -3057,7 +3059,7 @@ const AdminDebug = () => {
                         </h4>
                         <p className="description">
                           {probabilisticDebugData.user_analysis.purchase_sequence.join(
-                            " → "
+                            " → ",
                           )}
                         </p>
                       </div>
@@ -3086,13 +3088,13 @@ const AdminDebug = () => {
                                         <td>
                                           <strong>
                                             {(pred.probability * 100).toFixed(
-                                              2
+                                              2,
                                             )}
                                             %
                                           </strong>
                                         </td>
                                       </tr>
-                                    )
+                                    ),
                                   )}
                                 </tbody>
                               </table>
@@ -3227,7 +3229,7 @@ const AdminDebug = () => {
                                   </td>
                                   <td>{cat.count}</td>
                                 </tr>
-                              )
+                              ),
                             )}
                           </tbody>
                         </table>
@@ -3267,7 +3269,7 @@ const AdminDebug = () => {
                                           </strong>
                                         </td>
                                       </tr>
-                                    )
+                                    ),
                                   )}
                                 </tbody>
                               </table>
@@ -3392,7 +3394,7 @@ const AdminDebug = () => {
                         {allSimilarities
                           .slice(
                             (similaritiesPage - 1) * similaritiesPerPage,
-                            similaritiesPage * similaritiesPerPage
+                            similaritiesPage * similaritiesPerPage,
                           )
                           .map((sim, index) => (
                             <tr
@@ -3427,10 +3429,10 @@ const AdminDebug = () => {
                         setSimilaritiesPage((p) =>
                           Math.min(
                             Math.ceil(
-                              allSimilarities.length / similaritiesPerPage
+                              allSimilarities.length / similaritiesPerPage,
                             ),
-                            p + 1
-                          )
+                            p + 1,
+                          ),
                         )
                       }
                       disabled={
