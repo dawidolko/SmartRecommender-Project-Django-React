@@ -54,6 +54,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import config from "../../config/config";
+import DemoFallback from "../DemoFallback/DemoFallback";
 
 const CartContent = () => {
   const { items, totalAmount, removeFromCart, addToCart } =
@@ -98,12 +99,12 @@ const CartContent = () => {
       productIds.forEach((id) => params.append("product_ids[]", id));
 
       const response = await axios.get(
-        `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`
+        `${config.apiUrl}/api/frequently-bought-together/?${params.toString()}`,
       );
 
       if (!response.data || response.data.length === 0) {
         console.warn(
-          "⚠️ No recommendations found for these products. Association rules may not be generated yet."
+          "⚠️ No recommendations found for these products. Association rules may not be generated yet.",
         );
       }
 
@@ -242,12 +243,35 @@ const CartContent = () => {
           <TotalAmount />
         </div>
       ) : (
-        <div className="cart__empty">
-          <h2 className="cart__empty-title">Your cart is empty</h2>
-          <button className="cart__empty-btn" onClick={() => navigate("/shop")}>
-            Go To Shopping
-          </button>
-        </div>
+        (() => {
+          // Check if on GitHub Pages
+          const isGitHubPages =
+            typeof window !== "undefined" &&
+            (window.location.hostname.includes("github.io") ||
+              window.location.hostname.includes("project.dawidolko.pl") ||
+              (!window.location.hostname.includes("localhost") &&
+                !window.location.hostname.includes("127.0.0.1")));
+
+          if (isGitHubPages) {
+            return (
+              <DemoFallback
+                title="Shopping Cart - Demo Mode"
+                message="Shopping cart functionality requires database connectivity to manage items, calculate totals, and process orders. This feature is not available in the static demo version."
+              />
+            );
+          }
+
+          return (
+            <div className="cart__empty">
+              <h2 className="cart__empty-title">Your cart is empty</h2>
+              <button
+                className="cart__empty-btn"
+                onClick={() => navigate("/shop")}>
+                Go To Shopping
+              </button>
+            </div>
+          );
+        })()
       )}
     </div>
   );

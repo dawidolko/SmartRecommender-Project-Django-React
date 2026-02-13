@@ -1,0 +1,267 @@
+/**
+ * DemoFallback Styles
+ * 
+ * Styling for the GitHub Pages demo fallback content
+ */
+
+.demo-fallback {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+
+  &__container {
+    max-width: 600px;
+    text-align: center;
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  &__icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+
+    @media (max-width: 768px) {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 16px;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+  }
+
+  &__message {
+    font-size: 16px;
+    color: #64748b;
+    margin-bottom: 24px;
+    line-height: 1.5;
+
+    @media (max-width: 768px) {
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+  }
+
+  &__info {
+    background: #f1f5f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    text-align: left;
+
+    p {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.4;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: #1e293b;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__code {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    text-align: left;
+    overflow-x: auto;
+
+    code {
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 12px;
+      padding: 12px;
+      margin-bottom: 24px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+
+  &__btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    @media (max-width: 768px) {
+      padding: 10px 20px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    &--primary {
+      background: #3b82f6;
+      color: white;
+
+      &:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+      }
+    }
+
+    &--secondary {
+      background: #f8fafc;
+      color: #475569;
+      border: 2px solid #e2e8f0;
+
+      &:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+      }
+    }
+
+    &--github {
+      background: #24292e;
+      color: white;
+
+      &:hover {
+        background: #1b1f23;
+        transform: translateY(-1px);
+      }
+    }
+
+    &:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .demo-fallback {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+
+    &__container {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    &__title {
+      color: #f1f5f9;
+    }
+
+    &__message {
+      color: #94a3b8;
+    }
+
+    &__info {
+      background: #334155;
+
+      p {
+        color: #cbd5e1;
+
+        strong {
+          color: #f1f5f9;
+        }
+      }
+    }
+
+    &__code {
+      background: #000000;
+      color: #f1f5f9;
+    }
+
+    &__btn {
+      &--secondary {
+        background: #334155;
+        color: #e2e8f0;
+        border-color: #475569;
+
+        &:hover {
+          background: #3f4a5f;
+          border-color: #64748b;
+        }
+      }
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .demo-fallback {
+    &__container {
+      border: 3px solid #000000;
+    }
+
+    &__btn {
+      border: 2px solid currentColor;
+
+      &--primary {
+        background: #0000ff;
+        color: #ffffff;
+      }
+
+      &--secondary {
+        background: #ffffff;
+        color: #000000;
+        border-color: #000000;
+      }
+
+      &--github {
+        background: #000000;
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+// Animation for reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .demo-fallback__btn {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}

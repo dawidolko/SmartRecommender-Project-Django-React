@@ -44,6 +44,7 @@ import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
 import config from "../../config/config";
 import { mockAPI } from "../../utils/mockData";
+import DemoFallback from "../DemoFallback/DemoFallback";
 import { IoHomeOutline } from "react-icons/io5";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import {
@@ -79,6 +80,7 @@ const ShopContent = () => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState([]);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(30);
@@ -95,16 +97,22 @@ const ShopContent = () => {
     const fetchCategories = async () => {
       try {
         if (config.useMockData) {
+          console.log("ShopContent: Using mock data for categories");
           const data = await mockAPI.getCategories();
-          setCategories(data.map((cat) => cat.name));
+          console.log("ShopContent: Mock categories loaded:", data?.length);
+          setCategories((data || []).map((cat) => cat.name));
         } else {
           const response = await fetch(`${config.apiUrl}/api/categories/`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           const data = await response.json();
-          setCategories(data.map((cat) => cat.name));
+          setCategories((data || []).map((cat) => cat.name));
         }
-        setIsLoadingCategories(false);
       } catch (error) {
         console.error("Error fetching categories:", error);
+        setCategories([]); // Set empty array on error
+      } finally {
         setIsLoadingCategories(false);
       }
     };
@@ -112,22 +120,38 @@ const ShopContent = () => {
     const fetchProducts = async () => {
       try {
         if (config.useMockData) {
+          console.log("ShopContent: Using mock data for products");
           const data = await mockAPI.getProducts();
-          setProducts(data);
+          console.log("ShopContent: Mock products loaded:", data?.length);
+          setProducts(data || []);
         } else {
           const response = await fetch(`${config.apiUrl}/api/products/`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           const data = await response.json();
-          setProducts(data);
+          setProducts(data || []);
         }
-        setIsLoadingProducts(false);
       } catch (error) {
         console.error("Error fetching products:", error);
+        setProducts([]); // Set empty array on error
+      } finally {
         setIsLoadingProducts(false);
       }
     };
 
     fetchCategories();
     fetchProducts();
+
+    // Timeout fallback - if loading takes too long, show demo fallback
+    const timeoutId = setTimeout(() => {
+      if (isLoadingProducts || isLoadingCategories) {
+        console.log("ShopContent: Loading timeout - showing demo fallback");
+        setLoadingTimeout(true);
+        setIsLoadingProducts(false);
+        setIsLoadingCategories(false);
+      }
+    }, 8000);
 
     const handleResize = () => {
       if (window.innerWidth < 868) {
@@ -140,7 +164,10 @@ const ShopContent = () => {
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
@@ -405,9 +432,30 @@ const ShopContent = () => {
                 />
               ))
             ) : (
-              <p className="shop__no-products">
-                Brak produktów w tej kategorii.
-              </p>
+              (() => {
+                // Check if on GitHub Pages and no products
+                const isGitHubPages =
+                  typeof window !== "undefined" &&
+                  (window.location.hostname.includes("github.io") ||
+                    window.location.hostname.includes("project.dawidolko.pl") ||
+                    (!window.location.hostname.includes("localhost") &&
+                      !window.location.hostname.includes("127.0.0.1")));
+
+                if ((isGitHubPages && !isLoadingProducts) || loadingTimeout) {
+                  return (
+                    <DemoFallback
+                      title="Shop - Demo Mode"
+                      message="The product catalog requires database connectivity to display items, categories, and filtering. This feature is not available in the static demo version."
+                      showBackButton={false}
+                    />
+                  );
+                }
+                return (
+                  <p className="shop__no-products">
+                    Brak produktów w tej kategorii.
+                  </p>
+                );
+              })()
             )}
           </div>
 

@@ -40,6 +40,7 @@ import "../ShopContent/ShopContent.scss";
 import ShopProduct from "../ShopContent/ShopProduct";
 import config from "../../config/config";
 import { mockAPI } from "../../utils/mockData";
+import DemoFallback from "../DemoFallback/DemoFallback";
 
 const SearchResults = () => {
   const { query } = useParams();
@@ -91,7 +92,26 @@ const SearchResults = () => {
             />
           ))
         ) : (
-          <p>No products match your search.</p>
+          (() => {
+            // Check if on GitHub Pages
+            const isGitHubPages =
+              typeof window !== "undefined" &&
+              (window.location.hostname.includes("github.io") ||
+                window.location.hostname.includes("project.dawidolko.pl") ||
+                (!window.location.hostname.includes("localhost") &&
+                  !window.location.hostname.includes("127.0.0.1")));
+
+            if (isGitHubPages) {
+              return (
+                <DemoFallback
+                  title="Search Results - Demo Mode"
+                  message="Product search functionality requires database connectivity to query and filter products. This feature is not available in the static demo version."
+                />
+              );
+            }
+
+            return <p>No products match your search.</p>;
+          })()
         )}
       </div>
     </div>

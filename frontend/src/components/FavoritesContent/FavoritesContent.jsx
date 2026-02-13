@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import config from "../../config/config";
 import { mockAPI } from "../../utils/mockData";
+import DemoFallback from "../DemoFallback/DemoFallback";
 
 const FavoritesContent = () => {
   const { favorites, removeFromFavorites } = useFavorites();
@@ -86,14 +87,37 @@ const FavoritesContent = () => {
           </table>
         </div>
       ) : (
-        <div className="favorites__empty">
-          <h2 className="favorites__empty-title">Your Favorites are empty</h2>
-          <button
-            className="favorites__empty-btn"
-            onClick={() => navigate("/shop")}>
-            Go To Shopping
-          </button>
-        </div>
+        (() => {
+          // Check if on GitHub Pages
+          const isGitHubPages =
+            typeof window !== "undefined" &&
+            (window.location.hostname.includes("github.io") ||
+              window.location.hostname.includes("project.dawidolko.pl") ||
+              (!window.location.hostname.includes("localhost") &&
+                !window.location.hostname.includes("127.0.0.1")));
+
+          if (isGitHubPages) {
+            return (
+              <DemoFallback
+                title="Favorites - Demo Mode"
+                message="Favorites functionality requires database connectivity to save and manage your preferred items. This feature is not available in the static demo version."
+              />
+            );
+          }
+
+          return (
+            <div className="favorites__empty">
+              <h2 className="favorites__empty-title">
+                Your Favorites are empty
+              </h2>
+              <button
+                className="favorites__empty-btn"
+                onClick={() => navigate("/shop")}>
+                Go To Shopping
+              </button>
+            </div>
+          );
+        })()
       )}
     </div>
   );

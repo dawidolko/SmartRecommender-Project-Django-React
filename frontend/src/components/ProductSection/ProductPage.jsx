@@ -77,6 +77,7 @@ import "./ProductPage.scss";
 import config from "../../config/config";
 import { mockAPI } from "../../utils/mockData";
 import axios from "axios";
+import DemoFallback from "../DemoFallback/DemoFallback";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -206,8 +207,27 @@ const ProductPage = () => {
     if (product) fetchSimilarProducts();
   }, [product]);
 
+  // Check if on GitHub Pages and no product found
+  const isGitHubPages =
+    typeof window !== "undefined" &&
+    (window.location.hostname.includes("github.io") ||
+      window.location.hostname.includes("project.dawidolko.pl") ||
+      (!window.location.hostname.includes("localhost") &&
+        !window.location.hostname.includes("127.0.0.1")));
+
   if (loading) return <div className="loading-spinner"></div>;
-  if (!product) return <h2>Product not found.</h2>;
+
+  if (!product) {
+    if (isGitHubPages) {
+      return (
+        <DemoFallback
+          title="Product Details - Demo Mode"
+          message="Individual product pages require database connectivity to load product details, images, and specifications. This feature is not available in the static demo version."
+        />
+      );
+    }
+    return <h2>Product not found.</h2>;
+  }
 
   const handleToggleFavorite = () => {
     if (favorite) {

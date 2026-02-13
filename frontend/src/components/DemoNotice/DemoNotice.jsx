@@ -29,21 +29,21 @@ const DemoNotice = () => {
     typeof window !== "undefined" &&
     (window.location.hostname.includes("github.io") ||
       window.location.hostname.includes("project.dawidolko.pl") ||
-      (!window.location.hostname.includes("localhost") &&
-        !window.location.hostname.includes("127.0.0.1")));
+      window.location.hostname.includes("githubpages") ||
+      (window.location.protocol === "https:" &&
+        !window.location.hostname.includes("localhost") &&
+        !window.location.hostname.includes("127.0.0.1") &&
+        !window.location.hostname.includes("0.0.0.0")));
 
-  // Routes that require backend functionality
-  const backendRoutes = [
-    "/shop",
-    "/cart",
-    "/favorites",
-    "/login",
-    "/signup",
-    "/contact",
-    "/admin",
-    "/client",
-  ];
-
+  // Debug info
+  if (typeof window !== "undefined") {
+    console.log("DemoNotice Debug:", {
+      hostname: window.location.hostname,
+      protocol: window.location.protocol,
+      pathname: location.pathname,
+      isGitHubPages: isGitHubPages,
+    });
+  }
   // Check if current route requires backend
   const requiresBackend =
     backendRoutes.some((route) => location.pathname.startsWith(route)) ||
