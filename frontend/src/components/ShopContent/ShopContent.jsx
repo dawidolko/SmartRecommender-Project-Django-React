@@ -168,7 +168,7 @@ const ShopContent = () => {
       window.removeEventListener("resize", handleResize);
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [isLoadingProducts, isLoadingCategories]);
 
   useEffect(() => {
     setCurrentPage(1);
