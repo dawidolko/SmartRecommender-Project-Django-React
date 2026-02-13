@@ -43,6 +43,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./ShopContent.scss";
 import ShopProduct from "./ShopProduct";
 import config from "../../config/config";
+import { mockAPI } from "../../utils/mockData";
 import { IoHomeOutline } from "react-icons/io5";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import {
@@ -93,9 +94,14 @@ const ShopContent = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/api/categories/`);
-        const data = await response.json();
-        setCategories(data.map((cat) => cat.name));
+        if (config.useMockData) {
+          const data = await mockAPI.getCategories();
+          setCategories(data.map((cat) => cat.name));
+        } else {
+          const response = await fetch(`${config.apiUrl}/api/categories/`);
+          const data = await response.json();
+          setCategories(data.map((cat) => cat.name));
+        }
         setIsLoadingCategories(false);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -105,9 +111,14 @@ const ShopContent = () => {
 
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/api/products/`);
-        const data = await response.json();
-        setProducts(data);
+        if (config.useMockData) {
+          const data = await mockAPI.getProducts();
+          setProducts(data);
+        } else {
+          const response = await fetch(`${config.apiUrl}/api/products/`);
+          const data = await response.json();
+          setProducts(data);
+        }
         setIsLoadingProducts(false);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -137,7 +148,7 @@ const ShopContent = () => {
   }, [selectedMainCategory, selectedSubCategory]);
 
   const mainCategories = Array.from(
-    new Set(categories.map((cat) => cat.split(".")[0]))
+    new Set(categories.map((cat) => cat.split(".")[0])),
   );
 
   const subCategories =
@@ -167,7 +178,7 @@ const ShopContent = () => {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
-    indexOfLastProduct
+    indexOfLastProduct,
   );
 
   const getCategoryIcon = (categoryName) => {
@@ -201,7 +212,7 @@ const ShopContent = () => {
     setExpandedCategories((prev) =>
       prev.includes(category)
         ? prev.filter((cat) => cat !== category)
-        : [...prev, category]
+        : [...prev, category],
     );
   };
 
@@ -232,7 +243,7 @@ const ShopContent = () => {
           className={`pagination-number ${currentPage === i ? "active" : ""}`}
           onClick={() => handlePageChange(i)}>
           {i}
-        </button>
+        </button>,
       );
     }
 
@@ -305,7 +316,7 @@ const ShopContent = () => {
                       </button>
 
                       {categories.some((cat) =>
-                        cat.startsWith(mainCat + ".")
+                        cat.startsWith(mainCat + "."),
                       ) && (
                         <button
                           className="shop__sidebar-toggle"
@@ -388,7 +399,7 @@ const ShopContent = () => {
                   price={product.price}
                   old_price={product.old_price}
                   imgs={product.photos.map(
-                    (photo) => `${config.apiUrl}/media/${photo.path}`
+                    (photo) => `${config.apiUrl}/media/${photo.path}`,
                   )}
                   category={product.categories[0] || "N/A"}
                 />

@@ -2256,36 +2256,78 @@ const shopData = [
 
 export default shopData;
 
-
 // Export for compatibility with mock data usage
 export const mockProducts = shopData;
 
+// Mock categories
+export const mockCategories = [
+  { id: 1, name: "Computer", slug: "computer" },
+  { id: 2, name: "Laptop", slug: "laptop" },
+  { id: 3, name: "Case", slug: "case" },
+  { id: 4, name: "Cooler", slug: "cooler" },
+  { id: 5, name: "Disk", slug: "disk" },
+  { id: 6, name: "Fan", slug: "fan" },
+  { id: 7, name: "GPU", slug: "gpu" },
+  { id: 8, name: "Motherboard", slug: "motherboard" },
+  { id: 9, name: "Power Supply", slug: "powersupply" },
+  { id: 10, name: "Processor", slug: "processor" },
+  { id: 11, name: "RAM", slug: "ram" },
+];
+
 // Placeholder image for products without photos
-export const PLACEHOLDER_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E";
+export const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 // Mock API functions
 export const mockAPI = {
   getProducts: () => Promise.resolve(shopData),
-  
+
+  getProductById: (id) => {
+    const product = shopData.find((p) => p.id === parseInt(id));
+    return Promise.resolve(product || null);
+  },
+
+  getCategories: () => Promise.resolve(mockCategories),
+
+  getProductsByCategory: (category) => {
+    if (!category || category === "all") {
+      return Promise.resolve(shopData);
+    }
+    const filtered = shopData.filter(
+      (product) => product.category.toLowerCase() === category.toLowerCase(),
+    );
+    return Promise.resolve(filtered);
+  },
+
   getRandomProducts: (count = 8) => {
     const shuffled = [...shopData].sort(() => 0.5 - Math.random());
     return Promise.resolve(shuffled.slice(0, count));
   },
-  
+
   searchProducts: (query) => {
-    const filtered = shopData.filter(product =>
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      (product.description && product.description.toLowerCase().includes(query.toLowerCase()))
+    const filtered = shopData.filter(
+      (product) =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        (product.description &&
+          product.description.toLowerCase().includes(query.toLowerCase())),
     );
     return Promise.resolve(filtered);
   },
-  
-  getRecommendationSettings: () => Promise.resolve({
-    active_algorithm: 'random',
-    algorithms: ['random', 'content_based', 'collaborative']
-  }),
-  
+
+  getRecommendationSettings: () =>
+    Promise.resolve({
+      active_algorithm: "random",
+      algorithms: ["random", "content_based", "collaborative"],
+    }),
+
   getRecommendationPreview: (algorithm) => {
     return mockAPI.getRandomProducts(8);
-  }
+  },
+
+  getRelatedProducts: (productId, count = 4) => {
+    // Get random products excluding the current one
+    const filtered = shopData.filter((p) => p.id !== parseInt(productId));
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    return Promise.resolve(shuffled.slice(0, count));
+  },
 };

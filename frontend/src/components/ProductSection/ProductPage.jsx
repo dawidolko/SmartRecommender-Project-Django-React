@@ -75,6 +75,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./ProductPage.scss";
 import config from "../../config/config";
+import { mockAPI } from "../../utils/mockData";
 import axios from "axios";
 
 const ProductPage = () => {
@@ -104,7 +105,7 @@ const ProductPage = () => {
         await axios.post(
           `${config.apiUrl}/api/interaction/`,
           { product_id: id, interaction_type: type },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
       } catch (error) {
         if (error.response?.status !== 401) {
@@ -112,16 +113,31 @@ const ProductPage = () => {
         }
       }
     },
-    [id]
+    [id],
   );
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/api/product/${id}/`);
-        setProduct(response.data);
-        setFavorite(isFavorite(response.data.id));
-        sendInteraction("view");
+        if (config.useMockData) {
+          const data = await mockAPI.getProductById(id);
+          if (!data) {
+            toast.error("Product not found.", {
+              position: "top-center",
+            });
+            navigate("/shop");
+            return;
+          }
+          setProduct(data);
+          setFavorite(isFavorite(data.id));
+        } else {
+          const response = await axios.get(
+            `${config.apiUrl}/api/product/${id}/`,
+          );
+          setProduct(response.data);
+          setFavorite(isFavorite(response.data.id));
+          sendInteraction("view");
+        }
       } catch (error) {
         console.error(error);
         toast.error("Error loading product details.", {
@@ -144,29 +160,41 @@ const ProductPage = () => {
 
   useEffect(() => {
     const fetchSimilarProducts = async () => {
-      if (!product || !product.categories || product.categories.length === 0)
-        return;
+      if (!product) return;
 
       setSimilarProductsLoading(true);
       try {
-        const fullCategory = product.categories[0];
-        const mainCategory = fullCategory.split(".")[0];
-        const token = localStorage.getItem("access");
-        const headers = {};
-        if (token) headers.Authorization = `Bearer ${token}`;
+        if (config.useMockData) {
+          const data = await mockAPI.getRelatedProducts(product.id, 10);
+          setSimilarProducts(data);
+        } else {
+          if (!product.categories || product.categories.length === 0) {
+            setSimilarProducts([]);
+            setSimilarProductsLoading(false);
+            return;
+          }
 
-        const response = await axios.get(`${config.apiUrl}/api/products/`, {
-          params: { category: mainCategory },
-          headers: headers,
-        });
+          const fullCategory = product.categories[0];
+          const mainCategory = fullCategory.split(".")[0];
+          const token = localStorage.getItem("access");
+          const headers = {};
+          if (token) headers.Authorization = `Bearer ${token}`;
 
-        const filteredProducts = response.data.filter(
-          (p) =>
-            p.id !== product.id &&
-            p.categories.some((cat) => cat.startsWith(mainCategory))
-        );
-        const sortedProducts = filteredProducts.sort(() => 0.5 - Math.random());
-        setSimilarProducts(sortedProducts.slice(0, 10));
+          const response = await axios.get(`${config.apiUrl}/api/products/`, {
+            params: { category: mainCategory },
+            headers: headers,
+          });
+
+          const filteredProducts = response.data.filter(
+            (p) =>
+              p.id !== product.id &&
+              p.categories.some((cat) => cat.startsWith(mainCategory)),
+          );
+          const sortedProducts = filteredProducts.sort(
+            () => 0.5 - Math.random(),
+          );
+          setSimilarProducts(sortedProducts.slice(0, 10));
+        }
       } catch (error) {
         console.error("Error fetching similar products:", error);
         setSimilarProducts([]);
@@ -175,7 +203,7 @@ const ProductPage = () => {
       }
     };
 
-    if (product && product.categories) fetchSimilarProducts();
+    if (product) fetchSimilarProducts();
   }, [product]);
 
   if (loading) return <div className="loading-spinner"></div>;
@@ -206,13 +234,13 @@ const ProductPage = () => {
 
   const handlePrevImage = () => {
     setCurrentIndex((prev) =>
-      prev === 0 ? product.photos.length - 1 : prev - 1
+      prev === 0 ? product.photos.length - 1 : prev - 1,
     );
   };
 
   const handleNextImage = () => {
     setCurrentIndex((prev) =>
-      prev === product.photos.length - 1 ? 0 : prev + 1
+      prev === product.photos.length - 1 ? 0 : prev + 1,
     );
   };
 
@@ -571,7 +599,7 @@ const ProductPage = () => {
                               <span className="productPage__similar-product-old-price">
                                 $
                                 {parseFloat(similarProduct.old_price).toFixed(
-                                  2
+                                  2,
                                 )}
                               </span>
                             )}
