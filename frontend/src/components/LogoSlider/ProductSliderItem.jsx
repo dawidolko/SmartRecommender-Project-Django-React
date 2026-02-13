@@ -9,6 +9,7 @@ import config from "../../config/config";
 const ProductSliderItem = ({
   id,
   photos,
+  imgs,
   name,
   price,
   old_price,
@@ -37,9 +38,12 @@ const ProductSliderItem = ({
     } else {
       addToFavorites({
         id,
-        img: photos?.[0]?.path
-          ? `${config.apiUrl}/media/${photos[0].path}`
-          : "https://via.placeholder.com/150",
+        img:
+          config.useMockData && imgs && imgs[0]
+            ? imgs[0]
+            : photos?.[0]?.path
+              ? `${config.apiUrl}/media/${photos[0].path}`
+              : "https://via.placeholder.com/150",
         name,
         price,
       });
@@ -61,9 +65,12 @@ const ProductSliderItem = ({
     });
   };
 
-  const imageUrl = photos?.[0]?.path
-    ? `${config.apiUrl}/media/${photos[0].path}`
-    : "https://via.placeholder.com/150";
+  const imageUrl =
+    config.useMockData && imgs && imgs[0]
+      ? imgs[0]
+      : photos?.[0]?.path
+        ? `${config.apiUrl}/media/${photos[0].path}`
+        : "https://via.placeholder.com/150";
 
   return (
     <div className="sliderItem" onClick={handleBoxClick}>

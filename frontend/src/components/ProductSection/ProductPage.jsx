@@ -238,7 +238,12 @@ const ProductPage = () => {
     } else {
       addToFavorites({
         id: product.id,
-        img: `${config.apiUrl}/media/${product.photos[0]?.path}`,
+        img:
+          config.useMockData && product.imgs && product.imgs[0]
+            ? product.imgs[0]
+            : product.photos && product.photos[0]?.path
+              ? `${config.apiUrl}/media/${product.photos[0].path}`
+              : "/placeholder.jpg",
         name: product.name,
         price: product.price,
       });
@@ -441,9 +446,13 @@ const ProductPage = () => {
               </button>
               <img
                 src={
-                  product.photos && product.photos[currentIndex]
-                    ? `${config.apiUrl}/media/${product.photos[currentIndex].path}`
-                    : "/placeholder.jpg"
+                  config.useMockData &&
+                  product.imgs &&
+                  product.imgs[currentIndex]
+                    ? product.imgs[currentIndex]
+                    : product.photos && product.photos[currentIndex]
+                      ? `${config.apiUrl}/media/${product.photos[currentIndex].path}`
+                      : "/placeholder.jpg"
                 }
                 alt={product.name}
                 className="productPage__main-img productPage__main-img--clickable"
@@ -469,9 +478,13 @@ const ProductPage = () => {
                       <div key={`thumb-${photo?.id ?? photo?.path ?? idx}`}>
                         <img
                           src={
-                            photo?.path
-                              ? `${config.apiUrl}/media/${photo.path}`
-                              : "/placeholder.jpg"
+                            config.useMockData
+                              ? typeof photo === "string"
+                                ? photo
+                                : "/placeholder.jpg"
+                              : photo?.path
+                                ? `${config.apiUrl}/media/${photo.path}`
+                                : "/placeholder.jpg"
                           }
                           alt={`Thumbnail ${idx + 1}`}
                           className={`productPage__thumbnail ${
@@ -500,9 +513,13 @@ const ProductPage = () => {
                 <img
                   className="common-image-overlay__image"
                   src={
-                    product.photos && product.photos[currentIndex]
-                      ? `${config.apiUrl}/media/${product.photos[currentIndex].path}`
-                      : "/placeholder.jpg"
+                    config.useMockData &&
+                    product.imgs &&
+                    product.imgs[currentIndex]
+                      ? product.imgs[currentIndex]
+                      : product.photos && product.photos[currentIndex]
+                        ? `${config.apiUrl}/media/${product.photos[currentIndex].path}`
+                        : "/placeholder.jpg"
                   }
                   alt={product.name}
                 />
@@ -560,9 +577,13 @@ const ProductPage = () => {
                       onClick={() => navigate(`/product/${recProduct.id}`)}>
                       <img
                         src={
-                          recProduct.photos && recProduct.photos[0]
-                            ? `${config.apiUrl}/media/${recProduct.photos[0].path}`
-                            : "/placeholder.jpg"
+                          config.useMockData &&
+                          recProduct.imgs &&
+                          recProduct.imgs[0]
+                            ? recProduct.imgs[0]
+                            : recProduct.photos && recProduct.photos[0]
+                              ? `${config.apiUrl}/media/${recProduct.photos[0].path}`
+                              : "/placeholder.jpg"
                         }
                         alt={recProduct.name}
                         className="productPage__quick-rec-img"
@@ -629,9 +650,13 @@ const ProductPage = () => {
                       onClick={() => navigate(`/product/${similarProduct.id}`)}>
                       <img
                         src={
-                          similarProduct.photos && similarProduct.photos[0]
-                            ? `${config.apiUrl}/media/${similarProduct.photos[0].path}`
-                            : "/placeholder.jpg"
+                          config.useMockData &&
+                          similarProduct.imgs &&
+                          similarProduct.imgs[0]
+                            ? similarProduct.imgs[0]
+                            : similarProduct.photos && similarProduct.photos[0]
+                              ? `${config.apiUrl}/media/${similarProduct.photos[0].path}`
+                              : "/placeholder.jpg"
                         }
                         alt={similarProduct.name}
                         className="productPage__similar-product-img"

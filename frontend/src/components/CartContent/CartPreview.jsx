@@ -53,9 +53,12 @@ const CartPreview = () => {
           response.data.forEach((product) => {
             productMap[product.id] = {
               ...product,
-              image: product.photos?.[0]?.path
-                ? `${BASE_URL}/media/${product.photos[0].path}`
-                : PLACEHOLDER_IMAGE,
+              image:
+                config.useMockData && product.imgs && product.imgs[0]
+                  ? product.imgs[0]
+                  : product.photos?.[0]?.path
+                    ? `${BASE_URL}/media/${product.photos[0].path}`
+                    : PLACEHOLDER_IMAGE,
             };
           });
           setProducts(productMap);
