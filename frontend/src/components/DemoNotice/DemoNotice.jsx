@@ -1,22 +1,3 @@
-/**
- * DemoNotice Component - GitHub Pages Demo Version Notice
- *
- * Authors: Dawid Olko & Piotr Smoła
- * Date: 2026-02-13
- * Version: 1.0
- *
- * Displays a notice banner when the application is running on GitHub Pages
- * to inform users that this is a static preview version with limited functionality.
- *
- * Features:
- *   - Automatically detects GitHub Pages environment
- *   - Shows informative message about limited functionality
- *   - Only displays on routes that require backend connectivity
- *   - Responsive design with accessibility support
- *
- * @component
- * @returns {React.ReactElement|null} Demo notice banner or null if not on GitHub Pages
- */
 import React from "react";
 import { useLocation } from "react-router-dom";
 import "./DemoNotice.scss";
@@ -24,7 +5,16 @@ import "./DemoNotice.scss";
 const DemoNotice = () => {
   const location = useLocation();
 
-  // Check if we're on GitHub Pages or production environment
+  const backendRoutes = [
+    "/admin",
+    "/client-panel",
+    "/cart",
+    "/shop",
+    "/product",
+    "/search",
+    "/category",
+  ];
+
   const isGitHubPages =
     typeof window !== "undefined" &&
     (window.location.hostname.includes("github.io") ||
@@ -35,23 +25,12 @@ const DemoNotice = () => {
         !window.location.hostname.includes("127.0.0.1") &&
         !window.location.hostname.includes("0.0.0.0")));
 
-  // Debug info
-  if (typeof window !== "undefined") {
-    console.log("DemoNotice Debug:", {
-      hostname: window.location.hostname,
-      protocol: window.location.protocol,
-      pathname: location.pathname,
-      isGitHubPages: isGitHubPages,
-    });
-  }
-  // Check if current route requires backend
   const requiresBackend =
     backendRoutes.some((route) => location.pathname.startsWith(route)) ||
     location.pathname.includes("/product/") ||
     location.pathname.includes("/search/") ||
     location.pathname.includes("/category/");
 
-  // Only show notice on GitHub Pages for routes that need backend
   if (!isGitHubPages || !requiresBackend) {
     return null;
   }
