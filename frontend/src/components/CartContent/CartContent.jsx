@@ -139,7 +139,7 @@ const CartContent = () => {
 
   return (
     <div className="cart container">
-      {totalAmount() > 0 ? (
+      {totalAmount() > 0 && shopData.length > 0 ? (
         <div className="cart__container">
           <table className="cart__table">
             <thead className="cart__thead">
@@ -258,6 +258,24 @@ const CartContent = () => {
                 title="Shopping Cart - Demo Mode"
                 message="Shopping cart functionality requires database connectivity to manage items, calculate totals, and process orders. This feature is not available in the static demo version."
               />
+            );
+          }
+
+          // Show message if cart has items but no product data loaded
+          if (totalAmount() > 0 && shopData.length === 0) {
+            return (
+              <div className="cart__empty">
+                <h2 className="cart__empty-title">Cannot load cart products</h2>
+                <p style={{ marginBottom: "2rem", color: "#666" }}>
+                  Unable to connect to the server. Your cart items are saved
+                  locally but cannot be displayed without server connection.
+                </p>
+                <button
+                  className="cart__empty-btn"
+                  onClick={() => navigate("/shop")}>
+                  Go To Shopping
+                </button>
+              </div>
             );
           }
 

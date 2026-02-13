@@ -58,7 +58,7 @@ const FavoritesContent = () => {
 
   return (
     <div className="favorites container">
-      {favorites.length > 0 ? (
+      {favorites.length > 0 && products.length > 0 ? (
         <div className="favorites__container">
           <table className="favorites__table">
             <thead className="favorites__thead">
@@ -102,6 +102,27 @@ const FavoritesContent = () => {
                 title="Favorites - Demo Mode"
                 message="Favorites functionality requires database connectivity to save and manage your preferred items. This feature is not available in the static demo version."
               />
+            );
+          }
+
+          // Show message if favorites has items but no product data loaded
+          if (favorites.length > 0 && products.length === 0) {
+            return (
+              <div className="favorites__empty">
+                <h2 className="favorites__empty-title">
+                  Cannot load favorite products
+                </h2>
+                <p style={{ marginBottom: "2rem", color: "#666" }}>
+                  Unable to connect to the server. Your {favorites.length}{" "}
+                  favorite items are saved locally but cannot be displayed
+                  without server connection.
+                </p>
+                <button
+                  className="favorites__empty-btn"
+                  onClick={() => navigate("/shop")}>
+                  Go To Shopping
+                </button>
+              </div>
             );
           }
 

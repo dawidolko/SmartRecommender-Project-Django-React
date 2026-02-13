@@ -175,20 +175,27 @@ const ShopContent = () => {
   }, [selectedMainCategory, selectedSubCategory]);
 
   const mainCategories = Array.from(
-    new Set(categories.map((cat) => cat.split(".")[0])),
+    new Set(
+      (categories || [])
+        .filter((cat) => cat && typeof cat === "string")
+        .map((cat) => cat.split(".")[0]),
+    ),
   );
 
   const subCategories =
     selectedMainCategory !== "all"
-      ? categories
-          .filter((cat) => cat.startsWith(selectedMainCategory + "."))
+      ? (categories || [])
+          .filter((cat) => cat && cat.startsWith(selectedMainCategory + "."))
           .map((cat) => cat.split(".")[1])
       : [];
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = (products || []).filter((product) => {
+    if (!product || !product.categories) return false;
+
     const matchesCategory =
       selectedMainCategory === "all" ||
       product.categories.some((prodCat) => {
+        if (!prodCat || typeof prodCat !== "string") return false;
         const [prodMain, prodSub = "all"] = prodCat.split(".");
         return selectedSubCategory === "all"
           ? prodMain === selectedMainCategory
