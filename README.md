@@ -1,4 +1,4 @@
-# 🛍️ SmartRecommender: Product Recommendation Platform 
+# 🛍️ SmartRecommender: Product Recommendation Platform
 
 > **Project Description:** A comprehensive full-stack platform that delivers personalized product recommendations by combining machine learning, uncertainty modeling, and user behavior analysis. This system enhances user experience through dynamic, intelligent suggestions based on real-world data.
 
