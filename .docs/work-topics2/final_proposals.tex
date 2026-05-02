@@ -1,0 +1,1685 @@
+% !TeX program = pdflatex
+% Propozycje finalne tematów pracy magisterskiej — Olko + Smoła
+% Kompilacja: pdflatex final_proposals.tex (2x dla TOC)
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[lf]{carlito}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[polish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{tabularx}
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\onehalfspacing
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue!60!black,
+  citecolor=black,
+  pdftitle={Propozycje finalne tematów pracy magisterskiej},
+  pdfauthor={Dawid Olko, Piotr Smoła}
+}
+
+\titleformat{\section}[block]{\bfseries\Large\raggedright}{\thesection.}{0.6em}{}
+\titleformat{\subsection}[block]{\bfseries\large\raggedright}{\thesubsection.}{0.6em}{}
+\titleformat{\subsubsection}[block]{\bfseries\normalsize\raggedright}{\thesubsubsection.}{0.5em}{}
+
+\setlength{\cftbeforesecskip}{3pt}
+\setlength{\cftbeforesubsecskip}{2pt}
+
+\definecolor{codebg}{rgb}{0.96,0.96,0.96}
+\definecolor{codekey}{rgb}{0.0,0.2,0.6}
+\definecolor{codestr}{rgb}{0.5,0.0,0.0}
+\definecolor{codecmt}{rgb}{0.4,0.4,0.4}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  keywordstyle=\color{codekey}\bfseries,
+  stringstyle=\color{codestr},
+  commentstyle=\color{codecmt}\itshape,
+  breaklines=true,
+  frame=single,
+  framesep=3pt,
+  framerule=0pt,
+  numbers=none,
+  showstringspaces=false,
+  language=Python,
+  literate={ą}{{\k{a}}}1 {ć}{{\'c}}1 {ę}{{\k{e}}}1 {ł}{{\l{}}}1
+           {ń}{{\'n}}1 {ó}{{\'o}}1 {ś}{{\'s}}1 {ź}{{\'z}}1 {ż}{{\.z}}1
+           {Ą}{{\k{A}}}1 {Ć}{{\'C}}1 {Ę}{{\k{E}}}1 {Ł}{{\L{}}}1
+           {Ń}{{\'N}}1 {Ó}{{\'O}}1 {Ś}{{\'S}}1 {Ź}{{\'Z}}1 {Ż}{{\.Z}}1
+}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\begin{document}
+\setcounter{tocdepth}{3}
+
+% =====================================================================
+% Strona tytułowa
+% =====================================================================
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+
+{\Large\bfseries Propozycje tematów pracy magisterskiej}\\[0.4cm]
+{\normalsize\itshape Prace magisterskie (wniosek tytułu do promotora) --- dwa niezależne tematy na bazie projektu inżynierskiego \emph{SmartRecommender}}\\[1.0cm]
+
+{\large Rozszerzenie pracy inżynierskiej \emph{SmartRecommender}\\
+o warstwę badawczą, eksperymenty i --- opcjonalnie --- panel diagnostyczny w Django Admin}\\[2.2cm]
+
+\begin{tabular}{rl}
+\textbf{Autorzy:} & Dawid Olko, Piotr Smoła\\[4pt]
+\textbf{Promotor:} & dr hab. Urszula Bentkowska\\[4pt]
+\textbf{Jednostka:} & Uniwersytet Rzeszowski, WNST\\[4pt]
+\textbf{Repozytorium:} & \texttt{github.com/dawidolko/SmartRecommender}\\[4pt]
+\textbf{Data:} & 2026-05-02\\
+\end{tabular}
+
+\vfill
+
+{\small\textbf{Cel dokumentu:} zestaw \textbf{propozycji tematów pod prace magisterskie} (dwie osobne prace) oraz opis planowanej infrastruktury badawczej --- bez konieczności pisania aplikacji od zera.\\[0.75em]
+\footnotesize Opracowanie po analizie repozytorium, założeń promotora i wcześniejszych dokumentów (\texttt{propozycje.md}, \texttt{propozycje\_tematow\_magisterskich\_v2.pdf}).}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section*{Streszczenie}
+\addcontentsline{toc}{section}{Streszczenie}
+
+Niniejszy dokument dotyczy dwóch równoległych prac magisterskich jako \textbf{rozbudowy istniejącego} \emph{SmartRecommender}: bez przepisywania frontu i backendu od zera, z dodaniem warstwy badawczej (dane, eksperymenty, nowe moduły tam, gdzie to potrzebne). Kod i interfejs z pracy inżynierskiej pozostają punktem wyjścia, ale \textbf{nie każdy temat musi} kończyć się porównaniem z któryś z metod z inżynierki --- część propozycji to np.\ samodzielny tor LLM/RAG, nowy ranker, jakość usługi, graf towarów, monitoring; porównanie z istniejącym kodem jest \emph{możliwe}, lecz \emph{nieobowiązkowe}.
+
+\medskip
+\noindent W dokumencie zawarto m.in.\ \textbf{stos technologiczny dla LLM/RAG} (sekcja~\ref{sec:llm-stack}) oraz koncepcję \textbf{panelu badań w Django Admin} (sekcja~\ref{sec:admin-research}) --- sens: wyniki eksperymentów i wybór strategii rekomendacji widoczne w GUI, a nie wyłącznie w terminalu.
+
+\medskip
+\noindent W dokumencie zawarto \textbf{katalog wielu propozycji} dla każdego autora: najpierw \textbf{tabele skrótowe} (sekcja~\ref{sec:katalog-skrót}) --- żeby od razu widać było pełną listę identyfikatorów D1--D12 i P1--P12 --- potem rozwinięcia z celem, pytaniem badawczym, danymi i metrykami. \textbf{Dla Dawida} dodano mapę istniejącego kodu z inżynierki (sekcja~\ref{sec:dawid-mapa}) i przy każdym temacie D1--D12 blok ,,jak to powiedzieć na obronie'' + ,,co w repozytorium''. Sekcja~\ref{sec:deep-dive} to wyłącznie \textit{jeden} przykład głębokiego opracowania (hybrydy + LLM; segmentacja + IT2); można go zastąpić inną pozycją z katalogu.
+
+\medskip
+\noindent\textbf{Olko} (przykład w sekcji~\ref{sec:deep-dive}): hybrydy CF + sentyment + Apriori oraz LLM.\\
+\textbf{Smoła} (przykład): segmentacja użytkowników oraz IT2-FLS wobec Mamdani T1.
+
+\medskip
+\noindent Propozycje można zestawiać z typowymi punktami u promotora (kombinacje, tuning, LLM, sieć łącząca, segmentacja, jawne vs ukryte, skalowalność, IT2); w katalogu są też tematy \textbf{poza} tym zestawem (np.\ RAG, graf, fairness, monitoring).
+
+% =====================================================================
+\section{Punkt wyjścia --- stan obecny po pracy inżynierskiej}
+
+W ramach pracy inżynierskiej zrealizowanej wspólnie przez autorów powstał działający system rekomendacji produktów \emph{SmartRecommender} w architekturze:
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Backend}: Django 5.1 + Django REST Framework + PostgreSQL 16
+  \item \textbf{Frontend}: React 18 (SPA) z uwierzytelnianiem JWT
+  \item \textbf{Konteneryzacja}: Docker Compose (3 usługi: \code{db}, \code{backend}, \code{frontend})
+  \item \textbf{Baza}: 24 tabele, ok. 70 endpointów REST, panel admina i klienta
+\end{itemize}
+
+\medskip
+Zaimplementowano sześć metod rekomendacyjnych (oraz kilka podmodułów, które dla potrzeb badań traktujemy jako 9 niezależnych kanałów rankingowych):
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{c Y l l}
+\toprule
+\textbf{Lp.} & \textbf{Metoda / kanał} & \textbf{Autor} & \textbf{Lokalizacja w kodzie} \\
+\midrule
+1 & Collaborative Filtering (Item-Based, Adjusted Cosine) & Olko & \code{home/recommendation\_views.py} \\
+2 & Content-Based Filtering (Cosine + TF-IDF) & Smoła & \code{home/recommendation\_views.py} \\
+3 & Reguły asocjacyjne --- Apriori z bitmap pruning & Olko & \code{home/custom\_recommendation\_engine.py} \\
+4 & Logika rozmyta Mamdani typu pierwszego & Smoła & \code{home/fuzzy\_logic\_engine.py} \\
+5 & Wyszukiwanie rozmyte (typo tolerance) & Smoła (poboczne) & \code{home/sentiment\_views.py} \\
+6 & Analiza sentymentu (słownikowa, Liu 2012) & Olko & \code{home/custom\_recommendation\_engine.py} \\
+7 & Łańcuchy Markowa pierwszego rzędu & Smoła & \code{home/probabilistic\_views.py} \\
+8 & Naiwny klasyfikator Bayesa & Smoła & \code{home/probabilistic\_views.py} \\
+9 & Analiza sezonowości (komponent temporalny) & Smoła & \code{home/seasonal\_views.py} \\
+\bottomrule
+\end{tabularx}
+\caption{Metody rekomendacyjne zaimplementowane w pracy inżynierskiej.}
+\end{table}
+
+Każda metoda ma osobny endpoint debugujący (np.\ \code{/api/collaborative-filtering-debug/}), co ułatwia walidację w pracy magisterskiej.
+
+% =====================================================================
+\section{Co należy poprawić w istniejącym projekcie zanim zaczniemy badania}
+
+Istniejący seeder (\code{backend/home/management/commands/seed.py}, $\sim$1.4\,MB, $\sim$17\,300 linii) generuje dane w sposób, który nie wystarcza do rzetelnej oceny metod rekomendacyjnych. Wszystkie poniższe problemy zostały zweryfikowane bezpośrednio w kodzie:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{Y Y Y}
+\toprule
+\textbf{Problem} & \textbf{Aktualny stan} & \textbf{Konsekwencja dla badań} \\
+\midrule
+Mało użytkowników & 5 admin + 15 client (\code{seed\_users()}, l.~297) & Za mało, by liczyć wiarygodne metryki Precision@K \\
+Losowe interakcje & \code{UserInteraction} seedowany dorywczo & Brak realistycznego sygnału ukrytego \\
+Losowe opinie & 60 szablonów bez związku z produktem (l.~16606) & Sentyment per-produkt niewiarygodny \\
+Losowe daty & \code{random.randint(1,365)} dni wstecz (l.~16803) & Brak temporalnego split \\
+Losowa probabilistyka & \code{random.uniform()} w \code{analytics.py} & Modele probabilistyczne to atrapa, nie ML \\
+Brak typów klientów (persony) & Klienci kupują wszystko losowo & Brak struktury, której metody mogłyby się ,,uczyć'' \\
+Brak czasu na karcie & \code{UserInteraction} ma \code{timestamp}, brak \code{duration\_ms} & Niemożliwe ,,jawne vs ukryte'' w sensie dwell \\
+Brak metadanych eksp. & Brak tabeli wyników & Trzeba szukać metryk po logach konsoli \\
+\bottomrule
+\end{tabularx}
+\caption{Zidentyfikowane problemy obecnego seedera, zweryfikowane w kodzie.}
+\end{table}
+
+\subsection{Plan naprawczy --- nowa komenda \texttt{seed\_research}}
+
+Rozwiązanie: \textbf{nowa komenda} \code{python manage.py seed\_research} w pliku \code{backend/home/management/commands/seed\_research.py}. Istniejący \code{seed.py} pozostaje \textbf{bez zmian} jako kompatybilność wsteczna z aplikacją produkcyjną i panelem demo.
+
+\subsubsection{Co to znaczy ,,persona''? --- wyjaśnienie prostym językiem}\label{sec:co-to-persona}
+
+\textbf{Nie chodzi o żadną} osobną funkcję w sklepie dla prawdziwego klienta i nie musisz tego jakoś ,,widzieć'' w Reactcie.
+
+\medskip
+\noindent\textbf{Persona = etykieta typu kupującego przy \emph{sztucznych} kontach testowych.} Wyobraź sobie, że zamiast losować 150 klientów, którzy kupują przypadkowe produkty z całego katalogu, mówisz generatorowi danych:
+
+\begin{quote}
+\small
+,,Tych 40 użytkowników nazwij \texttt{gamer} --- niech w 80\% kupują z kategorii gaming i peryferiów.\\
+Tych 35 --- \texttt{office\_worker} --- niech kupują biuro i drukarki.\\
+Itd.''
+\end{quote}
+
+\noindent W bazie i tak jest zwykły \code{User} jak każdy inny; dodatkowy wiersz (np.\ model \code{UserPersona}) zapisuje tylko \textbf{string} typu \texttt{gamer} / \texttt{office\_worker}, żebyś \textbf{wiedział}, dlaczego ten użytkownik ma takie zamówienia i żebyś mógł liczyć metryki osobno dla takich grup (fairness, segmentacja).
+
+\medskip
+\noindent\textbf{Po co to komu:} metody jak CF i Apriori potrzebują \textbf{powtarzalnych schematów} (ludzie podobni do siebie kupują podobne rzeczy). Jeśli koszyki są całkiem losowe, algorytm nie ma sensu i obrona wygląda źle. Persony to sposób, żeby \textbf{ustrukturyzować} losowość --- nadal syntetyczne dane, ale przypominające prawdziwy świat (ktoś hobby, ktoś biuro), a nie szum telewizyjny.
+
+\medskip
+\noindent\textbf{Synonim na obronie:} zamiast ,,persony'' możesz powiedzieć \textit{typy zachowań klientów w wygenerowanych danych} lub \textit{profile testowe} --- to jest to samo.
+
+\subsubsection{Cel badawczy nowego seedera --- ok.\ 100--200 klientów i pełne ścieżki zakupowe}
+
+\noindent Chodzi o to, by \textbf{dokładając} do projektu osobny strumień danych (typowo: po jednorazowym ,,bazowym'' seedzie lub w środowisku tylko-lab) uzyskać \textbf{znacznie większą, sensowną próbę} niż 15 klientów demo:
+
+\begin{itemize}[leftmargin=1.5em,itemsep=3pt]
+  \item \textbf{Skala klientów badawczych}: \textbf{ok.\ 100--200} kont \texttt{client} (parametr CLI, np.\ \code{--clients 150}), każdy przypisany do \textbf{persony} zachowaniowej (\code{UserPersona}) --- wyjaśnienie słowa ,,persona'': sekcja~\ref{sec:co-to-persona}; dzięki temu macie różne wzorce koszyków, a nie jeden losowy rozkład.
+  \item \textbf{Nowe zamówienia}: dla każdego takiego użytkownika wielokrotne \textbf{zamówienia w czasie} (np.\ średnio 5--25 na osobę, zależnie od persony), z pozycjami na \textbf{różnych produktach} z katalogu --- głównie z kategorii zgodnych z personą, część jako eksploracja (inna kategoria), żeby były realistyczne współwystąpienia i długi ogon.
+  \item \textbf{Opinie powiązane z zakupem}: \textbf{nowe rekordy} \code{Opinion} (tekst/ocena) dla produktów faktycznie kupionych przez danego użytkownika; czas powstania opinii \textbf{po} dacie zamówienia; sentyment spójny z tym, czy zakup pasuje do persony (żeby analiza sentymentu i tekst miały sens metodyczny).
+  \item \textbf{Interakcje jawne/ukryte}: dla części ścieżek --- \code{UserInteraction} (\emph{view}, \emph{click}, itd.) \textbf{przed} zakupem, z sensowną kolejnością czasową; opcjonalnie \code{duration\_ms} przy oglądaniu karty produktu (do badań dwell / implicit), jeśli włączycie migrację i logowanie z frontu.
+  \item \textbf{Powtarzalność}: stały \code{--random-seed} + zapis wersji seeda w manifestcie / polu \code{seed\_research\_version} przy eksperymencie --- identyczna baza po ponownym uruchomieniu komendy.
+\end{itemize}
+
+\noindent Efekt liczbowy w docelowej konfiguracji (patrz tabela poniżej): rząd \textbf{tysięcy} opinii, \textbf{tysięcy} zamówień, \textbf{dziesiątek tysięcy} interakji --- to już podstawa pod stabilne Precision@$K$, NDCG@$K$, podział czasowy train/test, segmentację i tuning, bez budowania sklepu od zera.
+
+\subsubsection{Persony użytkowników --- przykładowe typy w kodzie \texttt{seed\_research}}
+
+Poniżej \textbf{konkretna lista} (5 nazw + parametry), którą możesz mieć w słowniku Pythona. To są tylko \textbf{przykłady} etykiet z sekcji~\ref{sec:co-to-persona} --- liczba i nazwy mogą być inne po uzgodnieniu w zespole.
+
+\begin{lstlisting}
+PERSONAS = {
+    "gamer": {
+        "preferred_categories": ["computers.gaming", "components.graphics",
+            "peripherals.mice", "peripherals.headphones",
+            "peripherals.keyboards", "gaming.consoles"],
+        "avg_basket_size": 2.5,
+        "price_sensitivity": "medium",
+        "review_propensity": 0.6,        # P(opinia po zakupie)
+        "active_hour": (18, 24),
+        "dwell_time_mean_ms": 45000,
+    },
+    "office_worker": {
+        "preferred_categories": ["computers.office", "laptops.office",
+            "peripherals.printers", "furniture.desks", "office.accessories"],
+        "avg_basket_size": 1.5,
+        "price_sensitivity": "high",
+        "review_propensity": 0.2,
+        "active_hour": (6, 12),
+        "dwell_time_mean_ms": 25000,
+    },
+    "content_creator": {
+        "preferred_categories": ["peripherals.microphones", "peripherals.webcams",
+            "components.graphics", "peripherals.monitors",
+            "cameras.stabilizers", "peripherals.headphones"],
+        "avg_basket_size": 3.0,
+        "price_sensitivity": "low",
+        "review_propensity": 0.8,
+        "active_hour": (12, 18),
+        "dwell_time_mean_ms": 60000,
+    },
+    "gift_buyer": {
+        "preferred_categories": ["wearables.watches", "electronics.tablets",
+            "electronics.phones", "drones", "gadgets"],
+        "avg_basket_size": 1.2,
+        "review_propensity": 0.4,
+        "seasonality": {"11": 2.5, "12": 3.0, "2": 1.8, "5": 1.5},
+    },
+    "tech_enthusiast": {
+        "preferred_categories": ["components.processors", "components.motherboards",
+            "components.memoryRam", "components.disks", "components.cooling"],
+        "avg_basket_size": 4.0,
+        "price_sensitivity": "low",
+        "review_propensity": 0.9,
+        "active_hour": (0, 6),
+        "dwell_time_mean_ms": 75000,
+    },
+}
+\end{lstlisting}
+
+\subsubsection{Skala danych --- kompromis jakość vs czas}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{Y c c Y}
+\toprule
+\textbf{Parametr} & \textbf{Aktualnie} & \textbf{seed\_research} & \textbf{CLI argument} \\
+\midrule
+Klienci (badawczy) & 15 & \textbf{100--200} (domyślnie 150) & \code{--clients 150} \\
+Admini & 5 & 5 & \code{--admins 5} \\
+Produkty & $\sim$500 & $\sim$500 & \code{--products 500} \\
+Zamówienia & 10/klient & 5--25/klient (persona) & \code{--orders-per-client-mean 12} \\
+Interakcje & brak & 30--150/klient & \code{--interactions-per-client-mean 80} \\
+Opinie & 2--5/produkt & 0--8/produkt & (auto) \\
+Okno czasowe & 365 dni & 730 dni & \code{--days-back 730} \\
+Seed losowości & brak & 42 (powtarzalność) & \code{--random-seed 42} \\
+\bottomrule
+\end{tabularx}
+\caption{Skala danych w nowym seederze badawczym (kluczowy skok: \textbf{100--200} aktywnych klientów z personami, wieloma zamówieniami i opiniami).}
+\end{table}
+
+\textbf{Liczby orientacyjne} (dla 150 klientów, średnio 80 interakcji na osobę, średnio 12 zamówień): ok.\ $12\,000$ interakcji + rząd $2\,000$ zamówień + kilka tysięcy opinii --- wystarcza na wiarygodne Precision@10 i NDCG@10 przy sensownym teście (reguła praktyczna: dużo więcej niż przy 15 kontach demo).
+
+\subsubsection{Spójność danych (kluczowe ulepszenia)}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Zamówienia z kategorii zgodnych z personą}: 80\% produktów z preferowanych, 20\% eksploracji.
+  \item \textbf{Sentyment opinii skorelowany z dopasowaniem do persony}: gamer kupujący kartę graficzną ma sentiment\_score $\approx +0.7$; office\_worker kupujący tę samą kartę przez przypadek $\approx -0.2$.
+  \item \textbf{Opinie po zakupie, nie przed}: \code{Opinion.created\_at > Order.date\_order}.
+  \item \textbf{Interakcje przed zakupem}: 3--15 wpisów \code{UserInteraction} (\code{view} $\to$ \code{click} $\to$ \code{add\_to\_cart} $\to$ \code{purchase}) z timestampami przed zamówieniem.
+  \item \textbf{Sezonowość}: \code{gift\_buyer} 3$\times$ częściej w grudniu, \code{tech\_enthusiast} boom w listopadzie (Black Friday) i sierpniu.
+\end{enumerate}
+
+\subsubsection{Migracje schematu bazy}
+
+Dodatki do \code{home/models.py}:
+
+\begin{lstlisting}
+class UserInteraction(models.Model):
+    # ... istniejące pola: user, product, interaction_type, timestamp ...
+    duration_ms = models.PositiveIntegerField(null=True, blank=True,
+        help_text="Czas spędzony na karcie (tylko dla 'view')")
+
+class Opinion(models.Model):
+    # ... istniejące pola ...
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+class UserPersona(models.Model):
+    """Powiązanie testowych użytkowników z personą — tylko dane badawcze."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    persona_name = models.CharField(max_length=50)
+    class Meta:
+        db_table = 'research_user_persona'
+
+class ExperimentRun(models.Model):
+    """Tabela logująca wyniki eksperymentów."""
+    experiment_id = models.CharField(max_length=100, unique=True)
+    method_or_combination = models.CharField(max_length=200)
+    parameters_json = models.JSONField()
+    seed_research_version = models.CharField(max_length=20)
+    precision_at_10 = models.FloatField()
+    recall_at_10 = models.FloatField()
+    ndcg_at_10 = models.FloatField()
+    map_score = models.FloatField()
+    coverage = models.FloatField()
+    diversity = models.FloatField()
+    train_size = models.PositiveIntegerField()
+    test_size = models.PositiveIntegerField()
+    duration_seconds = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True)
+    class Meta:
+        db_table = 'research_experiment_run'
+        ordering = ['-created_at']
+\end{lstlisting}
+
+\code{python manage.py makemigrations \&\& python manage.py migrate} --- bez breaking changes do produkcji, tylko nowe pola opcjonalne.
+
+\subsubsection{Wspólny moduł oceny}
+
+Plik \code{backend/home/experiments/metrics.py} eksportuje:
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \code{temporal\_split(test\_ratio=0.2)} --- gwarancja że test = ostatnie X\% czasu
+  \item \code{precision\_at\_k}, \code{recall\_at\_k}, \code{ndcg\_at\_k}, \code{map\_score}, \code{coverage}, \code{diversity}
+  \item \code{evaluate\_method(method\_callable, k=10)} --- uniwersalny wrapper
+\end{itemize}
+
+Plik \code{backend/home/experiments/runner.py} --- klasa \code{ExperimentRunner}:
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item Wywołuje metodę rekomendacyjną dla każdego użytkownika z testu
+  \item Liczy metryki
+  \item Zapisuje wynik do tabeli \code{ExperimentRun}
+  \item Generuje raport CSV w \code{experiments/results/}
+\end{enumerate}
+
+% --- Nowe podsekcje na tym samym poziomie co „Plan naprawczy” ---
+\subsection{Duże modele językowe (LLM) i RAG --- jak to działa w \emph{SmartRecommender}}\label{sec:llm-stack}
+
+Poniżej jeden spójny opis techniczny, który \textbf{w pracy magisterskiej} można odwołać z tematów D3, D9, D11 i P4: co jest porównywane, jak przebiega inferencja i jakie biblioteki są sensowne w Pythonie.
+
+\subsubsection{Typowe dwa tryby użycia LLM w rekomendacji}
+
+\textbf{(A) Re-ranking na liście kandydatów} (\emph{candidate generation + LLM}): najpierw tanio generujecie listę kandydatów $N$ produktów (np.\ $N=50$--$200$) --- popularność, losowanie spójne z kategorią, opcjonalnie TF-IDF/CBF z istniejącego kodu lub proste $k$NN na embeddingach. Do LLM trafia \textbf{zwężony} kontekst: skrót historii zakupów / ostatnie oglądane, tytuły i krótkie opisy kandydatów, czasem agregat sentymentu. Model zwraca rankingu lub permutację --- \textbf{to ogranicza halucynacje}, bo model ,,wybiera tylko z podanej listy'' (mimo to wymagana jest walidacja \code{product\_id}).
+
+\textbf{(B) RAG na katalogu}: embeddingi opisów produktów (i ewentualnie fragmentów opinii) trafiają do bazy wektorowej; dla użytkownika budujecie zapytanie tekstowe z historii; retrieval zwraca top-$k$ fragmentów; LLM na tej podstawie wskazuje produkty lub nadaje im wagi. Baseline do porównania: ten sam retriever + scoring bez LLM, popularność, losowość z ograniczeniem kategorii --- \textbf{nie musicie} porównywać z pełnym CF z inżynierki, jeśli pytanie badawcze dotyczy jakości RAG.
+
+\subsubsection{Co konkretnie porównujecie (przykładowe zestawy eksperymentów)}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{D3}: re-ranking (A) z różnymi promptami lub modelami vs.\ brak LLM (samo przycinanie listy kandydatów) vs.\ ewentualnie jeden wybrany kanał z repozytorium.
+  \item \textbf{D9}: RAG (B) vs.\ retrieval + prosta reguła (np.\ średnia ocena) vs.\ popularność.
+  \item \textbf{D11}: ten sam LLM z/walidacją \code{pydantic} i retry vs.\ ,,goły'' tekst --- metryka: odsetek odrzuconych odpowiedzi, czas, bezpieczeństwo.
+  \item \textbf{P4}: jakość integracji: timeouty, kolejka, limity tokenów --- często porównanie latencji i błędów między lokalnym Ollama a API (opcjonalnie).
+\end{itemize}
+
+\subsubsection{Biblioteki i usługi (Python) --- orientacyjny stos}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{l Y}
+\toprule
+\textbf{Warstwa} & \textbf{Typowe pakiety / narzędzia} \\
+\midrule
+Inferencja lokalna & \textbf{Ollama} + klient \code{ollama} (Python) lub \code{httpx}/\code{requests} pod REST \code{localhost:11434} \\
+API zewnętrzne (opcjonalnie, nie w osi pracy Olko) & \code{openai}, \code{litellm}, OpenRouter --- \textbf{płatne}; można pominąć, jeśli całość idzie lokalnie (Ollama na laptopie autora) \\
+Embeddings & \code{sentence-transformers}, \code{torch}; modele wielojęzyczne np.\ \code{paraphrase-multilingual-mpnet-base-v2} \\
+Baza wektorowa & \code{qdrant-client}, \code{chromadb}, lub \textbf{pgvector} w PostgreSQL (jedna usługa mniej w Dockerze) \\
+Orchestracja (opcjonalnie) & \code{langchain}, \code{llama-index} --- wygodne, lecz niekonieczne na obronę \\
+Walidacja wyjścia & \textbf{Pydantic v2} (struktura JSON), ewent.\ \code{instructor} lub JSON schema w promptcie \\
+Logowanie / metryki & istniejący \code{ExperimentRun}; w kodzie \code{structlog} lub standard \code{logging} \\
+\bottomrule
+\end{tabularx}
+\caption{Stos technologiczny LLM/RAG w kontekście Django (orientacyjnie).}
+\end{table}
+
+\subsubsection{Czy da się ``za darmo''?}
+
+\textbf{Tak, w sensie licencji i braku klucza API dla modeli open-weight:} modele takie jak Bielik, Mistral, Qwen w wariantach Apache 2.0 / podobnych można uruchomić lokalnie (\textbf{Ollama} --- także natywnie na Apple Silicon, np.\ MacBook Pro M3 Pro z unified memory). \textbf{W praktyce na M3 Pro} sensowny punkt startu to Bielik/Mistral w rozmiarze 7B--8B (szybciej niż CPU-only PC); większe modele mogą wymagać dłuższego czasu lub zwężenia eksperymentu (mniejszy podzbiór użytkowników testowych, mniejsze $N$ kandydatów do re-ranku). Warstwa embedding + Qdrant/pgvector jest darmowa w sensie oprogramowania. \textbf{W tej pracy przyjęto założenie autora:} oś eksperymentu bez API komercyjnych (GPT-4 itd.) --- wyłącznie lokalne modele otwarte, dla reprodukowalności, zerowych kosztów tokenów oraz merytorycznego wykorzystania polskiego Bielika.
+
+\subsubsection{Przepływ żądania (uproszczony)}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item Pobranie historii użytkownika z ORM Django (zamówienia, interakcje).
+  \item Generacja kandydatów (A) lub retrieval (B).
+  \item Budowa promptu z twardym formatem wyjścia (JSON: lista \code{\{product\_id, score\}}).
+  \item Wywołanie LLM; parsowanie; odrzucenie ID spoza bazy; ewentualnie druga próba z krótszym kontekstem.
+  \item Zapis wyniku ewaluacji do \code{ExperimentRun} / wyświetlenie w panelu admina (sekcja~\ref{sec:admin-research}).
+\end{enumerate}
+
+\subsection{Panel badań w Django Admin --- wyniki, uruchamianie eksperymentów, dobór metody}\label{sec:admin-research}
+
+\textbf{Sens w aplikacji:} praca magisterska bazuje na systemie ,,prawdziwym'', więc badania nie powinny żyć wyłącznie w terminalu. Panel administratora (który już macie w Django) naturalnie agreguje dane i uprawnienia --- warto dodać \textbf{dedykowaną sekcję badawczą}: lista eksperymentów, porównanie metryk, możliwość ustawienia ,,aktywnej strategii'' rekomendacji lub automatycznego wyboru wg ostatnich wyników.
+
+\subsubsection{Co rejestrujecie w adminie}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{\code{ExperimentRun}} --- każdy wiersz to jeden uruchomiony eksperyment: metoda/kombinacja, parametry JSON, NDCG@10, Precision@10, czas, wersja \texttt{seed\_research}. Lista z sortowaniem i filtrami (po dacie, po metodzie).
+  \item \textbf{\code{UserPersona}} (opcjonalnie read-only) --- podgląd, który użytkownik testowy należy do której persony (debug).
+  \item \textbf{Nowy model konfiguracyjny} (propozycja): np.\ \code{ActiveRecommendationPolicy} z polami: \code{mode} $\in \{\texttt{fixed}, \texttt{auto\_by\_segment}, \texttt{auto\_global}\}$, \code{fixed\_method\_key}, opcjonalnie JSON mapujący \texttt{persona\_name} $\to$ \texttt{method\_key} z ostatniego najlepszego \code{ExperimentRun}.
+\end{itemize}
+
+\subsubsection{GUI zamiast ``tylko manage.py''}
+
+\textbf{Minimalny sensowny zestaw:}
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item strona listy \code{ExperimentRun} z ``najlepszym runem'' wyróżnionym (np.\ admin action lub adnotacja w \code{notes});
+  \item widok tabelaryczny (custom \code{ModelAdmin} z \code{change\_list\_template} lub osobny \code{admin.view}) porównujący zaznaczone runy obok siebie;
+  \item przycisk ,,Uruchom ponownie z tymi parametrami'' wywołujący ten sam kod co \code{ExperimentRunner} (w tle \textbf{Celery} lub synchronicznie z komunikatem ,,to może trwać X min'').
+\end{itemize}
+
+Dzięki temu promotor lub autor przy obronie mogą \textbf{zobaczyć} w przeglądarce, że wynik nie jest ,,wymyślony'' --- jest powiązany z rekordem w bazie i timestampem.
+
+\subsubsection{Zmiana metody w runtime --- ``auto'' wg najlepszego wyniku}
+
+\textbf{Idea:} po serii eksperymentów offline wybieracie metodę $M^\ast$ z najwyższym NDCG@10 (przy ustalonym seedzie i splicie). W bazie zapisujecie albo (i) globalnie jedną flagę ,,używaj $M^\ast$ w produkcji/demo'', albo (ii) mapę per persona/segment: dla segmentu $s$ metoda $M_s^\ast$, wyliczona z osobnej tabeli wyników (związek z tematem P2).
+
+Warstwa API rekomendacji (np.\ wybrane \code{views}) na początku czyta \code{ActiveRecommendationPolicy}:
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{tryb \texttt{fixed}} --- zawsze np.\ ,,CF+RRF'' lub ,,LLM re-rank'';
+  \item \textbf{tryb \texttt{auto\_global}} --- identyfikator metody z ostatniego ``zwycięskiego'' \code{ExperimentRun} oznaczonego w panelu;
+  \item \textbf{tryb \texttt{auto\_by\_segment}} --- na podstawie \code{UserPersona} lub klastra wybierana jest strategia z mapy (np.\ dla ``cold'' użytkowników LLM, dla ``bogatej historii'' fuzja).
+\end{itemize}
+
+\textbf{Uzasadnienie merytoryczne:} w pracy magisterskiej można opisać to jako \emph{łączenie oceny offline z regułą wdrożeniową} --- różne metody wygrywają w różnych sytuacjach (np.\ cold start vs.\ długa historia), więc sztywny jeden algorytm w kodzie produkcyjnym jest gorszy niż konfigurowalna polityka sterowana wynikami eksperymentów.
+
+\subsubsection{Nowa ``zakładka'' w adminie}
+
+Technicznie: osobna grupa modeli w \code{admin.py} z etykietą \texttt{Research / Eksperymenty}, ewentualnie \textbf{custom AdminSite} lub strona pod ścieżką \code{/admin/research/dashboard/} z linkiem z głównego indeksu admina --- by wyglądało jak ,,nowa zakładka'' dla użytkownika końcowego administracji.
+
+% =====================================================================
+\newpage
+\section{Katalog propozycji tematów magisterskich}\label{sec:katalog}
+
+\noindent Poniżej --- \textbf{pula tematów} do uzgodnienia z promotorem. Nie trzeba realizować wszystkich wpisów; typowo jedna główna hipoteza + podrozdział (np.\ tuning lub skalowalność). \textbf{Warunek pracy nie jest} koniecznym porównywaniem z któryś z metod z inżynierki --- liczy się merytoryczna rozbudowa istniejącego systemu (back + front tylko tam, gdzie trzeba). Stary kod bywa infrastrukturą lub \emph{jednym z} baseline'ów; LLM, RAG, nowe modele lub tooling mogą stanowić główny wkład bez ,,pojedynku'' z konkretnym widokiem z inżynierki.
+
+\medskip
+\noindent W tabelach~\ref{tab:katalog-olko} i~\ref{tab:katalog-smola} jest \textbf{pełna lista numerów} (D1--D12, P1--P12), żeby w PDF od razu widać było wiele opcji; poniżej --- rozwinięcia. Kolumna \textbf{Inż.?}: \checkmark{} = naturalne odniesienie do kodu inżynierskiego; \textbf{$\sim$} = można, ale nie musi; \textbf{---} = temat głównie samodzielny (nowy tor).
+
+\subsection{Szybki przegląd --- pełna lista propozycji}\label{sec:katalog-skrót}
+
+\begin{table}[H]
+\centering
+\caption{Dawid Olko --- tematy D1--D12.}
+\label{tab:katalog-olko}
+\footnotesize
+\begin{tabularx}{\textwidth}{c Y c}
+\toprule
+\textbf{ID} & \textbf{Temat (skrót)} & \textbf{Inż.?} \\
+\midrule
+D1 & Fuzja (CF + Apriori + sentyment) vs.\ metody pojedyncze & \checkmark \\
+D2 & Tuning: CF, Apriori, sentyment (jakość vs.\ czas) & \checkmark \\
+D3 & LLM jako ranker/re-ranker; odniesienie do klasycznych \emph{opcjonalne} & $\sim$ \\
+D4 & Rekomendacje z danych jawnych vs.\ implicit \mbox{(z kolegą)} & \checkmark \\
+D5 & Skalowalność CF i reguł asocjacyjnych & \checkmark \\
+D6 & \texttt{seed\_research}, persony, manifest, powtarzalność & --- \\
+D7 & Cold start użytkownika/produktu & \checkmark \\
+D8 & Pipeline ewaluacji offline (\texttt{ExperimentRun}, CSV, metryki) & --- \\
+D9 & LLM + RAG nad opisami produktów; baseline np.\ popularność & --- \\
+D10 & Wyjaśnialność wybranego rankera (np.\ SHAP/LIME) & $\sim$ \\
+D11 & Hardening LLM w backendzie: walidacja JSON, anty-inżekcja, katalog & --- \\
+D12 & Bias/fairness rankingu między personami & --- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Piotr Smoła --- tematy P1--P12.}
+\label{tab:katalog-smola}
+\footnotesize
+\begin{tabularx}{\textwidth}{c Y c}
+\toprule
+\textbf{ID} & \textbf{Temat (skrót)} & \textbf{Inż.?} \\
+\midrule
+P1 & Sieć łącząca kanały score + kontekst; SHAP & \checkmark \\
+P2 & Segmentacja; strategia rekomendacji per segment & \checkmark \\
+P3 & Tuning CBF/TF-IDF, fuzzy, probabilistyka & \checkmark \\
+P4 & Integracja LLM jako usługa (limity, walidacja ID) & --- \\
+P5 & Profil z ukrytych interakcji (+ dwell) vs.\ jawny & \checkmark \\
+P6 & Skalowalność CBF, fuzzy, ścieżek probabilistycznych & \checkmark \\
+P7 & IT2-FLS vs.\ Mamdani T1 & \checkmark \\
+P8 & Meta-learner: boosting vs.\ MLP vs.\ fuzja & \checkmark \\
+P9 & Ranker na embeddingach tekstu ($k$NN); bez obowiązku TF-IDF z inżynierki & --- \\
+P10 & Graf współwystąpień produktów z koszyków & --- \\
+P11 & Reprodukowalność: CI, skrypty, wersjonowanie wyników eksperymentów & --- \\
+P12 & Dryf jakości / monitoring przy zmianie rozkładu danych & --- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Dawid Olko --- propozycje szczegółowe}
+
+\subsection{Twój kod z inżynierki --- gdzie co masz (mapa pod obronę)}\label{sec:dawid-mapa}
+
+W inżynierce zrobiłeś trzy główne ,,silniki'', z których korzysta sklep. W magisterce \textbf{nie musisz ich przepisywać} --- musisz umieć wskazać plik i powiedzieć, że dokładasz \textbf{warstwę eksperymentów} (metryki + podpinanie istniejących algorytmów pod jeden interfejs).
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{l Y l}
+\toprule
+\textbf{Co} & \textbf{Co to robi (jednym zdaniem)} & \textbf{Gdzie w kodzie / API} \\
+\midrule
+CF & Rekomenduje produkty \emph{podobne} do tych, które kupiłeś (item--item), na podstawie zakupów innych użytkowników (adjusted cosine). & \code{recommendation\_views.py} (m.in.\ \code{CollaborativeFilteringDebugView}, logika macierzy i progów); zapis w \code{ProductSimilarity} z \code{similarity\_type='collaborative'}; GET \code{/api/collaborative-filtering-debug/} \\
+Apriori / koszyk & ,,Kto kupił A, często dokupuje B'' --- reguły z koszyków zamówień. & \code{custom\_recommendation\_engine.py}: klasa \code{CustomAssociationRules}, funkcja \code{calculate\_association\_rules}; \code{association\_views.py}; tabela \code{ProductAssociation}; m.in.\ \code{/api/frequently-bought-together/}, POST \code{/api/update-association-rules/} (parametry \code{min\_support}, \code{min\_confidence}) \\
+Sentyment & Z tekstu opinii liczy nastrój w skali $-1\ldots 1$ (słowniki, negacje, intensyfikatory). & \code{custom\_recommendation\_engine.py}: klasa \code{CustomSentimentAnalysis}; \code{sentiment\_views.py}; m.in.\ \code{/api/sentiment-search/} i endpointy debug \\
+\bottomrule
+\end{tabularx}
+\caption{Trzy metody Twojego autorstwa w repozytorium --- punkty zaczepienia pod magisterkę.}
+\end{table}
+
+\noindent\textbf{Jedna wspólna myśl na obronie:} klient w sklepie dalej widzi React + istniejące API; Ty w magisterce budujesz \textbf{ścieżkę badawczą}: ten sam kod rekomendacji wołany jest wielokrotnie na użytkownikach z \texttt{seed\_research}, a wynik trafia do \code{ExperimentRun} i ewentualnie do zakładki w Django Admin (sekcja~\ref{sec:admin-research}).
+
+\subsubsection{Łączenie metod rekomendacji versus metody pojedyncze (\textbf{D1})}
+
+\paragraph{Cel i sens.}
+Sprawdzić, czy w systemie e-commerce opartym o kod z inżynierki \textbf{łączenie rankingów} z kilku źródeł (CF, Apriori, kanał opinii/sentymentu) daje istotny zysk względem najlepszej pojedynczej metody --- odpowiedź praktyczna dla małych i średnich sklepów z wieloma heurystykami.
+
+\paragraph{Pytanie badawcze.}
+Czy wybrane strategie fuzji (np.\ reciprocal rank fusion, głosowanie Bordy, ważona kombinacja znormalizowanych score) poprawiają NDCG@$K$ i Precision@$K$ w porównaniu z każdym rankerem osobno i z baseline popularności, przy stałym splitcie czasowym?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research} (persony, powtarzalny seed), jeden manifest wersji danych; baseline: singletony z inżynierki + popularność + ewentualnie ranking losowy.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, Precision@$K$, Recall@$K$, MAP, \emph{coverage} katalogu, ewentualnie \emph{diversity}; czas odpowiedzi na użytkownika.
+
+\paragraph{Promotor.}
+Kombinacja metod kontra metody pojedyncze.
+
+\paragraph{Jak to powiedzieć na obronie (bez żargonu).}
+Masz trzy \textbf{niezależne listy} rekomendacji dla tego samego użytkownika: (1)~,,co podobne do tego co kupiłeś'' (CF), (2)~,,co ludzie dokupują do Twojego koszyka'' (Apriori), (3)~,,co ma dobre opinie w tonacji podobnej do Ciebie'' (sentyment). Fuzja to po prostu \textbf{łączenie trzech list w jedną} według reguły (np.\ RRF --- każda metoda głosuje na produkty). Pytanie badawcze: czy taka ``średnia'' jest lepsza niż jedna wybrana metoda i niż ,,najpopularniejsze w sklepie''.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Nie ruszasz na siłę widoków klienta --- piszesz np.\ \code{home/experiments/recommenders/cf.py} wołające te same zapytania/logikę co CF (macierz z \code{OrderProduct}, podobieństwa z \code{ProductSimilarity}), osobno wrapper na reguły z \code{ProductAssociation}, osobno ranking z sentymentu (logika z \code{CustomSentimentAnalysis}). Potem \code{home/experiments/fusion.py} łączy wyniki. Ewaluacja: dla użytkowników z \textbf{ostatniego okna czasu} (test) sprawdzasz, czy produkty, które faktycznie kupili, pojawiają się w top-$K$ Twojej listy --- to są Precision / NDCG z \code{metrics.py}.
+
+\subsubsection{Wpływ hiperparametrów na jakość i czas --- CF, Apriori, sentyment (\textbf{D2})}
+
+\paragraph{Cel i sens.}
+Udokumentować \textbf{kompromis jakość--czas obliczeniowy} dla metod po stronie Olko: które parametry realnie przesuwają ranking (np.\ próg podobieństwa CF, \emph{min\_support} / minimum pewności reguł, agregacja sentymentu do poziomu produktu).
+
+\paragraph{Pytanie badawcze.}
+Które hiperparametry są najbardziej czułe na jakość rekomendacji przy ustalonym protokole testowym, a które tylko kosztują czas przeliczenia?
+
+\paragraph{Dane, porównania.}
+Ta sama baza co w całym zespole; siatka parametrów lub Optuna; porównanie z domyślnymi ustawieniami z inżynierki.
+
+\paragraph{Co mierzymy.}
+Te same metryki rankingowe co w całej pracy; dodatkowo czas budowy macierzy podobieństwa / reguł asocjacyjnych, liczność zapisanych reguł --- wykresy Pareto (jakość vs.\ czas).
+
+\paragraph{Promotor.}
+Hyperparameter tuning (promotorska lista).
+
+\paragraph{Jak to powiedzieć na obronie.}
+\textbf{Hiperparametr} to ``pokrętło'' w algorytmie: np.\ jak \textbf{często} para produktów musi wystąpić w zamówieniach, żeby uznać regułę (to jest \code{min\_support} w Apriori), albo od jakiego \textbf{progu podobieństwa} zapisujesz parę produktów w CF (w kodzie jest m.in.\ próg przy budowie list podobieństwa). Tuning = systematyczna zmiana tych pokręteł i pomiar: czy ranking się poprawia, a ile rośnie czas liczenia / liczba reguł w bazie.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Apriori: klasa \code{CustomAssociationRules(\_, min\_support, min\_confidence)} oraz endpoint aktualizacji reguł przyjmujący \code{min\_support} z JSON (\code{association\_views.py}) --- te wartości możesz zamienić w pętli eksperymentów. CF: w \code{recommendation\_views.py} przy generowaniu podobieństw jest m.in.\ \code{similarity\_threshold = 0.5} (i wcześniej w CBF w \code{custom\_recommendation\_engine.py} jest \code{similarity\_threshold = 0.2} --- to osobna metoda Piotra, ale pokazuje schemat). Sentyment: możesz stroić progi ``positive/negative'' lub sposób agregacji opinii do jednej liczby na produkt. Wszystko zapisujesz w \code{ExperimentRun.parameters\_json} + metryki.
+
+\subsubsection{Duży model językowy jako główny kanał rekomendacji (\textbf{D3}; porównanie z inżynierką opcjonalne)}
+
+\paragraph{Cel i sens.}
+Zbadać jakość rekomendacji, gdy \textbf{LLM} (lokalny lub API) jest głównym źródłem rankingu lub \textbf{re-rankingu} na zwężonej liście kandydatów (tryb (A) w sekcji~\ref{sec:llm-stack}). Praca może --- lecz nie musi --- zawierać porównanie z najlepszą heurystyką z kodu inżynierskiego; dozwolone jest użycie prostszego baseline (popularność, losowość z ograniczeniem kategorii, ostatnio oglądane), jeśli pytanie badawcze dotyczy np.\ stabilności promptu, kosztu czasu lub halucynacji.
+
+\paragraph{Jak to działa w systemie (krok po kroku).}
+\begin{enumerate}[leftmargin=1.5em,itemsep=1pt]
+  \item Generacja \textbf{kandydatów} $N$ (np.\ 80--150): tania metoda bez LLM --- żeby nie wpychać całego katalogu do kontekstu.
+  \item Z ORM składany jest \textbf{kontekst użytkownika}: skrócona historia zakupów, ewentualnie średnie sentymenty lub cytaty z opinii (ograniczone liczbą tokenów).
+  \item LLM dostaje instrukcję: zwrócić wyłącznie JSON z listą \code{product\_id} z kandydatów + ranking/score.
+  \item \textbf{Walidacja}: odrzucenie nieistniejących ID; ewentualnie drugie wywołanie przy błędzie składni (patrz D11).
+  \item Wynik oceniany jest \textbf{tym samym} modułem metryk co pozostałe metody (\texttt{seed\_research}, split czasowy).
+\end{enumerate}
+
+\paragraph{Co porównujecie (propozycja zestawu).}
+\begin{itemize}[leftmargin=1.5em,itemsep=1pt]
+  \item kilka modeli LLM (np.\ Bielik 7B vs.\ 11B vs.\ Mistral) przy tym samym prompcie;
+  \item zero-shot vs.\ few-shot (2--3 przykłady ,,dobrych'' list w prompcie);
+  \item LLM re-rank vs.\ ten sam zestaw kandydatów bez LLM (np.\ sortowanie po score z generatora);
+  \item opcjonalnie: jedna wybrana metoda z repozytorium jako dodatkowy baseline --- jeśli promotor tego wymaga.
+\end{itemize}
+
+\paragraph{Biblioteki, koszt ,,zero API''.}
+Szczegółowo: tabela w sekcji~\ref{sec:llm-stack} (\code{ollama}/\code{httpx}, \code{pydantic}, ewent.\ \code{sentence-transformers}). Uruchomienie lokalne = brak opłat za tokeny; w pracy opisujecie zużycie RAM/VRAM i czas.
+
+\paragraph{Powiązanie z GUI.}
+Każdy konfigurowany wariant (model + prompt + $N$) zapisujecie jako osobny lub wersjonowane \code{ExperimentRun}; w panelu admina (sekcja~\ref{sec:admin-research}) możecie oznaczyć zwycięski run i --- jeśli implementujecie politykę --- podpiąć go pod tryb produkcyjny/demo.
+
+\paragraph{Pytanie badawcze.}
+Przy ustalonym protokole (split czasowy na \texttt{seed\_research}) --- czy wybrana strategia LLM osiąga akceptowalny NDCG@$K$ i jak wygląda stabilność vs.\ halucynacje?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research}; baseline minimum: brak LLM na tych samych kandydatach; dalsze baseline do uzgodnienia z promotorem.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, Precision@$K$; odsetek odrzuconych / poprawionych odpowiedzi; latency na jedno wywołanie; ewentualnie koszt tokenów przy API (plan B).
+
+\paragraph{Promotor.}
+LLM jako kierunek akceptowalny przez promotora; doprecyzowanie porównań na spotkaniu.
+
+\paragraph{Jak to powiedzieć na obronie.}
+LLM tutaj \textbf{nie zna całego katalogu z pamięci}. Najpierw system (Twój kod w Django) buduje \textbf{krótką listę kandydatów} (np.\ 100 produktów) prostszą metodą; potem model tylko \textbf{przestawia} lub wybiera z tej listy na podstawie opisów i historii. Dzięki temu łatwiej wytłumaczyć: model sugeruje kolejność ,,z tego co już wybraliśmy algorytmem'', a Ty mierzysz, czy ta kolejność jest lepsza na danych testowych. Porównanie z CF/Apriori jest \textbf{możliwe}, ale nie jest obowiązkowe --- możesz porównać się z popularnością.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Nowy moduł np.\ \code{home/experiments/llm\_recommender.py}: pobiera zamówienia z \code{Order}/\code{OrderProduct}, kandydatów np.\ z \code{ProductAssociation} lub najpopularniejszych w kategorii użytkownika, buduje prompt, woła Ollamę (\code{httpx} lub pakiet \code{ollama}), parsuje JSON. Istniejące endpointy CF/sentymentu zostają; ewaluacja idzie tym samym \code{runner.py} co reszta. Na obronie pokazujesz też konfigurację modelu zapisane w \code{ExperimentRun}.
+
+\subsubsection{Jakość rekomendacji przy profilu z danych jawnych (opinie, oceny) (\textbf{D4})}
+
+\paragraph{Cel i sens.}
+Zbudować rankery wykorzystujące wyłącznie \textbf{jawny} sygnał (opinie, oceny, zagregowany sentyment) i porównać je z modelem opartym o interakcje ukryte --- na \textbf{tym samym} zadaniu przewidywania (np.\ następny zakup w obszarze testowym).
+
+\paragraph{Pytanie badawcze.}
+Czy przy dostępnych opiniach profil jawny wystarcza do competitivenego rankingu względem profilu z samych interakcji (realizowanego równolegle przez kolegę)?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research} z realistycznym powiązaniem opinii z produktami; druga gałąź (implicit) eksperymentalnie wyłączana lub realizowana przez Smołę --- wspólna tabela wyników.
+
+\paragraph{Co mierzymy.}
+Metryki rankingowe na zdarzeniach zakupu w teście; ewentualnie błąd regresji oceny --- jeśli ustalicie taki dodatkowy eksperyment.
+
+\paragraph{Promotor.}
+Jawne vs ukryte preferencje.
+
+\paragraph{Jak to powiedzieć na obronie.}
+\textbf{Jawne} = to, co użytkownik \textbf{napisał lub ocenił} (tekst opinii, gwiazdki). \textbf{Ukryte (implicit)} = to, co robi w aplikacji bez opinii (kliknięcia, czas na karcie --- u Ciebie głównie robi to Piotr). Temat D4: budujesz rekomendację \textbf{tylko z opinii/ocen} i porównujesz z jego modelem na interakcjach --- \textbf{na tym samym zadaniu} ``co kupi w przyszłości w zbiorze testowym''. Sens: sprawdzić, czy warto zbierać opinie, czy wystarczą ślady zachowania.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Dane: modele \code{Opinion} (+ oceny) w Django; sentyment liczy \code{CustomSentimentAnalysis}. Ty definiujesz \textbf{jedną ustaloną regułę}: np.\ score produktu = średni sentyment opinii minus kara za mało recenzji, albo ranking tylko z produktów skomentowanych przez użytkownika. Nie musisz zmieniać Reacta --- całość w backendzie + eksperyment. Kolega liczy swój ranking z \code{UserInteraction}; oboje zapisujecie wyniki w \code{ExperimentRun}.
+
+\subsubsection{Skalowalność collaborative filtering i reguł asocjacyjnych (\textbf{D5})}
+
+\paragraph{Cel i sens.}
+Pokazać, jak rosnąca skala $|U|$, $|I|$ i liczby transakcji wpływa na \textbf{czas przeliczenia i zużycie pamięci} dla CF i Apriori oraz na rozmiar tabel pośrednich w PostgreSQL --- z identyfikacją wąskich gardeł zapytań.
+
+\paragraph{Pytanie badawcze.}
+Przy której skali prosty pipeline przestaje być akceptowalny czasowo i jakie techniki (indeksy, batch, cache) dają mierzalną poprawę?
+
+\paragraph{Dane, porównania.}
+Seria konfiguracji \texttt{seed\_research} (np.\ $N$ użytkowników rosnące z krokiem); te same metryki jakości na jednym podzbiorze referencyjnym.
+
+\paragraph{Co mierzymy.}
+Czas budowy modelu, czas pojedynczej rekomendacji, rozmiar \code{ProductSimilarity} / tabel reguł; \texttt{EXPLAIN} dla najcięższych zapytań; jakość vs.\ skala (czy spada przy rzadszych danych).
+
+\paragraph{Promotor.}
+Skalowalność.
+
+\paragraph{Jak to powiedzieć na obronie.}
+Skalowalność = co się dzieje, gdy rośnie liczba \textbf{użytkowników, produktów i zamówień}: czy przeliczenie podobieństw CF i reguł Apriori nadąża, czy baza rośnie do gigantycznych rozmiarów, które zapytania są najwolniejsze. To typowy rozdział ,,inżynierski'' obok metryk jakości.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Mierzysz czas regeneracji macierzy CF (logika w \code{recommendation\_views.py} przy aktualizacji \code{ProductSimilarity}) i czas \code{update-association-rules} na większej liczbie transakcji z \texttt{seed\_research}. Patrzysz na rozmiar tabel \code{ProductSimilarity} (CF) i \code{ProductAssociation}. Opcjonalnie uruchamiasz \texttt{EXPLAIN} na najcięższych zapytaniach ORM. Nie musisz zmieniać algorytmu na siłę --- możesz opisać progi (cache, batch, indeksy), przy których system jest jeszcze akceptowalny.
+
+\subsubsection{Kontrolowany, powtarzalny zbiór danych pod ewaluację metod (\textbf{D6})}
+
+\paragraph{Cel i sens.}
+Uczynić \textbf{głównym wkładem} projekt person, manifestu wersji danych i komendy \texttt{seed\_research}, tak by każda praca w zespole cytowała ten sam protokół --- dokument metodyczny + implementacja.
+
+\paragraph{Pytanie badawcze.}
+Czy zaprojektowany zbiór odtwarza zjawiska istotne dla metod z inżynierki (np.\ długi ogon, sezonowość, nierówny udział person) i czy wyniki eksperymentów są stabilne między powtórzeniami seeda?
+
+\paragraph{Dane, porównania.}
+Opis person vs.\ statystyki wygenerowanej bazy; testy stabilności metryk przy tym samym \emph{random seed}.
+
+\paragraph{Co mierzymy.}
+Rozkłady interakcji, pokrycie kategorii, liczność cold start; wariancja wybranych metryk między runami.
+
+\paragraph{Promotor.}
+Ogólne --- podstawa pod każdy punkt z listy promotora (porównywalne eksperymenty).
+
+\paragraph{Jak to powiedzieć na obronie.}
+Teraz po odpaleniu zwykłego \code{seed.py} dostajesz małą, dość losową bazę --- na obronie trudno bronić liczb ,,bo tak''. \texttt{seed\_research} to \textbf{sztucznie zaprojektowany}, powtarzalny zestaw danych (persony, spójne koszyki, opinie po zakupie), żebyś mógł powiedzieć: ,,oto wersja danych 1.0, seed 42, każdy może to odtworzyć''.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Nowa komenda \code{manage.py seed\_research} (osobny plik obok \code{seed.py} --- nie kasujesz starego). Zapisujesz wersję w manifeście i w polu \code{seed\_research\_version} przy \code{ExperimentRun}. W pracy opisujesz persony i statystyki wygenerowanej bazy (ile zamówień, jak rozłożone kategorie). To może być \textbf{główny wkład} inżynierski, nawet jeśli algorytm jest prosty.
+
+\subsubsection{Cold start użytkownika lub produktu (\textbf{D7})}
+
+\paragraph{Cel i sens.}
+Zbadać zachowanie metod Olko przy \textbf{sztucznie obciętej historii} lub nowych kontach: kiedy klasyczny CF zawodzi, a sentyment lub reguły asocjacyjne utrzymują jakość.
+
+\paragraph{Pytanie badawcze.}
+Przy jakiej liczbie interakcji lub zamówień CF osiąga próg `używalności`, i czy hybryda z sentymentem/Apriori redukuje spadek NDCG@$K$?
+
+\paragraph{Dane, porównania.}
+Warianty \texttt{seed\_research} z ograniczoną historią per persona; pełny model jako górne odniesienie.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, Precision@$K$ w funkcji długości historii; ewentualnie odsetek użytkowników bez rekomendacji CF.
+
+\paragraph{Promotor.}
+Praktyczne uzupełnienie tematu kombinacji metod i LLM (łagodzenie cold start).
+
+\paragraph{Jak to powiedzieć na obronie.}
+\textbf{Cold start} = nowy użytkownik lub produkt bez historii; CF często wtedy \textbf{nic sensownego nie ma z czego policzyć}. Pytanie: kiedy zaczyna działać CF, a kiedy ratują np.\ reguły koszykowe (bo działają globalnie) albo sentyment z opinii przy produkcie.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+W \texttt{seed\_research} generujesz warianty z \textbf{obciętą historią} (np.\ tylko 1 zamówienie) vs.\ pełna historia; dla produktu --- symulujesz ``nowy'' przedmiot bez podobieństw w \code{ProductSimilarity}. Uruchamiasz te same funkcje co dziś (CF z widoku, reguły z \code{ProductAssociation}, sentyment). Pokazujesz wykres: oś X = ile interakcji, oś Y = NDCG@10.
+
+\subsubsection{Jednolity pipeline ewaluacji offline jako element pracy (\textbf{D8})}
+
+\paragraph{Cel i sens.}
+Sformalizować \textbf{narzędzie badawcze}: split czasowy, moduł metryk, zapis \texttt{ExperimentRun} / CSV --- i na nim wykonać 2--3 konkretne porównania hipotez (np.\ fuzja vs.\ singleton, jeden zestaw strojeń).
+
+\paragraph{Pytanie badawcze.}
+Czy zaprojektowany pipeline jest wystarczający do reprodukowalnych wyników w całym zespole i jak wygląda niepewność wyników przy bootstrapie po użytkownikach?
+
+\paragraph{Dane, porównania.}
+Manifest + wersjonowanie kodu eksperymentu; porównanie z ad-hoc logowaniem z konsoli (jeśli było).
+
+\paragraph{Co mierzymy.}
+Zgodność wyników między powtórzeniami; dokumentacja czasu przeliczenia; metryki dla zdefiniowanych hipotez pomocniczych.
+
+\paragraph{Promotor.}
+Infrastruktura pod wszystkie punkty listy (metryki, porównania).
+
+\paragraph{Jak to powiedzieć na obronie.}
+\textbf{Pipeline} = zawsze ten sam przepis: (1)~wczytaj dane po \texttt{seed\_research}, (2)~podziel czasowo na trening/test, (3)~dla każdego użytkownika w teście poproś metodę o listę top-$K$, (4)~sprawdź, czy faktyczne przyszłe zakupy są w tej liście, (5)~uśrednij --- to jest Precision/NDCG. Dzięki temu każdy eksperyment jest \textbf{porównywalny}.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Implementacja: \code{home/experiments/metrics.py} + \code{runner.py}; wynik w \code{ExperimentRun} i CSV. W adminie rejestrujesz model (sekcja~\ref{sec:admin-research}). Na pytanie ,,czy wynik jest wiarygodny'' odpowiadasz: ,,tak, bo ten sam kod liczy metryki dla wszystkich metod i zapisuje parametry w JSON''.
+
+\subsubsection{LLM i RAG wyłącznie nad treścią katalogu (\textbf{D9})}
+
+\paragraph{Cel i sens.}
+Zbudować tor rekomendacji, w którym \textbf{semantic search + LLM} na opisach produktów, atrybutach i ewentualnie skrótach opinii dominuje nad heurystyką transakcyjną (tryb (B) w sekcji~\ref{sec:llm-stack}). Metody z inżynierki \textbf{nie są wymagane}; typowy baseline to popularność, losowość z boundingiem kategorii lub \textbf{ten sam retriever} (np.\ top-$k$ embeddingów) + prosta funkcja łącząca \textbf{bez} wywołania LLM --- żeby pokazać, co dokładnie dokłada warstwa generatywna.
+
+\paragraph{Implementacja RAG (szczegóły).}
+\begin{enumerate}[leftmargin=1.5em,itemsep=1pt]
+  \item \textbf{Indeks}: dla każdego produktu łączycie pole tekstowe (nazwa + opis + kategoria); liczycie embedding (np.\ \code{sentence-transformers}); zapis do Qdrant/Chroma/\textbf{pgvector}.
+  \item \textbf{Zapytanie}: z historii zakupów/użytkownika budujecie tekst zapytania (``użytkownik kupuje sprzęt gamingowy, lubi niską latencję myszek'').
+  \item \textbf{Retrieval}: $k$ najbliższych produktów; opcjonalnie MMR żeby ograniczyć duplikaty w jednej kategorii.
+  \item \textbf{LLM}: na podstawie skróconych opisów retrieved produktów zwraca finalną listę rankingu lub odrzuca niepasujące --- zawsze z walidacją \code{product\_id}.
+\end{enumerate}
+
+\paragraph{Porównania.}
+RAG+LLM vs.\ sam retrieval (np.\ średnia ocena wśród retrieved) vs.\ popularność globalna; opcjonalnie vs.\ jeden prosty kanał z repo --- jeśli potrzebny dodatkowy cytat w rozdziale porównawczym.
+
+\paragraph{Biblioteki i koszt.}
+Jak w sekcji~\ref{sec:llm-stack}: \code{sentence-transformers}, klient bazy wektorowej, Ollama; \textbf{bez opłat} przy lokalnym inference.
+
+\paragraph{Panel admina.}
+Każda konfiguracja (model embeddingu, $k$, wersja indeksu) --- osobny wpis w \code{ExperimentRun} lub powiązana tabela \code{EmbeddingIndexVersion}; podgląd w sekcji~\ref{sec:admin-research}.
+
+\paragraph{Pytanie badawcze.}
+Czy RAG na lokalnym katalogu poprawia trafność w porównaniu z prostym baseline przy ograniczonym kontekście okna LLM?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research} (opinie i opisy spójne z produktami); ewaluacja na tym samym zadaniu co reszta zespołu (np.\ następny zakup w teście).
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, Precision@$K$; czas indeksacji i czas zapytania end-to-end; ewentualnie jakość retrieval (recall@$k$ na zawartości koszyka testowego).
+
+\paragraph{Promotor.}
+LLM --- naturalne rozszerzenie; dopasowanie brzmienia tytułu z promotorem.
+
+\paragraph{Jak to powiedzieć na obronie.}
+To jest inny tor niż CF: najpierw zamieniasz opisy produktów na \textbf{wektory} (embeddingi), szukasz podobnych do ``profilu tekstowego'' użytkownika, a LLM tylko pomaga ułożyć końcową listę z znalezionych fragmentów. Porównujesz: ``sam retrieval'' vs.\ ``retrieval + LLM'' --- żeby pokazać, czy model językowy coś realnie dokłada.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Źródłem tekstu są pola produktu w Django (\code{Product}: nazwa, opis, kategoria). Nowy skrypt indeksujący (poza requestem HTTP, wołany z management command): \code{sentence-transformers} $\to$ baza wektorowa lub \code{pgvector}. Nie musisz usuwać \code{CustomSentimentAnalysis} --- możesz dodać embedding opinii do tekstu produktu. Wyniki eksperymentów jak zwykle w \code{ExperimentRun}.
+
+\subsubsection{Wyjaśnialność wybranego rankera (\textbf{D10})}
+
+\paragraph{Cel i sens.}
+Dla \textbf{jednego} ustalonego pipeline (np.\ wybranej fuzji, modelu z kolegi lub własnego rankera) pokazać, które cechy wejścia (produkty, kategorie, historia) najmocniej wpływają na pozycję w rankingu --- metody typu SHAP/LIME lub analiza wrażliwości, zgodna z literaturą XAI.
+
+\paragraph{Pytanie badawcze.}
+Czy wyjaśnienia są stabilne dla podobnych użytkowników i czy zgadzają się z intencją person w \texttt{seed\_research}?
+
+\paragraph{Dane, porównania.}
+Podzbiór użytkowników testowych; możliwe porównanie dwóch architektur wyjaśnień.
+
+\paragraph{Co mierzymy.}
+Jakość proxy wyjaśnień (np.\ fidelity), ewentualnie studia przypadków; metryki rankingu wtórne.
+
+\paragraph{Promotor.}
+Możliwe jako uzupełnienie pracy o LLM lub ensemble.
+
+\paragraph{Jak to powiedzieć na obronie.}
+Na obronie ktoś może zapytać: ,,dlaczego ten produkt jest na 1. miejscu?''. W tej pracy wybierasz \textbf{jeden} ustalony pipeline (np.\ Twoja fuzja D1) i pokazujesz, które cechy (historia, kategoria, reguła koszykowa) najbardziej przesunęły ranking --- narzędzia typu SHAP/LIME albo prostsza analiza wrażliwości, zgodnie z literaturą XAI.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Bierzesz wektory cech, które już liczysz wewnątrz eksperymentu (np.\ score z CF, liczba reguł wspierających produkt, średni sentyment). Pakietowo: \code{shap} przy prostym modelu albo wyjaśnienia dla surrogate modelu. Nie musisz dotykać React --- w pracy pokazujesz wykresy + 2--3 przykłady użytkowników z \texttt{seed\_research}.
+
+\subsubsection{Bezpieczeństwo i walidacja wyjść LLM w Django (\textbf{D11})}
+
+\paragraph{Cel i sens.}
+Opracować \textbf{warstwę wiarygodnego wyjścia}: twardy kontrakt (JSON według schematu Pydantic), odrzucanie ID spoza katalogu, limit długości promptu, eskejpowanie lub sanitacja fragmentów opinii użytkownika wpinanych do promptu (mitigacja \emph{prompt injection}). Bez przepisywania całego frontu --- logika w backendzie i ewentualnie testy jednostkowe szablonów.
+
+\paragraph{Jak to jest zbudowane (technicznie).}
+\begin{itemize}[leftmargin=1.5em,itemsep=1pt]
+  \item szablon promptu w jednym miejscu (np.\ \code{llm/prompts/recommend\_v1.txt}) z symbolami zastępczymi;
+  \item odpowiedź parsowana przez \code{Pydantic}; przy \code{ValidationError} --- skrócenie kontekstu lub druga próba z instrukcją ,,popraw tylko JSON'';
+  \item testy z \textbf{złośliwymi} wstawkami w polach opinii (zsyntetykowane w \texttt{seed\_research} lub fixture) --- pomiar odsetka przypadków, w których model próbuje wygenerować niedozwolone ID lub ignoruje format.
+\end{itemize}
+Pełniejsza lista narzędzi: sekcja~\ref{sec:llm-stack}.
+
+\paragraph{Co porównujecie.}
+Model A vs.\ B \textbf{pod kątem conformance} (czy przestrzegają JSON); strategia z retry vs.\ bez; oraz (opcjonalnie) wpływ walidacji na NDCG@$K$ (czasem filtr ,,uczciwy'' obniża metrykę, ale rośnie bezpieczeństwo).
+
+\paragraph{GUI / audyt.}
+W Django Admin przy każdym \code{ExperimentRun} pole \code{notes} lub osobna tabela \code{LLMValidationAudit} z liczbą odrzuceń --- żeby na obronie pokazać tabelę ``błędów parsowania na 1000 wywołań'' (sekcja~\ref{sec:admin-research}).
+
+\paragraph{Pytanie badawcze.}
+Jak często modele X i Y łamią kontrakt wyjściowy i jakie wzorce ataku (np.\ inżekcja w tekście opinii) są skuteczne w Waszej architekturze?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research} + syntetyczne ,,złośliwe'' fragmenty w kontrolowanym benchu.
+
+\paragraph{Co mierzymy.}
+Błędy walidacji (\%), fallback rate, czas obsługi; ewentualnie skrótowy wpływ na metryki po filtracji.
+
+\paragraph{Promotor.}
+Nowoczesny kierunek (LLM + bezpieczeństwo) --- do uzgodnienia.
+
+\paragraph{Jak to powiedzieć na obronie.}
+LLM zwraca tekst --- tekst może być zły (zły JSON, wymyślone ID produktu, albo ``instrukcja'' podszyta pod opinię użytkownika). Ten temat to \textbf{twardy filtr w Django}: parsowanie Pydantic, odrzucanie ID spoza bazy, ewentualnie skrót promptu i ponowienie. Na obronie: ,,pokazuję, jak często model psuje format i jak na to reagujemy''.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Middleware/servis przy wywołaniu modelu w \code{llm\_recommender.py}; testy na sztucznych opiniach w \texttt{seed\_research}. Wynik audytu zapisujesz w \code{notes} lub osobnej tabeli; w adminie widać skalowanie błędów (sekcja~\ref{sec:admin-research}).
+
+\subsubsection{Uczciwość rankingu w podgrupach person (\textbf{D12})}
+
+\paragraph{Cel i sens.}
+Sprawdzić, czy wybrany algorytm (niekoniecznie z inżynierki) \textbf{faworyzuje} niektóre persony (np.\ \texttt{office\_worker} vs.\ \texttt{gamer}) pod względem NDCG@$K$ lub exposure w top-$K$.
+
+\paragraph{Pytanie badawcze.}
+Czy różnice między grupami są istotne i czy prosta korekta (np.\ równanie wag) je zmniejsza bez dużej utraty jakości globalnej?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research} z znanym przypisaniem \code{UserPersona}; porównanie przed/po korekcie.
+
+\paragraph{Co mierzymy.}
+Metryki per persona + agregaty (np.\ min-max spread); globalny NDCG@$K$.
+
+\paragraph{Promotor.}
+Opcjonalny, silny temat interdyscyplinarny --- do akceptacji.
+
+\paragraph{Jak to powiedzieć na obronie.}
+Dzięki personom w \texttt{seed\_research} wiesz, kto jest np.\ \texttt{gamer}, a kto \texttt{office\_worker}. Pytanie: czy Twój algorytm nie faworyzuje jednej grupy (np.\ zawsze lepszy NDCG dla gamerów)? To wygląda jak jakość ,,sprawiedliwości'' rekomendacji, nie tylko średnia globalna.
+
+\paragraph{Konkretnie w Twoim repozytorium.}
+Tabela \code{UserPersona} (propozycja w tym dokumencie) łączy użytkownika z nazwą persony. Liczysz metryki \textbf{osobno} dla każdej persony, potem porównujesz z metryką globalną. Możesz zaproponować prostą korektę wag w fuzji (D1) per persona --- i pokazać, czy minimalnie poprawiasz spread między grupami.
+
+\subsection{Piotr Smoła --- propozycje szczegółowe}
+
+\subsubsection{Sieć neuronowa łącząca wiele metod z kontekstem użytkownika (\textbf{P1})}
+
+\paragraph{Cel i sens.}
+Zastąpić ręczną fuzję \textbf{uczonym rankerem}: wektor normalizowanych score z dostępnych metod (w praktyce do 9 kanałów z inżynierki) plus cechy użytkownika (aktywność, entropia kategorii itd.); ocenić zysk względem najlepszej heurystyki i prostszego ensemble.
+
+\paragraph{Pytanie badawcze.}
+Czy MLP (lub podobna sieć) istotnie poprawia ranking w NDCG@$K$ i które metody dominują w których regionach przestrzeni cech --- interpretacja przez SHAP lub analogiczną metodę.
+
+\paragraph{Dane, porównania.}
+Wspólny bootstrap / split; baseline: najlepszy singleton, RRF, ewentualnie boosting (por.\ osobna pozycja katalogu).
+
+\paragraph{Co mierzymy.}
+Metryki rankingowe; krzywe uczenia; analiza ważności cech; czas treningu i inferencji.
+
+\paragraph{Promotor.}
+Sieć łącząca metody + dominacja źródeł.
+
+\subsubsection{Segmentacja użytkowników (K-Means, DBSCAN) i strategia per segment (\textbf{P2})}
+
+\paragraph{Cel i sens.}
+Grupować użytkowników po cechach z zamówień i interakcji, następnie dobierać \textbf{wagi fuzji lub wybór metody} osobno w każdym segmencie --- porównać z jednym globalnym ustawieniem.
+
+\paragraph{Pytanie badawcze.}
+Czy segmentacja redukuje błąd rankingowy ``średnio po użytkownikach'' i czy różne segmenty wymagają różnych wag (np.\ większy udział CBF w segmencie ``nowi'')?
+
+\paragraph{Dane, porównania.}
+Wyniki globalne vs.\ per-segment; stabilność klastrów przy różnym $K$ (silhouette, sensowność biznesowa person).
+
+\paragraph{Co mierzymy.}
+NDCG@$K$ globalnie i warunkowo na segment; liczba użytkowników w klastrach; czas klasteryzacji.
+
+\paragraph{Promotor.}
+Segmentacja + optymalna kombinacja per segment.
+
+\subsubsection{Hyperparameter tuning --- CBF, silnik rozmyty, modele probabilistyczne (\textbf{P3})}
+
+\paragraph{Cel i sens.}
+Systematycznie zestroić parametry po stronie Smoły (TF-IDF / CBF, funkcje przynależności i reguły w \code{fuzzy\_logic\_engine}, parametry Markowa i NBC), pokazując wpływ na metryki i koszt obliczeń.
+
+\paragraph{Pytanie badawcze.}
+Które parametry dają największy przyrost jakości przy rozsądnym czasie, a które są ``płaskie''?
+
+\paragraph{Dane, porównania.}
+Ustalony split; porównanie z wartościami domyślnymi z inżynierki; ewentualna wspólna tabela z pracy zespołowej jako załącznik.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, inne metryki zespołu; czas przeliczenia CBF i ewaluacji reguł rozmytych.
+
+\paragraph{Promotor.}
+Tuning hiperparametrów.
+
+\subsubsection{Warstwa integracji LLM (API, walidacja, koszt, niezawodność) (\textbf{P4})}
+
+\paragraph{Cel i sens.}
+Potraktować LLM jako \textbf{usługę wewnętrzną} Django: jeden moduł (np.\ \code{home/llm/service.py}) odpowiedzialny za timeouty, ponawianie, limity równoległych zapytań, logowanie błędów i \textbf{wspólną walidację} odpowiedzi. Dzięki temu Olko może skupić się na hipotezach badawczych, a Ty --- na niezawodności i obserwowalności --- naturalny podział w zespole. Porównanie z metodami klasycznymi \textbf{nie jest konieczne}: możecie raportować jakość usługi (SLA) i koszt czasu względem lokalnego Ollama vs.\ ewentualnego API.
+
+\paragraph{Architektura (propozycja).}
+\begin{itemize}[leftmargin=1.5em,itemsep=1pt]
+  \item \textbf{Adapter}: \code{LLMBackend} z implementacjami \code{OllamaBackend}, \code{OpenAICompatibleBackend} --- ten sam interfejs \code{complete(prompt) -> str}.
+  \item \textbf{Polityka}: kolejka (np.\ \code{django-rq} / Celery) na długie batch-e eksperymentów; krótkie żądania synchronicznie z timeoutem.
+  \item \textbf{Metryki operacyjne} (opcjonalnie, w stylu Prometheus): licznik błędów, histogram latency --- lub zapis do \code{ExperimentRun.notes}.
+\end{itemize}
+Biblioteki: sekcja~\ref{sec:llm-stack}.
+
+\paragraph{Co porównujecie / badacie.}
+Lokalny Ollama vs.\ API (jeśli macie klucz testowy); różne limity \code{max\_tokens}; strategia 1 wywołanie vs.\ ,,skróć kontekst i powtórz''; wpływ tych decyzji na \textbf{udział poprawnie zwalidowanych list} rekomendacji.
+
+\paragraph{Panel admina.}
+Konfiguracja endpointu LLM, kluczy (przez \code{django-environ}, nie w repo), przełącznik ,,środowisko lab vs prod'' --- formularz w adminie (model \code{LLMServiceConfig}) opisany w sekcji~\ref{sec:admin-research}; link do listy \code{ExperimentRun} filtrowanej po \texttt{method\_or\_combination} zawierającym \texttt{llm}.
+
+\paragraph{Pytanie badawcze.}
+Przy tym samym module \texttt{evaluate} jak reszta systemu --- jaki jest rozkład czasu odpowiedzi i odsetek odrzuconych odpowiedzi po walidacji przy różnych backendach?
+
+\paragraph{Dane, porównania.}
+Ten sam ground truth co u Olko, jeśli łączycie eksperymenty; równolegle możecie mieć tryb ``dry-run'' tylko na latency bez pełnej ewaluacji rankingowej.
+
+\paragraph{Co mierzymy.}
+Latency (p50, p95), throughput, error rate, metryki jakości rankingu po walidacji (gdy uruchamiacie pełny pipeline).
+
+\paragraph{Promotor.}
+LLM --- strona systemowa / integracyjna; uzgodnienie brzmienia z promotorem.
+
+\subsubsection{Rekomendacje z danych ukrytych (interakcje, ewentualnie dwell) (\textbf{P5})}
+
+\paragraph{Cel i sens.}
+Zbadać profile zbudowane tylko z \code{UserInteraction} (z ewentualnym decay czasu i czasem na karcie produktu), \textbf{bez} opinii jawnych --- na tym samym zadaniu co gałąź ``jawna'' Olko.
+
+\paragraph{Pytanie badawcze.}
+Czy implicit + ewentualnie dwell przewyższa lub dorównuje profilowi opartemu o opinie przy przewidywaniu zakupów w teście?
+
+\paragraph{Dane, porównania.}
+Wspólny seed z realistyczną ścieżką ``oglądanie przed zakupem''; porównanie z definiowaną przez kolegę gałęzią jawną.
+
+\paragraph{Co mierzymy.}
+Standardowe metryki rankingowe; ewentualnie AUC jeśli sformułujecie zadanie binarne ``kupi / nie kupi''.
+
+\paragraph{Promotor.}
+Jawne vs ukryte --- druga strona porównania.
+
+\subsubsection{Skalowalność CBF, logiki rozmytej i ścieżek probabilistycznych (\textbf{P6})}
+
+\paragraph{Cel i sens.}
+Ocenić koszt przeliczenia TF-IDF po całym korpusie opisów, liczby reguł rozmytych i zapytań Markova przy rosnącej skali danych --- inne wąskie gardła niż po stronie CF.
+
+\paragraph{Pytanie badawcze.}
+Które operacje dominują czas w PostgreSQL / Pythonie i jak skaluje się jakość vs.\ rozmiar korpusu?
+
+\paragraph{Dane, porównania.}
+Seria konfiguracji \texttt{seed\_research} o rosnącej liczbie użytkowników, produktów i transakcji; na wybranych punktach skali --- identyczny (lub proporcjonalny) protokół testowy, by oddzielić wpływ rozmiaru danych od przypadkowej próby.
+
+\paragraph{Co mierzymy.}
+Czas budowy wektorów, czas jednej rekomendacji, rozmiar struktur pośrednich; metryki jakości na stałym podzbiorze testowym.
+
+\paragraph{Promotor.}
+Skalowalność.
+
+\subsubsection{Wnioskowanie rozmyte typu drugiego (IT2-FLS) wobec Mamdani T1 z inżynierki (\textbf{P7})}
+
+\paragraph{Cel i sens.}
+Wprowadzić \textbf{niepewność} do wejść rozmytych (np.\ szerzej interpretowane sentymenty lub rzadsze opinie jako przedziały) i porównać system IT2 (np.\ biblioteka pyIT2FLS) z obecną logiką T1 pod kątem jakości rankingu i interpretowalności.
+
+\paragraph{Pytanie badawcze.}
+Czy IT2-FLS poprawia lub stabilizuje wyniki przy szumnych danych wejściowych względem T1 przy tym samym protokole testowym?
+
+\paragraph{Dane, porównania.}
+Mapowanie cech do przedziałów przynależności; baseline: silnik z \code{fuzzy\_logic\_engine}.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$ i pokrewne; ewentualnie sensowność defuzyfikacji (spójność z porządkiem preferencji); czas inferencji IT2 vs.\ T1.
+
+\paragraph{Promotor.}
+Wnioskowanie przedziałowe --- propozycja promotora.
+
+\subsubsection{Meta-uczenie prostsze od głębokiej sieci (np.\ gradient boosting) (\textbf{P8})}
+
+\paragraph{Cel i sens.}
+Sprawdzić, czy \textbf{gradient boosting} na wektorze score z metod + kontekst daje jakość bliską MLP przy mniejszej złożoności i łatwiejszej interpretacji częściowej.
+
+\paragraph{Pytanie badawcze.}
+Czy LightGBM / XGBoost na zgrubnie zdefiniowanych cechach nie gorsi znacząco sieci i jak wygląda mapa ważności cech vs.\ SHAP dla MLP?
+
+\paragraph{Dane, porównania.}
+Te same wektory co dla sieci łączącej; porównanie z MLP i prostą fuzją.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, czas treningu, rozmiar modelu, interpretacja ważności.
+
+\paragraph{Promotor.}
+Sieć łącząca --- alternatywa lżejsza i dobra do dyskusji o dominacji metod.
+
+\subsubsection{Ranker na embeddingach tekstu produktów (\textbf{P9})}
+
+\paragraph{Cel i sens.}
+Wdrożyć \textbf{nowy kanał} rekomendacji: embeddingi opisów/nazw (np.\ modele sentence-transformers), podobieństwo w przestrzeni wektorowej, ranking $k$ najbliższych sąsiadów względem profilu użytkownika złożonego z historii. \textbf{Nie wymaga} porównania z TF-IDF z inżynierki --- można potraktować CBF z inżynierki jako opcjonalny baseline.
+
+\paragraph{Pytanie badawcze.}
+Czy jakość rankingu i czas inferencji są akceptowalne przy rozmiarze katalogu z \texttt{seed\_research}?
+
+\paragraph{Dane, porównania.}
+Ten sam split i metryki co zespół; baseline: popularność lub prosty $k$NN na TF-IDF (świadomie dodany pod pracę).
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, czas budowy indeksu (FAISS/opcja czysto NumPy), RAM.
+
+\paragraph{Promotor.}
+Rozszerzenie systemu --- zgodne z ideą ,,nie od zera''.
+
+\subsubsection{Graf współwystąpień produktów z koszyków (\textbf{P10})}
+
+\paragraph{Cel i sens.}
+Zbudować graf (węzły = produkty, krawędzie = współwystąpienia w zamówieniach z seedera) i rekomendować sąsiadów / random walk --- klasyczna, jasna linia badawcza bez odwołania do rozmytości czy CBF.
+
+\paragraph{Pytanie badawcze.}
+Czy proste scoringi na grafie (adamic-adar, preferential attachment) ustawiają sensowny ranking w teście czasowym?
+
+\paragraph{Dane, porównania.}
+\texttt{seed\_research}; baseline popularności.
+
+\paragraph{Co mierzymy.}
+NDCG@$K$, degree distribution grafu, czas budowy.
+
+\paragraph{Promotor.}
+Treść do uzgodnienia z promotorem (graf jako wkład teoretyczno-praktyczny).
+
+\subsubsection{Reprodukowalność eksperymentów i automatyzacja (\textbf{P11})}
+
+\paragraph{Cel i sens.}
+Uczynić przewodnim elementem pracy \textbf{workflow}: Makefile lub CI, jednolita komenda ,,od zera do raportu'', wersjonowanie hash \texttt{seed\_research}, artefakty CSV/JSON --- żeby obrona i zespół miały dowód powtarzalności.
+
+\paragraph{Pytanie badawcze.}
+Czy pełny łańcuch (seed $\to$ przeliczenia $\to$ ewaluacja) daje bit-identyczne lub statystycznie zbieżne wyniki?
+
+\paragraph{Dane, porównania.}
+Kilka maszyn lub runów CI; ten sam commit + seed.
+
+\paragraph{Co mierzymy.}
+Czas pipeline'u, checksumy wyników, ewentualnie rozbieżności.
+
+\paragraph{Promotor.}
+Możliwy jako wkład inżynierski --- do uzgodnienia.
+
+\subsubsection{Dryf jakości i monitoring rankingu (\textbf{P12})}
+
+\paragraph{Cel i sens.}
+Zsyntetycznie \textbf{zmienić} rozkład person lub intensywność zakupów w kolejnej generacji \texttt{seed\_research} i zmierzyć, jak bardzo spadają metryki ustalonego rankera --- motyw praktyczny pod monitorowanie modeli w prod.
+
+\paragraph{Pytanie badawcze.}
+Które metryki najszybciej wykrywają dryf (np.\ NDCG vs.\ coverage)?
+
+\paragraph{Dane, porównania.}
+Dwa manifesty seedera (wersja A vs.\ B); ten sam kod rankera.
+
+\paragraph{Co mierzymy.}
+$\Delta$ metryk, ewentualnie testy na podzbiorach.
+
+\paragraph{Promotor.}
+Opcjonalny temat aplikowany --- akceptacja promotora.
+
+% =====================================================================
+\newpage
+\section{Przykładowa realizacja wybranych tematów (głęboki opis)}\label{sec:deep-dive}
+
+\noindent\textbf{Uwaga.} Poniżej rozwinięto \textbf{szczegółowy} przykład realizacji odpowiadający m.in.\ \textbf{D1--D3} (Olko) oraz \textbf{P2 i P7} (Smoła) z tabel katalogu. Można go zastąpić innym zestawem (np.\ sam \textbf{D9} + \textbf{P9}, lub \textbf{D6} + \textbf{P11}) przy zachowaniu wspólnej infrastruktury (\texttt{seed\_research}, metryki, \texttt{ExperimentRun}).
+
+\medskip
+Po analizie korespondencji od promotora (kombinacja metod, LLM, IT2-FLS, segmentacja --- wszystkie zaakceptowane), własnych metod inżynierskich oraz realistyczności w okresie pracy magisterskiej (12--15 mc) rekomendujemy podział, w którym każdy bierze 2 obszary tak, aby \textbf{nie przeszkadzać sobie nawzajem}, ale dzielić wspólną infrastrukturę (seeder + ewaluacja + ExperimentRun).
+
+% ----------------- OLKO -----------------
+\subsection{Praca Dawida Olko --- CF + Sentyment + Apriori}
+
+\subsubsection*{Tytuł roboczy}
+\noindent\textit{,,Hybrydowe łączenie metod rekomendacji z udziałem dużych modeli językowych w systemie e-commerce''}
+
+\medskip\noindent ang.: \textit{Hybrid Recommendation Method Combination with Large Language Models in an E-commerce System}
+
+\subsubsection*{Pytanie badawcze}
+
+Czy kombinacja klasycznych metod rekomendacyjnych (CF + Sentyment + Apriori) ze sobą oraz z modelem LLM daje istotnie lepsze rekomendacje niż każda metoda osobno? Czy LLM rozwiązuje problem zimnego startu lepiej niż CF + Apriori?
+
+\subsubsection*{Hipotezy}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{H1}: Fuzja rankingowa (RRF / Borda / weighted average) z 3 metod (CF + Sentyment + Apriori) poprawia NDCG@10 o $\geq$10\% względem najlepszego pojedynczego rankera.
+  \item \textbf{H2}: Dla użytkowników z $<$3 zamówieniami w historii LLM (Bielik 11B lub Mistral Small) daje wyższy NDCG@10 niż klasyczne CF i Apriori.
+  \item \textbf{H3}: Hybryda LLM + klasyka (LLM jako jeden z rankerów w fuzji) przewyższa zarówno czysty LLM jak i czystą klasykę.
+  \item \textbf{H4}: Hallucination rate (rekomendacje produktów spoza katalogu) dla LLM jest niezerowe i zależy od wielkości modelu.
+\end{itemize}
+
+\subsubsection*{Co konkretnie zrobić w kodzie}
+
+\textbf{Część A --- Refactor metod do wspólnego interfejsu}:
+
+\begin{lstlisting}
+# backend/home/experiments/base_recommender.py
+from abc import ABC, abstractmethod
+
+class BaseRecommender(ABC):
+    @abstractmethod
+    def recommend(self, user_id: int, k: int = 10) -> list[tuple[int, float]]:
+        """Zwraca [(product_id, score), ...] długości k, sortowane malejąco."""
+
+class CollaborativeFilteringRecommender(BaseRecommender):
+    def recommend(self, user_id, k=10):
+        # opakowuje istniejące process_collaborative_filtering()
+        ...
+
+class SentimentRecommender(BaseRecommender): ...
+class AprioriRecommender(BaseRecommender):   ...
+\end{lstlisting}
+
+\textbf{Część B --- Strategie fuzji rankingów}:
+
+\begin{lstlisting}
+# backend/home/experiments/fusion.py
+class ReciprocalRankFusion:
+    def __init__(self, recommenders, k_const=60):
+        self.recommenders = recommenders
+        self.k_const = k_const
+
+    def recommend(self, user_id, k=10):
+        scores = defaultdict(float)
+        for r in self.recommenders:
+            ranking = r.recommend(user_id, k=50)
+            for rank, (pid, _) in enumerate(ranking, start=1):
+                scores[pid] += 1.0 / (self.k_const + rank)
+        return sorted(scores.items(), key=lambda x: -x[1])[:k]
+
+class BordaCount: ...        # sumowanie pozycji
+class WeightedAverage: ...   # ważona średnia score'ów (po normalizacji)
+class Switching: ...         # wybór metody zależny od profilu użytkownika
+\end{lstlisting}
+
+\textbf{Część C --- LLM channel}:
+
+\begin{lstlisting}
+# backend/home/experiments/llm_recommender.py
+class LLMRecommender(BaseRecommender):
+    def __init__(self, model_name="bielik-11b-v3.0-instruct", mode="zero_shot"):
+        # mode in {"zero_shot", "few_shot", "rag"}
+        self.client = ollama.Client()
+        self.model_name = model_name
+        self.mode = mode
+
+    def recommend(self, user_id, k=10):
+        # 1. Pobierz historię zakupów użytkownika
+        # 2. Pobierz listę kandydatów (np. top-100 z CBF)
+        # 3. Build prompt: "Użytkownik kupił X, Y, Z. Mając kandydatów [...],
+        #    zarekomenduj 10 produktów uszeregowanych malejąco, w formacie JSON."
+        # 4. Wywołaj LLM, sparsuj listę produktów
+        # 5. Zwaliduj że ID są w katalogu (hallucination check)
+        ...
+\end{lstlisting}
+
+\textbf{Wybór modeli (open-source)}:
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Bielik v3 11B} (polski, Apache 2.0) --- kluczowy ze względu na polskie nazwy produktów i opisy
+  \item \textbf{Mistral Small 3 24B} (Apache 2.0) --- referencyjny zachodni
+  \item \textbf{Qwen 2.5 14B} (Apache 2.0) --- referencyjny azjatycki
+  \item Uruchomienie: \textbf{Ollama} (MacBook Pro M3 Pro / Apple Silicon lub PC z GPU; na M3 Pro typowo modele 7B--8B w akceptowalnym czasie)
+\end{itemize}
+
+\textbf{Część D --- Eksperymenty (zapisywane do \code{ExperimentRun})}:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l Y c}
+\toprule
+\textbf{ID} & \textbf{Konfiguracja} & \textbf{Liczba runów} \\
+\midrule
+E1.1--E1.3 & CF / Sentyment / Apriori --- pojedynczo & 3 \\
+E1.4--E1.6 & Pary: CF+Sentyment, CF+Apriori, Sentyment+Apriori (RRF) & 3 \\
+E1.7 & Trójka CF+Sentyment+Apriori (RRF) & 1 \\
+E1.8--E1.10 & Trójka --- Borda, Weighted, Switching & 3 \\
+E2.1--E2.3 & Czysty LLM (Bielik 7B, Bielik 11B, Mistral Small) & 3 \\
+E2.4--E2.5 & LLM zero-shot vs few-shot (best Bielik) & 2 \\
+E2.6 & LLM RAG (Bielik + retrieval z bazy opinii) & 1 \\
+E3.1--E3.3 & Hybryda LLM + klasyka (LLM jako 4. ranker w RRF) & 3 \\
+\midrule
+\textbf{Razem} & & \textbf{$\sim$19 runów $\times$ 5 CV $\approx$ 95 eksperymentów} \\
+\bottomrule
+\end{tabularx}
+\caption{Plan eksperymentalny pracy Olko.}
+\end{table}
+
+\subsubsection*{Stack technologiczny --- Olko}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l Y}
+\toprule
+\textbf{Element} & \textbf{Technologia} \\
+\midrule
+LLM inference & \textbf{Ollama} (lokalnie, w tym Apple Silicon); bez vLLM/klastra --- nieplanowane w tej pracy \\
+Embeddings (RAG) & sentence-transformers, \code{paraphrase-multilingual-mpnet-base-v2} \\
+Vector DB & Qdrant (lekki, lokalny Docker) \\
+Statystyka & scipy.stats --- Friedman + post-hoc Nemenyi \\
+Tracking & tabela \code{ExperimentRun} + CSV (bez MLflow) \\
+Wizualizacja & matplotlib, seaborn, heatmapa synergii 3$\times$3 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection*{Innowacyjność pracy Olko}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Polskie modele LLM} --- Bielik v3 jest praktycznie nieobecny w literaturze rekomendacyjnej (stan na 01/2026). Praca uzupełnia tę lukę.
+  \item \textbf{Praktyczne porównanie 4 strategii fuzji} --- większość artykułów testuje 1--2 strategie.
+  \item \textbf{Hallucination rate} w kontekście rekomendacji produktowych --- nowa metryka.
+  \item \textbf{Reprodukowalny seed} --- dane testowe dostępne razem z pracą (open science).
+\end{enumerate}
+
+\subsubsection*{Kluczowa literatura --- Olko}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=1pt]
+  \item Burke, R. (2002). Hybrid Recommender Systems: Survey and Experiments. UMUAI 12(4).
+  \item Sarwar, B. et al. (2001). Item-based collaborative filtering recommendation algorithms. WWW '01.
+  \item Wu, L. et al. (2024). A Survey on Large Language Models for Recommendation. arXiv:2305.19860.
+  \item Bao, K. et al. (2023). TALLRec: Tuning Framework to Align LLM with Recommendation. RecSys '23.
+  \item Hou, Y. et al. (2024). LLMs are Zero-Shot Rankers for Recommender Systems. ECIR '24.
+  \item Lewis, P. et al. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP. NeurIPS.
+  \item Ociepa, K. et al. (2026). Advancing Polish Language Modeling --- Bielik v3.
+\end{itemize}
+
+% ----------------- SMOŁA -----------------
+\newpage
+\subsection{Praca Piotra Smoły --- CBF + Fuzzy + Probabilistic}
+
+\subsubsection*{Tytuł roboczy}
+\noindent\textit{,,Segmentacja użytkowników i wnioskowanie przedziałowe (IT2-FLS) w hybrydowym systemie rekomendacji produktów''}
+
+\medskip\noindent ang.: \textit{User Segmentation and Interval Type-2 Fuzzy Inference in a Hybrid Product Recommendation System}
+
+\subsubsection*{Pytania badawcze}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item Czy podział użytkowników na segmenty (K-Means / DBSCAN) i osobny dobór wag metod CBF / Fuzzy / Probabilistic dla każdego segmentu poprawia jakość rekomendacji względem konfiguracji globalnej?
+  \item Czy wnioskowanie rozmyte typu drugiego (IT2-FLS, biblioteka \textbf{pyit2fls} wskazana przez promotora) --- które uwzględnia niepewność funkcji przynależności --- daje lepsze rekomendacje niż obecny system Mamdani T1, szczególnie w warunkach rzadkich danych?
+\end{enumerate}
+
+\subsubsection*{Hipotezy}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{H1}: Strategia świadoma segmentacji przewyższa najlepszą globalną konfigurację o $\geq$3\% w NDCG@10.
+  \item \textbf{H2}: Optymalna liczba segmentów dla zbioru testowego mieści się w przedziale 4--7 (zgodnie z RFM).
+  \item \textbf{H3}: IT2-FLS daje wyższą Precision@10 niż T1 dla użytkowników z $<$5 ocenami.
+  \item \textbf{H4}: Szerokość przedziału ufności (output IT2-FLS) koreluje istotnie z błędem predykcji.
+  \item \textbf{H5}: Koszt obliczeniowy IT2-FLS (defuzy Karnik--Mendel) jest 5--20$\times$ wyższy niż T1, ale opłacalny tylko w cold-start.
+\end{itemize}
+
+\subsubsection*{Co konkretnie zrobić w kodzie}
+
+\textbf{Część A --- Feature engineering użytkowników}:
+
+\begin{lstlisting}
+# backend/home/experiments/user_features.py
+def build_user_feature_vector(user) -> np.ndarray:
+    return np.array([
+        avg_order_value(user),            # 1. RFM-Monetary
+        purchase_frequency(user),         # 2. RFM-Frequency
+        category_entropy(user),           # 3. Shannon nad kategoriami
+        review_to_order_ratio(user),      # 4. ile pisze opinii
+        avg_sentiment_of_opinions(user),  # 5. tonacja
+        avg_dwell_time_ms(user),          # 6. UserInteraction.duration_ms
+        recency_days(user),               # 7. RFM-Recency
+        seasonality_score(user),          # 8. jak bardzo sezonowy
+        active_hour_avg(user),            # 9.
+    ])
+\end{lstlisting}
+
+\textbf{Część B --- Klasteryzacja}:
+
+\begin{lstlisting}
+# backend/home/experiments/segmentation.py
+class UserSegmentation:
+    def __init__(self, method="kmeans"):
+        self.method = method
+
+    def fit(self, X):
+        if self.method == "kmeans":
+            best_k, best_model = self._find_best_kmeans(X, k_range=range(2, 11))
+            self.model = best_model
+        elif self.method == "dbscan":
+            self.model = DBSCAN(eps=self._auto_eps(X), min_samples=5).fit(X)
+        elif self.method == "gmm":
+            best_n, best_model = self._find_best_gmm(X, n_range=range(2, 11))
+            self.model = best_model
+
+    def predict(self, X):
+        return (self.model.predict(X) if self.method != "dbscan"
+                else self.model.fit_predict(X))
+\end{lstlisting}
+
+\textbf{Część C --- Optymalizacja wag per-segment}:
+
+\begin{lstlisting}
+# backend/home/experiments/segment_optimizer.py
+class PerSegmentOptimizer:
+    """Dla każdego segmentu znajduje najlepsze wagi (w_cbf, w_fuzzy, w_prob)."""
+
+    def fit(self, segments_dict, train_orders):
+        for cluster_id, user_ids in segments_dict.items():
+            best_weights = self._grid_search_weights(user_ids, train_orders)
+            self.weights[cluster_id] = best_weights
+
+    def recommend(self, user_id, k=10):
+        cluster = self.cluster_of(user_id)
+        w_cbf, w_fuzzy, w_prob = self.weights[cluster]
+        s_cbf   = self.cbf.score(user_id)
+        s_fuzzy = self.fuzzy.score(user_id)
+        s_prob  = self.prob.score(user_id)
+        final = w_cbf * s_cbf + w_fuzzy * s_fuzzy + w_prob * s_prob
+        return top_k(final, k)
+\end{lstlisting}
+
+\textbf{Część D --- IT2-FLS jako alternatywa Mamdani T1}:
+
+\begin{lstlisting}
+# backend/home/it2_fuzzy_logic_engine.py
+import pyit2fls
+
+class IT2RecommendationEngine:
+    """Wnioskowanie rozmyte typu drugiego dla scoringu produktów.
+
+    Wymiary wejściowe:
+      - cena: tani / średni / drogi (IT2FS z FOU = +/- 20% wzgl. T1)
+      - jakość: niska / średnia / wysoka (sentiment-based)
+      - popularność: niska / średnia / wysoka (zakupy w okresie)
+
+    Wyjście:
+      - score: niski / średni / wysoki (przedział [low, high])
+    """
+
+    def __init__(self):
+        # Footprint of Uncertainty (FOU)
+        self.cena_tani = pyit2fls.IT2FS_Gaussian_UncertMean(...)
+        self.cena_sredni = pyit2fls.IT2FS_Gaussian_UncertMean(...)
+        # ...
+        self.system = pyit2fls.IT2Mamdani(...)
+        self._add_rules()
+
+    def score_product(self, product, user):
+        cena_norm = normalize_price(product.price)
+        jakosc = sentiment_summary(product)
+        popularnosc = buy_count_30d(product)
+        # Defuzyfikacja Karnik-Mendel
+        result = self.system.evaluate({
+            "cena": cena_norm, "jakosc": jakosc, "popularnosc": popularnosc
+        })
+        return result["score"]
+
+    def score_with_uncertainty(self, product, user):
+        result = self.system.evaluate(...)
+        return result["score_low"], result["score_high"]
+\end{lstlisting}
+
+\textbf{Część E --- Eksperymenty}:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l Y c}
+\toprule
+\textbf{ID} & \textbf{Konfiguracja} & \textbf{Liczba runów} \\
+\midrule
+E1.1--E1.3 & CBF / Fuzzy T1 / Probabilistic --- pojedynczo & 3 \\
+E2.1 & Globalna kombinacja CBF+Fuzzy T1+Prob (najlepsze wagi) & 1 \\
+E2.2--E2.4 & K-Means k=4/5/6 --- weighted CBF+Fuzzy+Prob per segment & 3 \\
+E2.5 & DBSCAN --- outlier detection + fallback to global & 1 \\
+E2.6 & GMM 5 klastrów & 1 \\
+E3.1 & IT2-FLS pojedynczo & 1 \\
+E3.2 & IT2-FLS + CBF + Prob (per segment) & 1 \\
+E3.3 & T1 vs IT2-FLS --- sparowane porównanie na 3 segmentach & 3 \\
+E3.4 & Pomiar szerokości CI vs błąd predykcji & 1 \\
+\midrule
+\textbf{Razem} & & \textbf{$\sim$15 runów $\times$ 5 CV $\approx$ 75 eksperymentów} \\
+\bottomrule
+\end{tabularx}
+\caption{Plan eksperymentalny pracy Smoły.}
+\end{table}
+
+\subsubsection*{Stack technologiczny --- Smoła}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l Y}
+\toprule
+\textbf{Element} & \textbf{Technologia} \\
+\midrule
+Klasteryzacja & scikit-learn (KMeans, DBSCAN, GaussianMixture) \\
+Redukcja wymiarów & scikit-learn PCA, umap-learn \\
+Walidacja klastrów & Silhouette, Davies-Bouldin, Calinski-Harabasz \\
+\textbf{IT2-FLS} & \textbf{pyit2fls} (\code{pip install pyit2fls}) --- wskazane przez promotora \\
+Numeryka & NumPy, SciPy \\
+Wizualizacja & matplotlib (membership, FOU plots), seaborn \\
+Statystyka & scipy.stats --- sparowany Wilcoxon \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection*{Innowacyjność pracy Smoły}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Zastosowanie IT2-FLS w rekomendacjach} --- w polskim środowisku akademickim praktycznie nieobecne.
+  \item \textbf{Empiryczne porównanie T1 vs T2 fuzzy w cold-start} --- odpowiedź na pytanie ,,czy złożoność IT2 się opłaca''.
+  \item \textbf{Confidence-aware ranking} --- produkty z szerokim przedziałem ufności są deprezjonowane lub oznaczane do uwagi użytkownika.
+  \item \textbf{Per-segment weight tuning} --- automatyczne mapowanie segment $\to$ konfiguracja, rzadko spotykane systemowo.
+\end{enumerate}
+
+\subsubsection*{Kluczowa literatura --- Smoła}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=1pt]
+  \item Pazzani, M. \& Billsus, D. (2007). Content-Based Recommendation Systems. The Adaptive Web.
+  \item Mendel, J. M. (2017). Uncertain Rule-Based Fuzzy Systems, wyd. 2. Springer.
+  \item Karnik, N. N. \& Mendel, J. M. (2001). Centroid of a type-2 fuzzy set. Information Sciences.
+  \item Wu, D. (2013). Approaches for reducing the computational cost of IT2-FLS. IEEE TFS.
+  \item Haghrah, A. A. \& Ghaemi, S. (2023). PyIT2FLS: A New Python Toolkit for IT2-FLS. arXiv:1909.10051.
+  \item MacQueen, J. (1967). Some methods for classification and analysis. Berkeley Symp.
+  \item Ester, M. et al. (1996). DBSCAN. KDD.
+  \item Hennig-Thurau, T. et al. (2012). Automated Group Recommender Systems. J. of Marketing.
+\end{itemize}
+
+% =====================================================================
+\newpage
+\section{Wspólny rdzeń projektu}
+
+Kawałki, które każdy z autorów musi mieć w swojej pracy --- warto zaimplementować raz i podzielić się autorstwem rozdziału (np.\ ,,Rozdział: Infrastruktura badawcza'' w obu pracach z odpowiednimi referencjami do siebie nawzajem).
+
+\subsection{\texttt{seed\_research} --- szczegółowy plan}
+
+Plik: \code{backend/home/management/commands/seed\_research.py}
+
+\begin{lstlisting}
+class Command(BaseCommand):
+    help = "Generuje powtarzalny zbiór badawczy z personami."
+
+    def add_arguments(self, parser):
+        parser.add_argument("--clients", type=int, default=200)
+        parser.add_argument("--admins", type=int, default=5)
+        parser.add_argument("--products", type=int, default=500)
+        parser.add_argument("--days-back", type=int, default=730)
+        parser.add_argument("--orders-per-client-mean", type=int, default=12)
+        parser.add_argument("--interactions-per-client-mean", type=int, default=80)
+        parser.add_argument("--random-seed", type=int, default=42)
+        parser.add_argument("--reset", action="store_true",
+                            help="Wyczyść bazę przed seedowaniem")
+
+    def handle(self, *args, **opts):
+        random.seed(opts["random_seed"])
+        np.random.seed(opts["random_seed"])
+        if opts["reset"]:
+            self._drop_research_data()
+        # 1. Produkty (zachowujemy z istniejącego seeda)
+        self._ensure_products(opts["products"])
+        # 2. Persony
+        personas = self._distribute_personas(opts["clients"])
+        # 3. Użytkownicy z personami (zapis do UserPersona)
+        users = self._create_users(personas, opts["admins"])
+        # 4. Zamówienia (temporalnie spójne, persona-driven)
+        self._create_orders(users, days_back=opts["days_back"])
+        # 5. Interakcje (view/click przed zakupem)
+        self._create_interactions(users)
+        # 6. Opinie (po zakupie, sentyment-persona-correlated)
+        self._create_opinions(users)
+        # 7. Sentiment summary, similarity, association rules
+        self._recompute_all_methods()
+        # 8. Metadane seedowania
+        self._log_seed_metadata(opts)
+\end{lstlisting}
+
+\subsection{\texttt{home/experiments/} --- wspólny moduł}
+
+\begin{lstlisting}[language=]
+backend/home/experiments/
+|- __init__.py
+|- base_recommender.py    # BaseRecommender + adaptery do istniejących metod
+|- metrics.py             # precision@k, recall@k, ndcg@k, map, coverage
+|- splits.py              # temporal_split, leave_last_one_out, k_fold_user
+|- runner.py              # ExperimentRunner — uruchamia, mierzy, loguje
+|- reporter.py            # generator raportów CSV i wykresów
+\- tests/
+   |- test_metrics.py
+   \- test_splits.py
+\end{lstlisting}
+
+\textbf{Wspólne API}:
+
+\begin{lstlisting}
+from home.experiments import temporal_split, ExperimentRunner
+
+train, test = temporal_split(test_ratio=0.2)
+runner = ExperimentRunner(method=my_recommender, k=10)
+results = runner.evaluate(test_users=test["users"],
+                          ground_truth=test["orders"])
+runner.save_to_db(experiment_id="E1.1_CF_solo", notes="Baseline CF")
+\end{lstlisting}
+
+\subsection{Tracking dwell time (frontend + backend) --- opcjonalny}
+
+Implementujemy tylko jeśli Smoła używa \code{dwell\_time\_mean\_ms} w \code{build\_user\_feature\_vector()}.
+
+\textbf{Backend}: migracja \code{UserInteraction.duration\_ms}, rozszerzenie \code{POST /api/interaction/} o pole \code{duration\_ms}.
+
+\textbf{Frontend} (\code{frontend/src/components/ProductSection/ProductPage.jsx}):
+
+\begin{lstlisting}[language=Java]
+useEffect(() => {
+  const enterTime = Date.now();
+  return () => {
+    const durationMs = Date.now() - enterTime;
+    axios.post('/api/interaction/', {
+      product: productId,
+      interaction_type: 'view',
+      duration_ms: durationMs
+    });
+  };
+}, [productId]);
+\end{lstlisting}
+
+Drobne zmiany, kilka godzin pracy. Może być wyłączone feature flagiem \code{REACT\_APP\_TRACK\_DWELL=true} w produkcji.
+
+\subsection{Panel diagnostyczny eksperymentów (opcjonalnie)}
+
+W panelu admina dodać kartę \textbf{,,Eksperymenty''} w \code{frontend/src/components/AdminPanel/}:
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item Lista zdefiniowanych eksperymentów (z \code{ExperimentRun.experiment\_id})
+  \item Wykres porównawczy NDCG@10 dla wybranego zbioru
+  \item Eksport do CSV
+  \item Przycisk ,,Uruchom'' wyzwalający Django management command w tle
+\end{itemize}
+
+To opcjonalne --- eksperymenty można uruchamiać z terminala. Panel UI dodaje wartości jeśli promotor chce widzieć demo na obronie.
+
+% =====================================================================
+\section{Tabelaryczne porównanie tematów}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{Y Y Y}
+\toprule
+\textbf{Aspekt} & \textbf{Olko (Konfig. A)} & \textbf{Smoła (Konfig. B)} \\
+\midrule
+Tytuł skrócony & Hybrydy + LLM & Segmentacja + IT2-FLS \\
+Bazuje na & CF / Sentyment / Apriori & CBF / Fuzzy / Probabilistic \\
+Główne pytanie & Czy fuzja + LLM > klasyka? & Czy segmenty + IT2-FLS > globalna T1? \\
+Liczba hipotez & 4 & 5 \\
+Liczba eksperymentów & $\sim$95 & $\sim$75 \\
+Najtrudniejszy element & Dobór rozmiaru modelu LLM i czasu inferencji \textbf{wyłącznie na laptopie} (M3 Pro) & Implementacja IT2-FLS dla 3 wymiarów \\
+Wymagania sprzętowe & \textbf{Własny} MacBook Pro M3 Pro (brak GPU/klastra na uczelni); ewentualnie zwężenie eksperymentu & Standardowy laptop, IT2-FLS jest CPU-bound \\
+Ryzyka & Hallucinations LLM, długi czas inferencji & Złożoność defuzy KM, czasochłonny grid search wag \\
+Wsparcie literaturowe & bardzo dobre (Da'u 2025, Bao 2023, Wu 2024) & dobre (Mendel 2017, Karnik--Mendel 2001) \\
+Stanowisko promotora & LLM ,,interesujące, na topie'' + kombinacja ,,dobra ścieżka'' & IT2-FLS ,,moja propozycja'' + segmentacja ,,warto'' \\
+\bottomrule
+\end{tabularx}
+\caption{Porównanie tematów Olko vs Smoła.}
+\end{table}
+
+% =====================================================================
+\section{Harmonogram realizacji (12 miesięcy)}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{c Y Y Y Y}
+\toprule
+\textbf{Mies.} & \textbf{Kamień milowy} & \textbf{Wspólne} & \textbf{Olko} & \textbf{Smoła} \\
+\midrule
+1 & Infrastruktura & seed\_research v1, ExperimentRun, metrics module & --- & --- \\
+2 & Refactor metod & adaptery \code{BaseRecommender} & CF/Sent/Apr $\to$ Recommender & CBF/Fuzzy/Prob $\to$ Recommender \\
+3 & Baseline & --- & E1.* (single) & E1.* (single) \\
+4--5 & Główne metody & --- & Fuzja + LLM channel & Segmentacja + IT2-FLS \\
+6--7 & Eksperymenty & --- & E2.*, E3.* & E2.*, E3.* \\
+8 & Analiza statystyczna & wspólne testy Friedman & wykresy synergii & wykresy CI vs error \\
+9--10 & Pisanie pracy & --- & rozdziały 1--7 & rozdziały 1--7 \\
+11 & Dopracowanie & --- & review koleżeńskie & review koleżeńskie \\
+12 & Obrona & --- & --- & --- \\
+\bottomrule
+\end{tabularx}
+\caption{Harmonogram pracy magisterskiej dla obu autorów.}
+\end{table}
+
+% =====================================================================
+\section{Ryzyka i plany awaryjne}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{Y c Y}
+\toprule
+\textbf{Ryzyko} & \textbf{Prawdop.} & \textbf{Plan B} \\
+\midrule
+LLM nie chce się uruchomić lokalnie (Olko) & niskie & Mniejszy model (7B), krótszy kontekst, mniejsza próba testowa; ewentualnie dłuższy czas batcha w nocy na M3 Pro \\
+pyit2fls okazuje się buggy (Smoła) & niskie & Implementacja własna IT2-FLS na NumPy + Karnik--Mendel z literatury \\
+Dane są zbyt mało zróżnicowane & niskie & Zwiększenie skali seedera do 500 użytkowników, dodanie person \\
+Eksperymenty trwają zbyt długo & średnie & Próbkowanie testowe 50\% użytkowników, zwężenie CV \\
+Promotor zmienia zdanie co do podziału & niskie & Konfiguracja modułowa --- każdy temat samodzielny \\
+\bottomrule
+\end{tabularx}
+\caption{Ryzyka i plany awaryjne.}
+\end{table}
+
+% =====================================================================
+\section{Założenia środowiskowe --- część LLM (Olko), ustalone przez autora}
+
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Brak zaplecza na uczelni} (GPU, klaster) --- całość eksperymentów z udziałem LLM jest realizowana na \textbf{własnym laptopie MacBook Pro M3 Pro}.
+  \item \textbf{Modele wyłącznie lokalne i otwarte} (priorytet: \textbf{Bielik} i ewentualnie inne open-weight przez Ollama) --- \textbf{bez} komercyjnych API (GPT-4 itd.) jako podstawy pracy. Uzasadnienie wobec promotora: \textbf{reprodukowalność} (ustalone środowisko), \textbf{brak kosztów tokenów}, \textbf{polski model} jako świadomy wkład merytoryczny, pełna kontrola nad wersją wag i seedem eksperymentu.
+  \item API płatne można wymienić w pracy wyłącznie jako teoretyczną alternatywę porównawczą, nie jako plan realizacji.
+\end{itemize}
+
+% =====================================================================
+\section{Pytania do uzgodnienia z promotorem}
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item Czy akceptowalna jest \textbf{pula tematów} z sekcji~\ref{sec:katalog}, a jako głęboki szablon realizacji --- przykładowy wariant z sekcji~\ref{sec:deep-dive} (Olko: LLM + kombinacja; Smoła: segmentacja + IT2-FLS), ewentualnie zamiana na inną parę pozycji z katalogu?
+  \item Czy promotor przewiduje publikację wyników (artykuł na konferencję, np.\ PP-RAI, FedCSIS)? Wpłynie to na język pisania (pl/en) i staranność eksperymentu.
+  \item Czy rozszerzyć UI o panel diagnostyczny eksperymentów (przyciski ,,Uruchom E1.1'', live preview wyników) czy zostać przy management commands z terminala?
+  \item Jaka jest minimalna i maksymalna oczekiwana objętość pracy magisterskiej (liczba stron) w Pani/Pana wymaganiach?
+\end{enumerate}
+
+\vspace{2cm}
+\begin{center}
+\rule{0.6\textwidth}{0.4pt}\\
+\textit{\small Dokument przygotowany jako finalna rekomendacja po analizie istniejącej bazy kodu, korespondencji z promotorem oraz dwóch wcześniejszych dokumentów propozycji. Wszystkie wskazane interwencje w kodzie zostały zweryfikowane na obecnej strukturze projektu.}
+\end{center}
+
+\end{document}

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir c:\\\\Users\\\\poczt\\\\Desktop\\\\SmartRecommender-Project-Django-React /a)",
+      "PowerShell(Get-ChildItem frontend/src/pages, frontend/src/components, frontend/src/context, frontend/src/utils, frontend/src/config -Force -Depth 1 | Where-Object { -not $_.PSIsContainer } | Select-Object Directory, Name, Length | Format-Table -AutoSize)",
+      "Bash(where pdflatex *)",
+      "Bash(python -c \"import reportlab\")",
+      "Bash(python -c \"import weasyprint\")",
+      "Bash(where pandoc *)",
+      "Bash(where xelatex *)",
+      "Bash(where wkhtmltopdf *)",
+      "Bash(pip install *)"
+    ]
+  }
+}
