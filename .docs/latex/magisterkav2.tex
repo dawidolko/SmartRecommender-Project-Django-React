@@ -1,0 +1,802 @@
+% =============================================================================
+%  Propozycje tematów pracy magisterskiej
+%  Autor: Dawid Olko (przy współpracy z Piotrem Smołą)
+%
+%  Kompilacja:
+%    XeLaTeX  (zalecane — pozwala użyć Carlito/Calibri):
+%        xelatex propozycje.tex
+%        xelatex propozycje.tex   % drugi przebieg dla spisu treści
+%
+%    pdfLaTeX (bez Carlito — fallback na Latin Modern):
+%        zakomentuj blok \usepackage{fontspec} i odkomentuj sekcję pdfLaTeX
+%        pdflatex propozycje.tex
+%        pdflatex propozycje.tex
+% =============================================================================
+
+\documentclass[12pt,a4paper]{article}
+
+% ----- Język polski -----
+\usepackage{polski}
+\usepackage[utf8]{inputenc}        % nieszkodliwe pod XeLaTeX, kluczowe pod pdfLaTeX
+\usepackage[T1]{fontenc}
+
+% ----- Marginesy, układ -----
+\usepackage[a4paper,left=2.2cm,right=2.2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.15}                   % lekko rozluźnione interlinie
+
+% ----- Pakiety pomocnicze -----
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks,colorlinks=true,linkcolor=primary,urlcolor=primary]{hyperref}
+\usepackage{microtype}
+
+% ----- Kolory -----
+\definecolor{primary}{HTML}{1F3A5F}
+\definecolor{accent}{HTML}{C0392B}
+\definecolor{lightbg}{HTML}{F4F6FA}
+\definecolor{border}{HTML}{CCCCCC}
+\definecolor{greytxt}{HTML}{555555}
+\definecolor{greenacc}{HTML}{27AE60}
+\definecolor{purpleacc}{HTML}{8E44AD}
+
+% ----- Style sekcji -----
+\titleformat{\section}
+    {\color{primary}\Large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}
+    {\color{primary}\large\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}
+    {\color{primary}\normalsize\bfseries}{\thesubsubsection}{0.4em}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.5em}
+\titlespacing*{\subsubsection}{0pt}{0.9em}{0.3em}
+
+% Akapit
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+% Listy
+\setlist[itemize]{leftmargin=1.4em,topsep=0.2em,itemsep=0.2em}
+\setlist[enumerate]{leftmargin=1.6em,topsep=0.2em,itemsep=0.2em}
+
+% =============================================================================
+%  Pomocnicze polecenia
+% =============================================================================
+
+% Nagłówek tematu z badżem źródła (autorski / wspólny / promotor)
+%   #1 = numer i autor (np. "Temat D1 — Dawid"),  #2 = źródło, #3 = tytuł
+\newcommand{\topicheader}[3]{%
+    \begin{tcolorbox}[
+        colback=primary,colframe=primary,
+        boxrule=0pt,arc=0pt,
+        left=8pt,right=8pt,top=4pt,bottom=4pt,
+        before skip=0.6em, after skip=0.4em
+    ]
+    \color{white}\bfseries #1 \hfill \normalfont\color{white}Źródło: #2
+    \end{tcolorbox}
+    \subsection*{#3}
+    \addcontentsline{toc}{subsection}{#3}
+}
+
+% Tabela "stack technologiczny" (lista par: nazwa | opis)
+% Używamy booktabs-like cienkich linii dla czystszego wyglądu
+\newenvironment{stacktab}{%
+    \arrayrulecolor{border}%
+    \begin{tabular}{|>{\columncolor{lightbg}\bfseries\color{primary}\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{12cm}|}
+    \hline
+}{%
+    \end{tabular}%
+    \arrayrulecolor{black}%
+}
+
+% Wiersz tabeli stack — używasz w stacktab
+\newcommand{\stackrow}[2]{#1 & #2 \\ \hline}
+
+% Sekcja w opisie tematu (opis, implementacja, ...)
+\newcommand{\topicsection}[1]{\subsubsection*{#1}}
+
+% Box z literaturą — lekko wyróżniony
+\newenvironment{literatura}{%
+    \topicsection{Literatura}
+    \begin{itemize}[leftmargin=1.6em,labelsep=0.5em]
+}{%
+    \end{itemize}
+}
+
+% =============================================================================
+%  Strona tytułowa i metadane
+% =============================================================================
+
+\title{\color{primary}\Huge\bfseries Propozycje tematów pracy magisterskiej}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+\null\vspace*{4cm}
+\begin{center}
+{\color{primary}\Huge\bfseries Propozycje tematów pracy magisterskiej}\\[1.2em]
+{\color{greytxt}\Large Rozszerzenie pracy inżynierskiej:}\\[0.3em]
+{\color{greytxt}\Large System rekomendacji produktów oparty na metodach hybrydowych}\\[0.6em]
+{\color{greytxt}\large praca dwuosobowa: Dawid Olko \& Piotr Smoła}
+\end{center}
+
+\vspace{2.5cm}
+
+Niniejszy dokument zawiera zestawienie propozycji tematów pracy magisterskiej, stanowiących rozszerzenie wcześniejszej pracy inżynierskiej poświęconej hybrydowemu systemowi rekomendacji produktów. Praca inżynierska zaowocowała w pełni działającym systemem zintegrowanym w architekturze Django, Django REST Framework, React oraz PostgreSQL, integrującym dziewięć metod generowania rekomendacji opartych zarówno na danych jawnych (oceny, treści opinii) jak i ukrytych (interakcje użytkownika, historia zakupów). Praca magisterska ma rozszerzyć ten dorobek o warstwę badawczo-eksperymentalną.
+
+Praca realizowana będzie wspólnie przez dwie osoby. Każdy z dyplomantów otrzyma odrębny tytuł pracy oraz odrębne rozdziały, jednak wszyscy korzystają ze wspólnego repozytorium kodu, wspólnego badawczego zbioru danych oraz wspólnego pipeline’u ewaluacji offline. Naturalny podział wynika z pracy inżynierskiej: Dawid Olko prowadził w niej moduły filtracji kolaboratywnej, reguł asocjacyjnych oraz analizy sentymentu, zaś Piotr Smoła --- moduł filtracji opartej na zawartości, logiki rozmytej oraz część probabilistyczną. Tematy magisterskie zostały dobrane tak, aby utrzymać ten podział i jednocześnie zapewnić, że obie prace po scaleniu tworzą spójną, funkcjonalną całość.
+
+Dokument otwiera krótki przegląd zaimplementowanych metod oraz stanowiska promotora. Rozdział drugi opisuje wspólny fundament, który obie prace muszą wykonać jako pierwszy etap (poprawa seedera, ujednolicenie metryk, zapis wyników eksperymentów). Rozdziały trzeci i czwarty zawierają tematy autorskie po stronie obu dyplomantów, sformułowane tak, aby wzajemnie się uzupełniały. Rozdział piąty zestawia obowiązki w postaci tabeli, rozdział szósty zaś prezentuje trzy spójne konfiguracje połączonych tematów. Dokument zamyka lista pytań do dalszego przedyskutowania.
+
+\end{titlepage}
+
+% =============================================================================
+% 1. KONTEKST
+% =============================================================================
+
+\section{Kontekst i punkt wyjścia}
+
+Praca inżynierska zrealizowana wspólnie przez Dawida Olko i Piotra Smołę zaowocowała hybrydowym systemem rekomendacji produktów zaimplementowanym w architekturze Django wraz z Django REST Framework, frontendem w React oraz bazą PostgreSQL. System integruje dziewięć niezależnych metod generowania rekomendacji, operujących na różnorodnych typach danych --- od deklaratywnych ocen produktów po obserwowalne wzorce zachowań użytkowników. Każda z metod została zaimplementowana w sposób umożliwiający niezależne uruchomienie i diagnostykę, co stanowi solidną bazę do dalszych prac badawczych.
+
+\subsection*{Zaimplementowane metody rekomendacji}
+
+\begin{tabularx}{\linewidth}{|c|X|l|}
+\hline
+\rowcolor{primary}
+\textcolor{white}{\textbf{Lp.}} &
+\textcolor{white}{\textbf{Metoda}} &
+\textcolor{white}{\textbf{Charakter danych}} \\ \hline
+1 & Filtracja oparta na zawartości (TF-IDF, podobieństwo kosinusowe) & jawne, atrybuty \\ \hline
+2 & Filtracja kolaboratywna (Adjusted Cosine Similarity) & ukryte, transakcje \\ \hline
+3 & Wnioskowanie rozmyte typu Mamdani (logika rozmyta typu 1) & mieszane \\ \hline
+4 & Wyszukiwanie rozmyte (odległość Levenshteina) & tekst zapytań \\ \hline
+5 & Analiza sentymentu opinii (metoda leksykonowa) & tekst opinii \\ \hline
+6 & Łańcuchy Markowa (przejścia między produktami) & sekwencyjne \\ \hline
+7 & Klasyfikator naiwny Bayesa (predykcja zakupu) & mieszane \\ \hline
+8 & Reguły asocjacyjne (algorytm Apriori) & transakcje \\ \hline
+9 & Analiza sezonowości (komponent temporalny) & czasowe \\ \hline
+\end{tabularx}
+
+\subsection*{Założenie o dwuosobowości pracy}
+
+Praca będzie realizowana wspólnie przez dwóch dyplomantów (Piotr Smoła i Dawid Olko), którzy wykorzystają to samo repozytorium oraz tą samą bazy danych, ale każdy z nich zrealizuje odrębny temat magisterski. Potrzebne jest odpowiednie rozdzielenie odpowiedzialności -- elementy, które są wspólne (dane, metryki, infrastruktura badawcza), są wykonywane razem na początku, a rozwój własnych metod każdy dyplomant prowadzi w wydzielonym module. Dzięki temu prace po scaleniu nie kolidują ze sobą, a jednocześnie tworzą funkcjonalną całość, w której wyniki obu dyplomantów dają się porównać na tym samym fundamencie.
+
+% =============================================================================
+% 2. WSPÓLNY FUNDAMENT
+% =============================================================================
+
+\section{Fundament wspólny --- co należy poprawić zanim zaczną się badania}
+
+Bieżący stan repozytorium z pracy inżynierskiej, choć w pełni funkcjonalny jako system działający, wymaga kilku korekt zanim stanie się solidnym fundamentem do badań ilościowych. Korekty te są na tyle uniwersalne, że obaj dyplomanci muszą je wykonać wspólnie na początku pracy --- każdy z osobnych tematów magisterskich będzie później korzystać z tego samego, ujednoliconego fundamentu. Dzięki temu wyniki różnych eksperymentów zachowują porównywalność.
+
+\subsection*{Identyfikacja problemów obecnego stanu}
+
+\begin{tabularx}{\linewidth}{|>{\bfseries\color{primary}}p{4.5cm}|X|}
+\hline
+\rowcolor{lightbg}
+\textbf{\color{primary}Problem} & \textbf{\color{primary}Skutek dla badań} \\ \hline
+Mała liczba użytkowników, zamówienia i opinie generowane w dużej mierze losowo &
+Trudno wyciągnąć wnioski statystyczne; metody działające w oparciu o korelację (filtracja kolaboratywna, reguły asocjacyjne) nie mają wystarczającego materiału do nauki. \\ \hline
+Słabe pokrycie scenariusza ,,jawne kontra ukryte'' &
+Interakcje użytkownika rejestrowane są bez wyraźnego związku z faktycznym zakupem, co uniemożliwia rzetelne porównanie ścieżek profilowania użytkownika. \\ \hline
+Brak deterministycznego stanu wyjściowego &
+Po zwykłym uruchomieniu seedera nie ma gwarancji, że tabele pochodne (podobieństwa, reguły) są przeliczone w jednolity sposób --- każdy eksperyment startuje z innego stanu. \\ \hline
+Brak miejsca na wyniki eksperymentów &
+Metryki rozproszone w logach konsoli; brak możliwości wygodnego ich zestawienia, porównania, ponownego uruchomienia. \\ \hline
+Brak ujednoliconego protokołu ewaluacji &
+Promotor wymaga raportowania metryk jakości rekomendacji, a brak jest jednego modułu obliczającego je w spójny sposób dla wszystkich metod. \\ \hline
+\end{tabularx}
+
+\subsection*{Zakres prac wspólnych przed właściwymi badaniami}
+
+\begin{enumerate}
+\item \textbf{Badawczy generator danych (seed\_research).} Rozszerzenie obecnego seedera o parametryzowaną liczbę użytkowników, persony zakupowe (np. użytkownik gamingowy, biurowy, technologiczny, osoby kupujące głównie w promocjach), spójne koszyki tematyczne, oraz oś czasową zamówień rozpiętą na kilkanaście miesięcy. Stały seed liczbowy zapewnia powtarzalność wyników. Persony tworzą realistyczne wzorce, na których wszystkie dziewięć metod ma się czego ,,uczyć''.
+
+\item \textbf{Skorelowane interakcje implicit.} Generowanie zdarzeń typu wyświetlenie i kliknięcie produktu poprzedzających zakup, korelowanych z personą użytkownika. Niezbędne dla rzetelnego porównania ścieżki danych jawnych i danych ukrytych. Jeśli wybrane tematy obejmują pomiar czasu spędzonego na karcie produktu, wymagana jest dodatkowo migracja bazy o pole z czasem trwania interakcji oraz drobne rozszerzenie frontendu o wysyłanie tej wartości w momencie opuszczania strony.
+
+\item \textbf{Polecenie \texttt{prepare\_research\_db}.} Pojedyncza komenda Django wykonująca po seedzie zawsze ten sam zestaw przeliczeń tabel pochodnych: macierz podobieństw kolaboratywnych i opartych na zawartości, reguły asocjacyjne, agregaty sentymentu, profile sezonowe. Gwarantuje to, że każdy eksperyment startuje z identycznego, w pełni przygotowanego stanu bazy.
+
+\item \textbf{Model \texttt{ExperimentRun}.} Migracja dodająca tabelę przechowującą metadane uruchomionego eksperymentu (data, identyfikator konfiguracji, wartości metryk) oraz powiązane wiersze szczegółowych wyników. Alternatywnie zapis do plików CSV w wydzielonym katalogu --- prostsze w implementacji, równie skuteczne dla potrzeb pracy magisterskiej.
+
+\item \textbf{Wspólny moduł metryk.} Pojedyncze miejsce w kodzie obliczające metryki Precision@K, Recall@K oraz nDCG@K, korzystające z ustalonego raz na zawsze podziału temporalnego (np. ostatnie dwadzieścia procent czasu jako zbiór testowy). Wartość parametru K jest również stała dla całej pracy. Każda metoda i każdy eksperyment muszą korzystać z tego samego modułu --- inaczej liczby z dwóch prac nie będą porównywalne.
+\end{enumerate}
+
+Te pięć elementów stanowi fundament. Bez ich wykonania jakikolwiek temat właściwy nie ma sensu jako praca badawcza, ponieważ wyniki nie byłyby ani powtarzalne, ani rzetelnie porównywalne. Z drugiej strony fundament ten, raz dobrze zbudowany, służy obu pracom magisterskim oraz wszelkim ich rozszerzeniom.
+
+\newpage
+
+% =============================================================================
+% 3. TEMATY DAWIDA
+% =============================================================================
+
+\section{Tematy dla Dawida (filtracja kolaboratywna, reguły asocjacyjne, sentyment)}
+
+Tematy w tej sekcji zostały dobrane tak, aby naturalnie kontynuować wkład Dawida w pracy inżynierskiej. Wszystkie zakładają, że fundament wspólny (rozdział drugi) jest już wykonany.
+
+% ------- TEMAT D1: Łączenie metod ----------------------------------------------
+\topicheader{Temat D1 --- Dawid}{autorski}{Łączenie metod rekomendacji a metody pojedyncze --- analiza synergii}
+
+\topicsection{Opis tematu}
+Centralny temat zaakceptowany przez promotora jako jedna z głównych ścieżek pracy. Polega na systematycznym porównaniu jakości rekomendacji generowanych przez metody działające w izolacji oraz przez ich kombinacje uzyskane prostymi technikami fuzji rankingów. Punktem wyjścia są trzy metody Dawida (filtracja kolaboratywna, reguły asocjacyjne, kanał oparty na opiniach i sentymencie) oraz dodatkowo wynik popularnościowy jako prosta linia bazowa. Badanie odpowiada na pytania: czy łączenie metod daje stabilny zysk, które pary metod uzupełniają się, a które konkurują, oraz która strategia fuzji jest najskuteczniejsza w typowych warunkach.
+
+\topicsection{Zakres prac implementacyjnych}
+Pierwszym krokiem jest ujednolicenie formatu wyjściowego rankingów ze wszystkich trzech metod, co umożliwi ich łączenie. Następnie powstaje moduł fuzji oferujący trzy klasyczne strategie: Reciprocal Rank Fusion, głosowanie Borda oraz ważoną średnią rankingu. Wagi w wariancie ważonym strojone są walidacyjnie. Wszystkie metody i wszystkie ich kombinacje oceniane są na tym samym wspólnym pipelinie ewaluacji (rozdział drugi), na tym samym podziale temporalnym, według tych samych metryk. Wyniki zapisywane są do tabeli eksperymentów lub plików CSV, co umożliwia łatwą analizę porównawczą i wizualizację.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Backend}{Django, Django REST Framework (środowisko bazowe)}
+\stackrow{Numeryka}{NumPy, SciPy, scikit-learn}
+\stackrow{Eksperymenty}{Jupyter Notebook, pandas, matplotlib, seaborn}
+\stackrow{Tracking}{własna tabela \texttt{ExperimentRun} lub eksport CSV; opcjonalnie MLflow}
+\stackrow{Analiza statystyczna}{\texttt{scipy.stats} --- testy nieparametryczne (Wilcoxon, Friedman)}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Większość prac w obszarze hybrydowych systemów rekomendacji bada kombinacje filtracji opartej na zawartości i filtracji kolaboratywnej. Niniejsze badanie systematycznie obejmuje również reguły asocjacyjne oraz sygnał sentymentu, co rzadziej pojawia się w literaturze. Wkład pracy obejmuje empiryczne porównanie trzech strategii fuzji w jednolitym protokole, identyfikację par metod o efekcie synergii oraz par o efekcie konkurencji, a także otwartą implementację umożliwiającą reprodukcję wyników.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: kombinacja co najmniej dwóch metod osiąga lepsze wyniki w metryce nDCG@K niż każda z metod pojedynczo i niż prosta linia popularnościowa. Hipoteza H2: Reciprocal Rank Fusion daje stabilniejsze wyniki niż średnia ważona w warunkach niejednorodnej skali ocen pochodzących z różnych metod. Hipoteza H3: dodanie sygnału sentymentu do kombinacji filtracji kolaboratywnej i reguł asocjacyjnych poprawia wynik tylko w segmencie produktów z bogatą bazą opinii.
+
+\topicsection{Plan eksperymentu}
+Uruchomienie wszystkich pojedynczych metod oraz wszystkich kombinacji dwu- i trójelementowych z trzema strategiami fuzji. Pomiar metryk Precision@K, nDCG@K oraz pokrycia katalogu na zbiorze testowym. Test Friedmana dla porównania metod globalnie, test Wilcoxona dla par metoda kontra kombinacja zawierająca tę metodę. Wizualizacja w postaci wykresów słupkowych z przedziałami ufności oraz heatmapy synergii dla par metod.
+
+\begin{literatura}
+\item Burke, R. (2002). Hybrid Recommender Systems: Survey and Experiments. \textit{User Modeling and User-Adapted Interaction}, 12(4), 331--370.
+\item Cormack, G. V., Clarke, C. L. A. \& Buettcher, S. (2009). Reciprocal Rank Fusion outperforms Condorcet and individual rank learning methods. \textit{SIGIR '09}.
+\item Çano, E. \& Morisio, M. (2017). Hybrid recommender systems: A systematic literature review. \textit{Intelligent Data Analysis}, 21(6), 1487--1524.
+\item Sarwar, B., Karypis, G., Konstan, J. \& Riedl, J. (2001). Item-based collaborative filtering recommendation algorithms. \textit{WWW '01}.
+\item Ricci, F., Rokach, L. \& Shapira, B. (red., 2022). \textit{Recommender Systems Handbook}, wyd. 3. Springer.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT D2: LLM ---------------------------------------------------------
+\topicheader{Temat D2 --- Dawid}{autorski}{LLM otwarto-źródłowe a klasyczne metody rekomendacji --- analiza po stronie treści}
+
+\topicsection{Opis tematu}
+Promotor wskazał ten temat jako szczególnie interesujący ze względu na aktualność problematyki. Po stronie Dawida temat skupia się na warstwie merytorycznej: budowa promptu, projekt protokołu pojedynczego zapytania, dobór modeli otwarto-źródłowych oraz ocena jakości wyjścia. Po stronie Piotra (temat P4) leży integracja techniczna --- serwis wywołań, obsługa limitów tokenów, walidacja identyfikatorów produktów, pomiar czasu odpowiedzi. Tematy dyplomantów spotykają się we wspólnym module ewaluacji.
+
+\topicsection{Zakres prac implementacyjnych}
+Powstaje moduł rekomendacji oparty na modelu LLM, składający się z trzech podstawowych klas. Pierwsza odpowiada za ranking metodą prompting --- model otrzymuje historię zakupów użytkownika, listę produktów-kandydatów (np. zwężoną przez filtrację opartą na zawartości, aby model nie musiał przeszukiwać całego katalogu) oraz instrukcję o oczekiwanym formacie odpowiedzi. Druga klasa generuje reprezentacje wektorowe opisów produktów oraz treści opinii i odpowiada na zapytania semantyczne. Trzecia klasa stanowi pipeline Retrieval-Augmented Generation, w którym kontekst wzbogacany jest powiązanymi opiniami i specyfikacją techniczną. Wszystkie trzy klasy korzystają wyłącznie z modeli otwarto-źródłowych, co zapewnia pełną reprodukowalność.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{LLM uniwersalne (open-source)}{Llama 4 Scout (109B), Mistral Large (Apache 2.0), Qwen 3.5, GLM-5.1 (MIT), DeepSeek V4 Flash}
+\stackrow{LLM lokalne}{Mistral Small 4 (24B), Gemma 4 (27B), Phi-4 (14B) --- działają na pojedynczej karcie GPU}
+\stackrow{LLM polskojęzyczne}{Bielik v3 (7B i 11B, SpeakLeash, Apache 2.0), PLLuM (8B--70B, OPI/HIVE)}
+\stackrow{Reprezentacje wektorowe}{sentence-transformers, multilingual BGE/E5}
+\stackrow{Baza wektorowa}{Qdrant lub ChromaDB w trybie lokalnym}
+\stackrow{Framework RAG}{LangChain lub LlamaIndex}
+\stackrow{Inferencja}{vLLM, Ollama, Hugging Face Transformers}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje cztery elementy. Po pierwsze, systematyczne porównanie modeli LLM różnej skali z metodami klasycznymi na tym samym zbiorze danych e-commerce. Po drugie, analiza kompromisu między jakością rekomendacji a kosztem obliczeniowym. Po trzecie, ocena współczynnika halucynacji --- częstości, z jaką model rekomenduje produkty nieistniejące w katalogu lub przypisuje im fałszywe atrybuty. Po czwarte, badanie wpływu języka na jakość rekomendacji, w tym ocena polskich modeli Bielik i PLLuM, których obecność w literaturze rekomendacyjnej jest minimalna.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: model LLM operujący na liście kandydatów dostarczonej przez prostą metodę zwężającą daje wyższe nDCG@K niż ta metoda samodzielnie. Hipoteza H2: jakość rekomendacji rośnie wraz ze wzrostem skali modelu, ale punkt nasycenia leży poniżej największych dostępnych modeli. Hipoteza H3: model Bielik v3 11B operujący na polskich opisach osiąga jakość niegorszą niż wielokrotnie większe modele uniwersalne, przy znacząco niższym koszcie. Hipoteza H4: pipeline RAG zmniejsza halucynacje w stosunku do prostego promptingu, ale podnosi opóźnienie odpowiedzi.
+
+\topicsection{Plan eksperymentu}
+Przygotowanie zbioru reprezentatywnych zapytań rekomendacyjnych wynikających z bazy. Generacja rekomendacji przez wybrane modele otwarto-źródłowe (od czterech do sześciu) i przez wszystkie metody klasyczne wraz z wybranymi hybrydami. Pomiar tych samych metryk co w temacie D1, dodatkowo: współczynnika halucynacji, średniego opóźnienia, kosztu zasobowego. Ocena ekspercka na próbie kontrolnej, zapewniająca walidację jakościową obok metryk ilościowych.
+
+\begin{literatura}
+\item Wu, L. et al. (2024). A Survey on Large Language Models for Recommendation. \textit{arXiv:2305.19860}.
+\item Hou, Y. et al. (2024). Large Language Models are Zero-Shot Rankers for Recommender Systems. \textit{ECIR '24}.
+\item Bao, K. et al. (2023). TALLRec: An Effective and Efficient Tuning Framework to Align Large Language Model with Recommendation. \textit{RecSys '23}.
+\item Lewis, P. et al. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. \textit{NeurIPS}.
+\item Ociepa, K. et al. (2026). Advancing Polish Language Modeling through Tokenizer Optimization in the Bielik v3 7B and 11B Series. \textit{arXiv:2604.10799}.
+\item Trybus, A., Bartnicki, B. \& Kinas, R. (2026). Making Bielik LLM Reason (Better): A Field Report. \textit{arXiv:2603.10640}.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT D3: Dane jawne --------------------------------------------------
+\topicheader{Temat D3 --- Dawid}{autorski}{Jakość rekomendacji oparta na danych jawnych --- ocena profilu opiniowo-sentymentowego}
+
+\topicsection{Opis tematu}
+Klasyczne pytanie systemów rekomendacji: ile można osiągnąć, opierając profil użytkownika wyłącznie na deklaratywnych źródłach informacji (oceny, treść opinii, agregaty sentymentu), bez sięgania po jego obserwowalne zachowania? Temat ten naturalnie spotyka się z tematem P3 Piotra, w którym zostanie zbudowany odpowiednik oparty wyłącznie na danych ukrytych. Dzięki temu obie prace dadzą jednoznaczną, ilościową odpowiedź na pytanie, który typ sygnału jest wartościowszy w warunkach typowego e-commerce, oraz w jakim segmencie użytkowników ta przewaga jest największa.
+
+\topicsection{Zakres prac implementacyjnych}
+Powstaje moduł budujący profil użytkownika wyłącznie na podstawie wystawionych ocen, treści opinii oraz agregatów sentymentu wyliczonych w temacie inżynierskim. Profil jest wykorzystywany przez ranker, który dla każdego użytkownika i każdego produktu kandydata oblicza spójność preferencji. Implementowane są trzy warianty rankera: oparty wyłącznie na ocenach, wzbogacony o sentyment, oraz hybrydowy z wagą strojoną walidacyjnie. Ewaluacja prowadzona jest tym samym pipelinem co reszta pracy. Wyniki tematu zestawiane są bezpośrednio z wynikami tematu P3, gdzie identyczna procedura jest stosowana do profilu zbudowanego z danych ukrytych.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Backend}{Django (środowisko bazowe), nowy moduł rankerów}
+\stackrow{Numeryka}{NumPy, scikit-learn, pandas}
+\stackrow{Analiza}{matplotlib, seaborn}
+\stackrow{Statystyka}{\texttt{scipy.stats} --- sparowane testy Wilcoxona dla porównania z tematem P3}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje sparowany eksperyment na tych samych użytkownikach, w tych samych warunkach, dający rygorystyczną odpowiedź na pytanie o względną wartość danych jawnych. Drugi element to analiza segmentowa --- czy dane jawne są przydatniejsze dla użytkowników aktywnie wystawiających opinie i mniej skuteczne dla użytkowników milczących. Trzeci element to krzywa gęstość-jakość, czyli wykres pokazujący, jak rośnie jakość rekomendacji wraz z liczbą wystawionych ocen na jednego użytkownika --- mocny wynik o znaczeniu biznesowym.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: dla użytkowników z więcej niż dwudziestoma wystawionymi ocenami profil oparty na danych jawnych daje wyższą metrykę nDCG@K niż profil oparty na danych ukrytych. Hipoteza H2: dla użytkowników z mniej niż pięcioma ocenami przewaga przesuwa się w stronę danych ukrytych --- dane deklaratywne są zbyt rzadkie, aby skutecznie modelować preferencje. Hipoteza H3: hybrydowy ranker łączący oba sygnały przewyższa każdy wariant samodzielny przy odpowiednim doborze wag.
+
+\topicsection{Plan eksperymentu}
+Implementacja trzech wariantów rankera. Podział użytkowników na pięć segmentów według gęstości deklaratywnego sygnału. Pomiar metryk Precision@K, nDCG@K oraz pokrycia osobno w każdym segmencie. Sparowane porównanie z wynikami tematu P3 (Piotr). Wykreślenie krzywej jakość-liczba sygnałów. Końcowa rekomendacja biznesowa: jaki rodzaj sygnału opłaca się pozyskiwać priorytetowo na danym etapie rozwoju katalogu.
+
+\begin{literatura}
+\item Hu, Y., Koren, Y. \& Volinsky, C. (2008). Collaborative Filtering for Implicit Feedback Datasets. \textit{ICDM}.
+\item Jawaheer, G., Szomszor, M. \& Kostkova, P. (2010). Comparison of implicit and explicit feedback from an online music recommendation service. \textit{HetRec '10}.
+\item Oard, D. W. \& Kim, J. (1998). Implicit feedback for recommender systems. \textit{AAAI Workshop}.
+\item Pang, B. \& Lee, L. (2008). Opinion Mining and Sentiment Analysis. \textit{Foundations and Trends in Information Retrieval}, 2(1-2), 1--135.
+\item Lerche, L., Jannach, D. \& Ludewig, M. (2016). On the Value of Reminders within E-Commerce Recommendations. \textit{UMAP '16}.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT D4: Skalowalność CF + Apriori -----------------------------------
+\topicheader{Temat D4 --- Dawid}{autorski}{Skalowalność filtracji kolaboratywnej i reguł asocjacyjnych --- identyfikacja wąskich gardeł}
+
+\topicsection{Opis tematu}
+Aspekt inżyniersko-badawczy. Praca inżynierska potwierdziła, że filtracja kolaboratywna i reguły asocjacyjne działają, jednak nie odpowiedziała na pytanie, jak ich koszt obliczeniowy zachowuje się przy rosnącej liczbie użytkowników, produktów i transakcji. Temat ten pokrywa metody Dawida i jest świadomie zrównoważony z tematem P5 Piotra, który dotyczy skalowalności metod typowych dla jego strony --- filtracji opartej na zawartości oraz logiki rozmytej. Dzięki temu po scaleniu obu prac powstaje pełny obraz wąskich gardeł całego systemu.
+
+\topicsection{Zakres prac implementacyjnych}
+Powstaje moduł benchmarkowy generujący syntetyczne zbiory danych w sześciu skalach, od kilkuset do kilkudziesięciu tysięcy użytkowników i produktów. Generator korzysta z tego samego mechanizmu person co badawczy seed, aby dane były realistyczne. Dla każdej skali mierzony jest czas pełnego przeliczenia macierzy podobieństw kolaboratywnych i czas wyznaczenia reguł asocjacyjnych algorytmem Apriori, a także zużycie pamięci. Profilowanie szczegółowe identyfikuje funkcje odpowiedzialne za większość kosztu. Następnie implementowane są wybrane optymalizacje (macierze rzadkie, FP-Growth jako alternatywa Apriori, indeksowanie wybranych pól w bazie) i ponawiany jest pomiar.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Profilowanie}{cProfile, line\_profiler, memory\_profiler}
+\stackrow{Profilowanie bazy}{django-debug-toolbar, PostgreSQL EXPLAIN ANALYZE}
+\stackrow{Macierze rzadkie}{\texttt{scipy.sparse} (CSR, COO)}
+\stackrow{Algorytmy reguł}{\texttt{mlxtend.frequent\_patterns} (Apriori, FP-Growth)}
+\stackrow{Wizualizacja}{matplotlib --- wykresy log-log, Plotly}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje empiryczne krzywe skalowalności dla dwóch klasycznych metod, identyfikację dominujących źródeł kosztu obliczeniowego oraz ilościowe wykazanie zysku z wybranych optymalizacji. W połączeniu z wynikami tematu P5 daje pełną mapę wydajności wszystkich kluczowych metod systemu, co stanowi materiał o wyraźnej wartości zastosowanej dla każdego inżyniera wdrażającego tego typu system w środowisku produkcyjnym.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: empiryczna złożoność filtracji kolaboratywnej rośnie kwadratowo w liczbie użytkowników, ale przy zastosowaniu macierzy rzadkich efektywny koszt obniża się o rząd wielkości. Hipoteza H2: algorytm Apriori przy parametrach domyślnych ulega degradacji wykładniczej powyżej pewnego progu, podczas gdy FP-Growth utrzymuje wydajność. Hipoteza H3: w typowych konfiguracjach bazy dominującym kosztem nie jest obliczenie samej macierzy, lecz operacje wejścia-wyjścia związane z odczytem danych --- co implikuje większą wartość indeksowania niż optymalizacji algorytmicznej.
+
+\topicsection{Plan eksperymentu}
+Sześć skal danych razy dwie metody, każda mierzona pięciokrotnie z raportowaniem mediany. Wykresy log-log i wyznaczenie empirycznego wykładnika złożoności. Profilowanie szczegółowe na największej skali, identyfikacja trzech najkosztowniejszych funkcji. Implementacja optymalizacji i ponowny pomiar. Tabela podsumowująca: złożoność teoretyczna, złożoność empiryczna, czas przed optymalizacją, czas po optymalizacji, zysk procentowy.
+
+\begin{literatura}
+\item Han, J., Pei, J. \& Yin, Y. (2000). Mining frequent patterns without candidate generation (FP-Growth). \textit{SIGMOD}.
+\item Linden, G., Smith, B. \& York, J. (2003). Amazon.com recommendations: item-to-item collaborative filtering. \textit{IEEE Internet Computing}, 7(1), 76--80.
+\item Karypis, G. (2001). Evaluation of Item-Based Top-N Recommendation Algorithms. \textit{CIKM}.
+\item Sarwar, B., Karypis, G., Konstan, J. \& Riedl, J. (2002). Recommender Systems for Large-scale E-Commerce: Scalable Neighborhood Formation. \textit{ICCIT}.
+\item Agrawal, R. \& Srikant, R. (1994). Fast algorithms for mining association rules. \textit{VLDB}.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT D5: Cold-start --------------------------------------------------
+\topicheader{Temat D5 --- Dawid}{autorski}{Zachowanie metod w warunkach niedostatku danych --- analiza scenariuszy cold-start}
+
+\topicsection{Opis tematu}
+Zagadnienie pomocnicze, możliwe do potraktowania jako temat samodzielny lub jako rozdział wspierający temat D1 lub D3. Polega na eksperymentalnym sprawdzeniu, jak metody Dawida (filtracja kolaboratywna, reguły asocjacyjne, sentyment) zachowują się w warunkach ograniczonego dostępu do danych --- dla nowych użytkowników, dla nowych produktów oraz w sytuacji obciętej historii zakupów. Pytanie badawcze: która metoda traci jakość najszybciej, a która utrzymuje rozsądny poziom rekomendacji nawet przy bardzo ubogiej historii.
+
+\topicsection{Zakres prac implementacyjnych}
+Implementacja generatora scenariuszy --- moduł losujący kontrolnie usuwanie ostatnich N transakcji wybranego użytkownika, usuwanie wszystkich opinii lub usuwanie produktu z bazy reguł asocjacyjnych. Każdy scenariusz testowany jest dla pięciu poziomów intensywności (od pełnej historii do braku jakichkolwiek danych). Trzy metody Dawida ewaluowane są na każdym scenariuszu, w tym samym pipelinie ewaluacji co reszta pracy.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Backend}{Django, nowy moduł generatora scenariuszy}
+\stackrow{Numeryka}{NumPy, pandas, scipy}
+\stackrow{Wizualizacja}{matplotlib, seaborn --- krzywe quality vs maturity}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje empiryczną mapę zachowania trzech metod w funkcji dostępności danych oraz konkretne wytyczne, kiedy warto przełączać się na metodę alternatywną w kontekście produkcyjnym. Wynik tematu D5 stanowi naturalne uzupełnienie tematu D1 lub D3 (jako rozdział uzupełniający), o ile promotor nie zaakceptuje go jako samodzielnego tematu.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: filtracja kolaboratywna degraduje się najszybciej --- już przy pięciu zachowanych transakcjach użytkownika wyniki są nieistotnie różne od losowych. Hipoteza H2: reguły asocjacyjne i sygnał popularnościowy zachowują rozsądną jakość najdłużej, ponieważ nie wymagają historii konkretnego użytkownika. Hipoteza H3: punkt równowagi, w którym filtracja kolaboratywna zaczyna bić proste fallbacki, leży w okolicach ośmiu transakcji.
+
+\topicsection{Plan eksperymentu}
+Pięć poziomów intensywności scenariusza razy trzy metody razy trzy typy cold-startu (nowy użytkownik, nowy produkt, obcięta historia). Pomiar tych samych metryk co w temacie D1. Krzywa jakość-dojrzałość dla każdej metody i każdego scenariusza. Identyfikacja punktów przejścia, w których jedna metoda przestaje być sensowna, a druga zaczyna dominować.
+
+\begin{literatura}
+\item Schein, A. I., Popescul, A., Ungar, L. H. \& Pennock, D. M. (2002). Methods and metrics for cold-start recommendations. \textit{SIGIR '02}.
+\item Lika, B., Kolomvatsos, K. \& Hadjiefthymiades, S. (2014). Facing the cold start problem in recommender systems. \textit{Expert Systems with Applications}, 41(4).
+\item Park, S.-T. \& Chu, W. (2009). Pairwise preference regression for cold-start recommendation. \textit{RecSys '09}.
+\item Sedhain, S., Sanner, S., Braziunas, D., Xie, L. \& Christensen, J. (2014). Social Collaborative Filtering for Cold-start Recommendations. \textit{RecSys '14}.
+\end{literatura}
+
+\newpage
+
+% =============================================================================
+% 4. TEMATY PIOTRA
+% =============================================================================
+
+\section{Tematy dla Piotra (filtracja oparta na zawartości, logika rozmyta, część probabilistyczna)}
+
+Tematy w tej sekcji pokrywają stronę pracy inżynierskiej prowadzoną dotychczas przez Piotra. Skonstruowane są tak, by tworzyć naturalną przeciwwagę dla tematów Dawida --- tam gdzie u Dawida są dane jawne, u Piotra są ukryte; tam gdzie u Dawida fuzja klasyczna, u Piotra meta-uczenie z kontekstem; tam gdzie u Dawida skalowalność metod transakcyjnych, u Piotra metod opartych na atrybutach. Dzięki tej symetrii obie prace składają się na jedną spójną opowieść o systemie.
+
+% ------- TEMAT P1: Sieć neuronowa łącząca 9 metod ------------------------------
+\topicheader{Temat P1 --- Piotr}{autorski}{Sieć neuronowa łącząca dziewięć metod rekomendacji z kontekstem użytkownika}
+
+\topicsection{Opis tematu}
+Naturalne rozwinięcie tematu D1 (klasyczne fuzje rankingów). Zamiast statycznego łączenia rankingów stosuje się uczoną sieć neuronową w roli meta-learnera. Wejściem sieci jest wektor dziewięciu znormalizowanych ocen (po jednej z każdej metody) wzbogacony o cechy kontekstowe użytkownika --- liczba interakcji, entropia kategorii zakupowych, średnia wartość zamówienia, segment przypisany w temacie P2. Wyjściem jest zagregowana ocena. Dodatkowy wymiar pracy stanowi analiza dominacji metod --- za pomocą metody SHAP możliwe jest pokazanie, które metody mają największy wpływ w konkretnych scenariuszach kontekstowych.
+
+\topicsection{Zakres prac implementacyjnych}
+Architektura sieci obejmuje wejście łączące dziewięć ocen z metod rekomendacji z cechami kontekstowymi, dwie do trzech warstw ukrytych typu Dense oraz warstwę wyjściową. Trening sieci odbywa się na danych historycznych, gdzie etykietą jest fakt rzeczywistego zakupu lub wysoka ocena. Po treningu wyznaczane są wartości SHAP dla każdej cechy wejściowej, co umożliwia globalną i lokalną interpretację dominacji metod. Powstaje dodatkowo cykliczne polecenie Django wyzwalające ponowny trening modelu przy aktualizacji bazy oraz nowy punkt końcowy API zwracający rekomendacje wygenerowane przez wytrenowaną sieć.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Deep Learning}{PyTorch 2.x oraz PyTorch Lightning}
+\stackrow{Modele referencyjne}{regresja liniowa oraz gradient boosting (XGBoost, LightGBM) jako proste meta-learnery}
+\stackrow{Tracking}{MLflow lub Weights \& Biases}
+\stackrow{Interpretowalność}{SHAP (atrybucja cech wejściowych), Captum}
+\stackrow{Wdrożenie}{ONNX Runtime lub TorchScript dla integracji z Django}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy elementy. Po pierwsze, stacking z mechanizmem kontekstowym, w którym wagi metod nie są stałe, lecz zależą od cech użytkownika i sytuacji. Po drugie, interpretowalna mapa dominacji metod oparta na wartościach SHAP, dająca konkretne wytyczne, w jakich segmentach która metoda przeważa. Po trzecie, empiryczne porównanie sieci neuronowej z prostszymi meta-learnerami (regresja, gradient boosting) i wyznaczenie progu, od którego złożoność sieci jest opłacalna.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: meta-learner neuronowy z kontekstem przewyższa najlepszą klasyczną fuzję z tematu D1 o co najmniej kilka procent w metryce nDCG@K. Hipoteza H2: gradient boosting jako prosty meta-learner osiąga ponad dziewięćdziesiąt procent jakości sieci neuronowej przy znacznie krótszym czasie treningu. Hipoteza H3: wartości SHAP wykazują systematyczne wzorce dominacji --- analiza sezonowości dominuje w okresie świątecznym, łańcuchy Markowa przy długich sesjach przeglądania, filtracja oparta na zawartości w segmentach niszowych.
+
+\topicsection{Plan eksperymentu}
+Przygotowanie zbioru treningowego zawierającego dla każdej historycznej pary użytkownik-produkt: dziewięć ocen z metod, cechy kontekstowe, etykietę zakupu. Trening trzech meta-learnerów (regresja liniowa, gradient boosting, sieć neuronowa). Porównanie z najlepszym wynikiem z tematu D1 jako klasyczną linią bazową. Analiza wartości SHAP --- generacja heatmap dominacji metod w funkcji segmentu i sezonu. Badanie ablacyjne --- iteracyjne usuwanie po jednej z dziewięciu metod z wejścia i pomiar spadku jakości.
+
+\begin{literatura}
+\item Wolpert, D. H. (1992). Stacked generalization. \textit{Neural Networks}, 5(2), 241--259.
+\item Vaswani, A. et al. (2017). Attention Is All You Need. \textit{NeurIPS}.
+\item He, X. et al. (2017). Neural Collaborative Filtering. \textit{WWW '17}.
+\item Cheng, H.-T. et al. (2016). Wide \& Deep Learning for Recommender Systems. \textit{DLRS '16}.
+\item Lundberg, S. M. \& Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. \textit{NeurIPS}.
+\item Tahmasebi, F., Meghdadi, M., Ahmadian, S. \& Valiallahi, K. (2021). A hybrid recommendation system based on stacking. \textit{Neural Computing and Applications}, 33, 13895--13909.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P2: Segmentacja użytkowników -----------------------------------
+\topicheader{Temat P2 --- Piotr}{autorski}{Segmentacja użytkowników metodami klasteryzacji i strategie rekomendacji per segment}
+
+\topicsection{Opis tematu}
+Klasyczne systemy rekomendacji traktują wszystkich użytkowników jednakowo. Praca proponuje podejście świadome segmentacji: najpierw użytkownicy grupowani są metodami klasteryzacji w segmenty zachowaniowe, a następnie dla każdego segmentu dobierana jest optymalna konfiguracja metod rekomendacji. Temat naturalnie współpracuje z tematem P1 --- segment przypisany użytkownikowi jest jedną z cech kontekstowych podawanych meta-learnerowi, a wyniki obu tematów składają się na całościowy obraz adaptacyjnego systemu rekomendacji.
+
+\topicsection{Zakres prac implementacyjnych}
+Pierwszym etapem jest inżynieria cech użytkowników --- agregacja wskaźników behawioralnych z istniejących modeli zamówień, interakcji i opinii. Powstaje wektor opisujący każdego użytkownika za pomocą cech takich jak średnia wartość zamówienia, częstotliwość zakupów, rozkład pory dnia, różnorodność kategorii (entropia), stosunek liczby opinii do liczby zamówień, średni sentyment opinii, współczynnik sezonowości. Drugim etapem jest klasteryzacja --- po standaryzacji cech i ewentualnej redukcji wymiarów stosowane są algorytmy K-Means (z analizą metody łokcia oraz wskaźnika Silhouette), DBSCAN (do wykrywania użytkowników nietypowych) oraz Gaussian Mixture Models. Trzecim etapem jest przypisanie każdemu segmentowi optymalnej konfiguracji metod, z wykorzystaniem wyników tematu D1. Powstaje również migracja modelu segmentu w bazie danych oraz cykliczne polecenie re-segmentacji.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Klasteryzacja}{scikit-learn (KMeans, DBSCAN, GaussianMixture)}
+\stackrow{Redukcja wymiarów}{scikit-learn PCA, biblioteka \texttt{umap-learn}}
+\stackrow{Wizualizacja}{matplotlib, seaborn, Plotly (rzuty 2D i 3D klastrów)}
+\stackrow{Walidacja klastrów}{Silhouette Score, Davies-Bouldin Index, Calinski-Harabasz Index}
+\stackrow{Pipeline}{Django management command, Celery dla cyklicznego przeliczania}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, automatyczne mapowanie segmentów użytkowników na konfiguracje silnika rekomendacji --- w literaturze segmentacja jest zazwyczaj deklaratywna (na przykład rozróżnienie nowych i powracających użytkowników), rzadko stosowana systemowo do wyboru metod. Po drugie, analiza stabilności klastrów w czasie. Po trzecie, badanie wrażliwości jakości rekomendacji na liczbę segmentów --- czy istnieje optymalne K, oraz jak silnie wynik zależy od jego doboru.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: strategia świadoma segmentacji przewyższa globalnie najlepszą konfigurację metod o ponad trzy procent w metryce nDCG@K. Hipoteza H2: optymalna liczba klastrów dla typowego zbioru e-commerce mieści się w przedziale od czterech do siedmiu, zgodnie z klasyczną segmentacją RFM (Recency, Frequency, Monetary). Hipoteza H3: DBSCAN identyfikuje mniej niż dziesięć procent użytkowników jako odstających, a użytkownicy ci charakteryzują się niższą jakością rekomendacji niezależnie od użytej metody --- stanowią naturalnie trudny przypadek dla systemów rekomendacji.
+
+\topicsection{Plan eksperymentu}
+Konstrukcja wektorowej reprezentacji wszystkich użytkowników. Klasteryzacja trzema algorytmami z różnymi parametrami. Wizualizacja klastrów wraz z interpretacją semantyczną każdego segmentu. Dla każdego klastra niezależnie wybór najlepszej konfiguracji metod (wykorzystanie wyników tematu D1). Test offline porównuje strategię świadomą segmentacji z konfiguracją globalną i z losowym przypisaniem. Test stabilności polega na ponownej segmentacji po wstrzyknięciu syntetycznych nowych interakcji oraz pomiarze odsetka użytkowników, którzy zmieniają segment.
+
+\begin{literatura}
+\item Macqueen, J. (1967). Some methods for classification and analysis of multivariate observations. \textit{Berkeley Symposium on Mathematical Statistics}.
+\item Ester, M., Kriegel, H.-P., Sander, J. \& Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases (DBSCAN). \textit{KDD}.
+\item Christakopoulou, K. \& Banerjee, A. (2018). Local Latent Space Models for Top-N Recommendation. \textit{KDD '18}.
+\item McInnes, L., Healy, J. \& Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. \textit{arXiv:1802.03426}.
+\item Aggarwal, C. C. (2016). \textit{Recommender Systems: The Textbook}, rozdział 13: Advanced Topics in Recommender Systems. Springer.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P3: Dane ukryte -------------------------------------------------
+\topicheader{Temat P3 --- Piotr}{autorski}{Jakość rekomendacji oparta na danych ukrytych --- profil z interakcji i czasu na karcie produktu}
+
+\topicsection{Opis tematu}
+Bezpośredni odpowiednik tematu D3 (Dawid). Polega na zbudowaniu profilu użytkownika wyłącznie z danych ukrytych --- przeglądnięć, kliknięć, dodań do koszyka, zakupów oraz opcjonalnie czasu spędzonego na karcie produktu. Metoda profilowania nie korzysta z deklaratywnych ocen ani treści opinii. Wyniki tematu zestawiane są z wynikami tematu D3 w jednym wspólnym module ewaluacji, dając ostateczną odpowiedź na pytanie o względną wartość obu typów sygnału.
+
+\topicsection{Zakres prac implementacyjnych}
+Powstaje moduł budujący profil użytkownika wyłącznie z modelu interakcji, z możliwością ważenia typów zdarzeń (przeglądnięcie ma mniejszą wagę niż dodanie do koszyka, które ma mniejszą wagę niż zakup). Opcjonalnie uwzględniany jest mechanizm decay --- nowsze interakcje mają większą wagę niż starsze. Jeśli wybrano wariant z czasem na karcie, wymagana jest migracja bazy o pole z czasem trwania zdarzenia oraz drobne rozszerzenie frontendu wysyłające ten czas przy opuszczaniu karty produktu. Powstaje również ranker analogiczny do tego z tematu D3, z trzema wariantami (tylko interakcje, interakcje z decay, interakcje z czasem). Ewaluacja prowadzona jest tym samym pipelinem co reszta pracy.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Backend}{Django, nowy moduł rankerów; rozszerzenie endpointu \texttt{log-interaction}}
+\stackrow{Frontend (przy wariancie z czasem)}{drobne rozszerzenie React (\texttt{ProductPage.jsx}) o wysyłanie czasu wyjścia}
+\stackrow{Algorytmy implicit feedback}{biblioteka \texttt{implicit} (Hu, Koren, Volinsky --- ALS)}
+\stackrow{Numeryka}{NumPy, pandas, scikit-learn}
+\stackrow{Statystyka}{\texttt{scipy.stats} --- sparowane testy Wilcoxona dla porównania z tematem D3}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, sparowany eksperyment z tematem D3 daje rygorystyczną odpowiedź na pytanie o względną wartość obu typów sygnału. Po drugie, badanie znaczenia poszczególnych typów interakcji --- które zdarzenia są najbardziej informatywne, a które niemal nieinformatywne. Po trzecie, ocena dodanej wartości mechanizmu decay oraz dodanej wartości czasu spędzonego na karcie produktu --- czy ten dodatkowy nakład inżynierski opłaca się w mierzalnym zysku jakościowym.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: dla użytkowników z bogatą historią interakcji profil oparty na danych ukrytych przewyższa profil oparty na danych jawnych. Hipoteza H2: dodanie wagi czasu na karcie produktu daje wymierny zysk dopiero powyżej progu kilkudziesięciu interakcji na użytkownika. Hipoteza H3: zakup jako sygnał ukryty jest wielokrotnie bardziej informatywny niż samo przeglądnięcie, ale dodanie do koszyka jest tylko nieznacznie słabsze niż zakup.
+
+\topicsection{Plan eksperymentu}
+Implementacja trzech wariantów rankera. Pomiar metryk Precision@K, nDCG@K i pokrycia osobno w pięciu segmentach gęstości sygnału. Sparowane porównanie z wynikami tematu D3 dla każdego segmentu. Krzywa jakość-liczba sygnałów. Końcowa analiza biznesowa: koszt pozyskania jednej oceny w stosunku do kosztu pozyskania dziesięciu interakcji oraz odpowiednia rekomendacja strategiczna.
+
+\begin{literatura}
+\item Hu, Y., Koren, Y. \& Volinsky, C. (2008). Collaborative Filtering for Implicit Feedback Datasets. \textit{ICDM}.
+\item Rendle, S., Freudenthaler, C., Gantner, Z. \& Schmidt-Thieme, L. (2009). BPR: Bayesian Personalized Ranking from Implicit Feedback. \textit{UAI}.
+\item Pan, R. et al. (2008). One-Class Collaborative Filtering. \textit{ICDM}.
+\item Yi, X., Hong, L., Zhong, E., Liu, N. N. \& Rajan, S. (2014). Beyond Clicks: Dwell Time for Personalization. \textit{RecSys '14}.
+\item Lerche, L., Jannach, D. \& Ludewig, M. (2016). On the Value of Reminders within E-Commerce Recommendations. \textit{UMAP '16}.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P4: IT2-FLS (PROMOTOR) ------------------------------------------
+\topicheader{Temat P4 --- Piotr}{promotor}{Wnioskowanie przedziałowe (IT2-FLS) z biblioteką pyit2fls}
+
+\topicsection{Opis tematu}
+Temat zaproponowany bezpośrednio przez promotora, naturalnie pasujący do strony Piotra ze względu na jego pracę inżynierską nad logiką rozmytą. Stanowi rozszerzenie istniejącego modułu wnioskowania rozmytego typu pierwszego. Logika rozmyta typu drugiego, a w szczególności jej praktyczny wariant przedziałowy (IT2-FLS), modeluje niepewność samej funkcji przynależności. O ile system typu pierwszego stwierdza, że stopień przynależności pewnej ceny do zbioru rozmytego ,,tani'' wynosi dokładnie 0,5, o tyle system przedziałowy mówi, że stopień ten mieści się w przedziale od 0,4 do 0,6. Lepiej oddaje to rzeczywistą niepewność danych w e-commerce --- ceny zmieniają się dynamicznie, oceny są subiektywne, opinie zaszumione. Biblioteka \texttt{pyit2fls} dostarcza w pełni funkcjonalne klasy zbiorów rozmytych typu drugiego, systemów Mamdani i TSK oraz algorytmy defuzyfikacji Karnika-Mendela.
+
+\topicsection{Zakres prac implementacyjnych}
+Praca obejmuje stworzenie nowego modułu wnioskowania przedziałowego, działającego równolegle do istniejącego modułu typu pierwszego. Etapy są następujące. Po pierwsze, definicja zbiorów rozmytych typu drugiego dla wszystkich pojęć językowych obecnych w systemie (cena: tani, średni, drogi; jakość: niska, średnia, wysoka; popularność). Każdy zbiór charakteryzowany jest parą funkcji przynależności wyznaczających obszar niepewności (Footprint of Uncertainty). Po drugie, przepisanie istniejącej bazy reguł rozmytych do postaci typu drugiego z wykorzystaniem klasy IT2Mamdani. Po trzecie, defuzyfikacja algorytmem Karnika-Mendela. Po czwarte, panel diagnostyczny pokazujący wizualnie obszar niepewności, aktywacje reguł górne i dolne oraz przedział wyjściowy. Po piąte, mechanizm porównania równoległego dla obu wariantów (typu pierwszego i drugiego).
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{System rozmyty typu drugiego}{biblioteka \texttt{pyit2fls} (\texttt{pip install pyit2fls})}
+\stackrow{Numeryka}{NumPy, SciPy}
+\stackrow{Wizualizacja FOU}{matplotlib --- wykresy obszaru niepewności w 2D i 3D}
+\stackrow{Backend}{Django, nowy moduł logiki rozmytej typu drugiego}
+\stackrow{Walidacja niepewności}{symulacja Monte Carlo dla weryfikacji obliczonych przedziałów}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, jedno z pierwszych zastosowań logiki rozmytej typu drugiego w kontekście systemów rekomendacji w polskim środowisku akademickim --- większość prac dotyczących IT2-FLS skupia się na sterowaniu, robotyce oraz finansach. Po drugie, empiryczna weryfikacja pytania, czy modelowanie niepewności faktycznie poprawia jakość rekomendacji, czy jedynie zwiększa koszt obliczeniowy bez wymiernych korzyści. Po trzecie, propozycja nowej metryki --- szerokości przedziału ufności rekomendacji --- jako miary tego, jak bardzo system jest pewny swojej propozycji.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: system typu drugiego daje wyższą metrykę Precision@K niż system typu pierwszego dla użytkowników z mniej niż pięcioma ocenami --- w warunkach rzadkich danych modelowanie niepewności ma większe znaczenie. Hipoteza H2: szerokość przedziału ufności obliczonego przez system typu drugiego koreluje istotnie z błędem predykcji --- szeroki przedział wskazuje rzeczywistą niepewność systemu. Hipoteza H3: koszt obliczeniowy systemu typu drugiego jest pięcio- do dwudziestokrotnie wyższy niż systemu typu pierwszego, ale opłacalny tylko w wybranych scenariuszach.
+
+\topicsection{Plan eksperymentu}
+Wykorzystanie istniejącego modułu typu pierwszego jako bazy odniesienia. Implementacja wariantu typu drugiego z obszarem niepewności wyznaczonym jako plus-minus dwadzieścia procent szerokości funkcji typu pierwszego. Test na trzech rozłącznych podzbiorach użytkowników: o niskiej, średniej i wysokiej liczbie ocen. Porównanie wariantu typu pierwszego, drugiego oraz hybrydowego. Walidacja przedziałów ufności metodą Monte Carlo. Pomiar opóźnienia obliczeń.
+
+\begin{literatura}
+\item Mendel, J. M. (2017). \textit{Uncertain Rule-Based Fuzzy Systems: Introduction and New Directions}, wyd. 2. Springer.
+\item Karnik, N. N. \& Mendel, J. M. (2001). Centroid of a type-2 fuzzy set. \textit{Information Sciences}, 132(1-4), 195--220.
+\item Wu, D. (2013). Approaches for reducing the computational cost of interval type-2 fuzzy logic systems. \textit{IEEE Transactions on Fuzzy Systems}, 21(1), 80--99.
+\item Haghrah, A. A. \& Ghaemi, S. (2023). PyIT2FLS: A New Python Toolkit for Interval Type 2 Fuzzy Logic Systems. \textit{arXiv:1909.10051}.
+\item Castillo, O. \& Melin, P. (2008). \textit{Type-2 Fuzzy Logic: Theory and Applications}. Springer.
+\item Mendel, J. M. \& John, R. I. (2002). Type-2 fuzzy sets made simple. \textit{IEEE Transactions on Fuzzy Systems}, 10(2), 117--127.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P4-ALT: ANFIS (alternatywa dla IT2-FLS) --------------------------
+\topicheader{Temat P4-ALTERNATYWNY -- Piotr}{autorski}{Hybrydowy system Neuro-Fuzzy ANFIS jako rozszerzenie logiki rozmytej}
+
+\topicsection{Opis tematu}
+Alternatywa dla tematu P4 (IT2-FLS). Rozszerzenie istniejącego systemu logiki rozmytej Mamdani-TSK o mechanizm adaptacyjnego uczenia się przy użyciu sieci neuronowych (ANFIS --- Adaptive Neuro-Fuzzy Inference System). ANFIS automatycznie dostosowuje parametry funkcji przynależności oraz wagi reguł rozmytych na podstawie danych treningowych (feedbacku użytkowników), eliminując potrzebę ręcznego strojenia systemu eksperckiego.
+
+\topicsection{Zakres prac implementacyjnych}
+Architektura ANFIS obejmuje pięć warstw: (1) fuzzyfikacja z adaptacyjnymi parametrami funkcji przynależności, (2) wnioskowanie z T-normą, (3) normalizacja, (4) defuzzyfikacja z adaptacyjnymi wagami konsekwensów, (5) agregacja. Algorytm uczenia to hybrid learning łączący backpropagation (dla parametrów antecedentów) z metodą najmniejszych kwadratów (dla parametrów konsekwensów). Powstaje również interfejs do treningu online oraz mechanizm przełączania między ANFIS (dla użytkowników z historią) a klasycznym Mamdani (dla cold-start).
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{ANFIS}{Własna implementacja w NumPy/SciPy lub anfis-pytorch}
+\stackrow{Backend}{Django, rozszerzenie modułu fuzzy\_logic\_engine}
+\stackrow{Cache feedbacku}{Redis (przechowywanie interakcji do treningu)}
+\stackrow{Wizualizacja}{matplotlib --- ewolucja funkcji przynależności w czasie}
+\stackrow{Ewaluacja}{scikit-learn metrics, scipy.stats}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, porównanie skuteczności systemów rozmytych (Mamdani vs TSK vs ANFIS) w rekomendacjach e-commerce --- brak kompleksowych badań w tej domenie. Po drugie, analiza wpływu wielkości zbioru treningowego na jakość adaptacji ANFIS (100, 500, 1000, 5000 interakcji). Po trzecie, propozycja hybrydowego podejścia: ANFIS dla użytkowników z historią + Mamdani dla nowych użytkowników (cold start).
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: system ANFIS z adaptacyjnymi parametrami osiąga wyższe nDCG@K niż system Mamdani ze stałymi funkcjami przynależności. Hipoteza H2: jakość ANFIS rośnie logarytmicznie wraz z liczbą interakcji treningowych, osiągając plateau przy około 1000 próbek. Hipoteza H3: czas konwergencji hybrid learning jest krótszy niż czystego gradient descent przy porównywalnej jakości końcowej.
+
+\topicsection{Plan eksperymentu}
+Trzy konfiguracje: Mamdani (stałe parametry), TSK (stałe wagi), ANFIS (adaptacyjne wszystko). Trening na zbiorach o różnej wielkości. Pomiar metryk Precision@K, nDCG@K oraz czasu konwergencji. Wizualizacja ewolucji funkcji przynależności w kolejnych epokach. Porównanie z tematem P4 (IT2-FLS) --- który kierunek rozszerzenia logiki rozmytej jest bardziej efektywny.
+
+\begin{literatura}
+\item Jang, J.-S. R. (1993). ANFIS: Adaptive-Network-Based Fuzzy Inference System. \textit{IEEE Transactions on Systems, Man, and Cybernetics}, 23(3), 665--685.
+\item Jang, J.-S. R. \& Sun, C.-T. (1995). Neuro-fuzzy modeling and control. \textit{Proceedings of the IEEE}, 83(3), 378--406.
+\item Karaboga, D. \& Kaya, E. (2019). Adaptive network based fuzzy inference system (ANFIS) training approaches: a comprehensive survey. \textit{Artificial Intelligence Review}, 52, 2263--2293.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P7: GNN jako meta-learner ----------------------------------------
+\topicheader{Temat P5 --- Piotr}{autorski}{Graph Neural Networks jako meta-learner dla hybrydyzacji metod rekomendacji}
+
+\topicsection{Opis tematu}
+Alternatywa dla tematu P1 (sieć MLP jako meta-learner). Zamiast prostej sieci neuronowej stosuje się Graph Neural Networks (GNN) do modelowania relacji między użytkownikami, produktami, kategoriami i opiniami jako graf heterogeniczny. GNN uczy się reprezentacji węzłów uwzględniających strukturę połączeń, co może lepiej oddawać złożone zależności między metodami rekomendacji a kontekstem użytkownika.
+
+\topicsection{Zakres prac implementacyjnych}
+Budowa grafu heterogenicznego z czterema typami węzłów (Users, Products, Categories, Opinions) i ośmioma typami krawędzi (purchased, viewed, rated, similar\_to, belongs\_to, subcategory\_of, mentions, sentiment\_about). Architektura GNN obejmuje: Graph Convolutional Layer (agregacja sąsiadów), Attention Mechanism (różne wagi dla różnych typów krawędzi), Pooling Layer (reprezentacja użytkownika/produktu), MLP Decoder (predykcja interakcji). Wyniki dziewięciu metod rekomendacji są cechami węzłów produktowych.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{GNN Framework}{PyTorch Geometric}
+\stackrow{Graf storage}{Neo4j lub NetworkX (preprocessing)}
+\stackrow{Architektura}{GraphSAGE lub GAT (Graph Attention Network)}
+\stackrow{Backend}{Django + TorchServe (model serving)}
+\stackrow{Wizualizacja}{NetworkX + matplotlib (struktura grafu)}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, pierwsza implementacja GNN dla hybrydyzacji 9 różnorodnych metod rekomendacyjnych (CBF+CF+Fuzzy+Probabilistic+Association+Sentiment+Markov+Seasonal+Search). Po drugie, analiza wpływu struktury grafu heterogenicznego na jakość rekomendacji --- porównanie grafów o różnej złożoności (tylko zakupy vs pełny graf z opiniami). Po trzecie, porównanie GNN z klasycznymi metodami meta-learningu (RF, XGBoost, MLP).
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: GNN przewyższa MLP meta-learner z tematu P1 dzięki uwzględnieniu struktury relacji między encjami. Hipoteza H2: dodanie krawędzi opinii i sentymentu do grafu poprawia jakość rekomendacji dla produktów z bogatą bazą recenzji. Hipoteza H3: Graph Attention Network (GAT) daje lepsze wyniki niż GraphSAGE dzięki adaptacyjnym wagom krawędzi, ale kosztem dłuższego treningu.
+
+\topicsection{Plan eksperymentu}
+Trzy warianty grafu: (a) Users↔Products, (b) +Categories, (c) +Opinions+Sentiment. Trzy architektury: GraphSAGE, GAT, GCN. Porównanie z MLP meta-learnerem z tematu P1 oraz z klasycznymi fuzjami z tematu D1. Ablation study --- wyłączanie kolejnych typów krawędzi. Analiza reprezentacji węzłów (t-SNE wizualizacja embeddingów).
+
+\begin{literatura}
+\item Hamilton, W. L., Ying, R. \& Leskovec, J. (2017). Inductive Representation Learning on Large Graphs (GraphSAGE). \textit{NeurIPS}.
+\item Veličković, P. et al. (2018). Graph Attention Networks. \textit{ICLR}.
+\item Wu, S. et al. (2022). Graph Neural Networks in Recommender Systems: A Survey. \textit{ACM Computing Surveys}, 55(5).
+\item Wang, X. et al. (2019). KGAT: Knowledge Graph Attention Network for Recommendation. \textit{KDD}.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P8: Temporal Sequential Pattern Mining ---------------------------
+\topicheader{Temat P6 --- Piotr}{autorski}{Temporal Sequential Pattern Mining --- rozszerzenie łańcucha Markova o GSP i deep learning}
+
+\topicsection{Opis tematu}
+Rozszerzenie istniejącego modelu Markova pierwszego rzędu o zaawansowane techniki sekwencyjnego pattern mining (GSP --- Generalized Sequential Patterns, PrefixSpan) oraz porównanie z deep learning (LSTM, GRU, Transformer). Główne pytanie badawcze: czy modele deep learning oferują istotną przewagę nad klasycznymi metodami sekwencyjnymi w małych i średnich zbiorach danych e-commerce (< 10,000 transakcji)?
+
+\topicsection{Zakres prac implementacyjnych}
+Implementacja pięciu modeli: (1) Markov Chain pierwszego rzędu (baseline), (2) Variable-order Markov Model (VOMM) z adaptacyjnym rzędem, (3) GSP (odkrywanie wzorców sekwencyjnych), (4) LSTM encoder-decoder (sequence-to-sequence), (5) Transformer z positional encoding. Dodatkowo: temporal features (time gap encoding, day of week, seasonal indicators) oraz analiza wpływu długości historii na jakość predykcji.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Pattern Mining}{Własna implementacja GSP/PrefixSpan w Python + Cython}
+\stackrow{Deep Learning}{PyTorch (LSTM, Transformer)}
+\stackrow{Temporal features}{log-binning time gaps, cyclical encoding (sin/cos)}
+\stackrow{Backend}{Django, nowy moduł sequential\_recommender}
+\stackrow{Wizualizacja}{D3.js (interactive sequence diagrams)}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, kompleksowe porównanie 5 podejść do predykcji sekwencji w e-commerce na tym samym zbiorze danych. Po drugie, analiza trade-off: jakość vs. interpretowalność vs. wymagania obliczeniowe --- GSP daje interpretowalne wzorce, LSTM/Transformer dają lepszą predykcję ale są czarne skrzynki. Po trzecie, propozycja hybrydowego modelu: GSP (odkrywanie wzorców) + LSTM (predykcja dla nowych sekwencji).
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: dla krótkich sekwencji (2-3 produkty) metody symboliczne (Markov, GSP) są równie dobre jak deep learning przy znacznie niższym koszcie. Hipoteza H2: przewaga LSTM/Transformer ujawnia się dopiero przy sekwencjach dłuższych niż 5 produktów. Hipoteza H3: dodanie temporal features (czas między zakupami) poprawia jakość predykcji wszystkich metod o co najmniej 5\% w metryce accuracy@5.
+
+\topicsection{Plan eksperymentu}
+Podział sekwencji na krótkie (2-3), średnie (4-10), długie (>10). Pięć modeli × trzy długości × z/bez temporal features. Metryki: accuracy@1, accuracy@5, MRR (Mean Reciprocal Rank). Analiza odkrytych wzorców GSP --- które sekwencje produktów są najczęstsze. Porównanie czasu treningu i inferencji. Wizualizacja attention weights Transformera --- na które poprzednie produkty model zwraca największą uwagę.
+
+\begin{literatura}
+\item Srikant, R. \& Agrawal, R. (1996). Mining Sequential Patterns: Generalizations and Performance Improvements (GSP). \textit{EDBT}.
+\item Pei, J. et al. (2001). PrefixSpan: Mining Sequential Patterns Efficiently by Prefix-Projected Pattern Growth. \textit{ICDE}.
+\item Hidasi, B. et al. (2016). Session-based Recommendations with Recurrent Neural Networks. \textit{ICLR}.
+\item Kang, W.-C. \& McAuley, J. (2018). Self-Attentive Sequential Recommendation (SASRec). \textit{ICDM}.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P5: Skalowalność CBF + fuzzy + probabilistyka -------------------
+\topicheader{Temat P7 --- Piotr}{autorski}{Skalowalność filtracji opartej na zawartości i logiki rozmytej --- analiza wąskich gardeł}
+
+\topicsection{Opis tematu}
+Bezpośredni odpowiednik tematu D4 (Dawid). Skupia się na metodach Piotra: filtracji opartej na zawartości (TF-IDF i podobieństwo kosinusowe), logice rozmytej oraz na zapytaniach probabilistycznych modułu analitycznego. Każda z tych metod ma inne charakterystyki kosztu obliczeniowego --- TF-IDF dominuje pamięciowo, logika rozmyta ulega eksplozji liczby reguł przy wzroście liczby zmiennych, zapytania probabilistyczne mogą obciążać bazę danych. Wynik tematu w połączeniu z tematem D4 daje pełną mapę skalowalności wszystkich kluczowych metod systemu.
+
+\topicsection{Zakres prac implementacyjnych}
+Wykorzystanie tego samego modułu benchmarkowego co w temacie D4 --- generatora syntetycznych zbiorów danych w sześciu skalach. Pomiar czasu obliczenia wektorów TF-IDF, czasu pełnego skanu macierzy podobieństw, czasu uruchomienia silnika rozmytego oraz czasu typowych zapytań probabilistycznych. Profilowanie szczegółowe, identyfikacja wąskich gardeł, implementacja wybranych optymalizacji (kompresja TF-IDF, redukcja liczby reguł, indeksy bazodanowe na często odpytywanych polach), ponowny pomiar i porównanie zysku.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Profilowanie}{cProfile, line\_profiler, memory\_profiler, py-spy}
+\stackrow{Profilowanie bazy}{django-debug-toolbar, PostgreSQL EXPLAIN ANALYZE}
+\stackrow{TF-IDF}{scikit-learn, kompresja przez SVD lub Johnson-Lindenstrauss}
+\stackrow{Logika rozmyta}{istniejący moduł wnioskowania, narzędzia profilowania}
+\stackrow{Wizualizacja}{matplotlib, Plotly}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje empiryczne krzywe skalowalności trzech metod opartych na atrybutach, identyfikację dominujących źródeł kosztu obliczeniowego oraz ilościowe wykazanie zysku z wybranych optymalizacji. W połączeniu z wynikami tematu D4 daje pełną mapę wydajności systemu, pokazującą która metoda ,,polegnie'' jako pierwsza wraz ze wzrostem skali oraz która optymalizacja przynosi najwięcej.
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: koszt TF-IDF rośnie liniowo, ale jego pamięciowa obecność jest największym wąskim gardłem przy ponad kilkunastu tysiącach produktów. Hipoteza H2: silnik rozmyty cierpi na eksplozję kombinatoryczną reguł powyżej pewnego progu liczby zmiennych --- redukcja zestawu reguł przez analizę aktywacji daje znaczący zysk. Hipoteza H3: zapytania probabilistyczne dominowane są przez koszt operacji wejścia-wyjścia, a odpowiednie indeksy bazodanowe dają większy zysk niż optymalizacje algorytmiczne.
+
+\topicsection{Plan eksperymentu}
+Sześć skal danych razy trzy metody, każda mierzona pięciokrotnie z raportowaniem mediany. Wykresy log-log i wyznaczenie empirycznego wykładnika złożoności. Profilowanie szczegółowe na największej skali, identyfikacja trzech najkosztowniejszych funkcji w każdej metodzie. Implementacja optymalizacji i ponowny pomiar. Tabela podsumowująca z analogicznym formatem do tematu D4, co umożliwi zestawienie obu wyników w wspólnej tabeli w pracy zespołowej.
+
+\begin{literatura}
+\item Manning, C. D., Raghavan, P. \& Schütze, H. (2008). \textit{Introduction to Information Retrieval}. Cambridge University Press.
+\item Salton, G. \& Buckley, C. (1988). Term-weighting approaches in automatic text retrieval. \textit{Information Processing \& Management}, 24(5), 513--523.
+\item Mendel, J. M. (2017). \textit{Uncertain Rule-Based Fuzzy Systems: Introduction and New Directions}, wyd. 2. Springer.
+\item Indyk, P. \& Motwani, R. (1998). Approximate nearest neighbors: towards removing the curse of dimensionality. \textit{STOC}.
+\item Linden, G., Smith, B. \& York, J. (2003). Amazon.com recommendations: item-to-item collaborative filtering. \textit{IEEE Internet Computing}, 7(1), 76--80.
+\end{literatura}
+
+\newpage
+
+% ------- TEMAT P6: Kalibracja probabilistyczna ---------------------------------
+\topicheader{Temat P8 --- Piotr}{autorski}{Kalibracja modelu probabilistycznego --- zastąpienie heurystyk modelem uczonym z danych}
+
+\topicsection{Opis tematu}
+Zagadnienie pomocnicze, dające się traktować jako temat samodzielny lub jako rozdział wspierający temat P1 lub P4. W obecnej implementacji modułu analitycznego predykcje prawdopodobieństwa zakupu opierają się częściowo na heurystykach z elementem losowości. Praca polega na zastąpieniu tych heurystyk modelem uczonym z danych historycznych --- klasyfikatorem logicznym, gradient boosting lub prostą siecią neuronową --- oraz na ocenie kalibracji tego modelu. Kalibracja oznacza, że jeśli model przewiduje prawdopodobieństwo zakupu na poziomie siedemdziesięciu procent, to faktycznie w siedemdziesięciu procentach takich przypadków zakup następuje.
+
+\topicsection{Zakres prac implementacyjnych}
+Pierwszym etapem jest przygotowanie zbioru treningowego z par użytkownik-produkt z bazy historycznej, gdzie etykietą jest fakt zakupu w określonym oknie czasowym po zarejestrowaniu pierwszej interakcji. Drugim etapem jest trening trzech modeli kandydackich (regresja logistyczna, XGBoost, prosta sieć neuronowa) i wybór najlepszego pod względem kalibracji. Trzecim etapem jest ocena za pomocą wykresów niezawodności (reliability diagrams) oraz metryk kalibracji (Brier score, Expected Calibration Error). Czwartym etapem jest porównanie jakości rankingu opartego na nowym modelu z jakością rankingu opartego na poprzedniej heurystyce.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Modele}{scikit-learn (LogisticRegression), XGBoost, LightGBM, opcjonalnie PyTorch}
+\stackrow{Kalibracja}{\texttt{sklearn.calibration} (CalibratedClassifierCV, calibration\_curve)}
+\stackrow{Metryki}{Brier score, Expected Calibration Error, Maximum Calibration Error}
+\stackrow{Wizualizacja}{matplotlib --- reliability diagrams, histogramy predykcji}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, świadome zastąpienie heurystyki modelem uczonym, połączone z formalną oceną kalibracji --- aspekt często pomijany w literaturze inżynierskiej, choć kluczowy dla praktycznego wdrożenia. Po drugie, porównanie trzech rodzin modeli pod kątem zarówno jakości rankingu, jak i jakości kalibracji. Po trzecie, badanie wpływu kalibracji na jakość rekomendacji w warunkach hybrydowej kombinacji metod (z tematu P1).
+
+\topicsection{Aspekt badawczy i eksperymentalny}
+Hipoteza H1: model uczony z danych przewyższa istniejącą heurystykę w obu metrykach --- kalibracji i jakości rankingu. Hipoteza H2: gradient boosting daje lepszą kalibrację niż regresja logistyczna na typowych danych e-commerce, ale w obu przypadkach kalibracja Platta lub izotoniczna podnosi wynik. Hipoteza H3: jakość kalibracji ma istotny wpływ na jakość rankingu w temacie P1, gdzie predykcje są jednym z dziewięciu wejść meta-learnera.
+
+\topicsection{Plan eksperymentu}
+Trening trzech modeli kandydackich na zbiorze treningowym wyodrębnionym ze wspólnego seeda badawczego. Dla każdego modelu --- ocena kalibracji surowej oraz po zastosowaniu kalibracji Platta i izotonicznej. Generacja wykresów niezawodności i pomiar wszystkich trzech metryk kalibracji. Porównanie jakości rankingu z heurystyką poprzednią na tym samym zbiorze testowym. Końcowa weryfikacja wpływu na temat P1 --- ponowne uruchomienie meta-learnera z nowym modelem probabilistycznym.
+
+\begin{literatura}
+\item Niculescu-Mizil, A. \& Caruana, R. (2005). Predicting good probabilities with supervised learning. \textit{ICML}.
+\item Platt, J. (1999). Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods. \textit{Advances in Large Margin Classifiers}.
+\item Guo, C., Pleiss, G., Sun, Y. \& Weinberger, K. Q. (2017). On Calibration of Modern Neural Networks. \textit{ICML}.
+\item Zadrozny, B. \& Elkan, C. (2002). Transforming classifier scores into accurate multiclass probability estimates. \textit{KDD}.
+\item Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. \textit{Monthly Weather Review}, 78(1), 1--3.
+\end{literatura}
+
+\newpage
+
+% =============================================================================
+% 5. PODZIAŁ OBOWIĄZKÓW
+% =============================================================================
+
+\section{Podział obowiązków --- co robimy razem, co osobno}
+
+Aby praca obu dyplomantów dawała się scalić w spójną, funkcjonalną całość, niezbędny jest jasny podział odpowiedzialności. Wspólny fundament musi być wykonany jako pierwszy etap, dopiero potem każdy dyplomant rozwija własne moduły bez ingerencji w pracę drugiej osoby.
+
+\begin{tabularx}{\linewidth}{|>{\columncolor{lightbg}\bfseries\color{primary}}p{4.5cm}|X|X|}
+\hline
+\rowcolor{primary}
+\textcolor{white}{\textbf{Wspólne}} &
+\textcolor{white}{\textbf{Dawid}} &
+\textcolor{white}{\textbf{Piotr}} \\ \hline
+Badawczy seed danych z personami, manifest danych badawczych, polecenie \texttt{prepare\_research\_db}, wspólny moduł metryk, model lub eksport eksperymentów, ewentualna migracja pola czasu na karcie produktu i odpowiednie rozszerzenie frontendu &
+Klasyczne fuzje rankingów (RRF, Borda, ważona średnia), filtracja kolaboratywna, reguły asocjacyjne, sentyment, jawny kanał danych, prompt i protokół po stronie LLM &
+Meta-learner sieciowy z mechanizmem kontekstowym, segmentacja użytkowników, wnioskowanie przedziałowe IT2-FLS, dane ukryte i frontend czasu na karcie, integracja techniczna LLM, kalibracja modelu probabilistycznego, skalowalność metod opartych na atrybutach \\ \hline
+\end{tabularx}
+
+W pracy każdy dyplomant ma własny tytuł oraz własne rozdziały. Wstęp może być uzgodniony jednym wspólnym akapitem o tym samym repozytorium, tym samym \texttt{seed\_research} i tej samej procedurze ewaluacji. Wnioski, dyskusje wyników oraz analiza ograniczeń pisane są niezależnie. Wspólne tabele porównawcze (na przykład tabela skalowalności obejmująca wszystkie metody) mogą występować jako załącznik w obu pracach.
+
+% =============================================================================
+% 6. KONFIGURACJE POŁĄCZONYCH TEMATÓW
+% =============================================================================
+
+\section{Konfiguracje połączonych tematów --- propozycje pełnej pracy zespołowej}
+
+Poniższe konfiguracje opisują, jak tematy obu dyplomantów składają się na spójną opowieść badawczą. Każda konfiguracja jest samowystarczalna, ma jednoznaczną oś merytoryczną i daje się obronić jako jedna kompletna funkcjonalność systemu rekomendacji. Poniższy zestaw nie wyczerpuje możliwości --- każdy z dyplomantów może wybrać dowolny temat z swojej puli, a po wyborze obu tematów warto upewnić się, że tworzą sensowną parę.
+
+\subsection*{Konfiguracja A --- system adaptacyjny (najmocniejszy aspekt badawczy)}
+
+Dawid: Temat D1 (klasyczne fuzje rankingów). Piotr: Temat P1 (sieć neuronowa łącząca dziewięć metod) plus Temat P2 (segmentacja) jako rozdział uzupełniający.
+
+Spójność: Dawid dostarcza klasyczną linię bazową fuzji, na tle której praca Piotra pokazuje wartość uczenia z kontekstem. Segment użytkownika z tematu P2 jest jedną z cech kontekstowych podawanych meta-learnerowi w temacie P1, co czyni system w pełni adaptacyjny --- wybór konfiguracji metod zależy zarówno od segmentu użytkownika, jak i od konkretnej sytuacji rankingowej.
+
+\subsection*{Konfiguracja B --- analiza wartości danych (przejrzysta narracja)}
+
+Dawid: Temat D3 (jakość z danych jawnych). Piotr: Temat P3 (jakość z danych ukrytych).
+
+Spójność: oba tematy stosują identyczny protokół ewaluacji, identyczne segmenty użytkowników i identyczny ground truth, ale różnią się tylko źródłem sygnału. Dzięki temu uzyskuje się sparowany eksperyment dający jednoznaczną odpowiedź na pytanie o względną wartość obu typów danych. Konfiguracja ma najczystszą strukturę narracyjną i najlepiej nadaje się do wystąpień konferencyjnych.
+
+\subsection*{Konfiguracja C --- nowoczesne metody (atrakcyjna technologicznie)}
+
+Dawid: Temat D2 (LLM otwarto-źródłowe). Piotr: Temat P4 (wnioskowanie przedziałowe IT2-FLS).
+
+Spójność: oba tematy badają nowoczesne metody przetwarzania niepewności i tekstu --- LLM po stronie Dawida wnoszą rozumienie języka naturalnego i zdolność do działania bez wcześniejszego treningu, IT2-FLS po stronie Piotra wnoszą formalny aparat modelowania niepewności. Wspólnym mianownikiem jest pytanie: kiedy nowoczesne metody pokonują klasyczne, a kiedy klasyczne pozostają lepszym wyborem. Dodatkowy atut: LLM polskojęzyczne (Bielik, PLLuM) wzmacniają lokalny charakter pracy.
+
+\subsection*{Konfiguracja D --- praktyczna i bezpieczna (najmniejsze ryzyko)}
+
+Dawid: Temat D4 (skalowalność CF i Apriori). Piotr: Temat P5 (skalowalność CBF, fuzzy, probabilistyka).
+
+Spójność: oba tematy stosują identyczny moduł benchmarkowy, identyczne skale danych i identyczny format wyników. Razem dają pełną mapę wąskich gardeł całego systemu rekomendacji oraz wykaz optymalizacji o największym wpływie. Konfiguracja ma najmniejsze ryzyko techniczne (nie wymaga deep learningu ani LLM), jest najbardziej inżynierska i najlepiej dokumentuje praktyczne ograniczenia systemu.
+
+\end{document}
