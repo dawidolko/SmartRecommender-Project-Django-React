@@ -1,0 +1,541 @@
+% =============================================================================
+%  Pełny opis zatwierdzonych tematów pracy magisterskiej (D2 i P4)
+%  Kompilacja: pdflatex magisterkav4.tex  (uruchomić dwukrotnie, dla spisu treści)
+%  Wersja: v4 -- po akceptacji tematów przez promotora
+% =============================================================================
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage[a4paper,left=2.2cm,right=2.2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.15}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks,colorlinks=true,linkcolor=primary,urlcolor=primary]{hyperref}
+\usepackage{microtype}
+
+\definecolor{primary}{HTML}{1F3A5F}
+\definecolor{accent}{HTML}{C0392B}
+\definecolor{lightbg}{HTML}{F4F6FA}
+\definecolor{highlightbg}{HTML}{FFF8E1}
+\definecolor{highlightborder}{HTML}{F39C12}
+\definecolor{border}{HTML}{CCCCCC}
+\definecolor{greytxt}{HTML}{555555}
+\definecolor{okgreen}{HTML}{1E7B34}
+
+\titleformat{\section}
+    {\color{primary}\Large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}
+    {\color{primary}\large\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}
+    {\color{primary}\normalsize\bfseries}{\thesubsubsection}{0.4em}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.5em}
+\titlespacing*{\subsubsection}{0pt}{0.9em}{0.3em}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\setlist[itemize]{leftmargin=1.4em,topsep=0.2em,itemsep=0.2em}
+\setlist[enumerate]{leftmargin=1.6em,topsep=0.2em,itemsep=0.2em}
+
+% Nagłówek tematu
+\newcommand{\topicheader}[3]{%
+    \begin{tcolorbox}[
+        colback=primary,colframe=primary,
+        boxrule=0pt,arc=0pt,
+        left=8pt,right=8pt,top=4pt,bottom=4pt,
+        before skip=0.6em, after skip=0.4em
+    ]
+    \color{white}\bfseries #1 \hfill \normalfont\color{white}Źródło: #2 \quad \bfseries\textbullet\ Temat zatwierdzony
+    \end{tcolorbox}
+    \subsection*{#3}
+    \addcontentsline{toc}{subsection}{#3}
+}
+
+\newenvironment{stacktab}{%
+    \arrayrulecolor{border}%
+    \begin{tabular}{|>{\columncolor{lightbg}\bfseries\color{primary}\raggedright\arraybackslash}p{4.4cm}|>{\raggedright\arraybackslash}p{11.6cm}|}
+    \hline
+}{%
+    \end{tabular}%
+    \arrayrulecolor{black}%
+}
+\newcommand{\stackrow}[2]{#1 & #2 \\ \hline}
+
+\newcommand{\topicsection}[1]{\subsubsection*{#1}}
+
+\newenvironment{literatura}{%
+    \topicsection{Literatura}
+    \begin{itemize}[leftmargin=1.6em,labelsep=0.5em]
+}{%
+    \end{itemize}
+}
+
+\newtcolorbox{infobox}[1]{
+    colback=highlightbg,
+    colframe=highlightborder,
+    boxrule=1pt,arc=2pt,
+    left=10pt,right=10pt,top=8pt,bottom=8pt,
+    title={\color{primary}\bfseries #1},
+    coltitle=primary,
+    fonttitle=\bfseries,
+    breakable
+}
+
+\newtcolorbox{okbox}[1]{
+    colback=lightbg,
+    colframe=okgreen,
+    boxrule=1pt,arc=2pt,
+    left=10pt,right=10pt,top=8pt,bottom=8pt,
+    title={\color{okgreen}\bfseries #1},
+    coltitle=okgreen,
+    fonttitle=\bfseries,
+    breakable
+}
+
+% =============================================================================
+\begin{document}
+
+% =============================================================================
+% STRONA TYTUŁOWA
+% =============================================================================
+\begin{titlepage}
+\null\vspace*{3cm}
+\begin{center}
+{\color{primary}\Huge\bfseries Szczegółowy opis zatwierdzonych\\[0.3em] tematów pracy magisterskiej}\\[1.4em]
+{\color{greytxt}\Large Temat D2 -- Dawid Olko \quad$\bullet$\quad Temat P4 -- Piotr Smoła}\\[0.8em]
+{\color{greytxt}\large Rozszerzenie pracy inżynierskiej:\\ System rekomendacji produktów oparty na metodach hybrydowych}
+\end{center}
+
+\vspace{2cm}
+
+Niniejszy dokument stanowi rozwinięcie wcześniejszej listy propozycji tematów. Tematy to: \textbf{Pre-trenowane modele językowe (LLM) otwarto-źródłowe a klasyczne metody rekomendacji} (autor: Dawid Olko) oraz \textbf{Wnioskowanie przedziałowe (logika rozmyta typu drugiego, IT2-FLS) z biblioteką \texttt{pyit2fls}} (autor: Piotr Smoła).
+
+\vspace{0.4em}
+
+W dokumencie przedstawiono: (1) analizę obecnego stanu aplikacji \emph{SmartRecommender} -- co już działa i co stanowi punkt wyjścia; (2) pełny, uszczegółowiony opis obu tematów -- co, gdzie i w jaki sposób będzie realizowane; (3) uwzględnienie wskazówek promotora (język pracy i promptów, polskie modele jako punkt odniesienia, włączenie ANFIS, fundament wspólny obu prac); (4) przegląd rekomendowanych modeli LLM wraz z uzasadnieniem doboru; (5) analizę literatury dotyczącej minimalnej liczby użytkowników wymaganej dla wiarygodności statystycznej testów.
+
+\vfill
+\begin{center}
+{\color{greytxt}Uniwersytet Rzeszowski \quad$\bullet$\quad rok akademicki 2025/2026}
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =============================================================================
+% 1. USTALENIA Z PROMOTOREM
+% =============================================================================
+\section{Ustalenia z promotorem}
+
+Poniżej ustalono dodatkowo cztery kwestie, które zostały uwzględnione w niniejszym opisie.
+
+\begin{enumerate}
+\item \textbf{Język pracy i promptów.} Praca magisterska (temat D2) zostanie napisana w języku polskim. Prompty kierowane do modeli językowych zostaną przygotowane w języku angielskim -- jest to język, w którym modele uniwersalne osiągają najwyższą jakość, a jednocześnie utrzymuje to spójność z literaturą. Główną oś porównawczą stanowią modele anglojęzyczne (Llama, Mistral, Qwen i inne), natomiast polskie modele otwarto-źródłowe (Bielik, PLLuM) zostają włączone jako ciekawy punkt odniesienia oraz przykład lokalnych inicjatyw badawczych.
+
+\item \textbf{Polskie systemy i modele.} Zgodnie ze wskazówką promotora -- ,,skoro istnieją polskie systemy, to należy je uwzględnić'' -- temat D2 obejmuje przegląd i empiryczną ocenę polskich modeli Bielik oraz PLLuM. Stanowi to wyraźny lokalny wkład pracy.
+
+\item \textbf{Rozszerzenie tematu P4 o ANFIS.} Zgodnie z sugestią (,,można do badania włączyć ANFIS i porównać te trzy systemy'') zakres tematu P4 zostaje rozszerzony. Badanie obejmuje porównanie \emph{trzech} systemów wnioskowania rozmytego: typu pierwszego (obecna implementacja Mamdaniego), typu drugiego przedziałowego (IT2-FLS, biblioteka \texttt{pyit2fls}) oraz hybrydy neuronowo-rozmytej ANFIS.
+
+\item \textbf{Wiarygodność statystyczna i liczba użytkowników.} Liczba użytkowników wymagana dla istotności statystycznej zależy od minimalnych wymagań stosowanych testów -- zwykle wystarcza kilkanaście do kilkudziesięciu użytkowników -- oraz zalecił sprawdzenie liczb spotykanych w literaturze systemów rekomendacyjnych. Przegląd ten zawiera rozdział~\ref{sec:liczebnosc}.
+\end{enumerate}
+
+% =============================================================================
+% 2. STAN OBECNY APLIKACJI
+% =============================================================================
+\section{Stan obecny aplikacji \emph{SmartRecommender}}
+
+Praca inżynierska zaowocowała w pełni działającym systemem e-commerce zintegrowanym w architekturze \textbf{Django + Django REST Framework + React + PostgreSQL}, z modułem rekomendacji obejmującym dziewięć metod. Praca magisterska nie buduje sklepu od nowa -- rozszerza istniejący system o warstwę badawczo-eksperymentalną. Poniższy opis odzwierciedla faktyczny stan repozytorium i posłuży jako punkt odniesienia dla obu tematów.
+
+\subsection*{Architektura i model danych}
+
+Backend (katalog \texttt{backend/home/}) opiera się na rozszerzonym modelu użytkownika z kontrolą dostępu opartą na rolach (admin / klient) oraz na zestawie modeli domenowych. Kluczowe encje to: \texttt{Product} (nazwa, cena, opis, kategorie, tagi -- opis tekstowy jest wykorzystywany w filtracji opartej na zawartości), \texttt{Category}, \texttt{Order} i \texttt{OrderProduct} (oś czasowa zamówień), \texttt{Opinion} (oceny 1--5 oraz treść tekstowa, z ograniczeniem unikalności para użytkownik--produkt), \texttt{Specification} (parametry techniczne) oraz \texttt{Complaint} (reklamacje).
+
+Osobną grupę stanowią modele warstwy metod, których nazwy tabel rozpoczynają się od przedrostka \texttt{method\_}: \texttt{UserInteraction} (zdarzenia: \emph{view}, \emph{click}, \emph{add\_to\_cart}, \emph{purchase}, \emph{favorite}), \texttt{ProductSimilarity} (zapisane podobieństwa produkt--produkt, z rozróżnieniem typu: \emph{collaborative} lub \emph{content\_based}), \texttt{ProductAssociation} (reguły asocjacyjne z miarami support, confidence, lift), \texttt{SentimentAnalysis} i \texttt{ProductSentimentSummary} (wynik analizy sentymentu opinii), \texttt{PurchaseProbability}, \texttt{UserPurchasePattern}, \texttt{SalesForecast}, \texttt{ProductDemandForecast}, \texttt{RiskAssessment} oraz \texttt{UserProductRecommendation}. Taki podział oznacza, że wyniki metod są \emph{materializowane} w bazie -- nie są przeliczane przy każdym żądaniu -- co jest istotne dla powtarzalności eksperymentów.
+
+\subsection*{Zaimplementowane metody rekomendacji}
+
+\begin{tabularx}{\linewidth}{|c|X|l|}
+\hline
+\rowcolor{primary}
+\textcolor{white}{\textbf{Lp.}} &
+\textcolor{white}{\textbf{Metoda i implementacja}} &
+\textcolor{white}{\textbf{Dane}} \\ \hline
+1 & Filtracja oparta na zawartości -- TF-IDF, ważone cechy (kategorie, tagi, słowa kluczowe z opisu, kategoria cenowa), podobieństwo kosinusowe; klasa \texttt{CustomContentBasedFilter} & jawne, atrybuty \\ \hline
+2 & Filtracja kolaboratywna item-based -- Adjusted Cosine Similarity (Sarwar i in. 2001), wyniki w \texttt{ProductSimilarity} & ukryte, transakcje \\ \hline
+3 & Wnioskowanie rozmyte typu Mamdaniego -- klasa \texttt{SimpleFuzzyInference}, 6 reguł, zmienne: cena / jakość / popularność & mieszane \\ \hline
+4 & Wyszukiwanie rozmyte -- klasa \texttt{CustomFuzzySearch}: odległość edycyjna, podobieństwo trigramowe i znakowe & tekst zapytań \\ \hline
+5 & Analiza sentymentu opinii -- klasa \texttt{CustomSentimentAnalysis}: metoda leksykonowa z negacją, intensyfikatorami i analizą bigramów & tekst opinii \\ \hline
+6 & Łańcuchy Markowa -- klasa \texttt{CustomMarkovChain}, przejścia między produktami / kategoriami & sekwencyjne \\ \hline
+7 & Klasyfikator naiwny Bayesa -- klasa \texttt{CustomNaiveBayes}, predykcja prawdopodobieństwa zakupu & mieszane \\ \hline
+8 & Reguły asocjacyjne -- klasa \texttt{CustomAssociationRules}: Apriori z reprezentacją bitmapową, parametry \texttt{min\_support}, \texttt{min\_confidence} & transakcje \\ \hline
+9 & Analiza sezonowości -- komponent temporalny prognoz popytu i sprzedaży & czasowe \\ \hline
+\end{tabularx}
+
+Wszystkie metody zaimplementowano autorsko w pliku \texttt{custom\_recommendation\_engine.py} (silnik rozmyty -- w osobnym \texttt{fuzzy\_logic\_engine.py}), bez korzystania z gotowych bibliotek rekomendacyjnych. Każda metoda ma własny zestaw widoków API (np. \texttt{recommendation\_views.py}, \texttt{association\_views.py}, \texttt{sentiment\_views.py}) oraz panel diagnostyczny w interfejsie administratora, co umożliwia niezależne uruchomienie i podgląd działania -- jest to mocna podstawa pod eksperymenty porównawcze.
+
+\subsection*{Zasilanie danymi -- obecny seeder}
+
+Aplikacja zawiera komendę \texttt{python manage.py seed} (plik \texttt{seed.py}), zasilającą bazę danymi demonstracyjnymi sklepu komputerowego: kategorie, użytkownicy, produkty z realnymi opisami i specyfikacjami, opinie, zamówienia, reklamacje, a na końcu przeliczenie tabel pochodnych (sentyment, reguły asocjacyjne, podobieństwa, prognozy). Dane są jednak częściowo losowe i w niewielkiej liczbie -- wystarczające do demonstracji systemu, lecz niewystarczające do rzetelnych eksperymentów. Stąd potrzeba fundamentu wspólnego opisanego w rozdziale~\ref{sec:fundament}.
+
+% =============================================================================
+% 3. FUNDAMENT WSPÓLNY
+% =============================================================================
+\section{Fundament wspólny obu prac}
+\label{sec:fundament}
+
+Poniżej przedstawiono zakres tego fundamentu w formie, którą obie prace współdzielą. Jest to pierwszy etap realizowany wspólnie przez obu autorów; dopiero na nim budowane są osobne rozdziały eksperymentalne.
+
+\begin{enumerate}
+\item \textbf{Badawczy seeder danych} -- nowa komenda \texttt{python manage.py seed\_research}, działająca obok istniejącego \texttt{seed} (bez kasowania go, bez zmian schematu bazy). Seeder generuje parametryzowaną liczbę użytkowników z \emph{personami zakupowymi} (np. gracz, biuro, twórca treści, kupujący prezent, entuzjasta), spójne tematycznie koszyki, oś czasową zamówień oraz strumienie danych jawnych (opinie) i ukrytych (interakcje). Stały \emph{seed} liczbowy gwarantuje powtarzalność wyników. Parametry siły sygnału i poziomu szumu są jawne i kontrolowane.
+
+\item \textbf{Polecenie \texttt{prepare\_research\_db}} -- po zasileniu bazy zawsze wykonuje to samo przeliczenie tabel pochodnych (macierz podobieństw, reguły asocjacyjne, agregaty sentymentu), tak aby każdy eksperyment startował z identycznego stanu bazy.
+
+\item \textbf{Wspólny moduł metryk} (np. \texttt{home/experiments/metrics.py}) -- ten sam podział temporalny (ostatni ustalony procent osi czasu = zbiór testowy) oraz te same metryki rankingowe: Precision@K, Recall@K, nDCG@K, dla raz ustalonego $K$.
+
+\item \textbf{Miejsce zapisu wyników} -- model \texttt{ExperimentRun} (parametry konfiguracji, metryki, czas wykonania, znacznik czasu) lub eksport do plików CSV -- aby wyniki nie ginęły w logach konsoli i były gotowe do analizy statystycznej.
+\end{enumerate}
+
+Dzięki wspólnemu fundamentowi temat D2 i temat P4 korzystają z tego samego zbioru danych, tego samego podziału i tych samych metryk -- co umożliwia bezpośrednie porównanie wyników w sekcji wspólnej obu prac.
+
+\newpage
+
+% =============================================================================
+% 4. TEMAT D2
+% =============================================================================
+\section{Temat D2 -- pełny opis}
+
+\topicheader{Temat D2}{autorski (Dawid Olko)}{Pre-trenowane modele językowe (LLM) otwarto-źródłowe a klasyczne metody rekomendacji}
+
+\topicsection{Cel i pytanie badawcze}
+Temat odpowiada na aktualne pytanie literatury rekomendacyjnej: czy nowoczesne, otwarto-źródłowe duże modele językowe (LLM) mogą realnie konkurować z klasycznymi metodami rekomendacji, a jeśli tak -- w jakim trybie wykorzystania, jakim kosztem i z jakim ryzykiem błędów. Praca porównuje rekomendacje generowane przez dostępne klasyczne metody z pracy inżynierskiej z rekomendacjami uzyskanymi z modeli LLM, w jednolitym protokole ewaluacji.
+
+\topicsection{Trzy paradygmaty wykorzystania LLM}
+Praca eksploruje trzy sposoby włączenia modelu językowego do systemu rekomendacji -- od najprostszego do najbardziej złożonego:
+
+\begin{enumerate}
+\item \textbf{Bezpośrednia rekomendacja / re-ranking (prompting).} Model otrzymuje w prompcie historię zakupów użytkownika oraz \emph{listę produktów-kandydatów} -- zawężoną wcześniej przez tanią metodę klasyczną (filtracja oparta na zawartości lub kolaboratywna), aby model nie musiał przeszukiwać całego katalogu. Zadaniem modelu jest uporządkowanie listy. Badane są warianty zero-shot i few-shot. Zgodnie z uwagą, prompty są przygotowane w języku angielskim.
+
+\item \textbf{Reprezentacje wektorowe opisów (embeddings).} Model językowy (lub dedykowany model embeddujący) oblicza wektorowe reprezentacje opisów produktów i treści opinii. Reprezentacje są indeksowane w lekkiej bazie wektorowej, a rekomendacja sprowadza się do wyszukiwania najbliższych sąsiadów. Ten paradygmat naturalnie radzi sobie z problemem zimnego startu produktu -- nowy produkt z opisem jest rekomendowalny natychmiast, mimo braku historii zakupów.
+
+\item \textbf{Retrieval-Augmented Generation (RAG).} Kontekst przekazywany do modelu generującego ranking jest wzbogacany o powiązane opinie i specyfikacje techniczne, pobierane z bazy wektorowej. Hipoteza: RAG ogranicza halucynacje względem prostego promptingu, ale podnosi opóźnienie odpowiedzi.
+\end{enumerate}
+
+\begin{infobox}{Spójność tematów D2 i P4}
+Oba tematy badają tę samą rzecz -- czy nowocześniejsze, bardziej złożone podejście realnie poprawia jakość rekomendacji, czy jedynie podnosi koszt. D2 zadaje to pytanie dla modeli językowych, P4 -- dla formalnego modelowania niepewności (logika rozmyta typu drugiego, ANFIS). Oba korzystają z tego samego seederа badawczego, tego samego podziału temporalnego i tych samych metryk, co pozwala zestawić wyniki w jednym wspólnym rozdziale.
+\end{infobox}
+
+\topicsection{Zakres prac implementacyjnych}
+Powstaje moduł rekomendacji oparty na LLM, działający równolegle do istniejących modułów -- bez ingerencji w działający system. Moduł składa się z trzech klas odpowiadających trzem paradygmatom:
+
+\begin{itemize}
+\item \textbf{Klasa promptująca} -- buduje prompt zawierający historię zakupów i listę kandydatów, wywołuje model, parsuje odpowiedź. Odpowiedź modelu jest walidowana strukturalnie (np. Pydantic v2); w razie niepoprawnej odpowiedzi system stosuje fallback do rankingu bazowego.
+\item \textbf{Klasa embeddująca} -- liczy reprezentacje wektorowe opisów i opinii, indeksuje je, obsługuje zapytania semantyczne (wyszukiwanie kNN).
+\item \textbf{Klasa RAG} -- pipeline pobierający kontekst i wzbogacający prompt przed wywołaniem modelu generującego ranking.
+\end{itemize}
+
+Wszystkie klasy korzystają wyłącznie z modeli otwarto-źródłowych, co zapewnia pełną reprodukowalność i niezależność od polityk komercyjnych dostawców.
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{Modele LLM uniwersalne}{Llama 4 / 4 Scout, Mistral (Medium 3.5 / Large 3, Apache 2.0), Qwen 3.5, GLM-5.1, DeepSeek V4 -- patrz rozdział~\ref{sec:modele}}
+\stackrow{Modele LLM lokalne}{Mistral Small (24B), Gemma 4, Phi-4 (14B), Qwen 3.5 w mniejszych wariantach -- działają na jednej karcie GPU}
+\stackrow{Modele LLM polskojęzyczne}{Bielik v3 (7B i 11B, SpeakLeash, Apache 2.0), PLLuM (8B--70B, konsorcjum OPI PIB) -- jako punkt odniesienia}
+\stackrow{Reprezentacje wektorowe}{sentence-transformers; modele wielojęzyczne BGE / E5 (porównanie modelu wielojęzycznego z anglojęzycznym)}
+\stackrow{Baza wektorowa}{pgvector (rozszerzenie PostgreSQL -- bez nowych usług w stacku) lub Qdrant / ChromaDB w trybie lokalnym}
+\stackrow{Framework RAG}{LangChain lub LlamaIndex}
+\stackrow{Inferencja}{Ollama, llama.cpp, vLLM lub Hugging Face Transformers}
+\stackrow{Backend}{Django + DRF -- nowy moduł rekomendacji LLM równolegle do istniejących}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje cztery elementy. Po pierwsze, systematyczne porównanie modeli LLM różnej skali i pochodzenia z klasycznymi metodami rekomendacji na tym samym zbiorze danych e-commerce. Po drugie, analiza kompromisu między jakością rekomendacji a kosztem obliczeniowym (opóźnienie odpowiedzi, zapotrzebowanie na pamięć GPU). Po trzecie, ocena współczynnika halucynacji -- częstości, z jaką model rekomenduje produkty nieistniejące w katalogu lub przypisuje im fałszywe atrybuty; jest to metryka rzadko raportowana, a krytyczna dla wdrożeń produkcyjnych. Po czwarte, badanie wpływu języka oraz ocena polskich modeli Bielik i PLLuM jako lokalnie dostępnej, taniej alternatywy -- co stanowi wyraźny lokalny wkład pracy.
+
+\topicsection{Hipotezy badawcze}
+\begin{itemize}
+\item \textbf{H1.} Model LLM operujący na liście kandydatów dostarczonej przez tanią metodę zawężającą osiąga wyższą metrykę nDCG@K niż ta metoda samodzielnie.
+\item \textbf{H2.} Jakość rekomendacji rośnie wraz ze skalą modelu, ale punkt nasycenia leży poniżej największych dostępnych modeli -- stosowanie modeli największych nie opłaca się, jeśli mniejsze dają porównywalny wynik.
+\item \textbf{H3.} Polski model Bielik v3 11B operujący na polskich opisach produktów osiąga jakość niegorszą niż wielokrotnie większe modele uniwersalne, przy znacząco niższym koszcie obliczeniowym.
+\item \textbf{H4.} Pipeline RAG zmniejsza współczynnik halucynacji względem prostego promptingu, lecz podnosi opóźnienie odpowiedzi.
+\end{itemize}
+
+\topicsection{Plan eksperymentu}
+Przygotowanie reprezentatywnego zbioru zapytań rekomendacyjnych z badawczego zbioru danych. Generacja rekomendacji przez wybrane modele otwarto-źródłowe (od czterech do sześciu modeli reprezentujących różne klasy wielkości i pochodzenia, w tym co najmniej jeden polski). Generacja rekomendacji przez wszystkie metody klasyczne oraz wybrane warianty hybrydowe (LLM nad metodą klasyczną). Pomiar metryk Precision@K, nDCG@K, współczynnika halucynacji, średniego opóźnienia odpowiedzi i kosztu zasobowego. Ocena ekspercka na próbie kontrolnej w celu walidacji jakościowej. Analiza statystyczna -- test Friedmana dla porównania wielu metod, z testem post-hoc (np. Nemenyiego) dla par metod.
+
+\topicsection{Koszty modeli i nakład pracy na wdrożenie}
+Świadomie wybieram wyłącznie modele otwarto-źródłowe, więc \textbf{za same modele nie płacę nic} -- pobieram je bezpłatnie z platformy Hugging Face i uruchamiam lokalnie na własnym sprzęcie. W odróżnieniu od komercyjnych API (OpenAI, Anthropic, Google), gdzie płaci się za każde tysiąc tokenów, tutaj nie ma żadnych opłat za zapytanie ani limitów -- mogę wykonać dowolnie wiele przebiegów eksperymentu, co jest istotne dla powtarzalności badania. Jedyny realny koszt to prąd i czas pracy mojego komputera.
+
+Pozostają trzy potencjalne, opcjonalne źródła kosztów -- żadne nie jest konieczne do realizacji pracy:
+
+\begin{itemize}
+\item \textbf{Modele zbyt duże na moją kartę graficzną} (rzędu 70B parametrów i większe). Jeśli zdecyduję się je włączyć do porównania, mogę skorzystać z usług hostingu inferencji rozliczanych za użycie (np. Together AI, Groq, OpenRouter) -- koszt jednego pełnego przebiegu eksperymentu na takim modelu to zwykle kilka--kilkanaście złotych, a całość mieści się w kilkudziesięciu złotych. Alternatywnie -- bezpłatnie -- uczelniany klaster obliczeniowy lub darmowy limit GPU w środowisku Google Colab.
+\item \textbf{Wynajem GPU w chmurze} (np. RunPod, Vast.ai) -- kilka złotych za godzinę, gdyby mój sprzęt okazał się niewystarczający. Przy planowanym zestawie 4--6 modeli mieszczących się lokalnie nie przewiduję takiej potrzeby.
+\item \textbf{Modele polskie} -- Bielik (licencja Apache 2.0) i PLLuM są w pełni darmowe i uruchamiają się lokalnie.
+\end{itemize}
+
+\textbf{Czas nauki.} Nie jest wymagane trenowanie ani dostrajanie modeli (fine-tuning) -- modele wykorzystuję w trybie gotowej inferencji (zero-shot i few-shot), co eliminuje najtrudniejszą i najbardziej czasochłonną część pracy z modelami językowymi. Realny nakład na opanowanie potrzebnych narzędzi szacuję następująco: uruchomienie modelu lokalnie przez Ollamę -- kwestia kilku godzin (instalacja, pobranie modelu, pierwsze zapytanie); konstrukcja promptów i walidacja odpowiedzi -- kilka dni iteracyjnej pracy; podstawy RAG i bazy wektorowej (pgvector, biblioteka LangChain lub LlamaIndex) -- około tygodnia. Najwięcej czasu pochłonie nie nauka narzędzi, lecz właściwe eksperymenty: dobór promptów, przebiegi pomiarowe i analiza wyników. Całość mieści się w typowym harmonogramie pracy magisterskiej i nie wymaga wcześniejszego doświadczenia z modelami językowymi.
+
+\begin{infobox}{W skrócie -- koszty}
+Modele: \textbf{0 zł} (otwarto-źródłowe, uruchamiane lokalnie). Brak opłat za zapytania, brak limitów. Opcjonalny koszt tylko gdybym chciał włączyć modele największej skali -- rzędu kilkudziesięciu złotych za hosting rozliczany za użycie, albo bezpłatnie przez klaster uczelni lub Google Colab. Trening modeli nie jest potrzebny.
+\end{infobox}
+
+\topicsection{Metodyka badania -- jak dane są porównywane i jak powstają wnioski}
+Praca ma charakter badawczy -- jej trzon stanowi systematyczne, mierzalne porównanie metod i modeli, zakończone wnioskami popartymi analizą statystyczną. Poniżej opisano, jak to porównanie jest przeprowadzane krok po kroku.
+
+\textbf{Krok 1 -- punkt odniesienia (ground truth).} Aby w ogóle dało się ocenić, czy rekomendacja jest trafna, potrzebny jest obiektywny wzorzec ,,prawidłowej odpowiedzi''. Stosuję \emph{podział temporalny}: oś czasu zakupów każdego użytkownika dzielona jest na część uczącą (wcześniejsze ok. 80\% historii) i część testową (ostatnie ok. 20\%). Metoda lub model ,,widzi'' wyłącznie część uczącą i na jej podstawie generuje ranking; ranking ten jest następnie konfrontowany z produktami, które użytkownik \emph{faktycznie kupił} w odciętej części testowej. Produkt obecny w przyszłych zakupach to trafienie. Podział jest deterministyczny (stały \emph{seed}), więc każde porównanie jest powtarzalne i nie wymaga udziału ludzi.
+
+\textbf{Krok 2 -- wspólny protokół.} Wszystkie metody klasyczne i wszystkie modele LLM oceniane są w \emph{identycznych} warunkach: ten sam badawczy zbiór danych, ten sam podział temporalny, ta sama wartość $K$, te same metryki. To warunek rzetelności -- bez niego porównanie nie miałoby wartości naukowej. Protokół realizuje wspólny moduł metryk (\texttt{home/experiments/metrics.py}) z fundamentu wspólnego.
+
+\textbf{Krok 3 -- metryki.} Dla każdego użytkownika i każdej metody (lub modelu) obliczane są:
+\begin{itemize}
+\item \textbf{Precision@K} -- jaka część z $K$ poleconych produktów okazała się trafiona;
+\item \textbf{Recall@K} -- jaką część rzeczywistych przyszłych zakupów udało się odzyskać;
+\item \textbf{nDCG@K} -- czy trafione produkty znalazły się wysoko w rankingu (pozycja ma znaczenie -- trafienie na miejscu 1. liczy się więcej niż na 10.);
+\item \textbf{współczynnik halucynacji} -- odsetek rekomendacji wskazujących produkty spoza katalogu lub z fałszywymi atrybutami (metryka specyficzna dla LLM);
+\item \textbf{opóźnienie odpowiedzi i koszt zasobowy} -- średni czas wygenerowania rekomendacji oraz zapotrzebowanie na pamięć GPU.
+\end{itemize}
+
+\textbf{Krok 4 -- trzy osie porównania.} Badanie zestawia wyniki na trzech płaszczyznach:
+\begin{itemize}
+\item \emph{LLM kontra metody klasyczne} -- np. Bielik kontra filtracja kolaboratywna kontra reguły asocjacyjne, na tych samych użytkownikach (główne pytanie pracy);
+\item \emph{LLM kontra LLM} -- porównanie modeli między sobą: Qwen, Mistral, Bielik, Phi-4 i inne (weryfikacja hipotez H2 i H3 o wpływie skali i pochodzenia modelu);
+\item \emph{paradygmat kontra paradygmat} -- prompting kontra embeddings kontra RAG (weryfikacja hipotezy H4).
+\end{itemize}
+
+\textbf{Krok 5 -- analiza statystyczna.} Sama tabela średnich nie wystarcza -- różnica może być przypadkowa. Każda metoda daje wektor wyników (po jednej wartości metryki na każdego użytkownika testowego). \textbf{Test Friedmana} sprawdza, czy różnice między wszystkimi porównywanymi metodami są istotne statystycznie (przy poziomie istotności $\alpha = 0{,}05$). Jeśli test wykaże istotność, \textbf{test post-hoc Nemenyiego} wskazuje, które konkretnie pary metod różnią się istotnie. Pozwala to przejść od stwierdzenia ,,model A wygląda lepiej'' do ,,model A jest istotnie lepszy od modelu B (p = 0{,}03)''. Dla porównań par metod stosowany jest dodatkowo test Wilcoxona dla par powiązanych.
+
+\textbf{Krok 6 -- wnioski.} Wyniki podsumowuje ranking metod według jakości oraz wykres kompromisu \emph{jakość kontra koszt} (front Pareto: nDCG@K na jednej osi, opóźnienie odpowiedzi na drugiej). Wniosek pracy ma postać konkretnej, popartej liczbami rekomendacji -- na przykład: ,,dla sklepu tej skali model Bielik 11B w trybie promptingu osiąga około 90\% jakości największego modelu uniwersalnego przy ułamku kosztu obliczeniowego, a pipeline RAG nie poprawia wyniku w sposób istotny statystycznie''. Tak sformułowany wniosek odpowiada wprost na pytanie badawcze pracy i jest weryfikowalny.
+
+\begin{infobox}{Aspekt badawczy w skrócie}
+Praca nie jest wyłącznie wdrożeniem modeli LLM -- jest \textbf{badaniem porównawczym}. Mierzy te same metryki dla wszystkich metod w identycznych warunkach, sprawdza istotność różnic testami statystycznymi (Friedman, post-hoc Nemenyi, Wilcoxon) i kończy się wnioskami popartymi liczbami: który model i który paradygmat daje najlepszy stosunek jakości do kosztu. To właśnie stanowi naukową wartość tematu D2.
+\end{infobox}
+
+\topicsection{Przeprowadzenie testów i panel administratora}
+Aby eksperymenty były wygodne do uruchamiania i przejrzyste w odbiorze, warstwa badawcza tematu D2 zostanie zintegrowana z istniejącym panelem administratora -- analogicznie do obecnych paneli diagnostycznych poszczególnych metod. Powstanie nowa zakładka \emph{,,Eksperymenty LLM''}, a w niej:
+
+\begin{itemize}
+\item \textbf{Uruchamianie eksperymentu z panelu} -- formularz pozwalający wybrać badane modele, paradygmat (prompting / embeddings / RAG), wartość $K$ oraz podzbiór użytkowników testowych, a następnie uruchomić przebieg jednym przyciskiem. Eksperyment wykonuje się w tle (zadanie asynchroniczne), a panel pokazuje pasek postępu -- nie trzeba uruchamiać niczego z terminala.
+\item \textbf{Tabela wyników} -- każdy zakończony przebieg trafia jako wiersz do modelu \texttt{ExperimentRun} i jest wyświetlany w panelu: nazwa modelu, paradygmat, metryki Precision@K, nDCG@K, współczynnik halucynacji, średnie opóźnienie odpowiedzi, znacznik czasu. Wyniki można sortować i filtrować.
+\item \textbf{Wykresy porównawcze} -- panel rysuje zestawienie metryk dla wszystkich przebiegów (np. wykres słupkowy nDCG@K dla kolejnych modeli oraz wykres jakość kontra opóźnienie), co daje natychmiastowy obraz, który model wypada najlepiej.
+\item \textbf{Eksport do CSV} -- przycisk \emph{,,Eksportuj wyniki''} pobiera wszystkie przebiegi (lub wybrane) w postaci pliku CSV gotowego do dalszej analizy statystycznej w środowisku zewnętrznym (Python, R, arkusz kalkulacyjny). Eksport CSV jest też dostępny bezpośrednio przez endpoint API, na wypadek pracy wsadowej.
+\item \textbf{Podgląd pojedynczej rekomendacji} -- dla wybranego użytkownika panel pokazuje obok siebie listę kandydatów, ranking zwrócony przez model oraz -- przy paradygmacie RAG -- fragmenty kontekstu (opinie, specyfikacje), które trafiły do promptu. Ułatwia to diagnostykę i jest atrakcyjnym materiałem na obronę.
+\end{itemize}
+
+Takie podejście oznacza, że całe badanie da się przeprowadzić i przeglądać ,,klikając'' w panelu, a wyniki w każdej chwili wyeksportować do CSV -- bez grzebania w konsoli.
+
+\topicsection{Widoczność zmian po stronie frontendu}
+Tak -- zmiany będą widoczne w interfejsie, i to w dwóch miejscach. Po pierwsze, w \textbf{panelu administratora} pojawi się opisana wyżej zakładka eksperymentów. Po drugie, na \textbf{stronie sklepu} rekomendacje generowane przez modele LLM zostaną podpięte jako kolejna, równoprawna opcja w istniejącym mechanizmie wyboru algorytmu rekomendacji.
+
+Obecnie aplikacja pozwala wskazać aktywny algorytm rekomendacji (model \texttt{RecommendationSettings} z wariantami: filtracja kolaboratywna, oparta na zawartości, logika rozmyta), a sekcje rekomendowanych produktów na stronach renderują się zgodnie z tym wyborem. W ramach tematu D2 lista dostępnych algorytmów zostanie rozszerzona o opcję opartą na LLM -- po jej wybraniu sekcje rekomendacji (np. ,,Polecane dla Ciebie'', ,,Produkty dopasowane'') będą wyświetlać produkty uszeregowane przez model językowy. Dzięki temu admin może w panelu przełączyć sklep na rekomendacje LLM dokładnie tak samo, jak dziś przełącza między metodami klasycznymi, a efekt jest natychmiast widoczny dla klienta na stronie. Pozwala to też pokazać działanie na żywo podczas obrony -- przełączenie algorytmu i porównanie, jak zmienia się zawartość sekcji rekomendacji.
+
+\topicsection{Sposób podpięcia modeli i miejsce konfiguracji promptów}
+Modele językowe podpinam do aplikacji przez \emph{warstwę inferencji} -- lokalny serwer (Ollama lub vLLM) udostępniający model pod adresem HTTP, z którym backend Django komunikuje się tak samo, jak z dowolnym innym serwisem. Adres serwera i nazwa modelu trafiają do konfiguracji aplikacji (plik ustawień / zmienne środowiskowe), więc zmiana modelu nie wymaga modyfikacji kodu -- wystarczy wskazać inny model w konfiguracji lub, docelowo, w panelu administratora.
+
+Prompty \textbf{nie są zaszyte na sztywno w kodzie}. Tekst promptu rozkłada się na dwie części. Część stała -- \emph{szablon promptu} (instrukcja zadania, format oczekiwanej odpowiedzi, ewentualne przykłady few-shot) -- przechowywana jest jako wersjonowany szablon: w pierwszej wersji w pliku konfiguracyjnym repozytorium, docelowo w bazie danych, co umożliwi edycję szablonu wprost z panelu administratora bez ponownego wdrażania aplikacji. Część zmienna -- historia zakupów użytkownika i lista produktów-kandydatów -- jest wstawiana do szablonu dynamicznie przy każdym żądaniu. Takie rozdzielenie ma trzy zalety: pozwala porównywać różne wersje promptów w eksperymencie (a wynik każdego przebiegu w tabeli \texttt{ExperimentRun} zapisuje, której wersji promptu użyto -- co gwarantuje powtarzalność), umożliwia łatwą edycję promptów bez dotykania kodu oraz utrzymuje zgodność z ustaleniem językowym -- szablon redaguję po angielsku, mimo że dane produktów pozostają w języku polskim.
+
+\begin{literatura}
+\item Wu, L. i in. (2024). A Survey on Large Language Models for Recommendation. \textit{arXiv:2305.19860}.
+\item Hou, Y. i in. (2024). Large Language Models are Zero-Shot Rankers for Recommender Systems. \textit{ECIR '24}.
+\item Bao, K. i in. (2023). TALLRec: An Effective and Efficient Tuning Framework to Align LLM with Recommendation. \textit{RecSys '23}.
+\item Lewis, P. i in. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. \textit{NeurIPS}.
+\item Reimers, N., Gurevych, I. (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. \textit{EMNLP}.
+\item Ociepa, K. i in. (2025). Advancing Polish Language Modeling through Tokenizer Optimization in the Bielik v3 Series. \textit{arXiv}.
+\end{literatura}
+
+\newpage
+
+% =============================================================================
+% 5. REKOMENDOWANE MODELE LLM
+% =============================================================================
+\section{Rekomendowane modele LLM dla tematu D2}
+\label{sec:modele}
+
+Dobór modeli do badania kieruje się czterema kryteriami: (1) \textbf{licencja otwarto-źródłowa} pozwalająca na użycie badawcze i reprodukcję; (2) \textbf{możliwość uruchomienia lokalnego} -- przynajmniej części modeli -- bez zależności od komercyjnego API; (3) \textbf{reprezentatywność skali} -- modele małe, średnie i duże, aby zbadać hipotezę o punkcie nasycenia; (4) \textbf{aktualność} -- modele stanowiące stan wiedzy w pierwszej połowie 2026 roku. Poniżej zestaw rekomendowany, podzielony na trzy osie porównawcze.
+
+\subsection*{Oś główna -- modele uniwersalne anglojęzyczne}
+
+\begin{tabularx}{\linewidth}{|>{\bfseries\color{primary}}p{3.0cm}|p{2.2cm}|X|}
+\hline
+\rowcolor{primary}
+\textcolor{white}{\textbf{Model}} & \textcolor{white}{\textbf{Skala / licencja}} & \textcolor{white}{\textbf{Uzasadnienie doboru}} \\ \hline
+Qwen 3.5 & wiele wariantów; Apache 2.0 & Najlepszy stosunek jakości do kosztu i otwartości w 2026 r.; dostępny w wariantach od kilku do kilkuset miliardów parametrów -- pozwala badać hipotezę H2 (punkt nasycenia) w obrębie jednej rodziny modeli. \\ \hline
+Llama 4 / 4 Scout & MoE; licencja Meta & Najszerzej wdrażana rodzina modeli otwartych; wariant Scout dobrze radzi sobie z długim kontekstem -- istotne dla RAG i długich list kandydatów. \\ \hline
+Mistral (Medium 3.5 / Large 3) & 41B aktywnych (Large 3); Apache 2.0 & Model europejski, w pełni otwarta licencja Apache 2.0; dobry punkt odniesienia dla modeli ,,frontier'' przy zachowaniu reprodukowalności. \\ \hline
+DeepSeek V4 & MoE & Silny model do długiego kontekstu; reprezentuje klasę dużych modeli MoE dostępnych do uruchomienia lub przez API uczelni. \\ \hline
+\end{tabularx}
+
+\subsection*{Oś lokalna -- modele uruchamialne na jednej karcie GPU}
+
+Modele tej osi służą do zbadania tezy, że rekomendacja LLM jest wykonalna bez infrastruktury chmurowej -- co ma bezpośrednie znaczenie praktyczne dla mniejszego sklepu e-commerce.
+
+\begin{tabularx}{\linewidth}{|>{\bfseries\color{primary}}p{3.0cm}|p{2.2cm}|X|}
+\hline
+\rowcolor{primary}
+\textcolor{white}{\textbf{Model}} & \textcolor{white}{\textbf{Skala}} & \textcolor{white}{\textbf{Uzasadnienie doboru}} \\ \hline
+Mistral Small & 24B & Mieści się w 16 GB VRAM po kwantyzacji 4-bit; dobry kompromis jakość/rozmiar dla wariantu lokalnego. \\ \hline
+Gemma 4 & ok. 27B & Rodzina Google o silnych wynikach na zadaniach językowych; alternatywa dla Mistral Small w porównaniu modeli lokalnych. \\ \hline
+Phi-4 & 14B & Mały, ,,gęsty'' model o dużej efektywności -- reprezentuje dolną granicę skali; mieści się w VRAM po kwantyzacji 8-bit. \\ \hline
+\end{tabularx}
+
+\subsection*{Oś polska -- punkt odniesienia i lokalny wkład pracy}
+
+\textbf{Bielik} to seria otwarto-źródłowych modeli językowych dla języka polskiego, rozwijana przez społeczność SpeakLeash przy wsparciu Akademii Górniczo-Hutniczej i innych uczelni. Modele Bielik v3 (7B i 11B) powstały przez kontynuację treningu (\emph{continual pre-training}) na bazie modelu Llama, z użyciem korpusu polskich tekstów liczącego dziesiątki miliardów tokenów. Innowacją jest autorski tokenizer zoptymalizowany pod język polski, redukujący liczbę tokenów potrzebnych do reprezentacji polskiego tekstu -- co przekłada się na krótszy czas inferencji. Modele są dostępne na licencji Apache 2.0.
+
+\textbf{PLLuM} (Polish Large Language Model) to inicjatywa finansowana ze środków publicznych, realizowana przez konsorcjum obejmujące OPI PIB, Politechnikę Gdańską i inne jednostki. PLLuM oferuje modele w rozmiarach od 8B do 70B parametrów, trenowane lub dostrajane na polskojęzycznych danych ogólnych i specjalistycznych.
+
+W temacie D2 -- zgodnie z ustaleniem językowym -- modele polskie pełnią rolę \emph{punktu odniesienia}: pozwalają sprawdzić, czy model trenowany na polskich danych daje przewagę przy polskojęzycznych opisach produktów, mimo że prompty operacyjne sformułowane są po angielsku. Hipoteza H3 zakłada, że Bielik v3 11B dorównuje wielokrotnie większym modelom uniwersalnym przy ułamku kosztu -- jest to teza interesująca naukowo i o wyraźnym lokalnym charakterze.
+
+\begin{infobox}{Uwaga praktyczna -- dobór końcowy}
+Do badania nie trzeba używać wszystkich wymienionych modeli. Rekomendowany zestaw roboczy to \textbf{4--6 modeli}: dwa z osi głównej (np. Qwen 3.5 i Mistral), jeden--dwa lokalne (np. Mistral Small lub Phi-4) oraz co najmniej jeden polski (Bielik v3 11B). Taki dobór pokrywa pełne spektrum skali i pochodzenia, a jednocześnie utrzymuje liczbę warunków eksperymentu na poziomie wykonalnym -- co jest istotne dla mocy statystycznej testów (patrz rozdział~\ref{sec:liczebnosc}).
+\end{infobox}
+
+\newpage
+
+% =============================================================================
+% 6. TEMAT P4
+% =============================================================================
+\section{Temat P4 -- pełny opis}
+
+\topicheader{Temat P4}{promotor (Piotr Smoła)}{Wnioskowanie przedziałowe (IT2-FLS) i hybryda neuronowo-rozmyta ANFIS a klasyczny system rozmyty}
+
+\topicsection{Cel i pytanie badawcze}
+Temat stanowi rozszerzenie istniejącego w aplikacji modułu wnioskowania rozmytego typu pierwszego (klasyczny system Mamdaniego, klasa \texttt{SimpleFuzzyInference}). Pytanie badawcze: czy formalne, bardziej zaawansowane modelowanie niepewności realnie poprawia jakość rekomendacji w warunkach rzadkich danych, czy jedynie zwiększa koszt obliczeniowy bez wymiernych korzyści. Zgodnie z sugestią promotora badanie obejmuje \emph{trzy} systemy: typu pierwszego, typu drugiego przedziałowy (IT2-FLS) oraz hybrydę neuronowo-rozmytą ANFIS.
+
+\topicsection{Punkt wyjścia -- istniejący system rozmyty}
+W obecnej implementacji (\texttt{fuzzy\_logic\_engine.py}) system typu pierwszego operuje na trzech zmiennych językowych: \emph{cena} (zbiory: tani / średni / drogi -- funkcje trójkątne i trapezowe), \emph{jakość} (niska / średnia / wysoka, na podstawie oceny 1--5) oraz \emph{popularność} (niska / średnia / wysoka, na podstawie liczby wyświetleń). Baza reguł liczy sześć reguł (np. ,,R1: wysoka jakość w dobrej cenie''), agregacja przesłanek odbywa się normą t (minimum), a defuzyfikacja -- przez ważoną średnią aktywacji reguł. Ten system jest bezpośrednim punktem odniesienia dla nowych wariantów -- nie wymaga przebudowy, służy jako baseline.
+
+\topicsection{Trzy badane systemy}
+\begin{enumerate}
+\item \textbf{System typu pierwszego (T1-FLS)} -- istniejący system Mamdaniego. Stopień przynależności jest liczbą -- np. cena pewnego produktu należy do zbioru ,,tani'' w stopniu dokładnie 0,5.
+
+\item \textbf{System typu drugiego przedziałowy (IT2-FLS)} -- modeluje niepewność samej funkcji przynależności. Zamiast jednej liczby stopień przynależności jest \emph{przedziałem} -- np. od 0,4 do 0,6. Każdy zbiór rozmyty typu drugiego charakteryzowany jest parą funkcji wyznaczających obszar niepewności (\emph{Footprint of Uncertainty}, FOU). Lepiej oddaje to rzeczywistą niepewność danych e-commerce: ceny zmieniają się dynamicznie, oceny są subiektywne, opinii bywa mało. Implementacja korzysta z biblioteki \texttt{pyit2fls}, dostarczającej klasy zbiorów IT2FS, systemy Mamdani i TSK oraz algorytmy redukcji typu i defuzyfikacji Karnika-Mendela.
+
+\item \textbf{Hybryda neuronowo-rozmyta ANFIS} -- system, w którym parametry funkcji przynależności i wagi reguł nie są ustalane ręcznie przez eksperta, lecz \emph{uczone} z danych (feedbacku użytkowników) algorytmem uczenia hybrydowego. ANFIS eliminuje potrzebę ręcznego strojenia systemu eksperckiego. Włączenie ANFIS do badania jest bezpośrednią realizacją sugestii promotora -- pozwala porównać trzy podejścia: ekspercką wiedzę stałą (T1), ekspercką wiedzę z modelowaniem niepewności (IT2) oraz wiedzę uczoną z danych (ANFIS).
+\end{enumerate}
+
+\topicsection{Zakres prac implementacyjnych}
+Powstają dwa nowe moduły wnioskowania, działające równolegle do istniejącego modułu typu pierwszego:
+
+\begin{itemize}
+\item \textbf{Moduł IT2-FLS} -- definicja zbiorów rozmytych typu drugiego dla wszystkich pojęć językowych systemu (cena, jakość, popularność), każdy z wyznaczonym obszarem niepewności FOU; przepisanie istniejącej bazy sześciu reguł do postaci typu drugiego (klasa \texttt{IT2Mamdani} z \texttt{pyit2fls}); defuzyfikacja algorytmem Karnika-Mendela.
+\item \textbf{Moduł ANFIS} -- struktura sieci adaptacyjnej odwzorowująca system rozmyty, z parametrami funkcji przynależności uczonymi z danych; trening na feedbacku użytkowników z badawczego zbioru danych.
+\item \textbf{Panel diagnostyczny} -- rozszerzenie istniejącego panelu logiki rozmytej w interfejsie administratora o wizualizację obszaru niepewności FOU, aktywacji reguł górnych i dolnych oraz przedziału wyjściowego.
+\item \textbf{Mechanizm porównania równoległego} -- uruchomienie wszystkich trzech systemów na tych samych danych wejściowych i zapis wyników do wspólnej tabeli eksperymentów.
+\end{itemize}
+
+\topicsection{Stack technologiczny}
+\begin{stacktab}
+\stackrow{System typu drugiego}{biblioteka \texttt{pyit2fls} (\texttt{pip install pyit2fls})}
+\stackrow{ANFIS}{implementacja na bazie PyTorch / TensorFlow lub dedykowanej biblioteki ANFIS}
+\stackrow{Numeryka}{NumPy, SciPy}
+\stackrow{Wizualizacja FOU}{matplotlib -- wykresy obszaru niepewności}
+\stackrow{Backend}{Django -- nowe moduły logiki rozmytej obok istniejącego \texttt{fuzzy\_logic\_engine.py}}
+\stackrow{Walidacja przedziałów}{symulacja Monte Carlo dla weryfikacji obliczonych przedziałów ufności}
+\end{stacktab}
+
+\topicsection{Innowacyjność}
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, jedno z nielicznych zastosowań logiki rozmytej typu drugiego w kontekście systemów rekomendacji w polskim środowisku akademickim -- większość prac dotyczących IT2-FLS dotyczy sterowania, robotyki i finansów. Po drugie, empiryczna weryfikacja pytania, czy modelowanie niepewności faktycznie poprawia jakość rekomendacji -- z trzema systemami zamiast dwóch, co daje pełniejszy obraz: stała wiedza ekspercka kontra niepewność modelowana kontra wiedza uczona. Po trzecie, propozycja nowej metryki -- szerokości przedziału ufności rekomendacji -- jako miary pewności systemu; otwiera to drogę do rankingu świadomego pewności.
+
+\begin{infobox}{Uwaga -- ANFIS jako rozszerzenie, nie zamiennik}
+W poprzedniej wersji listy tematów ANFIS figurował jako temat alternatywny (P4-ALT). Zgodnie z sugestią promotora (,,można do badania włączyć ANFIS i porównać te trzy systemy'') ANFIS zostaje włączony do tematu P4 jako trzeci porównywany system -- nie zastępuje IT2-FLS, lecz uzupełnia badanie. Trzon pracy pozostaje przy wnioskowaniu przedziałowym i bibliotece \texttt{pyit2fls}.
+\end{infobox}
+
+\topicsection{Hipotezy badawcze}
+\begin{itemize}
+\item \textbf{H1.} System typu drugiego osiąga wyższą metrykę Precision@K niż system typu pierwszego dla użytkowników z małą liczbą ocen -- w warunkach rzadkich danych modelowanie niepewności ma większe znaczenie.
+\item \textbf{H2.} Szerokość przedziału ufności obliczonego przez system typu drugiego koreluje istotnie z błędem predykcji -- szeroki przedział wskazuje rzeczywistą niepewność systemu.
+\item \textbf{H3.} ANFIS, ucząc parametry z danych, dorównuje lub przewyższa system typu pierwszego o stałych parametrach, a jego jakość rośnie wraz z liczbą próbek treningowych, osiągając plateau.
+\item \textbf{H4.} Koszt obliczeniowy systemu typu drugiego (zwłaszcza defuzyfikacji Karnika-Mendela) jest istotnie wyższy niż systemu typu pierwszego, lecz opłacalny tylko w wybranych scenariuszach (rzadkie dane, nowi użytkownicy).
+\end{itemize}
+
+\topicsection{Plan eksperymentu}
+Wykorzystanie istniejącego modułu typu pierwszego jako bazy odniesienia. Implementacja wariantu IT2-FLS z obszarem niepewności wyznaczonym jako odchylenie procentowe od funkcji typu pierwszego (parametr regulowany). Implementacja i trening ANFIS na badawczym zbiorze danych. Test na trzech rozłącznych podzbiorach użytkowników: o niskiej, średniej i wysokiej liczbie ocen. Porównanie wszystkich trzech systemów oraz wariantu hybrydowego (IT2 dla użytkowników o ubogiej historii, T1 dla pozostałych). Walidacja przedziałów ufności metodą Monte Carlo. Pomiar opóźnienia obliczeń dla każdego z systemów. Analiza statystyczna -- test Friedmana z testem post-hoc.
+
+\begin{literatura}
+\item Mendel, J. M. (2017). \textit{Uncertain Rule-Based Fuzzy Systems: Introduction and New Directions}, wyd. 2. Springer.
+\item Karnik, N. N., Mendel, J. M. (2001). Centroid of a type-2 fuzzy set. \textit{Information Sciences}, 132(1-4), 195--220.
+\item Wu, D. (2013). Approaches for reducing the computational cost of interval type-2 fuzzy logic systems. \textit{IEEE Transactions on Fuzzy Systems}, 21(1), 80--99.
+\item Haghrah, A. A., Ghaemi, S. (2023). PyIT2FLS: A New Python Toolkit for Interval Type 2 Fuzzy Logic Systems. \textit{arXiv:1909.10051}.
+\item Jang, J.-S. R. (1993). ANFIS: Adaptive-Network-Based Fuzzy Inference System. \textit{IEEE Transactions on Systems, Man, and Cybernetics}, 23(3), 665--685.
+\item Chen, C., John, R. i in. Type-1 and Interval Type-2 ANFIS: A Comparison. \textit{Materiały konferencyjne IEEE}.
+\item Castillo, O., Melin, P. (2008). \textit{Type-2 Fuzzy Logic: Theory and Applications}. Springer.
+\end{literatura}
+
+\newpage
+
+% =============================================================================
+% 7. LICZEBNOŚĆ PRÓBY
+% =============================================================================
+\section{Wiarygodność statystyczna -- minimalna liczba użytkowników}
+\label{sec:liczebnosc}
+
+Promotor wskazał, że wiarygodność (istotność) statystyczna testów jest dyktowana minimalnymi wymaganiami stosowanych testów oraz że ,,zwykle wystarcza kilkadziesiąt lub nawet kilkanaście użytkowników''. Poniżej przegląd literatury potwierdzający i precyzujący to stwierdzenie. Należy rozróżnić dwa rodzaje liczebności występujące w pracy: liczbę \emph{użytkowników w badawczym zbiorze danych} (ewaluacja offline -- metryki rankingowe) oraz liczbę \emph{uczestników badania z udziałem ludzi} (ewentualna ocena ekspercka, badanie z użytkownikami).
+
+\subsection*{Badania z udziałem użytkowników -- liczby z literatury}
+
+\begin{itemize}
+\item \textbf{Nielsen Norman Group} (przegląd zaleceń dotyczących liczebności prób w badaniach ilościowych) wskazuje, że \textbf{40 uczestników} jest liczbą odpowiednią dla większości badań ilościowych -- przy poziomie ufności 95\% i marginesie błędu 15\%. Liczbę można obniżyć do \textbf{30} przy poziomie ufności 90\% lub do \textbf{20--25} w projektach o ograniczonym budżecie, choć autorzy określają to jako podejście ryzykowne. Wniosek operacyjny tego samego źródła: \emph{aby uzyskać statystycznie istotne wyniki, należy przebadać co najmniej 20 użytkowników; ciaśniejsze przedziały ufności wymagają większej liczby}.
+\\ \textit{Źródło: \url{https://www.nngroup.com/articles/summary-quant-sample-sizes/}}
+
+\item \textbf{Knijnenburg \& Willemsen}, \emph{Evaluating Recommender Systems with User Experiments} -- praca metodyczna wprost poświęcona eksperymentom z użytkownikami w systemach rekomendacji. Autorzy zwracają uwagę, że jedno z pierwszych badań user-centric systemu rekomendacji objęło zaledwie \textbf{19 uczestników} i mimo wykrycia istotnych efektów było \emph{niedostatecznie zasilone} (\emph{underpowered}) -- wniosków nie dało się uogólnić. Kluczowa wskazówka metodyczna: liczba uczestników potrzebna dla danej mocy statystycznej rośnie \emph{liniowo z liczbą warunków eksperymentu}, dlatego należy utrzymywać liczbę porównywanych warunków na niskim poziomie.
+\\ \textit{Źródło: \url{https://www.usabart.nl/portfolio/KnijnenburgWillemsen-UserExperiments.pdf}}
+
+\item \textbf{Nielsen Norman Group}, \emph{How Many Test Users in a Usability Study} -- klasyczne rozróżnienie: badania \emph{jakościowe} (wykrywanie problemów) wymagają około 5 użytkowników, natomiast badania \emph{ilościowe} nastawione na statystykę wymagają co najmniej 20 użytkowników.
+\\ \textit{Źródło: \url{https://www.nngroup.com/articles/how-many-test-users/}}
+
+\item Przegląd metodyczny w czasopismach medycznych (\emph{Sample size: how many participants do I need in my research?}) podkreśla, że dokładna liczebność wynika z planowanej \emph{mocy statystycznej} (zwykle 80\%), zakładanej wielkości efektu i poziomu istotności ($\alpha = 0{,}05$) -- liczbę należy wyznaczyć analizą mocy, a nie przyjmować arbitralnie.
+\\ \textit{Źródło: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC4148275/}}
+\end{itemize}
+
+\subsection*{Wnioski dla obu prac}
+
+\begin{okbox}{Rekomendacja liczebności}
+\textbf{Ewaluacja offline (metryki rankingowe, testy Friedmana po użytkownikach).} Badawczy zbiór danych powinien obejmować rzędu \textbf{150--300 użytkowników} z odpowiednio bogatą historią -- jest to liczba swobodnie osiągalna przez parametryzowany seeder, a jednocześnie wystarczająca, by test Friedmana po użytkownikach miał wysoką moc. Tu liczebność nie jest ograniczeniem -- ogranicza ją wyłącznie realizm danych, nie ich pozyskanie.
+
+\textbf{Badanie z udziałem ludzi / ocena ekspercka (jeśli zostanie przeprowadzone).} Minimum \textbf{20 uczestników} dla uzyskania istotności statystycznej; \textbf{30--40 uczestników} jako wartość bezpieczna (poziom ufności 90--95\%). Liczbę porównywanych warunków (modeli, systemów) należy utrzymać nisko -- stąd rekomendowany zestaw 4--6 modeli w temacie D2 i 3--4 systemy w temacie P4.
+
+\textbf{Zasada nadrzędna.} Ostateczną liczebność wyznacza analiza mocy statystycznej dla konkretnie wybranego testu (Friedman, Wilcoxon, ANOVA), przy założonej mocy 80\% i $\alpha = 0{,}05$. Zostanie to opisane w rozdziale metodycznym każdej z prac.
+\end{okbox}
+
+% =============================================================================
+% 8. PODZIAŁ PRAC
+% =============================================================================
+\section{Podział prac i harmonogram ramowy}
+
+\begin{tabularx}{\linewidth}{|>{\bfseries\color{primary}}p{3.4cm}|X|}
+\hline
+\rowcolor{primary}
+\textcolor{white}{\textbf{Zakres}} & \textcolor{white}{\textbf{Realizacja}} \\ \hline
+Wspólnie & Badawczy seeder \texttt{seed\_research}, polecenie \texttt{prepare\_research\_db}, wspólny moduł metryk, model \texttt{ExperimentRun}, wspólny rozdział zestawiający wyniki obu prac. \\ \hline
+Dawid Olko (D2) & Moduł rekomendacji LLM (prompting, embeddings, RAG), dobór i konfiguracja modeli, eksperymenty porównawcze LLM kontra metody klasyczne, ocena halucynacji i kosztu, badanie modeli polskich. \\ \hline
+Piotr Smoła (P4) & Moduły IT2-FLS i ANFIS, przepisanie bazy reguł rozmytych, panel diagnostyczny FOU, eksperymenty porównawcze trzech systemów rozmytych, walidacja przedziałów Monte Carlo. \\ \hline
+\end{tabularx}
+
+Każda praca ma własny tytuł i własne rozdziały. Wstęp obu prac może zawierać wspólny akapit o tym samym repozytorium i tym samym badawczym zbiorze danych. Ramowy harmonogram: (1) fundament wspólny; (2) implementacja modułów własnych; (3) eksperymenty i zbieranie wyników; (4) analiza statystyczna i redakcja; (5) wspólny rozdział zestawiający wyniki.
+
+\vspace{1em}
+
+\begin{infobox}{Podsumowanie}
+Tematy D2 i P4 zostały zatwierdzone. Niniejszy dokument uszczegóławia ich zakres w oparciu o faktyczną analizę aplikacji \emph{SmartRecommender} oraz uwzględnia wszystkie cztery wskazówki promotora: język pracy (polski) i promptów (angielski), polskie modele Bielik i PLLuM jako punkt odniesienia w temacie D2, włączenie ANFIS jako trzeciego systemu w temacie P4 oraz oparcie liczebności prób na przeglądzie literatury. Oba tematy współdzielą fundament badawczy, co umożliwia bezpośrednie zestawienie wyników i -- w razie interesujących rezultatów -- wspólną publikację.
+\end{infobox}
+
+\end{document}
