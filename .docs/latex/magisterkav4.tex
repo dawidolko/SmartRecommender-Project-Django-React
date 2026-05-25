@@ -64,7 +64,7 @@
         left=8pt,right=8pt,top=4pt,bottom=4pt,
         before skip=0.6em, after skip=0.4em
     ]
-    \color{white}\bfseries #1 \hfill \normalfont\color{white}Źródło: #2 \quad \bfseries\textbullet\ Temat zatwierdzony
+    \color{white}\bfseries #1 \hfill \normalfont\color{white}Źródło: #2 \quad \bfseries\textbullet\
     \end{tcolorbox}
     \subsection*{#3}
     \addcontentsline{toc}{subsection}{#3}
@@ -131,7 +131,7 @@ Niniejszy dokument stanowi rozwinięcie wcześniejszej listy propozycji tematów
 
 \vspace{0.4em}
 
-W dokumencie przedstawiono: (1) analizę obecnego stanu aplikacji \emph{SmartRecommender} -- co już działa i co stanowi punkt wyjścia; (2) pełny, uszczegółowiony opis obu tematów -- co, gdzie i w jaki sposób będzie realizowane; (3) uwzględnienie wskazówek promotora (język pracy i promptów, polskie modele jako punkt odniesienia, włączenie ANFIS, fundament wspólny obu prac); (4) przegląd rekomendowanych modeli LLM wraz z uzasadnieniem doboru; (5) analizę literatury dotyczącej minimalnej liczby użytkowników wymaganej dla wiarygodności statystycznej testów.
+W dokumencie przedstawiono: (1) analizę obecnego stanu aplikacji \emph{SmartRecommender} -- co już działa i co stanowi punkt wyjścia; (2) pełny, uszczegółowiony opis obu tematów -- co, gdzie i w jaki sposób będzie realizowane; (3) uwzględnienie wskazówek (język pracy i promptów, polskie modele jako punkt odniesienia, włączenie ANFIS, fundament wspólny obu prac); (4) przegląd rekomendowanych modeli LLM wraz z uzasadnieniem doboru; (5) analizę literatury dotyczącej minimalnej liczby użytkowników wymaganej dla wiarygodności statystycznej testów.
 
 \vfill
 \begin{center}
@@ -152,11 +152,11 @@ Poniżej ustalono dodatkowo cztery kwestie, które zostały uwzględnione w nini
 \begin{enumerate}
 \item \textbf{Język pracy i promptów.} Praca magisterska (temat D2) zostanie napisana w języku polskim. Prompty kierowane do modeli językowych zostaną przygotowane w języku angielskim -- jest to język, w którym modele uniwersalne osiągają najwyższą jakość, a jednocześnie utrzymuje to spójność z literaturą. Główną oś porównawczą stanowią modele anglojęzyczne (Llama, Mistral, Qwen i inne), natomiast polskie modele otwarto-źródłowe (Bielik, PLLuM) zostają włączone jako ciekawy punkt odniesienia oraz przykład lokalnych inicjatyw badawczych.
 
-\item \textbf{Polskie systemy i modele.} Zgodnie ze wskazówką promotora -- ,,skoro istnieją polskie systemy, to należy je uwzględnić'' -- temat D2 obejmuje przegląd i empiryczną ocenę polskich modeli Bielik oraz PLLuM. Stanowi to wyraźny lokalny wkład pracy.
+\item \textbf{Polskie systemy i modele.} Zgodnie ze wskazówką -- ,,skoro istnieją polskie systemy, to należy je uwzględnić'' -- temat D2 obejmuje przegląd i empiryczną ocenę polskich modeli Bielik oraz PLLuM. Stanowi to wyraźny lokalny wkład pracy.
 
-\item \textbf{Rozszerzenie tematu P4 o ANFIS.} Zgodnie z sugestią (,,można do badania włączyć ANFIS i porównać te trzy systemy'') zakres tematu P4 zostaje rozszerzony. Badanie obejmuje porównanie \emph{trzech} systemów wnioskowania rozmytego: typu pierwszego (obecna implementacja Mamdaniego), typu drugiego przedziałowego (IT2-FLS, biblioteka \texttt{pyit2fls}) oraz hybrydy neuronowo-rozmytej ANFIS.
+\item \textbf{Rozszerzenie tematu P4 o ANFIS.} Zasugerowana możliwość włączenia ANFIS (,,można do badania włączyć ANFIS i porównać te trzy systemy''). Trzon tematu P4 stanowi porównanie systemu typu pierwszego (obecny Mamdani-TSK) z systemem typu drugiego przedziałowym (IT2-FLS, biblioteka \texttt{pyit2fls}). Po analizie wykonalności (sekcja ,,Analiza wykonalności ANFIS'') ANFIS został potraktowany jako \emph{rozszerzenie warunkowe} -- ze względu na problem etykiet treningowych, którego para T1 kontra IT2-FLS nie ma. Ostateczny status ANFIS musi zostać uzgodniony i zatwierdzony bądź odrzucony.
 
-\item \textbf{Wiarygodność statystyczna i liczba użytkowników.} Liczba użytkowników wymagana dla istotności statystycznej zależy od minimalnych wymagań stosowanych testów -- zwykle wystarcza kilkanaście do kilkudziesięciu użytkowników -- oraz zalecił sprawdzenie liczb spotykanych w literaturze systemów rekomendacyjnych. Przegląd ten zawiera rozdział~\ref{sec:liczebnosc}.
+\item \textbf{Wiarygodność statystyczna i liczba użytkowników.} Liczba użytkowników wymagana dla istotności statystycznej zależy od minimalnych wymagań stosowanych testów -- zwykle wystarcza kilkanaście do kilkudziesięciu użytkowników -- sprawdzenie liczb spotykanych w literaturze systemów rekomendacyjnych. Przegląd ten zawiera rozdział~\ref{sec:liczebnosc}.
 \end{enumerate}
 
 % =============================================================================
@@ -233,7 +233,7 @@ Temat odpowiada na aktualne pytanie literatury rekomendacyjnej: czy nowoczesne, 
 Praca eksploruje trzy sposoby włączenia modelu językowego do systemu rekomendacji -- od najprostszego do najbardziej złożonego:
 
 \begin{enumerate}
-\item \textbf{Bezpośrednia rekomendacja / re-ranking (prompting).} Model otrzymuje w prompcie historię zakupów użytkownika oraz \emph{listę produktów-kandydatów} -- zawężoną wcześniej przez tanią metodę klasyczną (filtracja oparta na zawartości lub kolaboratywna), aby model nie musiał przeszukiwać całego katalogu. Zadaniem modelu jest uporządkowanie listy. Badane są warianty zero-shot i few-shot. Zgodnie z uwagą, prompty są przygotowane w języku angielskim.
+\item \textbf{Bezpośrednia rekomendacja / re-ranking (prompting).} Model otrzymuje w prompcie historię zakupów użytkownika oraz \emph{listę produktów-kandydatów} -- zawężoną wcześniej przez tanią metodę klasyczną (filtracja oparta na treści lub kolaboratywna), aby model nie musiał przeszukiwać całego katalogu. Zadaniem modelu jest uporządkowanie listy. Badane są warianty zero-shot i few-shot. Zgodnie z uwagą, prompty są przygotowane w języku angielskim.
 
 \item \textbf{Reprezentacje wektorowe opisów (embeddings).} Model językowy (lub dedykowany model embeddujący) oblicza wektorowe reprezentacje opisów produktów i treści opinii. Reprezentacje są indeksowane w lekkiej bazie wektorowej, a rekomendacja sprowadza się do wyszukiwania najbliższych sąsiadów. Ten paradygmat naturalnie radzi sobie z problemem zimnego startu produktu -- nowy produkt z opisem jest rekomendowalny natychmiast, mimo braku historii zakupów.
 
@@ -279,10 +279,10 @@ Wkład pracy obejmuje cztery elementy. Po pierwsze, systematyczne porównanie mo
 \end{itemize}
 
 \topicsection{Plan eksperymentu}
-Przygotowanie reprezentatywnego zbioru zapytań rekomendacyjnych z badawczego zbioru danych. Generacja rekomendacji przez wybrane modele otwarto-źródłowe (od czterech do sześciu modeli reprezentujących różne klasy wielkości i pochodzenia, w tym co najmniej jeden polski). Generacja rekomendacji przez wszystkie metody klasyczne oraz wybrane warianty hybrydowe (LLM nad metodą klasyczną). Pomiar metryk Precision@K, nDCG@K, współczynnika halucynacji, średniego opóźnienia odpowiedzi i kosztu zasobowego. Ocena ekspercka na próbie kontrolnej w celu walidacji jakościowej. Analiza statystyczna -- test Friedmana dla porównania wielu metod, z testem post-hoc (np. Nemenyiego) dla par metod.
+Przygotowanie reprezentatywnego zbioru zapytań rekomendacyjnych z badawczego zbioru danych. Generacja rekomendacji przez wybrane modele otwarto-źródłowe (od czterech do sześciu modeli reprezentujących różne klasy wielkości i pochodzenia, w tym co najmniej jeden polski). Generacja rekomendacji przez wszystkie metody klasyczne oraz wybrane warianty hybrydowe (LLM nad metodą klasyczną). Pomiar metryk Precision@K, nDCG@K, współczynnika halucynacji, średniego opóźnienia odpowiedzi i kosztu zasobowego. Analiza statystyczna -- test Friedmana dla porównania wielu metod, z testem post-hoc (np. Nemenyiego) dla par metod. Jako uzupełnienie jakościowe -- ocena ekspercka przez autorów na niewielkiej, kontrolnej próbie przypadków (bez badania z udziałem użytkowników -- szczegóły w rozdziale~\ref{sec:liczebnosc}).
 
 \topicsection{Koszty modeli i nakład pracy na wdrożenie}
-Świadomie wybieram wyłącznie modele otwarto-źródłowe, więc \textbf{za same modele nie płacę nic} -- pobieram je bezpłatnie z platformy Hugging Face i uruchamiam lokalnie na własnym sprzęcie. W odróżnieniu od komercyjnych API (OpenAI, Anthropic, Google), gdzie płaci się za każde tysiąc tokenów, tutaj nie ma żadnych opłat za zapytanie ani limitów -- mogę wykonać dowolnie wiele przebiegów eksperymentu, co jest istotne dla powtarzalności badania. Jedyny realny koszt to prąd i czas pracy mojego komputera.
+Świadomie wybieram wyłącznie modele otwarto-źródłowe, więc \textbf{za same modele nie płacę nic (oprócz prądu elektrycznego)} -- pobieram je bezpłatnie z platformy Hugging Face i uruchamiam lokalnie na własnym sprzęcie. W odróżnieniu od komercyjnych API (OpenAI, Anthropic, Google), gdzie płaci się za każde tysiąc tokenów, tutaj nie ma żadnych opłat za zapytanie ani limitów -- mogę wykonać dowolnie wiele przebiegów eksperymentu, co jest istotne dla powtarzalności badania. Jedyny realny koszt to prąd i czas pracy mojego komputera.
 
 Pozostają trzy potencjalne, opcjonalne źródła kosztów -- żadne nie jest konieczne do realizacji pracy:
 
@@ -415,60 +415,88 @@ Do badania nie trzeba używać wszystkich wymienionych modeli. Rekomendowany zes
 % =============================================================================
 \section{Temat P4 -- pełny opis}
 
-\topicheader{Temat P4}{promotor (Piotr Smoła)}{Wnioskowanie przedziałowe (IT2-FLS) i hybryda neuronowo-rozmyta ANFIS a klasyczny system rozmyty}
+\topicheader{Temat P4}{promotor}{Wnioskowanie przedziałowe (IT2-FLS) a klasyczny system rozmyty -- z opcjonalnym rozszerzeniem o hybrydę neuronowo-rozmytą ANFIS}
 
 \topicsection{Cel i pytanie badawcze}
-Temat stanowi rozszerzenie istniejącego w aplikacji modułu wnioskowania rozmytego typu pierwszego (klasyczny system Mamdaniego, klasa \texttt{SimpleFuzzyInference}). Pytanie badawcze: czy formalne, bardziej zaawansowane modelowanie niepewności realnie poprawia jakość rekomendacji w warunkach rzadkich danych, czy jedynie zwiększa koszt obliczeniowy bez wymiernych korzyści. Zgodnie z sugestią promotora badanie obejmuje \emph{trzy} systemy: typu pierwszego, typu drugiego przedziałowy (IT2-FLS) oraz hybrydę neuronowo-rozmytą ANFIS.
+Temat stanowi rozszerzenie istniejącego w aplikacji modułu wnioskowania rozmytego typu pierwszego (system hybrydowy Mamdani-TSK, klasa \texttt{SimpleFuzzyInference} -- doprecyzowanie klasyfikacji poniżej). Pytanie badawcze: czy formalne modelowanie niepewności (logika rozmyta typu drugiego) realnie poprawia jakość rekomendacji w warunkach rzadkich danych, czy jedynie zwiększa koszt obliczeniowy bez wymiernych korzyści. \textbf{Trzon pracy} stanowi porównanie \emph{dwóch} systemów: typu pierwszego (baza odniesienia) oraz typu drugiego przedziałowego (IT2-FLS). Jako \textbf{rozszerzenie warunkowe} -- jeśli pozwoli na to czas i dostępność danych etykietowanych -- badanie obejmuje trzeci system: hybrydę neuronowo-rozmytą ANFIS (uzasadnienie i ograniczenia opisano w osobnej sekcji poniżej).
 
 \topicsection{Punkt wyjścia -- istniejący system rozmyty}
-W obecnej implementacji (\texttt{fuzzy\_logic\_engine.py}) system typu pierwszego operuje na trzech zmiennych językowych: \emph{cena} (zbiory: tani / średni / drogi -- funkcje trójkątne i trapezowe), \emph{jakość} (niska / średnia / wysoka, na podstawie oceny 1--5) oraz \emph{popularność} (niska / średnia / wysoka, na podstawie liczby wyświetleń). Baza reguł liczy sześć reguł (np. ,,R1: wysoka jakość w dobrej cenie''), agregacja przesłanek odbywa się normą t (minimum), a defuzyfikacja -- przez ważoną średnią aktywacji reguł. Ten system jest bezpośrednim punktem odniesienia dla nowych wariantów -- nie wymaga przebudowy, służy jako baseline.
+W obecnej implementacji (\texttt{fuzzy\_logic\_engine.py}) system operuje na trzech zmiennych językowych: \emph{cena} (zbiory: tani / średni / drogi -- funkcje trójkątne i trapezowe), \emph{jakość} (niska / średnia / wysoka, na podstawie oceny 1--5) oraz \emph{popularność} (niska / średnia / wysoka, na podstawie liczby wyświetleń). Baza reguł liczy sześć reguł (np. ,,R1: wysoka jakość w dobrej cenie''). Faza wnioskowania jest zgodna z podejściem Mamdaniego -- rozmyte poprzedniki (przesłanki) oraz operatory T-normy (minimum) i S-normy (maksimum). Etap defuzyfikacji nie definiuje jednak rozmytych zbiorów dla zmiennej wyjściowej: wynik liczony jest jako średnia ważona stałych wartości liczbowych w następnikach reguł.
 
-\topicsection{Trzy badane systemy}
+\begin{infobox}{Doprecyzowanie terminologiczne -- Mamdani czy TSK}
+Ponieważ następniki reguł są stałymi wartościami liczbowymi (a nie zbiorami rozmytymi), obecny system jest formalnie \textbf{systemem wnioskowania typu Sugeno zerowego rzędu (TSK-0)}, a nie klasycznym systemem Mamdaniego. Zgodnie z Ross (2010, \textit{Fuzzy Logic with Engineering Applications}) model Sugeno rzędu zerowego, w którym następnik każdej reguły jest stałą, bywa traktowany jako szczególny przypadek systemu Mamdaniego z następnikami w postaci singletonów rozmytych. Z uwagi na to strukturalne podobieństwo (rozmyte poprzedniki, struktura IF-THEN, operatory T-/S-norm w stylu Mamdaniego) najprecyzyjniejszym określeniem jest \textbf{system hybrydowy Mamdani-TSK} (lub: ,,system wnioskowania typu Sugeno zerowego rzędu''). Nieścisłość dotyczy wyłącznie klasyfikacji teoretycznej -- sama implementacja działa poprawnie zgodnie z teorią wnioskowania rozmytego.
+\end{infobox}
+
+Niezależnie od klasyfikacji Mamdani/TSK, obecny system jest systemem \emph{typu pierwszego} (stopnie przynależności to ostre liczby) -- i to właśnie ta cecha (a nie typ następnika) jest osią rozszerzenia w niniejszym temacie. System ten jest bezpośrednim punktem odniesienia dla nowych wariantów -- nie wymaga przebudowy, służy jako podstawa (baseline).
+
+\topicsection{Badane systemy -- trzon i rozszerzenie}
+\textbf{Trzon pracy (dwa systemy):}
 \begin{enumerate}
-\item \textbf{System typu pierwszego (T1-FLS)} -- istniejący system Mamdaniego. Stopień przynależności jest liczbą -- np. cena pewnego produktu należy do zbioru ,,tani'' w stopniu dokładnie 0,5.
+\item \textbf{System typu pierwszego (T1, Mamdani-TSK)} -- istniejący system opisany wyżej. Stopień przynależności jest pojedynczą, ostrą liczbą -- np. cena pewnego produktu należy do zbioru ,,tani'' w stopniu dokładnie 0,5.
 
 \item \textbf{System typu drugiego przedziałowy (IT2-FLS)} -- modeluje niepewność samej funkcji przynależności. Zamiast jednej liczby stopień przynależności jest \emph{przedziałem} -- np. od 0,4 do 0,6. Każdy zbiór rozmyty typu drugiego charakteryzowany jest parą funkcji wyznaczających obszar niepewności (\emph{Footprint of Uncertainty}, FOU). Lepiej oddaje to rzeczywistą niepewność danych e-commerce: ceny zmieniają się dynamicznie, oceny są subiektywne, opinii bywa mało. Implementacja korzysta z biblioteki \texttt{pyit2fls}, dostarczającej klasy zbiorów IT2FS, systemy Mamdani i TSK oraz algorytmy redukcji typu i defuzyfikacji Karnika-Mendela.
+\end{enumerate}
 
-\item \textbf{Hybryda neuronowo-rozmyta ANFIS} -- system, w którym parametry funkcji przynależności i wagi reguł nie są ustalane ręcznie przez eksperta, lecz \emph{uczone} z danych (feedbacku użytkowników) algorytmem uczenia hybrydowego. ANFIS eliminuje potrzebę ręcznego strojenia systemu eksperckiego. Włączenie ANFIS do badania jest bezpośrednią realizacją sugestii promotora -- pozwala porównać trzy podejścia: ekspercką wiedzę stałą (T1), ekspercką wiedzę z modelowaniem niepewności (IT2) oraz wiedzę uczoną z danych (ANFIS).
+Para T1 kontra IT2-FLS jest osią badania: oba systemy korzystają z tej samej, eksperckiej bazy reguł, różnią się wyłącznie sposobem reprezentacji niepewności -- co czyni porównanie czystym i jednoznacznym (żaden z systemów nie wymaga danych etykietowanych do treningu).
+
+\textbf{Rozszerzenie warunkowe (trzeci system):}
+\begin{enumerate}\setcounter{enumi}{2}
+\item \textbf{Hybryda neuronowo-rozmyta ANFIS} -- system, w którym parametry funkcji przynależności i wagi reguł nie są ustalane ręcznie przez eksperta, lecz \emph{uczone} z danych algorytmem uczenia hybrydowego. ANFIS pozwoliłby porównać trzy paradygmaty wiedzy: stałą wiedzę ekspercką (T1), wiedzę ekspercką z modelowaniem niepewności (IT2) oraz wiedzę uczoną z danych (ANFIS). ANFIS wnosi jednak istotne ograniczenia metodologiczne (problem etykiet treningowych, ryzyko uczenia się danych syntetycznych), dlatego traktowany jest jako rozszerzenie warunkowe, a nie równoprawny trzon -- szczegóły w sekcji ,,Analiza wykonalności ANFIS''.
 \end{enumerate}
 
 \topicsection{Zakres prac implementacyjnych}
-Powstają dwa nowe moduły wnioskowania, działające równolegle do istniejącego modułu typu pierwszego:
+Powstaje nowy moduł wnioskowania typu drugiego, działający równolegle do istniejącego modułu typu pierwszego; moduł ANFIS jest realizowany warunkowo.
 
 \begin{itemize}
-\item \textbf{Moduł IT2-FLS} -- definicja zbiorów rozmytych typu drugiego dla wszystkich pojęć językowych systemu (cena, jakość, popularność), każdy z wyznaczonym obszarem niepewności FOU; przepisanie istniejącej bazy sześciu reguł do postaci typu drugiego (klasa \texttt{IT2Mamdani} z \texttt{pyit2fls}); defuzyfikacja algorytmem Karnika-Mendela.
-\item \textbf{Moduł ANFIS} -- struktura sieci adaptacyjnej odwzorowująca system rozmyty, z parametrami funkcji przynależności uczonymi z danych; trening na feedbacku użytkowników z badawczego zbioru danych.
-\item \textbf{Panel diagnostyczny} -- rozszerzenie istniejącego panelu logiki rozmytej w interfejsie administratora o wizualizację obszaru niepewności FOU, aktywacji reguł górnych i dolnych oraz przedziału wyjściowego.
-\item \textbf{Mechanizm porównania równoległego} -- uruchomienie wszystkich trzech systemów na tych samych danych wejściowych i zapis wyników do wspólnej tabeli eksperymentów.
+\item \textbf{Moduł IT2-FLS} (trzon) -- definicja zbiorów rozmytych typu drugiego dla wszystkich pojęć językowych systemu (cena, jakość, popularność), każdy z wyznaczonym obszarem niepewności FOU; przepisanie istniejącej bazy sześciu reguł do postaci typu drugiego. Ponieważ system bazowy jest typu Sugeno zerowego rzędu (Mamdani-TSK), naturalnym odpowiednikiem typu drugiego jest wariant IT2-TSK (klasa \texttt{IT2TSK} z \texttt{pyit2fls}); dla porównania rozważany jest również wariant IT2-Mamdani (klasa \texttt{IT2Mamdani}). Redukcja typu i defuzyfikacja -- algorytmem Karnika-Mendela.
+\item \textbf{Panel diagnostyczny} (trzon) -- rozszerzenie istniejącego panelu logiki rozmytej w interfejsie administratora o wizualizację obszaru niepewności FOU, aktywacji reguł górnych i dolnych oraz przedziału wyjściowego.
+\item \textbf{Mechanizm porównania równoległego} (trzon) -- uruchomienie porównywanych systemów na tych samych danych wejściowych i zapis wyników do wspólnej tabeli eksperymentów.
+\item \textbf{Moduł ANFIS} (rozszerzenie warunkowe) -- struktura sieci adaptacyjnej odwzorowująca system rozmyty, z parametrami funkcji przynależności uczonymi z danych. Realizowany pod warunkiem rozstrzygnięcia kwestii etykiet treningowych opisanej w sekcji ,,Analiza wykonalności ANFIS''.
 \end{itemize}
 
 \topicsection{Stack technologiczny}
 \begin{stacktab}
-\stackrow{System typu drugiego}{biblioteka \texttt{pyit2fls} (\texttt{pip install pyit2fls})}
+\stackrow{System typu drugiego}{biblioteka \texttt{pyit2fls}}
 \stackrow{ANFIS}{implementacja na bazie PyTorch / TensorFlow lub dedykowanej biblioteki ANFIS}
 \stackrow{Numeryka}{NumPy, SciPy}
 \stackrow{Wizualizacja FOU}{matplotlib -- wykresy obszaru niepewności}
 \stackrow{Backend}{Django -- nowe moduły logiki rozmytej obok istniejącego \texttt{fuzzy\_logic\_engine.py}}
-\stackrow{Walidacja przedziałów}{symulacja Monte Carlo dla weryfikacji obliczonych przedziałów ufności}
+\stackrow{Walidacja przedziału wyjściowego}{symulacja Monte Carlo -- perturbacja wejść w zakresie ich niepewności i sprawdzenie, czy rozrzut wyników mieści się w przedziale wyznaczonym przez system typu drugiego (pokrycie / coverage)}
 \end{stacktab}
 
 \topicsection{Innowacyjność}
-Wkład pracy obejmuje trzy aspekty. Po pierwsze, jedno z nielicznych zastosowań logiki rozmytej typu drugiego w kontekście systemów rekomendacji w polskim środowisku akademickim -- większość prac dotyczących IT2-FLS dotyczy sterowania, robotyki i finansów. Po drugie, empiryczna weryfikacja pytania, czy modelowanie niepewności faktycznie poprawia jakość rekomendacji -- z trzema systemami zamiast dwóch, co daje pełniejszy obraz: stała wiedza ekspercka kontra niepewność modelowana kontra wiedza uczona. Po trzecie, propozycja nowej metryki -- szerokości przedziału ufności rekomendacji -- jako miary pewności systemu; otwiera to drogę do rankingu świadomego pewności.
+Wkład pracy obejmuje trzy aspekty. Po pierwsze, jedno z nielicznych zastosowań logiki rozmytej typu drugiego w kontekście systemów rekomendacji w polskim środowisku akademickim -- większość prac dotyczących IT2-FLS dotyczy sterowania, robotyki i finansów. Po drugie, empiryczna weryfikacja pytania, czy modelowanie niepewności faktycznie poprawia jakość rekomendacji w warunkach rzadkich danych. Po trzecie, propozycja nowej metryki -- szerokości przedziału wyjściowego (niepewności rozmytej) rekomendacji -- jako miary pewności systemu; otwiera to drogę do rankingu świadomego pewności. Opcjonalne rozszerzenie o ANFIS dokłada czwarty wątek: porównanie wiedzy eksperckiej z wiedzą uczoną z danych.
 
-\begin{infobox}{Uwaga -- ANFIS jako rozszerzenie, nie zamiennik}
-W poprzedniej wersji listy tematów ANFIS figurował jako temat alternatywny (P4-ALT). Zgodnie z sugestią promotora (,,można do badania włączyć ANFIS i porównać te trzy systemy'') ANFIS zostaje włączony do tematu P4 jako trzeci porównywany system -- nie zastępuje IT2-FLS, lecz uzupełnia badanie. Trzon pracy pozostaje przy wnioskowaniu przedziałowym i bibliotece \texttt{pyit2fls}.
+\topicsection{Analiza wykonalności ANFIS -- dlaczego rozszerzenie warunkowe}
+Zasugerowane włączenie ANFIS jako jednej z możliwości. Po analizie obecnej aplikacji ANFIS jest \emph{wykonalny}, lecz wnosi tarcia, których para T1 kontra IT2-FLS nie ma -- stąd jego rola jako rozszerzenia warunkowego, a nie równoprawnego trzonu.
+
+\textbf{Co przemawia za ANFIS.} Pod względem architektury ANFIS pasuje do tego systemu \emph{dobrze}: skoro obecny silnik jest typu Sugeno zerowego rzędu (Mamdani-TSK), to ANFIS -- który natywnie używa następników w stylu Sugeno -- jest jego bezpośrednim, uczonym odpowiednikiem. Model jest mały (3 wejścia, kilkadziesiąt parametrów), trenuje się offline w sekundy, nie wymaga GPU, a wytrenowane wagi można materializować w bazie tak jak inne tabele pochodne. Od strony platformy e-commerce (Django/React) nie ma żadnych przeszkód.
+
+\textbf{Główne ograniczenie -- problem etykiet treningowych.} ANFIS to model uczony nadzorowany: potrzebuje par ,,wejście $\rightarrow$ poprawne wyjście''. Wejścia są dostępne (cena, jakość, popularność, dopasowanie kategorii), ale obecny system rozmyty \emph{nie definiuje} docelowej wartości wyjściowej -- score jest wyznaczany regułami eksperckimi, nie ma ,,prawdy'', do której ANFIS miałby się dopasować. Trzeba więc świadomie wybrać cel uczenia, a każdy wariant ma wadę:
+\begin{itemize}
+\item \emph{Cel = przyszły zakup lub wysoka ocena} -- sensowny i obronny, ale wtedy ANFIS staje się klasyfikatorem dopasowania konkurującym raczej z naiwnym Bayesem czy filtracją kolaboratywną niż z logiką rozmytą; pojawia się pytanie ,,czemu ANFIS, a nie zwykły gradient boosting''.
+\item \emph{Cel = score obecnego systemu rozmytego} -- ANFIS uczy się naśladować T1, więc z definicji go nie przewyższy (T1 jest jego nauczycielem); naukowo słabe.
+\item \emph{Cel = oceny opinii (rating)} -- najbliższe duchowi systemu, ale opinie są rzadkie, a to właśnie scenariusz, w którym ANFIS radzi sobie najgorzej.
+\end{itemize}
+
+\textbf{Drugie ograniczenie -- ryzyko uczenia się danych syntetycznych.} Jeśli ANFIS trenowany jest na badawczym seederze, który sam zawiera wbudowaną logikę preferencji, istnieje ryzyko, że model uczy się seederа, a nie zjawiska. Para T1 kontra IT2-FLS tego problemu nie ma w ogóle, bo nie jest uczona z danych.
+
+\begin{infobox}{Decyzja projektowa -- ANFIS jako plan B}
+Trzon tematu P4 to czyste, jednoznaczne porównanie \textbf{T1 (Mamdani-TSK) kontra IT2-FLS} -- oba na tej samej bazie reguł eksperckich, bez potrzeby etykiet, bez ryzyka uczenia się seederа. ANFIS zostaje oznaczony jako \textbf{rozszerzenie warunkowe}
 \end{infobox}
 
 \topicsection{Hipotezy badawcze}
 \begin{itemize}
 \item \textbf{H1.} System typu drugiego osiąga wyższą metrykę Precision@K niż system typu pierwszego dla użytkowników z małą liczbą ocen -- w warunkach rzadkich danych modelowanie niepewności ma większe znaczenie.
-\item \textbf{H2.} Szerokość przedziału ufności obliczonego przez system typu drugiego koreluje istotnie z błędem predykcji -- szeroki przedział wskazuje rzeczywistą niepewność systemu.
-\item \textbf{H3.} ANFIS, ucząc parametry z danych, dorównuje lub przewyższa system typu pierwszego o stałych parametrach, a jego jakość rośnie wraz z liczbą próbek treningowych, osiągając plateau.
-\item \textbf{H4.} Koszt obliczeniowy systemu typu drugiego (zwłaszcza defuzyfikacji Karnika-Mendela) jest istotnie wyższy niż systemu typu pierwszego, lecz opłacalny tylko w wybranych scenariuszach (rzadkie dane, nowi użytkownicy).
+\item \textbf{H2.} Szerokość przedziału wyjściowego obliczonego przez system typu drugiego koreluje istotnie z błędem predykcji -- szeroki przedział wskazuje rzeczywistą niepewność systemu.
+\item \textbf{H3.} Koszt obliczeniowy systemu typu drugiego (zwłaszcza defuzyfikacji Karnika-Mendela) jest istotnie wyższy niż systemu typu pierwszego, lecz opłacalny tylko w wybranych scenariuszach (rzadkie dane, nowi użytkownicy).
+\item \textbf{H4} (warunkowa, dotyczy rozszerzenia ANFIS). ANFIS, ucząc parametry z danych, dorównuje lub przewyższa system typu pierwszego o stałych parametrach przy celu uczenia ustawionym na przyszły zakup, a jego jakość rośnie wraz z liczbą próbek treningowych, osiągając plateau.
 \end{itemize}
 
 \topicsection{Plan eksperymentu}
-Wykorzystanie istniejącego modułu typu pierwszego jako bazy odniesienia. Implementacja wariantu IT2-FLS z obszarem niepewności wyznaczonym jako odchylenie procentowe od funkcji typu pierwszego (parametr regulowany). Implementacja i trening ANFIS na badawczym zbiorze danych. Test na trzech rozłącznych podzbiorach użytkowników: o niskiej, średniej i wysokiej liczbie ocen. Porównanie wszystkich trzech systemów oraz wariantu hybrydowego (IT2 dla użytkowników o ubogiej historii, T1 dla pozostałych). Walidacja przedziałów ufności metodą Monte Carlo. Pomiar opóźnienia obliczeń dla każdego z systemów. Analiza statystyczna -- test Friedmana z testem post-hoc.
+\textbf{Trzon.} Wykorzystanie istniejącego modułu typu pierwszego jako bazy odniesienia. Implementacja wariantu IT2-FLS z obszarem niepewności wyznaczonym jako odchylenie procentowe od funkcji typu pierwszego (parametr regulowany). Test na trzech rozłącznych podzbiorach użytkowników: o niskiej, średniej i wysokiej liczbie ocen. Porównanie systemu typu pierwszego, drugiego oraz wariantu hybrydowego (IT2 dla użytkowników o ubogiej historii, T1 dla pozostałych). Walidacja przedziału wyjściowego metodą Monte Carlo -- perturbacja wejść w zakresie ich niepewności i sprawdzenie pokrycia (coverage) przedziału wyznaczonego przez system typu drugiego. Pomiar opóźnienia obliczeń dla każdego z systemów. Analiza statystyczna -- test Friedmana z testem post-hoc (gdy porównywane są więcej niż dwa systemy) lub test Wilcoxona dla par powiązanych (dla pary T1 kontra IT2).
+
+\textbf{Rozszerzenie warunkowe.} Jeśli realizowany będzie moduł ANFIS: implementacja i trening z celem uczenia ustawionym na przyszły zakup, z jawną kontrolą poziomu szumu seederа oraz walidacją krzyżową na niezależnym zbiorze. ANFIS dołącza wówczas jako trzeci system do porównania opisanego wyżej.
 
 \begin{literatura}
 \item Mendel, J. M. (2017). \textit{Uncertain Rule-Based Fuzzy Systems: Introduction and New Directions}, wyd. 2. Springer.
@@ -485,12 +513,16 @@ Wykorzystanie istniejącego modułu typu pierwszego jako bazy odniesienia. Imple
 % =============================================================================
 % 7. LICZEBNOŚĆ PRÓBY
 % =============================================================================
-\section{Wiarygodność statystyczna -- minimalna liczba użytkowników}
+\section{Wiarygodność statystyczna i forma ewaluacji}
 \label{sec:liczebnosc}
 
-Promotor wskazał, że wiarygodność (istotność) statystyczna testów jest dyktowana minimalnymi wymaganiami stosowanych testów oraz że ,,zwykle wystarcza kilkadziesiąt lub nawet kilkanaście użytkowników''. Poniżej przegląd literatury potwierdzający i precyzujący to stwierdzenie. Należy rozróżnić dwa rodzaje liczebności występujące w pracy: liczbę \emph{użytkowników w badawczym zbiorze danych} (ewaluacja offline -- metryki rankingowe) oraz liczbę \emph{uczestników badania z udziałem ludzi} (ewentualna ocena ekspercka, badanie z użytkownikami).
+Wiarygodność (istotność) statystyczna testów jest dyktowana minimalnymi wymaganiami stosowanych testów oraz użytkowników. Poniżej przegląd literatury potwierdzający i precyzujący.
 
-\subsection*{Badania z udziałem użytkowników -- liczby z literatury}
+\begin{infobox}{Forma ewaluacji w obu pracach}
+Główną i rozstrzygającą formą oceny w obu pracach jest \textbf{ewaluacja offline} -- automatyczny pomiar metryk rankingowych (Precision@K, Recall@K, nDCG@K) na badawczym zbiorze danych, z testami statystycznymi po użytkownikach. \textbf{Nie planujemy badania z udziałem użytkowników}. Jako jakościowe uzupełnienie przewidujemy \textbf{ocenę ekspercką} przeprowadzaną przez nas - autorów na niewielkiej, kontrolnej próbie przypadków. Poniższy przegląd literatury służy zatem dwóm celom: (1) uzasadnia liczebność \emph{użytkowników w zbiorze danych} dla ewaluacji offline oraz (2) pokazuje, dlaczego pełnoskalowe badanie z udziałem ludzi nie jest dla tej pracy konieczne.
+\end{infobox}
+
+\subsection*{Liczebność a istotność statystyczna -- liczby z literatury}
 
 \begin{itemize}
 \item \textbf{Nielsen Norman Group} (przegląd zaleceń dotyczących liczebności prób w badaniach ilościowych) wskazuje, że \textbf{40 uczestników} jest liczbą odpowiednią dla większości badań ilościowych -- przy poziomie ufności 95\% i marginesie błędu 15\%. Liczbę można obniżyć do \textbf{30} przy poziomie ufności 90\% lub do \textbf{20--25} w projektach o ograniczonym budżecie, choć autorzy określają to jako podejście ryzykowne. Wniosek operacyjny tego samego źródła: \emph{aby uzyskać statystycznie istotne wyniki, należy przebadać co najmniej 20 użytkowników; ciaśniejsze przedziały ufności wymagają większej liczby}.
@@ -508,12 +540,14 @@ Promotor wskazał, że wiarygodność (istotność) statystyczna testów jest dy
 
 \subsection*{Wnioski dla obu prac}
 
-\begin{okbox}{Rekomendacja liczebności}
-\textbf{Ewaluacja offline (metryki rankingowe, testy Friedmana po użytkownikach).} Badawczy zbiór danych powinien obejmować rzędu \textbf{150--300 użytkowników} z odpowiednio bogatą historią -- jest to liczba swobodnie osiągalna przez parametryzowany seeder, a jednocześnie wystarczająca, by test Friedmana po użytkownikach miał wysoką moc. Tu liczebność nie jest ograniczeniem -- ogranicza ją wyłącznie realizm danych, nie ich pozyskanie.
+\begin{okbox}{Rekomendacja dla obu prac}
+\textbf{Ewaluacja offline -- forma główna (metryki rankingowe, testy statystyczne po użytkownikach).} Badawczy zbiór danych powinien obejmować rzędu \textbf{150--300 użytkowników} z odpowiednio bogatą historią -- jest to liczba swobodnie osiągalna przez parametryzowany seeder, a jednocześnie wystarczająca, by testy po użytkownikach (Friedman, Wilcoxon) miały wysoką moc. Tu liczebność nie jest ograniczeniem -- ogranicza ją wyłącznie realizm danych, nie ich pozyskanie. To na tej ewaluacji opiera się główny ciężar dowodowy obu prac.
 
-\textbf{Badanie z udziałem ludzi / ocena ekspercka (jeśli zostanie przeprowadzone).} Minimum \textbf{20 uczestników} dla uzyskania istotności statystycznej; \textbf{30--40 uczestników} jako wartość bezpieczna (poziom ufności 90--95\%). Liczbę porównywanych warunków (modeli, systemów) należy utrzymać nisko -- stąd rekomendowany zestaw 4--6 modeli w temacie D2 i 3--4 systemy w temacie P4.
+\textbf{Ocena ekspercka -- uzupełnienie jakościowe.} W miejsce niemożliwego do przeprowadzenia badania z udziałem użytkowników stosujemy ocenę ekspercką: ocenimy jakość rekomendacji na \textbf{niewielkiej, kontrolnej próbie przypadków} (np. kilkadziesiąt zapytań rekomendacyjnych obejmujących różne persony i scenariusze, w tym zimny start). Ocena ta nie służy do wyciągania wniosków statystycznych o populacji użytkowników -- pełni rolę \emph{walidacji jakościowej}: weryfikuje, czy rekomendacje wysoko ocenione przez metryki są też sensowne ,,po ludzku'', oraz wychwytuje błędy, których metryki nie pokazują (np. rekomendacje trafne, lecz nietrafione kontekstowo, albo -- w temacie D2 -- halucynacje modelu). Aby ograniczyć subiektywizm, ocena prowadzona jest według ustalonej rubryki (np. trafność, różnorodność, poprawność opisu) i, gdzie to możliwe, w trybie ślepym względem metody.
 
-\textbf{Zasada nadrzędna.} Ostateczną liczebność wyznacza analiza mocy statystycznej dla konkretnie wybranego testu (Friedman, Wilcoxon, ANOVA), przy założonej mocy 80\% i $\alpha = 0{,}05$. Zostanie to opisane w rozdziale metodycznym każdej z prac.
+\textbf{Liczba porównywanych warunków.} Niezależnie od formy oceny liczbę porównywanych systemów utrzymujemy nisko -- rekomendowany zestaw 4--6 modeli w temacie D2 oraz 2 systemy w trzonie tematu P4 (T1 kontra IT2-FLS), ewentualnie 3 z opcjonalnym ANFIS.
+
+\textbf{Zasada nadrzędna.} Wiarygodność wyników opiera się na ewaluacji offline; ostateczne parametry testów statystycznych (Friedman, Wilcoxon) zostaną dobrane analizą mocy przy założonej mocy 80\% i $\alpha = 0{,}05$ i opisane w rozdziale metodycznym każdej z prac. Ocena ekspercka stanowi jakościowe potwierdzenie, nie odrębne badanie statystyczne.
 \end{okbox}
 
 % =============================================================================
@@ -527,7 +561,7 @@ Promotor wskazał, że wiarygodność (istotność) statystyczna testów jest dy
 \textcolor{white}{\textbf{Zakres}} & \textcolor{white}{\textbf{Realizacja}} \\ \hline
 Wspólnie & Badawczy seeder \texttt{seed\_research}, polecenie \texttt{prepare\_research\_db}, wspólny moduł metryk, model \texttt{ExperimentRun}, wspólny rozdział zestawiający wyniki obu prac. \\ \hline
 Dawid Olko (D2) & Moduł rekomendacji LLM (prompting, embeddings, RAG), dobór i konfiguracja modeli, eksperymenty porównawcze LLM kontra metody klasyczne, ocena halucynacji i kosztu, badanie modeli polskich. \\ \hline
-Piotr Smoła (P4) & Moduły IT2-FLS i ANFIS, przepisanie bazy reguł rozmytych, panel diagnostyczny FOU, eksperymenty porównawcze trzech systemów rozmytych, walidacja przedziałów Monte Carlo. \\ \hline
+Piotr Smoła (P4) & Moduł IT2-FLS (trzon), przepisanie bazy reguł rozmytych, panel diagnostyczny FOU, eksperymenty porównawcze T1 kontra IT2-FLS, walidacja przedziałów Monte Carlo; opcjonalnie moduł ANFIS jako rozszerzenie warunkowe. \\ \hline
 \end{tabularx}
 
 Każda praca ma własny tytuł i własne rozdziały. Wstęp obu prac może zawierać wspólny akapit o tym samym repozytorium i tym samym badawczym zbiorze danych. Ramowy harmonogram: (1) fundament wspólny; (2) implementacja modułów własnych; (3) eksperymenty i zbieranie wyników; (4) analiza statystyczna i redakcja; (5) wspólny rozdział zestawiający wyniki.
@@ -535,7 +569,7 @@ Każda praca ma własny tytuł i własne rozdziały. Wstęp obu prac może zawie
 \vspace{1em}
 
 \begin{infobox}{Podsumowanie}
-Tematy D2 i P4 zostały zatwierdzone. Niniejszy dokument uszczegóławia ich zakres w oparciu o faktyczną analizę aplikacji \emph{SmartRecommender} oraz uwzględnia wszystkie cztery wskazówki promotora: język pracy (polski) i promptów (angielski), polskie modele Bielik i PLLuM jako punkt odniesienia w temacie D2, włączenie ANFIS jako trzeciego systemu w temacie P4 oraz oparcie liczebności prób na przeglądzie literatury. Oba tematy współdzielą fundament badawczy, co umożliwia bezpośrednie zestawienie wyników i -- w razie interesujących rezultatów -- wspólną publikację.
+Tematy D2 i P4 zostały wstępnie zatwierdzone. Niniejszy dokument uszczegóławia ich zakres w oparciu o faktyczną analizę aplikacji \emph{SmartRecommender} oraz uwzględnia wszystkie cztery wskazówki: język pracy (polski) i promptów (angielski), polskie modele Bielik i PLLuM jako punkt odniesienia w temacie D2, możliwość rozszerzenia tematu P4 o ANFIS (po analizie wykonalności potraktowany jako rozszerzenie warunkowe obok trzonu T1 kontra IT2-FLS) oraz oparcie liczebności prób na przeglądzie literatury. Oba tematy współdzielą fundament badawczy, co umożliwia bezpośrednie zestawienie wyników i -- w razie interesujących rezultatów -- wspólną publikację.
 \end{infobox}
 
 \end{document}
