@@ -1,67 +1,163 @@
-# 🛍️ SmartRecommender: Product Recommendation Platform
+# SmartRecommender
 
-> **Project Description:** A comprehensive full-stack platform that delivers personalized product recommendations by combining machine learning, uncertainty modeling, and user behavior analysis. This system enhances user experience through dynamic, intelligent suggestions based on real-world data.
+> 🚀 **Full-Stack Product Recommendation Platform** - Six recommendation methods written from scratch, wired into a working e-commerce store
 
-> **Tech Stack:** `Python`, `Django`, `PostgreSQL`, `React`, `scikit-learn`, `Docker`
+**SmartRecommender** is a full-stack e-commerce platform that delivers personalized product recommendations by combining collaborative filtering, content analysis, association mining, fuzzy logic, sentiment analysis and probabilistic modelling. Every recommendation method is implemented from the ground up on top of NumPy, pandas and scikit-learn rather than pulled in from a ready-made recommender library, which makes the repository as much a study of the algorithms as it is a shop.
+
+The system pairs a Django REST Framework API with a React 18 storefront and a PostgreSQL 16 database, all reproducible through Docker. It was developed as an engineering thesis project, so alongside the application you will find the full academic apparatus: per-method algorithm write-ups, UML diagrams and entity-relationship documentation.
+
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.1-092E20?logo=django&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-Apache%202.0-D22128)
 
 ---
 
-## 🌍 Live Demo
+## 🎯 Key Features
 
-🔗 **Preview Version:** [project.dawidolko.pl](https://project.dawidolko.pl)
-
-> **⚠️ Note:** This is a static preview version hosted on GitHub Pages. Only the homepage and basic navigation work. Features requiring database connectivity (like shopping cart, user accounts, recommendations) are not functional in this demo version.
-
-> **💡 For Full Experience:** Follow the installation guide below to run the complete application with all features enabled.
+- 🤝 **Collaborative Filtering** — user-based and item-based similarity matrices that recommend products based on what comparable customers bought.
+- 🏷️ **Content-Based Filtering** — matches products by their own attributes, categories and tags against what a user has already liked.
+- 🛒 **Association Rules** — an Apriori implementation that surfaces "frequently bought together" sets from real order history.
+- 🔍 **Fuzzy Search** — typo-tolerant, partial-match product search backed by a dedicated fuzzy logic engine.
+- 💬 **Sentiment Analysis** — analyses customer reviews with TextBlob/NLTK so positively received products can be discovered and ranked.
+- 🎲 **Probabilistic Methods** — Markov chains for next-purchase prediction and Bayesian insights over user behaviour.
+- 📊 **Admin Analytics Dashboard** — sales forecasting, product demand prediction, churn risk assessment, RFM purchase-pattern analysis and seasonal trends.
+- 🧪 **Algorithm Debug Endpoints** — every recommendation family exposes a debug view so its intermediate output can be inspected instead of guessed at.
+- 🛍️ **Complete Storefront** — catalog browsing, product detail pages, favourites, cart, orders, complaints and a client panel.
+- 🔐 **JWT Authentication** — token-based auth with role separation between clients and administrators.
 
 ---
 
-## 🚀 Usage
+## 🖼️ Screenshots
 
-### Option 1: Docker Setup (Recommended)
+| Storefront landing page | Product catalog |
+|---|---|
+| ![SmartRecommender homepage with hero section and featured products](docs/screenshots/home.webp) | ![Product catalog view with category filtering and product cards](docs/screenshots/catalog.webp) |
 
-The easiest way to run the project is using Docker. This ensures consistent environment across all platforms.
+---
 
-#### Prerequisites
+## 🏗️ Architecture
 
-- **Docker Desktop** installed on your system
-- **Hardware virtualization** enabled (Intel VT-x or AMD-V)
+### Application Layer
 
-#### Quick Start with Docker
+![Application Layer](docs/diagrams/app-layer.svg)
 
-1. **Clone the repository:**
+### Application Architecture
 
-   ```bash
-   git clone https://github.com/dawidolko/SmartRecommender-Project-Django-React
-   cd SmartRecommender-Project-Django-React
-   ```
+![Application Architecture](docs/diagrams/architecture.svg)
 
-2. **Create environment file:**
+### 📐 UML & Database Documentation
 
-   ```bash
-   # Create .env file in the root directory
-   DB_NAME=product_recommendation
-   DB_USER=postgres
-   DB_PASSWORD=admin
-   DB_HOST=db
-   DB_PORT=5432
-   SECRET_KEY=django-insecure-default-key
-   DEBUG=True
-   ALLOWED_HOSTS=localhost,127.0.0.1
-   ```
+The repository carries a full set of modelling artifacts produced alongside the implementation.
 
-3. **Build and run with Docker:**
+- **`.diagrams/`** — UML diagrams grouped per recommendation method: `association_rules`, `collaborative_filtering`, `content_based_filtering`, `fuzzy_search`, `probabilistic_methods` and `sentiment_analysis`. Each folder holds Use Case, Class, Activity, Sequence, Component or State diagrams (depending on the method) as both editable `.uml` sources and rendered `.png` exports.
+- **`.database/entity-relationship-diagram/`** — entity-relationship diagrams for the schema (`erd.png`, `appErd.png`, `methodsErd.png`) together with the `erd.pgerd` project file and `erd.sql`.
+- **`.database/`** — `backup.sql`, `RELATIONSHIPS_IN_BASE.md` and `tree_database.png` documenting the relational model.
+- **`.methods/`** — a written specification per algorithm explaining how each method is computed.
+- **`.docs/`** — the thesis text, LaTeX sources and presentation material.
 
-   ```bash
-   docker compose -f .tools/docker/docker-compose.yml up --build
-   ```
+---
 
-4. **Access the application:**
-   - **Frontend (React)** → [http://localhost:3000](http://localhost:3000)
-   - **Backend (Django)** → [http://localhost:8000](http://localhost:8000)
-   - **Database (PostgreSQL)** → port `5432`
+## 🧩 Recommendation Methods
 
-#### Docker Management Commands
+| Method | What it does | Implementation |
+|---|---|---|
+| Collaborative Filtering | Recommends what similar users purchased (user-based and item-based) | `backend/home/recommendation_views.py`, `custom_recommendation_engine.py` |
+| Content-Based Filtering | Recommends products with attributes similar to previously liked items | `backend/home/recommendation_views.py` |
+| Association Rules | Apriori mining of frequently bought together product sets | `backend/home/association_views.py` |
+| Fuzzy Search | Typo-tolerant search and fuzzy-logic ranking | `backend/home/fuzzy_logic_engine.py`, `fuzzy_debug_view.py` |
+| Sentiment Analysis | Review sentiment scoring and sentiment-driven discovery | `backend/home/sentiment_views.py` |
+| Probabilistic Methods | Markov next-purchase prediction and Bayesian insights | `backend/home/probabilistic_views.py`, `probabilistic_debug_view.py` |
+
+Predictive analytics built on top of these methods — sales forecasting, demand prediction, churn risk and purchase patterns — live in `backend/home/analytics.py`, `analytics_views.py` and `seasonal_views.py`.
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend
+
+- **React 18** with **React Router 6** for routing
+- **CRACO** build tooling on top of `react-scripts` 5
+- **SCSS / Sass** and **Tailwind CSS** for styling
+- **Chart.js**, **react-chartjs-2** and **Recharts** for analytics visualisations
+- **Axios** for API calls, **jwt-decode** for token handling
+- **Formik** + **Yup** for forms and validation
+- **Framer Motion**, **React Spring**, **react-slick**, **react-toastify** for interaction and UI polish
+- **Lucide**, **React Icons**, **React Feather** icon sets
+
+### Backend
+
+- **Django 5.1** with **Django REST Framework 3.15**
+- **django-cors-headers**, **django-environ** for configuration
+- **psycopg2-binary** as the PostgreSQL driver
+- **NumPy**, **pandas**, **scikit-learn** for the recommendation computations
+- **TextBlob** and **NLTK** for sentiment processing
+- **Pillow** for product image handling
+- **tqdm** for seeder progress output
+
+### Infrastructure
+
+- **PostgreSQL 16** with a healthchecked container and persistent volume
+- **Docker Compose** orchestrating `db`, `backend` and `frontend` services
+- **GitHub Pages** for the static preview deployment (`gh-pages`)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Docker Desktop** installed, with **hardware virtualization** enabled (Intel VT-x or AMD-V) — for the Docker path
+- **Python 3.x**, **Node.js** and a local **PostgreSQL 16** instance — for the manual path
+- **Git**
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/dawidolko/SmartRecommender-Project-Django-React
+cd SmartRecommender-Project-Django-React
+```
+
+### 2. Configure Environment Variables
+
+Create a `.env` file (see `backend/.env.example` for the template):
+
+```bash
+# Security Key
+SECRET_KEY=django-insecure-default-key
+
+# Debug Mode
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database Settings
+DB_NAME=product_recommendation
+DB_USER=postgres
+DB_PASSWORD=admin
+DB_HOST=db          # use "localhost" for the manual setup
+DB_PORT=5432
+```
+
+### 3. Run
+
+#### Option 1 — Docker (recommended)
+
+```bash
+docker compose -f .tools/docker/docker-compose.yml up --build
+```
+
+On first start the backend container waits for PostgreSQL, then runs migrations, creates the `recommendation_cache_table` cache table, seeds the database and verifies media files before launching the development server.
+
+Once it is up:
+
+- **Frontend (React)** → [http://localhost:3000](http://localhost:3000)
+- **Backend (Django)** → [http://localhost:8000](http://localhost:8000)
+- **Database (PostgreSQL)** → port `5432`
+
+**Docker management commands**
 
 ```bash
 # Run in background
@@ -73,225 +169,186 @@ docker compose -f .tools/docker/docker-compose.yml down
 # View logs
 docker compose -f .tools/docker/docker-compose.yml logs -f
 
-# Enter backend container
-docker exec -it SmartRecommender-Django bash
+# Enter the backend container
+docker exec -it SmartRecommender-Django-BACKEND bash
 
-# Enter database
-docker exec -it SmartRecommender-PostgreSQL psql -U postgres -d product_recommendation
+# Enter the database
+docker exec -it SmartRecommender-PostgreSQL-DB psql -U postgres -d product_recommendation
 ```
 
-### Option 2: Manual Setup
+#### Option 2 — Startup scripts
 
-#### Running with Startup Scripts
-
-We provide ready-to-use startup scripts for both Windows and Linux:
-
-##### Windows
+Ready-to-use startup scripts ship for both platforms.
 
 ```bash
-# Start backend
+# Windows — backend
 cd backend
 start.bat
 
-# Start frontend (in a new terminal)
+# Windows — frontend (new terminal)
 cd frontend
 start.bat
 ```
 
-##### Linux/macOS
-
 ```bash
-# Start backend
+# Linux/macOS — backend
 cd backend
 chmod +x start.sh
 ./start.sh
 
-# Start frontend (in a new terminal)
+# Linux/macOS — frontend (new terminal)
 cd frontend
 chmod +x start.sh
 ./start.sh
 ```
 
-#### Manual Installation
+#### Option 3 — Manual setup
 
-##### Backend (Django)
-
-1. Create and activate a virtual environment:
+**Backend (Django)**
 
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+source venv/bin/activate          # Windows: venv\Scripts\activate
 
-2. Install backend dependencies:
-
-```bash
 pip install -r requirements.txt
-```
 
-3. Configure your PostgreSQL database in `.env` (see `.env.example` for template)
-
-4. Apply database migrations and seed data:
-
-```bash
+# Configure your PostgreSQL connection in .env (see .env.example)
 python manage.py migrate
 python manage.py seed
-```
 
-5. Start the backend server:
-
-```bash
 python manage.py runserver
 ```
 
-Backend will be available at [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+The backend will be available at [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
-##### Frontend (React)
-
-1. Navigate to the frontend directory:
+**Frontend (React)**
 
 ```bash
 cd frontend
-```
-
-2. Install frontend dependencies:
-
-```bash
 npm install
-```
-
-3. Start the frontend server:
-
-```bash
 npm start
 ```
 
-Frontend will be available at [http://localhost:3000/](http://localhost:3000/).
+The frontend will be available at [http://localhost:3000/](http://localhost:3000/).
 
 ---
 
-## 📈 Features
-
-- **Advanced Product Recommendations:**
-  - Collaborative Filtering (User-Based & Item-Based)
-  - Content-Based Filtering
-  - Association Rules (Frequently Bought Together)
-  - Fuzzy Search Logic
-  - Sentiment Analysis
-  - Probabilistic Methods
-
-- **Comprehensive Admin Dashboard:**
-  - Sales forecasting
-  - Demand prediction
-  - Customer churn risk assessment
-  - Purchase pattern analysis
-
-- **User Experience:**
-  - Personalized product recommendations
-  - Smart search with typo tolerance
-  - Sentiment-based product discovery
-
----
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
 SmartRecommender-Project-Django-React/
-├── .database/                  # Database resources
-│   ├── entity-relationship-diagram/  # ERD diagrams
-│   ├── backup.sql              # Database backup
-│   ├── clearAll.sql            # Reset script
-│   ├── README.md               # Database documentation
-│   ├── RELATIONSHIPS_IN_BASE.md  # Relationship documentation
-│   └── tree_database.png       # Visual DB structure
+├── .database/                        # Database resources
+│   ├── entity-relationship-diagram/  # ERD diagrams (erd, appErd, methodsErd)
+│   ├── backup.sql                    # Database backup
+│   ├── RELATIONSHIPS_IN_BASE.md      # Relationship documentation
+│   └── tree_database.png             # Visual DB structure
 │
-├── .docs/                      # Documentation files
+├── .diagrams/                        # UML diagrams per recommendation method
+│   ├── association_rules/            # UseCase / Class / Activity / Sequence / Component
+│   ├── collaborative_filtering/
+│   ├── content_based_filtering/
+│   ├── fuzzy_search/
+│   ├── probabilistic_methods/
+│   └── sentiment_analysis/
 │
-├── .github/                    # GitHub configuration
+├── .docs/                            # Thesis text, LaTeX sources, presentation
+├── .methods/                         # Written specification per algorithm
+├── .github/                          # GitHub configuration
 │
-├── .methods/                   # Algorithm documentation
-│   ├── association_rules.md    # Association rules implementation
-│   ├── collaborative_filtering.md  # CF algorithm details
-│   ├── content_based_filtering.md  # CBF algorithm details
-│   ├── fuzzy_search.md         # Fuzzy search implementation
-│   ├── probabilistic_methods.md  # Probabilistic methods
-│   └── sentiment_analysis.md   # Sentiment analysis details
+├── .tools/docker/                    # Docker configuration
+│   ├── docker-compose.yml
+│   ├── Dockerfile.backend
+│   └── Dockerfile.frontend
 │
-├── .tools/                     # Development tools
-│   └── docker/                 # Docker configuration
-│       ├── docker-compose.yml  # Docker Compose setup
-│       ├── Dockerfile.backend  # Backend container
-│       └── Dockerfile.frontend # Frontend container
+├── backend/                          # Django backend
+│   ├── core/                         # Project settings, URLs, ASGI/WSGI
+│   ├── home/                         # Main application
+│   │   ├── models.py                 # Domain model
+│   │   ├── urls.py                   # Full REST API map
+│   │   ├── views.py                  # Catalog, cart, orders, users, admin stats
+│   │   ├── recommendation_views.py   # Collaborative & content-based endpoints
+│   │   ├── association_views.py      # Apriori association rules
+│   │   ├── sentiment_views.py        # Sentiment & fuzzy search endpoints
+│   │   ├── probabilistic_views.py    # Markov / Bayesian endpoints
+│   │   ├── analytics_views.py        # Forecasting, churn, purchase patterns
+│   │   ├── seasonal_views.py         # Seasonal trend analysis
+│   │   ├── custom_recommendation_engine.py
+│   │   ├── fuzzy_logic_engine.py
+│   │   └── management/               # Custom commands (seed)
+│   ├── media/                        # Uploaded product images
+│   ├── static/                       # Static files
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── start.sh / start.bat
 │
-├── backend/                    # Django backend
-│   ├── core/                   # Core application
-│   ├── home/                   # Main application
-│   ├── media/                  # User uploaded files
-│   ├── static/                 # Static files
-│   ├── venv/                   # Python virtual environment
-│   ├── .env                    # Environment variables
-│   ├── .env.example            # Environment template
-│   ├── check_media.py          # Media verification
-│   ├── manage.py               # Django management
-│   ├── package.json            # Node.js dependencies
-│   ├── requirements.txt        # Python dependencies
-│   ├── start.bat               # Windows startup script
-│   └── start.sh                # Linux startup script
+├── frontend/                         # React frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── components/               # Reusable components (admin, client, shop)
+│   │   ├── pages/                    # Home, Shop, Cart, Favorites, panels, ...
+│   │   ├── context/                  # React context providers
+│   │   ├── config/                   # API configuration
+│   │   ├── utils/                    # Helpers
+│   │   └── App.js
+│   ├── craco.config.js
+│   ├── package.json
+│   └── start.sh / start.bat
 │
-├── frontend/                   # React frontend
-│   ├── node_modules/           # Node.js packages
-│   ├── public/                 # Public assets
-│   ├── src/                    # Source code
-│   ├── .env                    # Environment variables
-│   ├── .env.example            # Environment template
-│   ├── .htaccess               # Apache configuration
-│   ├── package-lock.json       # Dependency lock
-│   ├── package.json            # Node.js dependencies
-│   ├── README.md               # Frontend documentation
-│   ├── start.bat               # Windows startup script
-│   └── start.sh                # Linux startup script
+├── docs/                             # README assets
+│   ├── diagrams/                     # app-layer.svg, architecture.svg
+│   └── screenshots/                  # home.webp, catalog.webp
 │
-├── images/                     # Project images
-│   ├── team1.jpg               # Dawid Olko
-│   ├── team2.jpg               # Piotr Smoła
-│   └── team3.png               # Dr. Grochowalski
-│
-├── .gitignore                  # Git ignored files
-├── CNAME                       # Custom domain
-├── CNAME.md                    # Domain documentation
-├── CONTRIBUTING.md             # Contribution guidelines
-├── LICENSE                     # License information
-└── README.md                   # Main documentation
+├── images/                           # Team photos
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-## 🧠 Recommendation Algorithms
+## 🔌 API Overview
 
-Our platform implements six distinct recommendation approaches:
+The REST API is documented in detail at the top of `backend/home/urls.py`. It is organised into ten groups:
 
-1. **Collaborative Filtering**: Recommends products based on what similar users have purchased
-2. **Content-Based Filtering**: Recommends products with similar attributes to those a user has liked
-3. **Association Rules**: Identifies products frequently bought together using Apriori algorithm
-4. **Fuzzy Search**: Intelligent search with typo tolerance and partial matching
-5. **Sentiment Analysis**: Analyzes customer reviews to recommend positively reviewed products
-6. **Probabilistic Methods**: Predicts user purchase probabilities and product demand
+| Group | Examples |
+|---|---|
+| Authentication & users | `/api/login/`, `/api/register/`, `/api/token/refresh/`, `/api/me/`, `/api/users/` |
+| Product catalog | `/api/products/`, `/api/products/search/`, `/api/categories/`, `/api/tags/` |
+| Cart & orders | `/cart/preview/`, `/cart/update/<id>/`, `/api/orders/` |
+| Customer service | `/api/complaints/` |
+| Recommendations | `/api/recommended-products/`, `/api/process-recommendations/`, `/api/interaction/` |
+| Association rules | `/api/frequently-bought-together/`, `/api/association-rules/` |
+| Probabilistic analytics | `/api/markov-recommendations/`, `/api/bayesian-insights/` |
+| Predictive analytics | `/api/sales-forecast/`, `/api/product-demand/`, `/api/risk-dashboard/` |
+| Sentiment & fuzzy | `/api/sentiment-search/`, `/api/fuzzy-search/` |
+| Admin dashboards | `/api/admin-stats/`, `/api/admin-dashboard-stats/`, `/api/client-stats/` |
 
-Detailed documentation for each algorithm can be found in the `.methods/` directory.
+Access control follows three levels: `AllowAny` for public browsing, `IsAuthenticated` for cart, orders and reviews, and `IsAdminUser` for user management, product CRUD and analytics.
 
 ---
 
 ## 💾 Database Structure
 
-The system uses PostgreSQL with a comprehensive schema of 24 interconnected tables, including:
+The system uses PostgreSQL with a schema of interconnected tables covering:
 
-- Core entities (Users, Products, Categories, Tags)
-- E-Commerce functionality (Orders, Cart, Complaints)
-- Recommendation tables (Similarities, Interactions, Associations)
-- Analytics tables (Sentiment, Purchase Patterns, Risk Assessment)
+- **Core entities** — Users, Products, Categories, Tags
+- **E-commerce** — Orders, Cart, Complaints, Reviews
+- **Recommendation data** — similarity matrices, user interactions, association rules
+- **Analytics** — sentiment summaries, purchase patterns, risk assessment
 
-See `.database/` directory for complete database documentation and entity relationship diagrams.
+Full documentation, the ERD set and a database backup live in the `.database/` directory.
+
+---
+
+## 🌍 Live Demo
+
+🔗 **Preview version:** [project.dawidolko.pl](https://project.dawidolko.pl)
+
+> **⚠️ Note:** This is a **static preview** hosted on GitHub Pages. Only the homepage and basic navigation work. Features requiring database connectivity — shopping cart, user accounts, recommendations, admin dashboards — are **not functional** in this demo.
+>
+> **💡 For the full experience:** follow the installation guide above to run the complete application with all features enabled.
 
 ---
 
@@ -299,18 +356,31 @@ See `.database/` directory for complete database documentation and entity relati
 
 <table>
   <tr>
-    <td align="center"><img src="images/team1.jpg" width="100px;" alt="Dawid Olko"/><br /><sub><b>Dawid Olko</b></sub></sub><br /><sub>Creator</sub></td>
-    <td align="center"><img src="images/team3.png" width="100px;" alt="Dr. Grochowalski"/><br /><sub><b>Dr. Piotr Grochowalski</b></sub><br /><sub>Supervisor</sub></td>
-    <td align="center"><img src="images/team2.jpg" width="100px;" alt="Piotr Smoła"/><br /><sub><b>Piotr Smoła</b></sub></sub><br /><sub>Creator</sub></td>
+    <td align="center"><img src="images/team1.jpg" width="100px;" alt="Dawid Olko"/><br /><sub><b>Dawid Olko</b></sub><br /><sub>Creator</sub></td>
+    <td align="center"><img src="images/team3.png" width="100px;" alt="Dr. Piotr Grochowalski"/><br /><sub><b>Dr. Piotr Grochowalski</b></sub><br /><sub>Supervisor</sub></td>
+    <td align="center"><img src="images/team2.jpg" width="100px;" alt="Piotr Smoła"/><br /><sub><b>Piotr Smoła</b></sub><br /><sub>Creator</sub></td>
   </tr>
 </table>
 
-> This project was developed as part of an engineering thesis at TBD University.
+> This project was developed as part of an engineering thesis.
 
 ---
 
-## 📜 License
+## 🤝 Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [SECURITY.md](SECURITY.md) for the vulnerability disclosure policy.
+
+---
+
+## 📄 License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
 
 ---
+
+## 👨‍💻 Author
+
+Created by **[Dawid Olko](https://github.com/dawidolko)**
+
+- **Website** — [dawidolko.pl](https://dawidolko.pl/)
+- **LinkedIn** — [@dawidolko](https://www.linkedin.com/in/dawidolko/)
