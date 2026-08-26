@@ -64,3 +64,5 @@ htmlcov/
 
 # === STREAMLIT ===
 .streamlit/
+# Machine-local Claude settings
+.claude/settings.local.json
