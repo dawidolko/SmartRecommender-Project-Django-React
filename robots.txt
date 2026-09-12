@@ -1,0 +1,5 @@
+# Strona prezentacyjna projektu inzynierskiego — w calosci publiczna.
+User-agent: *
+Allow: /
+
+Sitemap: https://project.dawidolko.pl/sitemap.xml
